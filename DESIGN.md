@@ -28,7 +28,7 @@ The catalogue lives in Storybook (`bun run storybook`, localhost:6041). Stories 
 
 - Controls: Button, Input, Textarea, Field, Label, Checkbox, Switch and Select.
 - Overlays: Dialog, AlertDialog, SheetContent, DropdownMenu and Tooltip.
-- Collections: Table, Tabs, Badge, Progress, Skeleton and Card.
+- Collections: Table, Tabs, Badge, Progress, Skeleton, Card, Kbd, NumberTicker and SeriesChart.
 - Patterns: WorkspaceShell, PageHeader, SectionHeader, CollectionToolbar, BulkActions and StatePanel.
 
 Use named exports for React server/client compatibility. Shared interactive entries retain `use client`; tokens and styles have no React dependency. Each control keeps Base UI/native semantics and an accessible name. Form validation belongs to the host; `Field` connects the label, hint and error with the control.

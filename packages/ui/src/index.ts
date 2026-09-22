@@ -19,3 +19,6 @@ export * from "./carousel";
 export * from "./sidebar";
 export * from "./spinner";
 export * from "./toaster";
+export * from "./kbd";
+export * from "./number-ticker";
+export * from "./chart";

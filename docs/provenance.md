@@ -25,9 +25,13 @@ addition to `destructive`, so Radiant menus can use the existing menu.
 | `command.tsx` | shadcn/ui (cmdk) | Radiant composer |
 | `carousel.tsx` | shadcn/ui (Embla Carousel) | Radiant inline citations |
 | `toaster.tsx` | shadcn/ui sonner wrapper | Radiant and ai-relay toasts |
+| `kbd.tsx` | Fabrials | Shortcut hint on the command palette. Not the Spectrum 3D keycap. |
+| `number-ticker.tsx` | Spectrum UI number ticker (beUI, Apache-2.0) | ai-relay overview totals and Spanreed pool size |
+| `chart.tsx` | shadcn/ui chart (Recharts), adapted to one series chart | ai-relay usage-by-model bars; Spanreed plan cost lines and model mix |
 
 `class-variance-authority`, `cmdk`, `embla-carousel-react`, and `sonner` are
 dependencies of this package. Hosts should not depend on them directly.
+`motion` and `recharts` were added for the ticker and the series chart.
 `@base-ui/react` and `lucide-react` stay package dependencies too. The
 catalog source does not import Radix. `cmdk` 1.1.1 still depends on
 `@radix-ui/react-dialog` for its own dialog primitive.

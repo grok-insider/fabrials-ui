@@ -1,0 +1,270 @@
+// Origin: shadcn/ui chart (Recharts), adapted 2026-09-22 for Fabrials metric series. Fabrials will modify this.
+"use client";
+
+import { useMemo, useState } from "react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import { classes } from "./shared";
+
+const PALETTE = [
+  "var(--chart-1)",
+  "var(--chart-2)",
+  "var(--chart-3)",
+  "var(--chart-4)",
+  "var(--chart-5)",
+];
+
+export type ChartSeries = {
+  key: string;
+  label?: string;
+  color?: string;
+  dashed?: boolean;
+};
+
+export type SeriesChartProps = {
+  data: Array<Record<string, string | number | null | undefined>>;
+  xKey: string;
+  series: ChartSeries[];
+  kind?: "bar" | "line";
+  stacked?: boolean;
+  lineType?: "monotone" | "step";
+  yFormat?: (value: number) => string;
+  titleKey?: string;
+  caption: string;
+  height?: number;
+  className?: string;
+};
+
+export function SeriesChart({
+  data,
+  xKey,
+  series,
+  kind = "bar",
+  stacked = false,
+  lineType = "monotone",
+  yFormat = (value) => String(value),
+  titleKey,
+  caption,
+  height = 288,
+  className,
+}: SeriesChartProps) {
+  const [hidden, setHidden] = useState<ReadonlySet<string>>(new Set());
+  const painted = useMemo(
+    () =>
+      series.map((item, index) => ({
+        ...item,
+        label: item.label ?? item.key,
+        color: item.color ?? PALETTE[index % PALETTE.length],
+      })),
+    [series],
+  );
+  const visible = painted.filter((item) => !hidden.has(item.key));
+
+  function toggle(key: string) {
+    setHidden((current) => {
+      const next = new Set(current);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      if (next.size === painted.length) return new Set();
+      return next;
+    });
+  }
+
+  const axes = (
+    <>
+      <CartesianGrid vertical={false} stroke="var(--border)" />
+      <XAxis
+        dataKey={xKey}
+        axisLine={false}
+        tickLine={false}
+        interval="preserveStartEnd"
+        tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+      />
+      <YAxis
+        axisLine={false}
+        tickLine={false}
+        width={72}
+        tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+        tickFormatter={(value: number) => yFormat(value)}
+      />
+      <Tooltip
+        cursor={{ fill: "var(--muted)", opacity: 0.45 }}
+        content={(props) => (
+          <SeriesTooltip
+            active={props.active}
+            label={props.label}
+            payload={props.payload}
+            titleKey={titleKey}
+            yFormat={yFormat}
+          />
+        )}
+      />
+    </>
+  );
+
+  return (
+    <div className={classes("grid gap-3", className)}>
+      <div className="w-full min-w-0" style={{ height }}>
+        <ResponsiveContainer width="100%" height="100%">
+          {kind === "line" ? (
+            <LineChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+              {axes}
+              {visible.map((item) => (
+                <Line
+                  key={item.key}
+                  type={lineType === "step" ? "stepAfter" : "monotone"}
+                  dataKey={item.key}
+                  name={item.label}
+                  stroke={item.color}
+                  strokeWidth={item.dashed ? 2 : 1.5}
+                  strokeDasharray={item.dashed ? "5 4" : undefined}
+                  dot={false}
+                  connectNulls
+                  isAnimationActive={false}
+                />
+              ))}
+            </LineChart>
+          ) : (
+            <BarChart data={data} margin={{ top: 8, right: 4, left: 0, bottom: 0 }} barCategoryGap="22%">
+              {axes}
+              {visible.map((item) => (
+                <Bar
+                  key={item.key}
+                  dataKey={item.key}
+                  name={item.label}
+                  fill={item.color}
+                  stackId={stacked ? "series" : undefined}
+                  isAnimationActive={false}
+                />
+              ))}
+            </BarChart>
+          )}
+        </ResponsiveContainer>
+      </div>
+      <table className="sr-only">
+        <caption>{caption}</caption>
+        <thead>
+          <tr>
+            <th>Label</th>
+            {painted.map((item) => (
+              <th key={item.key}>{item.label}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((row, index) => (
+            <tr key={`${String(row[xKey] ?? index)}`}>
+              <th>{String(titleKey ? row[titleKey] ?? row[xKey] : row[xKey] ?? "")}</th>
+              {painted.map((item) => (
+                <td key={item.key}>{yFormat(numeric(row[item.key]))}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {painted.length > 1 ? (
+        <div className="flex flex-wrap gap-x-3 gap-y-1">
+          {painted.map((item) => {
+            const shown = !hidden.has(item.key);
+            return (
+              <span key={item.key} className="inline-flex items-center">
+                <button
+                  type="button"
+                  aria-pressed={shown}
+                  aria-label={shown ? `Hide ${item.label}` : `Show ${item.label}`}
+                  className="inline-flex min-h-11 items-center gap-2 rounded-lg px-1.5 text-xs focus-visible:outline-2 focus-visible:outline-offset-2"
+                  onClick={() => toggle(item.key)}
+                >
+                  <span aria-hidden className="size-2.5 rounded-full" style={{ background: item.color }} />
+                  <span className={shown ? "text-foreground" : "text-muted-foreground line-through"}>{item.label}</span>
+                </button>
+                <button
+                  type="button"
+                  aria-label={`Show only ${item.label}`}
+                  className="min-h-11 rounded-lg px-1.5 text-[11px] text-muted-foreground"
+                  onClick={() => setHidden(new Set(painted.filter((entry) => entry.key !== item.key).map((entry) => entry.key)))}
+                >
+                  Only
+                </button>
+              </span>
+            );
+          })}
+          {visible.length !== painted.length ? (
+            <button
+              type="button"
+              className="min-h-11 rounded-lg px-2 text-xs font-medium"
+              onClick={() => setHidden(new Set())}
+            >
+              Show all
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function SeriesTooltip({
+  active,
+  payload,
+  label,
+  titleKey,
+  yFormat,
+}: {
+  active?: boolean;
+  label?: unknown;
+  titleKey?: string;
+  yFormat: (value: number) => string;
+  payload?: ReadonlyArray<{
+    name?: unknown;
+    value?: unknown;
+    color?: string;
+    payload?: Record<string, unknown>;
+  }>;
+}) {
+  if (!active || !payload?.length) return null;
+  const row = payload[0]?.payload;
+  const title = titleKey && row ? row[titleKey] : label;
+  const rows = payload.filter((item) => numeric(item.value) !== 0);
+  const total = payload.reduce((sum, item) => sum + numeric(item.value), 0);
+  return (
+    <div className="fui-chart-tip">
+      <p className="font-medium">{String(title ?? "")}</p>
+      {rows.length ? (
+        <ul className="grid gap-1">
+          {rows.map((item) => (
+            <li className="flex items-center justify-between gap-4" key={String(item.name)}>
+              <span className="flex min-w-0 items-center gap-2">
+                <span aria-hidden className="size-2 shrink-0 rounded-full" style={{ background: item.color }} />
+                <span className="truncate">{String(item.name ?? "")}</span>
+              </span>
+              <span className="font-mono">{yFormat(numeric(item.value))}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No value</p>
+      )}
+      {payload.length > 1 ? (
+        <p className="flex justify-between gap-4 border-t pt-2 font-mono">
+          <span>Total</span>
+          <span>{yFormat(total)}</span>
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+function numeric(value: unknown): number {
+  const next = typeof value === "number" ? value : Number(value ?? 0);
+  return Number.isFinite(next) ? next : 0;
+}

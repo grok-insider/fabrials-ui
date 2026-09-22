@@ -27,6 +27,8 @@ test("generic source only depends on presentation libraries and local modules", 
           "class-variance-authority",
           "cmdk",
           "embla-carousel-react",
+          "motion/react",
+          "recharts",
           "sonner",
         ]);
         assert.ok(
