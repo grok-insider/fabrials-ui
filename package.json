@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
+    "@fabrials/ui": "file:vendor/fabrials-ui-0.3.0",
     "@modelcontextprotocol/client": "2.0.0",
     "@modelcontextprotocol/server": "2.0.0",
     "ajv": "^8.20.0",
@@ -74,6 +75,9 @@
     "webmcp-types": "^0.1.6"
   },
   "packageManager": "bun@1.4.2",
+  "overrides": {
+    "@fabrials/ui": "file:vendor/fabrials-ui-0.3.0"
+  },
   "engines": {
     "node": ">=22.19.0",
     "bun": ">=1.4.2"

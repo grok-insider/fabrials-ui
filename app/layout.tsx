@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { SiteFrame } from "@/components/site-shell";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import "@fabrials/ui/fonts.css";
+import "@fabrials/ui/tokens.css";
+import "@fabrials/ui/styles.css";
 import "./globals.css";
 import { RootProvider } from "fumadocs-ui/provider/next";
 export const metadata: Metadata = {
