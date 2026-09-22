@@ -85,6 +85,13 @@ export function DialogFooter({ className, ...props }: ComponentProps<"div">) {
   return <div className={classes("fui-dialog-footer", className)} {...props} />;
 }
 
+export const Sheet = Dialog;
+export const SheetTrigger = DialogTrigger;
+export const SheetClose = DialogClose;
+export const SheetHeader = DialogHeader;
+export const SheetTitle = DialogTitle;
+export const SheetDescription = DialogDescription;
+
 export function SheetContent({
   side = "right",
   ...props

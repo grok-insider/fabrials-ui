@@ -114,8 +114,18 @@ export function AlertAction({ className, ...props }: ComponentProps<"div">) {
   return <div className={classes("fui-actions", className)} {...props} />;
 }
 
-export function Separator({ className, ...props }: ComponentProps<"hr">) {
-  return <hr className={classes("fui-separator", className)} {...props} />;
+export function Separator({
+  className,
+  orientation = "horizontal",
+  ...props
+}: ComponentProps<"hr"> & { orientation?: "horizontal" | "vertical" }) {
+  return (
+    <hr
+      data-orientation={orientation}
+      className={classes("fui-separator", className)}
+      {...props}
+    />
+  );
 }
 
 export function Skeleton({ className, ...props }: ComponentProps<"div">) {

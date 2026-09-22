@@ -11,16 +11,23 @@ export const DropdownMenuGroup = BaseMenu.Group;
 export function DropdownMenuContent({
   className,
   align = "end",
+  side = "bottom",
   sideOffset = 6,
+  collisionAvoidance,
   ...props
 }: StyledProps<BaseMenu.Popup.Props> &
-  Pick<BaseMenu.Positioner.Props, "align" | "sideOffset">) {
+  Pick<
+    BaseMenu.Positioner.Props,
+    "align" | "side" | "sideOffset" | "collisionAvoidance"
+  >) {
   return (
     <BaseMenu.Portal>
       <BaseMenu.Positioner
         className="fui-positioner"
         align={align}
+        side={side}
         sideOffset={sideOffset}
+        collisionAvoidance={collisionAvoidance}
       >
         <BaseMenu.Popup className={classes("fui-menu", className)} {...props} />
       </BaseMenu.Positioner>
@@ -31,12 +38,17 @@ export function DropdownMenuContent({
 export function DropdownMenuItem({
   className,
   destructive = false,
+  variant = "default",
   ...props
-}: StyledProps<BaseMenu.Item.Props> & { destructive?: boolean }) {
+}: StyledProps<BaseMenu.Item.Props> & {
+  destructive?: boolean;
+  variant?: "default" | "destructive";
+}) {
+  const isDestructive = destructive || variant === "destructive";
   return (
     <BaseMenu.Item
       className={classes("fui-menu-item", className)}
-      data-destructive={destructive || undefined}
+      data-destructive={isDestructive || undefined}
       {...props}
     />
   );

@@ -21,12 +21,23 @@ test("generic source only depends on presentation libraries and local modules", 
         ts.isStringLiteral(node.moduleSpecifier)
       ) {
         const specifier = node.moduleSpecifier.text;
+        const presentation = new Set([
+          "react",
+          "lucide-react",
+          "class-variance-authority",
+          "cmdk",
+          "embla-carousel-react",
+          "sonner",
+        ]);
         assert.ok(
           specifier.startsWith("./") ||
-            specifier === "react" ||
-            specifier === "lucide-react" ||
-            specifier.startsWith("@base-ui/react/"),
+            specifier.startsWith("@base-ui/react/") ||
+            presentation.has(specifier),
           `${file}: forbidden dependency ${specifier}`,
+        );
+        assert.ok(
+          !specifier.startsWith("@radix-ui/"),
+          `${file}: Radix stays out of the generic package`,
         );
       }
       if (ts.isCallExpression(node) && ts.isIdentifier(node.expression))
