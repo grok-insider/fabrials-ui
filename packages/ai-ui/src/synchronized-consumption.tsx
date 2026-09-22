@@ -24,6 +24,7 @@ function add(target: ConsumptionTotal, value: ConsumptionTotal) {
 }
 function project(snapshots: ConsumptionSnapshot[]): ConsumptionReport {
   const daily = new Map<string, ConsumptionTotal>();
+  const models = new Map<string, ConsumptionTotal>();
   const clients: ConsumptionTotal[] = [],
     periods: ConsumptionTotal[] = [];
   const total = empty("total");
@@ -53,6 +54,14 @@ function project(snapshots: ConsumptionSnapshot[]): ConsumptionReport {
       periods.push(period);
       add(client, period);
     }
+    for (const model of snapshot.models ?? []) {
+      const row = models.get(model.model) ?? empty(model.model);
+      row.tokens += model.tokens;
+      row.known_usd += model.estimated_usd;
+      row.records += model.requests;
+      row.partial ||= snapshot.partial;
+      models.set(model.model, row);
+    }
     clients.push(client);
     add(total, client);
   }
@@ -71,7 +80,9 @@ function project(snapshots: ConsumptionSnapshot[]): ConsumptionReport {
     daily: [...daily.values()].sort((a, b) => a.key.localeCompare(b.key)),
     period_totals: periods,
     clients,
-    models: [],
+    models: [...models.values()].sort(
+      (a, b) => b.tokens - a.tokens || a.key.localeCompare(b.key),
+    ),
     sessions: [],
     projects: [],
   };

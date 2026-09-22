@@ -84,9 +84,11 @@ export function ConsumptionView({
               <option value="daily">Day</option>
               <option value="period_totals">Session / account totals</option>
               <option value="clients">Client</option>
+              {(!synchronized || report.models.length > 0) && (
+                <option value="models">Model</option>
+              )}
               {!synchronized && (
                 <>
-                  <option value="models">Model</option>
                   <option value="sessions">Session</option>
                   <option value="projects">Project</option>
                 </>
@@ -105,6 +107,7 @@ export function ConsumptionView({
             <thead>
               <tr>
                 <th scope="col">{group}</th>
+                {group === "models" && <th scope="col">Requests</th>}
                 <th scope="col">Tokens</th>
                 <th scope="col">Known cost</th>
               </tr>
@@ -115,6 +118,7 @@ export function ConsumptionView({
                   <th scope="row" style={{ overflowWrap: "anywhere" }}>
                     {row.key}
                   </th>
+                  {group === "models" && <td>{number.format(row.records)}</td>}
                   <td>{number.format(row.tokens)}</td>
                   <td>
                     {money.format(row.known_usd)}
