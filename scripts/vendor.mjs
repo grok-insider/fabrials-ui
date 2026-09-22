@@ -20,12 +20,13 @@ const targets = {
   web: resolve(root, "../../web/vendor"),
   admin: resolve(root, "../../admin/vendor"),
   "fabrials-webmcp": resolve(root, "../../libs/fabrials-webmcp/vendor"),
+  ditox: resolve(root, "../../ditox/gui/vendor"),
 };
-const genericOnly = new Set(["open-email", "radiant", "web", "admin", "fabrials-webmcp"]);
+const genericOnly = new Set(["open-email", "radiant", "web", "admin", "fabrials-webmcp", "ditox"]);
 const [consumer, mode = "--check"] = process.argv.slice(2);
 if (!(consumer in targets) || !["--write", "--check"].includes(mode))
   throw new Error(
-    "Usage: bun run vendor <ai-relay|spanreed|open-email|radiant|web|admin|fabrials-webmcp> [--check|--write]",
+    "Usage: bun run vendor <ai-relay|spanreed|open-email|radiant|web|admin|fabrials-webmcp|ditox> [--check|--write]",
   );
 
 for (const name of genericOnly.has(consumer) ? ["ui"] : ["ui", "ai-ui"]) {
