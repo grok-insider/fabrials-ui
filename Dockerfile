@@ -3,6 +3,7 @@ FROM node:22-alpine AS deps
 COPY --from=bun /usr/local/bin/bun /usr/local/bin/bun
 WORKDIR /app
 COPY package.json bun.lock ./
+COPY vendor ./vendor
 RUN bun install --frozen-lockfile
 FROM node:22-alpine AS builder
 COPY --from=bun /usr/local/bin/bun /usr/local/bin/bun
