@@ -1,0 +1,210 @@
+"use client";
+
+import type { ComponentProps } from "react";
+import { Tabs as BaseTabs } from "@base-ui/react/tabs";
+import { classes, type StyledProps } from "./shared";
+
+export type Tone = "neutral" | "success" | "warning" | "danger";
+
+export function Badge({
+  className,
+  tone = "neutral",
+  ...props
+}: ComponentProps<"span"> & { tone?: Tone }) {
+  return (
+    <span
+      className={classes("fui-badge", className)}
+      data-tone={tone}
+      {...props}
+    />
+  );
+}
+
+export function Card({ className, ...props }: ComponentProps<"section">) {
+  return (
+    <section
+      data-slot="card"
+      className={classes("fui-card", className)}
+      {...props}
+    />
+  );
+}
+
+export function CardHeader({ className, ...props }: ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="card-header"
+      className={classes("fui-card-header", className)}
+      {...props}
+    />
+  );
+}
+
+export function CardTitle({
+  className,
+  as: Heading = "h2",
+  ...props
+}: ComponentProps<"h2"> & { as?: "h2" | "h3" | "h4" }) {
+  return (
+    <Heading
+      data-slot="card-title"
+      className={classes("fui-card-title", className)}
+      {...props}
+    />
+  );
+}
+
+export function CardDescription({ className, ...props }: ComponentProps<"p">) {
+  return (
+    <p
+      data-slot="card-description"
+      className={classes("fui-description", className)}
+      {...props}
+    />
+  );
+}
+
+export function CardContent({ className, ...props }: ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="card-content"
+      className={classes("fui-card-content", className)}
+      {...props}
+    />
+  );
+}
+
+export function CardFooter({ className, ...props }: ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="card-footer"
+      className={classes("fui-card-footer", className)}
+      {...props}
+    />
+  );
+}
+
+export function Alert({
+  className,
+  variant = "default",
+  ...props
+}: ComponentProps<"div"> & { variant?: "default" | "destructive" }) {
+  return (
+    <div
+      role={variant === "destructive" ? "alert" : "status"}
+      data-variant={variant}
+      className={classes("fui-alert", className)}
+      {...props}
+    />
+  );
+}
+
+export function AlertTitle({ className, ...props }: ComponentProps<"div">) {
+  return <div className={classes("fui-alert-title", className)} {...props} />;
+}
+
+export function AlertDescription({
+  className,
+  ...props
+}: ComponentProps<"div">) {
+  return <div className={classes("fui-description", className)} {...props} />;
+}
+
+export function AlertAction({ className, ...props }: ComponentProps<"div">) {
+  return <div className={classes("fui-actions", className)} {...props} />;
+}
+
+export function Separator({ className, ...props }: ComponentProps<"hr">) {
+  return <hr className={classes("fui-separator", className)} {...props} />;
+}
+
+export function Skeleton({ className, ...props }: ComponentProps<"div">) {
+  return (
+    <div
+      aria-hidden="true"
+      className={classes("fui-skeleton", className)}
+      {...props}
+    />
+  );
+}
+
+export function Progress({ className, ...props }: ComponentProps<"progress">) {
+  return <progress className={classes("fui-progress", className)} {...props} />;
+}
+
+export function Table({
+  className,
+  children,
+  regionLabel,
+  ...props
+}: ComponentProps<"table"> & { regionLabel?: string }) {
+  return (
+    <div
+      className="fui-table-scroll"
+      tabIndex={0}
+      role="region"
+      aria-label={
+        regionLabel ??
+        (typeof props["aria-label"] === "string"
+          ? `${props["aria-label"]} table`
+          : "Scrollable table")
+      }
+    >
+      <table className={classes("fui-table", className)} {...props}>
+        {children}
+      </table>
+    </div>
+  );
+}
+
+export const Tabs = BaseTabs.Root;
+
+export function TableHeader(props: ComponentProps<"thead">) {
+  return <thead {...props} />;
+}
+export function TableBody(props: ComponentProps<"tbody">) {
+  return <tbody {...props} />;
+}
+export function TableFooter(props: ComponentProps<"tfoot">) {
+  return <tfoot {...props} />;
+}
+export function TableRow(props: ComponentProps<"tr">) {
+  return <tr {...props} />;
+}
+export function TableHead(props: ComponentProps<"th">) {
+  return <th scope="col" {...props} />;
+}
+export function TableCell(props: ComponentProps<"td">) {
+  return <td {...props} />;
+}
+export function TableCaption(props: ComponentProps<"caption">) {
+  return <caption {...props} />;
+}
+
+export function TabsList({
+  className,
+  ...props
+}: StyledProps<BaseTabs.List.Props>) {
+  return (
+    <BaseTabs.List className={classes("fui-tabs-list", className)} {...props} />
+  );
+}
+
+export function TabsTrigger({
+  className,
+  ...props
+}: StyledProps<BaseTabs.Tab.Props>) {
+  return <BaseTabs.Tab className={classes("fui-tab", className)} {...props} />;
+}
+
+export function TabsContent({
+  className,
+  ...props
+}: StyledProps<BaseTabs.Panel.Props>) {
+  return (
+    <BaseTabs.Panel
+      className={classes("fui-tab-panel", className)}
+      {...props}
+    />
+  );
+}

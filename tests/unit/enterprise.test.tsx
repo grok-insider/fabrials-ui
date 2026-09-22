@@ -1,0 +1,38 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { renderToStaticMarkup } from "react-dom/server";
+import { readFileSync } from "node:fs";
+import { Alert, AlertTitle, Card, CardHeader, CardTitle, CardContent, NativeCheckbox, NativeSelect, StatePanel, Table, TableHeader, TableHead, TableBody, TableRow, TableCell, BulkActions } from "../../packages/ui/src/index";
+import { buttonVariants } from "../../packages/ui/src/button-variants";
+
+test("native controls preserve form names, values and disabled semantics", () => {
+  const html = renderToStaticMarkup(<form><NativeSelect name="account" defaultValue="support" required><option value="support">Support</option></NativeSelect><NativeCheckbox name="confirmed" value="yes" defaultChecked disabled /></form>);
+  assert.match(html, /name="account"/);
+  assert.match(html, /value="support" selected/);
+  assert.match(html, /type="checkbox"/);
+  assert.match(html, /disabled=""/);
+  assert.match(html, /checked=""/);
+});
+
+test("cards and feedback retain host heading levels and alert semantics", () => {
+  const html = renderToStaticMarkup(<Card><CardHeader><CardTitle as="h3">Account</CardTitle></CardHeader><CardContent><Alert variant="destructive"><AlertTitle>Unavailable</AlertTitle></Alert><StatePanel headingLevel={4} state="empty" title="Sin mensajes" /></CardContent></Card>);
+  assert.match(html, /<h3[^>]*>Account<\/h3>/);
+  assert.match(html, /role="alert"/);
+  assert.match(html, /<h4>Sin mensajes<\/h4>/);
+});
+
+test("collection labels are localizable without changing native table semantics", () => {
+  const html = renderToStaticMarkup(<><Table regionLabel="Usuarios"><TableHeader><TableRow><TableHead>Nombre</TableHead></TableRow></TableHeader><TableBody><TableRow><TableCell>Ana</TableCell></TableRow></TableBody></Table><BulkActions count={2} regionLabel="Acciones" label="2 seleccionados">Archivar</BulkActions></>);
+  assert.match(html, /aria-label="Usuarios"/);
+  assert.match(html, /scope="col"/);
+  assert.match(html, /aria-label="Acciones"/);
+  assert.match(html, /2 seleccionados/);
+});
+
+test("server link styles have no client boundary and dark mode supports either host attribute", () => {
+  assert.match(buttonVariants({ variant: "outline", size: "sm" }), /fui-button-outline fui-button-size-sm/);
+  const helper = readFileSync(new URL("../../packages/ui/src/button-variants.ts", import.meta.url), "utf8");
+  assert.doesNotMatch(helper, /use client/);
+  const css = readFileSync(new URL("../../packages/ui/src/tokens.css", import.meta.url), "utf8");
+  assert.match(css, /\.dark,\s*\[data-theme="dark"\]/);
+});

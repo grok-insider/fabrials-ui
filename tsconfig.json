@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["node", "react", "react-dom"],
+    "paths": {
+      "@fabrials/ui": ["./packages/ui/src/index.ts"],
+      "@fabrials/ai-ui": ["./packages/ai-ui/src/index.tsx"]
+    }
+  },
+  "include": ["packages/*/src", "stories", ".storybook", "tests/visual", "playwright.config.ts"]
+}

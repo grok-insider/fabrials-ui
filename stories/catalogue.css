@@ -1,0 +1,99 @@
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font: 400 14px/1.5 var(--fui-font-sans);
+  font-variant-numeric: tabular-nums;
+}
+button,
+input,
+select {
+  font: inherit;
+}
+.catalogue {
+  max-width: 76rem;
+  padding: 2rem;
+  margin-inline: auto;
+}
+.catalogue > section {
+  margin-top: 2rem;
+}
+.catalogue-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: 1.5rem;
+}
+.catalogue-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.catalogue-stack {
+  display: grid;
+  gap: 1rem;
+}
+.catalogue-nav {
+  width: 14rem;
+  flex-shrink: 0;
+  background: var(--sidebar);
+  border-right: 1px solid var(--sidebar-border);
+  padding: 1.5rem 0.75rem;
+}
+.catalogue-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 0.75rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+.catalogue-nav nav {
+  display: grid;
+  gap: 0.25rem;
+}
+.catalogue-nav .fui-button {
+  justify-content: flex-start;
+}
+.catalogue-nav .fui-button[aria-current] {
+  background: var(--accent);
+  font-weight: 600;
+}
+.catalogue-topbar-spacer {
+  flex: 1;
+}
+.catalogue-mobile-menu {
+  display: none;
+}
+.catalogue-truncate {
+  display: block;
+  max-width: 20rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.catalogue-table-meta {
+  color: var(--muted-foreground);
+  font-size: var(--fui-text-xs);
+}
+.catalogue-secret {
+  font-family: var(--fui-font-mono);
+}
+.catalogue-panel {
+  margin-top: 2rem;
+}
+@media (max-width: 1023px) {
+  .catalogue {
+    padding: 1rem;
+  }
+  .catalogue-nav {
+    display: none;
+  }
+  .catalogue-mobile-menu {
+    display: inline-flex;
+  }
+  .catalogue-nav-mobile {
+    display: grid;
+    gap: 0.5rem;
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "name": "fabrials-design-system",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "workspaces": ["packages/*"],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint packages stories tests scripts .storybook --max-warnings=0",
+    "test": "bun test packages/ai-ui/tests tests/unit",
+    "check": "bun run typecheck && bun run lint && bun run test && bun run build",
+    "storybook": "storybook dev --host 127.0.0.1 -p 6041 --no-open --disable-telemetry",
+    "build:storybook": "storybook build --disable-telemetry",
+    "test:visual": "playwright test",
+    "test:visual:container": "node scripts/visual.mjs",
+    "vendor": "node scripts/vendor.mjs"
+  },
+  "devDependencies": {
+    "@base-ui/react": "1.7.0",
+    "@fabrials/ui": "workspace:*",
+    "@fabrials/ai-ui": "workspace:*",
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@playwright/test": "1.58.2",
+    "@axe-core/playwright": "4.11.1",
+    "@storybook/react-vite": "10.6.0",
+    "@storybook/addon-a11y": "10.6.0",
+    "storybook": "10.6.0",
+    "eslint": "^9",
+    "typescript-eslint": "^8",
+    "typescript": "~5.9.3",
+    "vite": "7.3.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "lucide-react": "1.40.0"
+  }
+}

@@ -1,0 +1,27 @@
+name: Design system checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  foundation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      - run: bun install --frozen-lockfile
+      - run: bun run check
+      - run: bun run build:storybook
+      - run: bun run test:visual:container
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: visual-test-failures
+          path: |
+            playwright-report/
+            test-results/
