@@ -1,9 +1,9 @@
 # Adopting Fabrials UI 0.3
 
-The 0.3 delivery covers the AI Relay UI and enterprise Open Mail. Spanreed
-still vendors 0.1. Radiant, the fabrials.com product routes, and admin are not
-on this package yet. This adoption does not change backend contracts, publish
-to npm, or deploy applications.
+The 0.3 package is the shared source for AI Relay, enterprise Open Mail, the
+Spanreed desktop, Radiant, fabrials.com product routes, and admin.
+ui.fabrials.com takes the font and tokens only. This adoption does not change
+backend contracts, publish to npm, or deploy applications.
 
 ## Ownership
 

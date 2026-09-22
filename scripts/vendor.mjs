@@ -16,14 +16,19 @@ const targets = {
   "ai-relay": resolve(root, "../../ai-relay/frontend/vendor"),
   spanreed: resolve(root, "../../spanreed/desktop/vendor"),
   "open-email": resolve(root, "../../open-email/apps/web/vendor"),
+  radiant: resolve(root, "../../radiant/vendor"),
+  web: resolve(root, "../../web/vendor"),
+  admin: resolve(root, "../../admin/vendor"),
+  "fabrials-webmcp": resolve(root, "../../libs/fabrials-webmcp/vendor"),
 };
+const genericOnly = new Set(["open-email", "radiant", "web", "admin", "fabrials-webmcp"]);
 const [consumer, mode = "--check"] = process.argv.slice(2);
 if (!(consumer in targets) || !["--write", "--check"].includes(mode))
   throw new Error(
-    "Usage: bun run vendor <ai-relay|spanreed|open-email> [--check|--write]",
+    "Usage: bun run vendor <ai-relay|spanreed|open-email|radiant|web|admin|fabrials-webmcp> [--check|--write]",
   );
 
-for (const name of consumer === "open-email" ? ["ui"] : ["ui", "ai-ui"]) {
+for (const name of genericOnly.has(consumer) ? ["ui"] : ["ui", "ai-ui"]) {
   const source = resolve(root, "packages", name);
   const pkg = JSON.parse(
     await readFile(resolve(source, "package.json"), "utf8"),

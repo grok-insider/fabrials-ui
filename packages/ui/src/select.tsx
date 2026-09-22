@@ -11,11 +11,13 @@ export const SelectGroup = BaseSelect.Group;
 export function SelectTrigger({
   className,
   children,
+  size,
   ...props
-}: StyledProps<BaseSelect.Trigger.Props>) {
+}: StyledProps<BaseSelect.Trigger.Props> & { size?: string }) {
   return (
     <BaseSelect.Trigger
       className={classes("fui-input", "fui-select-trigger", className)}
+      data-size={size}
       {...props}
     >
       {children}
@@ -29,13 +31,17 @@ export function SelectTrigger({
 export function SelectContent({
   className,
   children,
+  align = "center",
   ...props
-}: StyledProps<BaseSelect.Popup.Props>) {
+}: StyledProps<BaseSelect.Popup.Props> & {
+  align?: "start" | "center" | "end";
+}) {
   return (
     <BaseSelect.Portal>
       <BaseSelect.Positioner
         className="fui-positioner"
         sideOffset={6}
+        align={align}
         alignItemWithTrigger={false}
       >
         <BaseSelect.Popup className={classes("fui-menu", className)} {...props}>
