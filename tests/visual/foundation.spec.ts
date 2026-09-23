@@ -1,5 +1,20 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+
+async function audit(page: Page) {
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    try {
+      return await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+        .analyze();
+    } catch (error) {
+      if (!String(error).includes("Axe is already running") || attempt === 3)
+        throw error;
+      await page.waitForTimeout(200);
+    }
+  }
+  throw new Error("Accessibility audit did not finish");
+}
 
 const stories: Record<string, string> = {
   controls: "fabrials-foundation--controls",
@@ -13,7 +28,7 @@ const stories: Record<string, string> = {
   console: "fabrials-patterns--console",
   "public-site": "fabrials-patterns--public-site",
   "sign-in": "fabrials-patterns--sign-in",
-  settings: "fabrials-patterns--settings",
+  settings: "fabrials-patterns--settings-page",
 };
 
 for (const theme of ["light", "dark"]) {
@@ -35,10 +50,8 @@ for (const theme of ["light", "dark"]) {
             () => document.documentElement.scrollWidth <= innerWidth,
           ),
         ).toBe(true);
-        const audit = await new AxeBuilder({ page })
-          .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
-          .analyze();
-        expect(audit.violations).toEqual([]);
+        const result = await audit(page);
+        expect(result.violations).toEqual([]);
         await expect(page).toHaveScreenshot(`${story}-${theme}-${width}.png`, {
           fullPage: true,
         });

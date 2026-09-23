@@ -225,6 +225,7 @@ select {
   backdrop-filter: blur(12px);
 }
 .catalogue-console-body {
+  box-sizing: border-box;
   width: 100%;
   max-width: var(--fui-content);
   margin-inline: auto;

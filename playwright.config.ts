@@ -1,5 +1,8 @@
 import { defineConfig } from "@playwright/test";
 
+const storybookPort = process.env.STORYBOOK_PORT ?? "6041";
+const storybookUrl = `http://127.0.0.1:${storybookPort}`;
+
 export default defineConfig({
   testDir: "./tests/visual",
   timeout: 30_000,
@@ -8,6 +11,8 @@ export default defineConfig({
   workers: 2,
   retries: process.env.CI ? 1 : 0,
   reporter: [["list"], ["html", { open: "never" }]],
-  use: { baseURL: "http://127.0.0.1:6041", browserName: "chromium", trace: "retain-on-failure", contextOptions: { reducedMotion: "reduce" } },
-  webServer: { command: "bun run storybook --ci", url: "http://127.0.0.1:6041", reuseExistingServer: !process.env.CI, timeout: 60_000 },
+  use: { baseURL: storybookUrl, browserName: "chromium", trace: "retain-on-failure", contextOptions: { reducedMotion: "reduce" } },
+  webServer: process.env.STORYBOOK_EXTERNAL
+    ? undefined
+    : { command: "bun run storybook --ci", url: storybookUrl, reuseExistingServer: !process.env.CI, timeout: 60_000 },
 });
