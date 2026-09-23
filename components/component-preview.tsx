@@ -1,6 +1,7 @@
 "use client";
 
-import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+import { Code2, Eye } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@fabrials/ui";
 import { ComponentDemo } from "@/components/demos";
 import { CodeBlock } from "@/components/code-block";
 
@@ -14,13 +15,23 @@ export function ComponentPreview({
   codeLabel: string;
 }) {
   return (
-    <Tabs items={["Preview", codeLabel]}>
-      <Tab value="Preview">
-        <ComponentDemo slug={slug} />
-      </Tab>
-      <Tab value={codeLabel}>
+    <Tabs defaultValue="preview" className="docs-preview">
+      <TabsList className="docs-segmented" aria-label="Example view">
+        <TabsTrigger value="preview">
+          <Eye aria-hidden="true" /> Preview
+        </TabsTrigger>
+        <TabsTrigger value="code">
+          <Code2 aria-hidden="true" /> {codeLabel}
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent value="preview" className="docs-preview-stage">
+        <div className="fui-preview">
+          <ComponentDemo slug={slug} />
+        </div>
+      </TabsContent>
+      <TabsContent value="code" className="docs-preview-code">
         <CodeBlock code={code} label={codeLabel} />
-      </Tab>
+      </TabsContent>
     </Tabs>
   );
 }

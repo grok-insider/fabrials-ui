@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SiteFrame } from "@/components/site-shell";
+import { DocsSearchDialog } from "@/components/docs/docs-search-dialog";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "@fabrials/ui/fonts.css";
 import "@fabrials/ui/tokens.css";
@@ -35,6 +36,7 @@ export default function RootLayout({
         </a>
         <RootProvider
           theme={{ storageKey: "fabrials-ui-theme", hotKey: false }}
+          search={{ SearchDialog: DocsSearchDialog }}
         >
           <TooltipProvider>
             <SiteFrame>{children}</SiteFrame>

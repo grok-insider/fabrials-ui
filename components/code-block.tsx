@@ -1,7 +1,32 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import { Check, Copy, Terminal } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Check, Copy, FileCode, Terminal } from "lucide-react";
+import { Button } from "@fabrials/ui";
+import "./code-block.css";
+
+const TOKEN =
+  /(\/\/.*$|\/\*[\s\S]*?\*\/)|("(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'|`(?:[^`\\]|\\.)*`)|(<\/?)([A-Za-z][\w.]*)|\b(import|from|export|function|return|const|let|type|interface|default|async|await|new|if|else|true|false|null|undefined)\b|([A-Za-z_][\w-]*)(?==)|(\b\d[\d_.]*\b)/gm;
+
+function highlight(code: string) {
+  const parts: ReactNode[] = [];
+  let last = 0;
+  for (const match of code.matchAll(TOKEN)) {
+    const index = match.index ?? 0;
+    if (index > last) parts.push(code.slice(last, index));
+    const [text, comment, string, bracket, tag, keyword, attribute, number] = match;
+    const key = `${index}`;
+    if (comment) parts.push(<span key={key} data-token="comment">{comment}</span>);
+    else if (string) parts.push(<span key={key} data-token="string">{string}</span>);
+    else if (tag) parts.push(bracket, <span key={key} data-token="tag">{tag}</span>);
+    else if (keyword) parts.push(<span key={key} data-token="keyword">{keyword}</span>);
+    else if (attribute) parts.push(<span key={key} data-token="attribute">{attribute}</span>);
+    else if (number) parts.push(<span key={key} data-token="number">{number}</span>);
+    last = index + text.length;
+  }
+  parts.push(code.slice(last));
+  return parts;
+}
+
 export function CodeBlock({
   code,
   label = "Terminal",
@@ -15,16 +40,20 @@ export function CodeBlock({
   const [error, setError] = useState("");
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   useEffect(() => () => clearTimeout(timer.current), []);
+  const shell = variant === "command" || /^(terminal|sh|bash|shell)$/i.test(label);
+  const LabelIcon = shell ? Terminal : FileCode;
   return (
-    <div className="min-w-0 overflow-hidden rounded-xl border bg-muted/25">
-      <div className="flex items-center justify-between gap-3 border-b px-4 py-2">
-        <span className="inline-flex items-center gap-2 text-xs text-muted-foreground">
-          <Terminal aria-hidden="true" className="size-3.5" />
+    <figure className="docs-code" data-variant={variant}>
+      <figcaption className="docs-code-title">
+        <span>
+          <LabelIcon aria-hidden="true" />
           {label}
         </span>
         <Button
+          type="button"
           variant="ghost"
           size="sm"
+          className="docs-copy"
           aria-label={`Copy ${label}`}
           onClick={async () => {
             try {
@@ -39,29 +68,16 @@ export function CodeBlock({
             }
           }}
         >
-          {copied ? (
-            <Check className="size-3.5" />
-          ) : (
-            <Copy className="size-3.5" />
-          )}
-          <span className="text-xs">{copied ? "Copied" : "Copy"}</span>
+          {copied ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />}
+          <span>{copied ? "Copied" : "Copy"}</span>
         </Button>
-      </div>
-      <pre
-        tabIndex={variant === "code" ? 0 : undefined}
-        aria-label={label}
-        className={`max-h-[36rem] p-4 font-mono text-xs leading-6 ${variant === "command" ? "whitespace-pre-wrap [overflow-wrap:anywhere]" : "overflow-auto [scrollbar-width:thin]"}`}
-      >
-        <code>{code}</code>
+      </figcaption>
+      <pre tabIndex={variant === "code" ? 0 : undefined} aria-label={label}>
+        <code>{shell ? code : highlight(code)}</code>
       </pre>
-      <span
-        role="status"
-        className={
-          error ? "block px-4 pb-3 text-xs text-destructive" : "sr-only"
-        }
-      >
+      <span role="status" className={error ? "docs-code-error" : "fui-sr-only"}>
         {error || (copied ? "Copied to clipboard" : "")}
       </span>
-    </div>
+    </figure>
   );
 }

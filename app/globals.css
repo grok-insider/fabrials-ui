@@ -187,21 +187,6 @@ html {
   scroll-padding-top: 100px;
 }
 
-:root {
-  --fd-layout-width: 100%;
-}
-.fabrials-docs {
-  --color-fd-background: var(--background);
-  --color-fd-foreground: var(--foreground);
-  --color-fd-card: var(--card);
-  --color-fd-muted: var(--muted);
-  --color-fd-muted-foreground: var(--muted-foreground);
-  --color-fd-border: var(--border);
-}
-.fabrials-docs [data-layout-content] {
-  max-width: none;
-}
-
 .tour-theatre .comparison-table {
   border-radius: 0.75rem;
 }
@@ -266,11 +251,6 @@ html {
   .tour-type-caret {
     animation: none;
   }
-}
-
-.fabrials-docs {
-  --fd-banner-height: 68px;
-  --fd-docs-height: calc(100dvh - 68px);
 }
 
 .fui-preview {
