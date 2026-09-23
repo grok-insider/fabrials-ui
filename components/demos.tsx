@@ -35,6 +35,8 @@ const MCPDashboard = dynamic(() =>
 import { ArgumentsForm } from "@/registry/components/arguments-form";
 import { errorMessage } from "@/registry/mcp/types";
 import type { ToolDefinition } from "@/registry/mcp/types";
+import { UiDemo } from "@/components/ui-demos";
+import { uiCatalogItem } from "@/lib/ui-catalog";
 export const projects = [
   { id: "01", name: "WebMCP", category: "Browser", status: "Preview" },
   {
@@ -462,6 +464,7 @@ export function ComponentDemo({ slug }: { slug: string }) {
   const [open, setOpen] = useState(false);
   const [count, setCount] = useState(0);
   const [dates, setDates] = useState({ from: "", to: "" });
+  if (uiCatalogItem(slug)) return <UiDemo slug={slug} />;
   if (
     [
       "data-explorer",

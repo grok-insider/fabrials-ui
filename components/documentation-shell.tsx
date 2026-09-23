@@ -1,46 +1,69 @@
 import type { ReactNode } from "react";
 import { DocsLayout } from "fumadocs-ui/layouts/docs";
-import type { Root } from "fumadocs-core/page-tree";
+import type { Item, Root } from "fumadocs-core/page-tree";
 import { catalog, guides } from "@/lib/catalog";
+import { uiCatalog, uiGroups } from "@/lib/ui-catalog";
 import { DocsToolbar } from "@/components/docs-toolbar";
+
+const page = (name: string, url: string): Item => ({ type: "page", name, url });
+
+const agentGroups = ["Interaction", "WebMCP", "MCP", "Foundation"] as const;
+
 const tree: Root = {
   name: "Fabrials UI",
   children: [
-    { type: "page", name: "All components", url: "/components" },
     {
       type: "folder",
-      name: "Get started",
-      defaultOpen: true,
-      children: guides.map((g) => ({
-        type: "page",
-        name: g.title,
-        url: `/docs/${g.slug}`,
-      })),
+      name: "Components",
+      root: true,
+      description: "Shared interface controls",
+      index: page("All components", "/components"),
+      children: [
+        page("All components", "/components"),
+        ...uiGroups.map((group) => ({
+          type: "folder" as const,
+          name: group.name,
+          children: uiCatalog
+            .filter((item) => item.group === group.name)
+            .map((item) => page(item.title, `/docs/${item.slug}`)),
+        })),
+      ],
     },
-    ...(["Interaction", "WebMCP", "MCP", "Foundation"] as const).map(
-      (category) => ({
+    {
+      type: "folder",
+      name: "Agents",
+      root: true,
+      description: "WebMCP and MCP",
+      index: page("Comparison", "/docs/comparison"),
+      children: agentGroups.map((category) => ({
         type: "folder" as const,
         name: category,
-        defaultOpen: true,
         children: catalog
-          .filter((c) => c.category === category)
+          .filter((item) => item.category === category)
           .sort((a, b) => a.title.localeCompare(b.title))
-          .map((c) => ({
-            type: "page" as const,
-            name: c.title,
-            url: `/docs/${c.slug}`,
-          })),
-      }),
-    ),
+          .map((item) => page(item.title, `/docs/${item.slug}`)),
+      })),
+    },
+    {
+      type: "folder",
+      name: "Guides",
+      root: true,
+      description: "Install and operate the registry",
+      index: page("Introduction", "/docs/introduction"),
+      children: guides.map((guide) => page(guide.title, `/docs/${guide.slug}`)),
+    },
   ],
 };
+
 export function DocumentationShell({ children }: { children: ReactNode }) {
   return (
     <DocsLayout
       tree={tree}
       nav={{ title: "Documentation", url: "/docs/introduction" }}
+      sidebar={{ defaultOpenLevel: 0 }}
       slots={{ header: DocsToolbar }}
       themeSwitch={{ enabled: false }}
+      searchToggle={{ enabled: true }}
       containerProps={{ className: "fabrials-docs" }}
     >
       {children}

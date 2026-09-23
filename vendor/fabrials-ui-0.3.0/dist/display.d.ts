@@ -19,7 +19,9 @@ export declare function Alert({ className, variant, ...props }: ComponentProps<"
 export declare function AlertTitle({ className, ...props }: ComponentProps<"div">): import("react").JSX.Element;
 export declare function AlertDescription({ className, ...props }: ComponentProps<"div">): import("react").JSX.Element;
 export declare function AlertAction({ className, ...props }: ComponentProps<"div">): import("react").JSX.Element;
-export declare function Separator({ className, ...props }: ComponentProps<"hr">): import("react").JSX.Element;
+export declare function Separator({ className, orientation, ...props }: ComponentProps<"hr"> & {
+    orientation?: "horizontal" | "vertical";
+}): import("react").JSX.Element;
 export declare function Skeleton({ className, ...props }: ComponentProps<"div">): import("react").JSX.Element;
 export declare function Progress({ className, ...props }: ComponentProps<"progress">): import("react").JSX.Element;
 export declare function Table({ className, children, regionLabel, ...props }: ComponentProps<"table"> & {

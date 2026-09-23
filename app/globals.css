@@ -272,3 +272,14 @@ html {
   --fd-banner-height: 68px;
   --fd-docs-height: calc(100dvh - 68px);
 }
+
+.fui-preview {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.fui-carousel-frame {
+  max-width: 100%;
+  overflow: hidden;
+  padding-inline: 3rem;
+}

@@ -1,5 +1,5 @@
 function classes(...values) {
-  return values.filter(Boolean).join(" ");
+  return values.filter((value) => typeof value === "string" && value.length > 0).join(" ");
 }
 export {
   classes

@@ -1,6 +1,6 @@
 # Fabrials design system
 
-Version: 0.3.0. AI Relay, enterprise Open Mail, the Spanreed desktop, Radiant, the fabrials.com product routes, and admin.fabrials.com consume generated 0.3 distributions. ui.fabrials.com imports the shared IBM Plex font and semantic tokens and keeps its WebMCP catalogue. Distribution is a verified vendor copy, not an npm release.
+Version: 0.3.0. AI Relay, enterprise Open Mail, the Spanreed desktop, Radiant, the fabrials.com product routes, and admin.fabrials.com consume generated 0.3 distributions. ui.fabrials.com documents every `@fabrials/ui` control next to its WebMCP catalogue. Those design-system pages are live previews and usage notes, not registry install items. Distribution of `@fabrials/ui` remains a verified vendor copy, not an npm release.
 
 ## Identity
 
@@ -24,11 +24,11 @@ The shell is not a mandatory universal layout: mail retains its resizable three 
 
 ## Components and state
 
-The catalogue lives in Storybook (`bun run storybook`, localhost:6041). Stories use synthetic data, never mail, credentials or account records captured from production.
+The catalogue lives in Storybook (`bun run storybook`, localhost:6041) and is documented at ui.fabrials.com. Stories and docs use synthetic data, never mail, credentials or account records captured from production.
 
 - Controls: Button, Input, Textarea, Field, Label, Checkbox, Switch and Select.
 - Overlays: Dialog, AlertDialog, SheetContent, DropdownMenu and Tooltip.
-- Collections: Table, Tabs, Badge, Progress, Skeleton and Card.
+- Collections: Table, Tabs, Badge, Progress, Skeleton, Card, Kbd, NumberTicker and SeriesChart.
 - Patterns: WorkspaceShell, PageHeader, SectionHeader, CollectionToolbar, BulkActions and StatePanel.
 
 Use named exports for React server/client compatibility. Shared interactive entries retain `use client`; tokens and styles have no React dependency. Each control keeps Base UI/native semantics and an accessible name. Form validation belongs to the host; `Field` connects the label, hint and error with the control.

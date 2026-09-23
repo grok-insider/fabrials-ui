@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 const config: NextConfig = {
   output: "standalone",
+  transpilePackages: ["@fabrials/ui"],
+  allowedDevOrigins: ["127.0.0.1"],
   async redirects() {
     return [
       { source: "/examples", destination: "/playground", permanent: true },

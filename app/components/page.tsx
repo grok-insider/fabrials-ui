@@ -9,7 +9,7 @@ import { ComponentIndex } from "@/components/component-index";
 export const metadata = {
   title: "Components",
   description:
-    "Browse reusable WebMCP and MCP components for React. Search the registry and copy the components into your app.",
+    "Shared Fabrials UI controls, plus WebMCP and MCP blocks you can copy into an app.",
 };
 export default function Components() {
   return (
@@ -18,8 +18,9 @@ export default function Components() {
         <p className="mb-4 text-xs text-muted-foreground">The registry</p>
         <DocsTitle>Components</DocsTitle>
         <DocsDescription>
-          Reusable pieces for interfaces that people and agents can use
-          together. Browse, preview and copy them into your app.
+          Shared controls from @fabrials/ui, plus WebMCP and MCP blocks you
+          can copy into an app. Design-system pages are previews. Agent blocks
+          stay installable from the registry.
         </DocsDescription>
         <div className="mt-5 flex gap-5 text-sm">
           <Link

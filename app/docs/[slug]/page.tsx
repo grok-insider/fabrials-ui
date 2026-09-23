@@ -4,7 +4,10 @@ import Link from "next/link";
 import { readFile } from "node:fs/promises";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
+import { Callout } from "fumadocs-ui/components/callout";
+import { Step, Steps } from "fumadocs-ui/components/steps";
 import { catalog, guides } from "@/lib/catalog";
+import { uiCatalog, uiCatalogItem } from "@/lib/ui-catalog";
 import { DocumentationShell } from "@/components/documentation-shell";
 import {
   DocsPage,
@@ -18,7 +21,7 @@ import { getTableOfContents } from "fumadocs-core/content/toc";
 import { ComponentPreview } from "@/components/component-preview";
 import { CodeBlock } from "@/components/code-block";
 export function generateStaticParams() {
-  return [...catalog, ...guides].map((x) => ({ slug: x.slug }));
+  return [...catalog, ...guides, ...uiCatalog].map((x) => ({ slug: x.slug }));
 }
 export async function generateMetadata({
   params,
@@ -28,7 +31,7 @@ export async function generateMetadata({
   const { slug } = await params;
   return {
     title:
-      [...catalog, ...guides].find((x) => x.slug === slug)?.title ??
+      [...catalog, ...guides, ...uiCatalog].find((x) => x.slug === slug)?.title ??
       "Documentation",
   };
 }
@@ -38,18 +41,20 @@ export default async function Docs({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const item = catalog.find((x) => x.slug === slug);
+  const registryItem = catalog.find((x) => x.slug === slug);
+  const uiItem = uiCatalogItem(slug);
+  const item = registryItem ?? uiItem;
   const guide = guides.find((x) => x.slug === slug);
   if (!item && !guide) notFound();
   let source = "";
-  if (item) source = await readFile(item.files[0], "utf8");
+  if (registryItem) source = await readFile(registryItem.files[0], "utf8");
+  const usage = uiItem?.usage ?? "";
   const mdx = await readFile(`content/${slug}.mdx`, "utf8").catch(() => "");
   const contentToc = getTableOfContents(mdx);
   return (
     <DocumentationShell>
       <DocsPage
         id="main-content"
-        full
         toc={
           item
             ? [
@@ -72,41 +77,31 @@ export default async function Docs({
         {item && (
           <>
             {slug === "server-connector" ? (
-              <div className="mb-8 rounded-lg border bg-muted/40 p-5 text-sm leading-7">
-                This is a Node server adapter. Install it on your backend and
-                provide authentication, destination configuration and credential
-                storage. See the{" "}
-                <Link className="underline" href="/docs/server">
-                  connector guide
-                </Link>
-                .
-              </div>
+              <Callout title="Node server adapter">
+                Install it on your backend and provide authentication,
+                destination configuration and credential storage. See the{" "}
+                <Link href="/docs/server">connector guide</Link>.
+              </Callout>
             ) : (
               <section
                 id="preview"
                 aria-label="Component preview"
                 className="scroll-mt-28"
               >
-                <ComponentPreview slug={slug} source={source} />
+                <ComponentPreview
+                  slug={slug}
+                  code={uiItem ? usage : source}
+                  codeLabel={uiItem ? "Usage" : "Source code"}
+                />
               </section>
             )}
             {slug === "comparison" && (
-              <div className="mt-6 rounded-lg border bg-muted/30 p-5 text-sm leading-7">
-                <p className="font-medium">
-                  A component for comparing any set of options
-                </p>
-                <p className="text-muted-foreground">
-                  Columns, rows and optional highlights are controlled by your
-                  app. Product recommendations, cart state and tool registration
-                  belong to the example.
-                </p>
-                <Link
-                  href="/playground#comparison"
-                  className="mt-2 inline-block underline underline-offset-4"
-                >
-                  Explore the shopping example →
-                </Link>
-              </div>
+              <Callout title="Any set of options">
+                Columns, rows and optional highlights are controlled by your
+                app. Product recommendations, cart state and tool registration
+                belong to the example.{" "}
+                <Link href="/playground#comparison">Explore the shopping example</Link>
+              </Callout>
             )}
             <h2
               id="installation"
@@ -114,10 +109,29 @@ export default async function Docs({
             >
               Installation
             </h2>
-            <CodeBlock
-              variant="command"
-              code={`bunx shadcn@latest add https://ui.fabrials.com/r/${slug}.json`}
-            />
+            {uiItem ? (
+              <Steps>
+                <Step>
+                  <p>
+                    Import the control from <code>@fabrials/ui</code>. Fabrials
+                    products consume a vendored copy. This page is not a
+                    registry install.
+                  </p>
+                  <CodeBlock code={usage} label="TypeScript" />
+                </Step>
+              </Steps>
+            ) : (
+              <Steps>
+                <Step>
+                  <p>Add the registry entry to your app.</p>
+                  <CodeBlock
+                    variant="command"
+                    code={`bunx shadcn@latest add https://ui.fabrials.com/r/${slug}.json`}
+                    label="Terminal"
+                  />
+                </Step>
+              </Steps>
+            )}
             <h2
               id="api"
               className="scroll-mt-28 mt-10 mb-4 text-xl font-medium tracking-tight"
@@ -154,21 +168,19 @@ export default async function Docs({
             >
               Behavior & compatibility
             </h2>
-            <p className="text-sm leading-7 text-muted-foreground">
-              {item.note}
-            </p>
+            <Callout title="Behavior">{item.note}</Callout>
             <h2
               id="accessibility"
               className="scroll-mt-28 mt-8 mb-3 text-xl font-medium tracking-tight"
             >
               Accessibility
             </h2>
-            <p className="text-sm leading-7 text-muted-foreground">
+            <Callout type="info" title="Keyboard and contrast">
               Keep visible labels, keyboard focus and status announcements when
               customizing. These components inherit your theme; maintain
-              sufficient contrast in both color modes. The preview is fully
-              keyboard operable.
-            </p>
+              sufficient contrast in both color modes. The preview is keyboard
+              operable.
+            </Callout>
           </>
         )}
         {mdx && (

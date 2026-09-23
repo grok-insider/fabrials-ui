@@ -9,7 +9,9 @@ const DropdownMenuGroup = Menu.Group;
 function DropdownMenuContent({
   className,
   align = "end",
+  side = "bottom",
   sideOffset = 6,
+  collisionAvoidance,
   ...props
 }) {
   return /* @__PURE__ */ jsx(Menu.Portal, { children: /* @__PURE__ */ jsx(
@@ -17,7 +19,9 @@ function DropdownMenuContent({
     {
       className: "fui-positioner",
       align,
+      side,
       sideOffset,
+      collisionAvoidance,
       children: /* @__PURE__ */ jsx(Menu.Popup, { className: classes("fui-menu", className), ...props })
     }
   ) });
@@ -25,13 +29,15 @@ function DropdownMenuContent({
 function DropdownMenuItem({
   className,
   destructive = false,
+  variant = "default",
   ...props
 }) {
+  const isDestructive = destructive || variant === "destructive";
   return /* @__PURE__ */ jsx(
     Menu.Item,
     {
       className: classes("fui-menu-item", className),
-      "data-destructive": destructive || void 0,
+      "data-destructive": isDestructive || void 0,
       ...props
     }
   );

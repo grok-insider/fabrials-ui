@@ -16,6 +16,12 @@ export declare function DialogTitle({ className, ...props }: StyledProps<BaseDia
 export declare function DialogDescription({ className, ...props }: StyledProps<BaseDialog.Description.Props>): import("react").JSX.Element;
 export declare function DialogHeader({ className, ...props }: ComponentProps<"div">): import("react").JSX.Element;
 export declare function DialogFooter({ className, ...props }: ComponentProps<"div">): import("react").JSX.Element;
+export declare const Sheet: typeof BaseDialog.Root;
+export declare const SheetTrigger: BaseDialog.Trigger;
+export declare const SheetClose: import("react").ForwardRefExoticComponent<Omit<import("@base-ui/react").AlertDialogCloseProps, "ref"> & import("react").RefAttributes<HTMLButtonElement>>;
+export declare const SheetHeader: typeof DialogHeader;
+export declare const SheetTitle: typeof DialogTitle;
+export declare const SheetDescription: typeof DialogDescription;
 export declare function SheetContent({ side, ...props }: Omit<DialogContentProps, "placement"> & {
     side?: "left" | "right";
 }): import("react").JSX.Element;

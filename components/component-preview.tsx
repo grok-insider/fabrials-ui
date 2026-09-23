@@ -1,28 +1,26 @@
 "use client";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 import { ComponentDemo } from "@/components/demos";
 import { CodeBlock } from "@/components/code-block";
+
 export function ComponentPreview({
   slug,
-  source,
+  code,
+  codeLabel,
 }: {
   slug: string;
-  source: string;
+  code: string;
+  codeLabel: string;
 }) {
   return (
-    <Tabs defaultValue="preview">
-      <TabsList variant="line">
-        <TabsTrigger value="preview">Preview</TabsTrigger>
-        <TabsTrigger value="code">Source code</TabsTrigger>
-      </TabsList>
-      <TabsContent value="preview">
-        <div className="my-4 rounded-xl border bg-card p-5 sm:p-8">
-          <ComponentDemo slug={slug} />
-        </div>
-      </TabsContent>
-      <TabsContent value="code" className="my-4">
-        <CodeBlock code={source} label="Source · TypeScript" />
-      </TabsContent>
+    <Tabs items={["Preview", codeLabel]}>
+      <Tab value="Preview">
+        <ComponentDemo slug={slug} />
+      </Tab>
+      <Tab value={codeLabel}>
+        <CodeBlock code={code} label={codeLabel} />
+      </Tab>
     </Tabs>
   );
 }

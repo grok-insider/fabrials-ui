@@ -7,6 +7,7 @@ import { Moon, Sun, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import { catalog, guides } from "@/lib/catalog";
+import { uiCatalog } from "@/lib/ui-catalog";
 export function Mark() {
   return (
     <svg
@@ -70,7 +71,8 @@ export function SiteHeader() {
             aria-current={path === "/components" ? "page" : undefined}
             className={
               path === "/components" ||
-              catalog.some((item) => path === `/docs/${item.slug}`)
+              catalog.some((item) => path === `/docs/${item.slug}`) ||
+              uiCatalog.some((item) => path === `/docs/${item.slug}`)
                 ? "text-foreground"
                 : "text-muted-foreground hover:text-foreground"
             }

@@ -1,12 +1,14 @@
 "use client";
+
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowUpRight, Search } from "lucide-react";
+import { Search } from "lucide-react";
+import { Card, Cards } from "fumadocs-ui/components/card";
 import { catalog } from "@/lib/catalog";
-import { Input } from "@/components/ui/input";
+import { uiCatalog, uiGroups } from "@/lib/ui-catalog";
 import { Button } from "@/components/ui/button";
 
-const groups = [
+const agentGroups = [
   {
     name: "Interaction",
     description: "Forms, choices and actions for a shared interface.",
@@ -24,13 +26,48 @@ const groups = [
     description: "Clients and adapters that connect everything.",
   },
 ];
+
+const sections = [
+  ...uiGroups.map((group) => ({
+    name: group.name,
+    description: group.description,
+    items: uiCatalog
+      .filter((item) => item.group === group.name)
+      .map((item) => ({
+        slug: item.slug,
+        title: item.title,
+        description: item.description,
+      })),
+  })),
+  ...agentGroups.map((group) => ({
+    name: group.name,
+    description: group.description,
+    items: catalog
+      .filter((item) => item.category === group.name)
+      .map((item) => ({
+        slug: item.slug,
+        title: item.title,
+        description: item.description,
+      })),
+  })),
+];
+
 export function ComponentIndex() {
   const [query, setQuery] = useState("");
-  const matches = catalog.filter((item) =>
-    `${item.title} ${item.description} ${item.category}`
-      .toLowerCase()
-      .includes(query.trim().toLowerCase()),
-  );
+  const needle = query.trim().toLowerCase();
+  const visible = sections
+    .map((section) => ({
+      ...section,
+      items: section.items
+        .filter((item) =>
+          `${item.title} ${item.description} ${section.name}`
+            .toLowerCase()
+            .includes(needle),
+        )
+        .sort((a, b) => a.title.localeCompare(b.title)),
+    }))
+    .filter((section) => section.items.length > 0);
+  const count = visible.reduce((sum, section) => sum + section.items.length, 0);
   return (
     <>
       <div className="mt-9 flex flex-wrap items-center justify-between gap-4 border-b pb-6">
@@ -39,67 +76,45 @@ export function ComponentIndex() {
             aria-hidden="true"
             className="absolute left-3 top-3 size-4 text-muted-foreground"
           />
-          <Input
+          <input
             aria-label="Search components"
             placeholder="Search components…"
-            className="h-10 bg-card pl-10"
+            className="h-10 w-full rounded-lg border bg-card pl-10 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(event) => setQuery(event.target.value)}
           />
         </div>
         <p role="status" className="text-sm text-muted-foreground">
-          {matches.length} {matches.length === 1 ? "component" : "components"}
+          {count} {count === 1 ? "component" : "components"}
         </p>
       </div>
-      {groups.map((group) => {
-        const items = matches
-          .filter((item) => item.category === group.name)
-          .sort((a, b) => a.title.localeCompare(b.title));
-        if (!items.length) return null;
-        return (
-          <section
-            key={group.name}
-            id={group.name.toLowerCase()}
-            className="scroll-mt-28 py-9"
-          >
-            <h2 className="text-xl font-medium tracking-tight">{group.name}</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {group.description}
-            </p>
-            <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-              {items.map((item) => (
-                <Link
-                  key={item.slug}
-                  href={`/docs/${item.slug}`}
-                  className="group rounded-xl border bg-card p-5 transition-colors hover:border-foreground/30 hover:bg-muted/40"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <h3 className="text-sm font-medium">{item.title}</h3>
-                    <ArrowUpRight
-                      aria-hidden="true"
-                      className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 motion-reduce:transform-none"
-                    />
-                  </div>
-                  <p className="mt-3 text-[13px] leading-6 text-muted-foreground">
-                    {item.description}
-                  </p>
-                </Link>
-              ))}
-            </div>
-          </section>
-        );
-      })}
-      {!matches.length && (
+      {visible.map((section) => (
+        <section
+          key={section.name}
+          id={section.name.toLowerCase()}
+          className="scroll-mt-28 py-9"
+        >
+          <h2 className="text-xl font-medium tracking-tight">{section.name}</h2>
+          <p className="mt-2 text-sm text-muted-foreground">{section.description}</p>
+          <Cards className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            {section.items.map((item) => (
+              <Card
+                key={item.slug}
+                title={item.title}
+                description={item.description}
+                href={`/docs/${item.slug}`}
+              />
+            ))}
+          </Cards>
+        </section>
+      ))}
+      {!count && (
         <div className="py-16 text-center">
           <h2 className="font-medium">No components found</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Try a name like “form”, “tool” or “connection”.
+            Try a name like “button”, “chart” or “form”.
           </p>
-          <Button
-            className="mt-5"
-            variant="outline"
-            onClick={() => setQuery("")}
-          >
+          <Button className="mt-5" variant="outline" onClick={() => setQuery("")}>
             Clear search
           </Button>
         </div>

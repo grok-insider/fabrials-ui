@@ -76,6 +76,12 @@ function DialogHeader({ className, ...props }) {
 function DialogFooter({ className, ...props }) {
   return /* @__PURE__ */ jsx("div", { className: classes("fui-dialog-footer", className), ...props });
 }
+const Sheet = Dialog;
+const SheetTrigger = DialogTrigger;
+const SheetClose = DialogClose;
+const SheetHeader = DialogHeader;
+const SheetTitle = DialogTitle;
+const SheetDescription = DialogDescription;
 function SheetContent({
   side = "right",
   ...props
@@ -167,5 +173,11 @@ export {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  SheetContent
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger
 };

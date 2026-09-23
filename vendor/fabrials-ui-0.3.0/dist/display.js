@@ -107,8 +107,19 @@ function AlertDescription({
 function AlertAction({ className, ...props }) {
   return /* @__PURE__ */ jsx("div", { className: classes("fui-actions", className), ...props });
 }
-function Separator({ className, ...props }) {
-  return /* @__PURE__ */ jsx("hr", { className: classes("fui-separator", className), ...props });
+function Separator({
+  className,
+  orientation = "horizontal",
+  ...props
+}) {
+  return /* @__PURE__ */ jsx(
+    "hr",
+    {
+      "data-orientation": orientation,
+      className: classes("fui-separator", className),
+      ...props
+    }
+  );
 }
 function Skeleton({ className, ...props }) {
   return /* @__PURE__ */ jsx(
