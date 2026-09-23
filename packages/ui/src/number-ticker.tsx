@@ -68,8 +68,8 @@ export function NumberTicker({
 
   return (
     <span ref={containerRef} className={classes("fui-ticker", className)}>
-      <span className="sr-only">{readableText}</span>
-      <span aria-hidden="true" className="inline-flex items-center">
+      <span className="fui-sr-only">{readableText}</span>
+      <span aria-hidden="true" className="fui-ticker-row">
         {prefix ? <span>{prefix}</span> : null}
         {glyphs.map(({ char, id }, index) => {
           if (!/\d/.test(char)) {
@@ -126,9 +126,17 @@ function Digit({
     };
   }, [blur, delay, digit, duration, reduce]);
 
+  if (reduce) {
+    return (
+      <span className={classes("fui-ticker-digit", className)} style={{ width: "1ch" }}>
+        {digit}
+      </span>
+    );
+  }
+
   return (
     <span
-      className={classes("relative inline-block overflow-hidden", className)}
+      className={classes("fui-ticker-digit", className)}
       style={{ height: `${DIGIT_HEIGHT_EM}em`, width: "1ch" }}
     >
       <motion.span
@@ -136,10 +144,10 @@ function Digit({
         initial={{ y: 0 }}
         animate={{ y: `-${digit * DIGIT_HEIGHT_EM}em` }}
         transition={reduce ? { duration: 0 } : { duration, delay, ease: EASE_OUT }}
-        className="absolute inset-x-0 top-0 flex flex-col items-center"
+        className="fui-ticker-column"
       >
         {DIGITS.map((n) => (
-          <span key={n} className="flex h-[1.1em] items-center justify-center leading-none">
+          <span key={n} className="fui-ticker-glyph">
             {n}
           </span>
         ))}

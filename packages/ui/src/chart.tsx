@@ -1,7 +1,7 @@
 // Origin: shadcn/ui chart (Recharts), adapted 2026-09-22 for Fabrials metric series. Fabrials will modify this.
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -57,6 +57,17 @@ export function SeriesChart({
   height = 288,
   className,
 }: SeriesChartProps) {
+  const frameRef = useRef<HTMLDivElement>(null);
+  const [frameWidth, setFrameWidth] = useState(0);
+  useEffect(() => {
+    const element = frameRef.current;
+    if (!element) return;
+    const update = () => setFrameWidth(Math.round(element.clientWidth));
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
   const [hidden, setHidden] = useState<ReadonlySet<string>>(new Set());
   const painted = useMemo(
     () =>
@@ -112,9 +123,14 @@ export function SeriesChart({
   );
 
   return (
-    <div className={classes("grid gap-3", className)}>
+    <div ref={frameRef} className={classes("grid min-w-0 gap-3", className)}>
       <div className="w-full min-w-0" style={{ height }}>
-        <ResponsiveContainer width="100%" height="100%">
+        {frameWidth > 0 ? (
+        <ResponsiveContainer
+          width={frameWidth}
+          height={height}
+          initialDimension={{ width: frameWidth, height }}
+        >
           {kind === "line" ? (
             <LineChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
               {axes}
@@ -149,8 +165,9 @@ export function SeriesChart({
             </BarChart>
           )}
         </ResponsiveContainer>
+        ) : null}
       </div>
-      <table className="sr-only">
+      <table className="fui-sr-only">
         <caption>{caption}</caption>
         <thead>
           <tr>

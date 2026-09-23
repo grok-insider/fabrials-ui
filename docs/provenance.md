@@ -2,8 +2,10 @@
 
 These controls were copied into `@fabrials/ui` on 2026-09-22 because a product
 screen already imported them. Each source file starts with the same origin
-note. Fabrials will modify the copies. The public registry at ui.fabrials.com
-does not document these controls; it stays the WebMCP catalog.
+note. Fabrials will modify the copies. ui.fabrials.com documents these
+controls on `/components` and `/docs/<slug>`. Those pages are previews and
+usage notes. They are not added to `public/r/*.json`. The installable
+registry stays the WebMCP catalog.
 
 The package already owned button, input, textarea, select, checkbox, switch,
 label, dialog, sheet, dropdown menu, tooltip, badge, card, alert, separator,

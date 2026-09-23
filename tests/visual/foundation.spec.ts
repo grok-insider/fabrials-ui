@@ -3,11 +3,17 @@ import AxeBuilder from "@axe-core/playwright";
 
 for (const theme of ["light", "dark"]) {
   for (const width of [390, 768, 1440]) {
-    for (const story of ["controls", "accounts", "states", "enterprise"]) {
+    for (const story of ["controls", "accounts", "states", "enterprise", "catalogue"]) {
       test(`${story} ${theme} ${width}`, async ({ page }) => {
         await page.setViewportSize({ width, height: 960 });
+        const id =
+          story === "enterprise"
+            ? "fabrials-enterprise--preferences"
+            : story === "catalogue"
+              ? "fabrials-catalogue--gallery"
+              : `fabrials-foundation--${story}`;
         await page.goto(
-          `/iframe.html?id=${story === "enterprise" ? "fabrials-enterprise--preferences" : `fabrials-foundation--${story}`}&viewMode=story&globals=theme:${theme}`,
+          `/iframe.html?id=${id}&viewMode=story&globals=theme:${theme}`,
         );
         await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
         await page.evaluate(() => document.fonts.ready);

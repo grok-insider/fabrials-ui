@@ -12,11 +12,19 @@ select {
 }
 .catalogue {
   max-width: 76rem;
+  min-width: 0;
   padding: 2rem;
   margin-inline: auto;
+  overflow-x: clip;
 }
 .catalogue > section {
   margin-top: 2rem;
+  min-width: 0;
+}
+.fui-carousel-frame {
+  max-width: 100%;
+  overflow: hidden;
+  padding-inline: 3rem;
 }
 .catalogue-grid {
   display: grid;
