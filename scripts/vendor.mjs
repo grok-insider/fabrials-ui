@@ -7,26 +7,44 @@ import {
   access,
   rename,
 } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { fileHashes, verifyDistribution } from "./integrity.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const workspace = process.env.FABRIALS_WORKSPACE
+  ? resolve(process.env.FABRIALS_WORKSPACE)
+  : resolve(root, "../..");
+// The enterprise mail monorepo keeps its client in apps/web; the standalone
+// open-email repository is the client itself.
+const openEmail = existsSync(resolve(workspace, "open-email/apps/web/package.json"))
+  ? resolve(workspace, "open-email/apps/web/vendor")
+  : resolve(workspace, "open-email/vendor");
 const targets = {
-  "ai-relay": resolve(root, "../../ai-relay/frontend/vendor"),
-  spanreed: resolve(root, "../../spanreed/desktop/vendor"),
-  "open-email": resolve(root, "../../open-email/apps/web/vendor"),
-  radiant: resolve(root, "../../radiant/vendor"),
-  web: resolve(root, "../../web/vendor"),
-  admin: resolve(root, "../../admin/vendor"),
-  "fabrials-webmcp": resolve(root, "../../libs/fabrials-webmcp/vendor"),
-  ditox: resolve(root, "../../ditox/gui/vendor"),
+  "ai-relay": resolve(workspace, "ai-relay/frontend/vendor"),
+  spanreed: resolve(workspace, "spanreed/desktop/vendor"),
+  "open-email": openEmail,
+  "grok-insider-web": resolve(workspace, "grok-insider-web/vendor"),
+  radiant: resolve(workspace, "radiant/vendor"),
+  web: resolve(workspace, "web/vendor"),
+  admin: resolve(workspace, "admin/vendor"),
+  "fabrials-webmcp": resolve(workspace, "libs/fabrials-webmcp/vendor"),
+  ditox: resolve(workspace, "ditox/gui/vendor"),
 };
-const genericOnly = new Set(["open-email", "radiant", "web", "admin", "fabrials-webmcp", "ditox"]);
+const genericOnly = new Set([
+  "open-email",
+  "grok-insider-web",
+  "radiant",
+  "web",
+  "admin",
+  "fabrials-webmcp",
+  "ditox",
+]);
 const [consumer, mode = "--check"] = process.argv.slice(2);
 if (!(consumer in targets) || !["--write", "--check"].includes(mode))
   throw new Error(
-    "Usage: bun run vendor <ai-relay|spanreed|open-email|radiant|web|admin|fabrials-webmcp|ditox> [--check|--write]",
+    `Usage: bun run vendor <${Object.keys(targets).join("|")}> [--check|--write]`,
   );
 
 for (const name of genericOnly.has(consumer) ? ["ui"] : ["ui", "ai-ui"]) {
