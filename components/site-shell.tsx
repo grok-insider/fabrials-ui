@@ -3,11 +3,21 @@ import Link from "next/link";
 import { GitHubLink } from "@/components/github-link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
-import { Moon, Sun, Menu, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Menu } from "lucide-react";
 import { useTheme } from "next-themes";
 import { catalog, guides } from "@/lib/catalog";
 import { uiCatalog } from "@/lib/ui-catalog";
+import {
+  Button,
+  ProductLockup,
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SiteHeader as FuiSiteHeader,
+  ThemeSwitcher,
+} from "@fabrials/ui";
 export function Mark() {
   return (
     <svg
@@ -27,105 +37,68 @@ export function Mark() {
   );
 }
 export function SiteHeader() {
-  const { resolvedTheme, setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const dark = mounted && resolvedTheme === "dark";
-  const [menu, setMenu] = useState(false);
   const path = usePathname();
   useEffect(() => setMounted(true), []);
-  useEffect(() => setMenu(false), [path]);
+  const preference =
+    mounted && (theme === "light" || theme === "dark" || theme === "system")
+      ? theme
+      : "system";
+  const docsActive = guides.some((guide) => path === `/docs/${guide.slug}`);
+  const componentsActive =
+    path === "/components" ||
+    catalog.some((item) => path === `/docs/${item.slug}`) ||
+    uiCatalog.some((item) => path === `/docs/${item.slug}`);
+  const links = (
+    <>
+      <Link href="/docs/introduction" aria-current={docsActive ? "page" : undefined}>
+        Documentation
+      </Link>
+      <Link href="/components" aria-current={componentsActive ? "page" : undefined}>
+        Components
+      </Link>
+      <Link href="/playground" aria-current={path.startsWith("/playground") ? "page" : undefined}>
+        Playground
+      </Link>
+    </>
+  );
   return (
-    <header
+    <FuiSiteHeader
       data-site-header
-      className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur-sm"
-    >
-      <div className="flex h-17 w-full items-center justify-between gap-5 px-6 lg:px-10">
-        <Link
-          href="/"
-          className="flex items-center gap-2.5 font-medium tracking-tight"
-        >
-          <Mark />
-          <span>
-            fabrials
-            <span className="ml-1.5 font-normal text-muted-foreground">
-              / ui
-            </span>
-          </span>
+      brand={
+        <Link href="/" className="text-foreground no-underline">
+          <ProductLockup product="Fabrials UI" gem="zircon" size="sm" />
         </Link>
-        <nav
-          className="hidden items-center gap-7 text-[13px] [&>a]:inline-flex [&>a]:min-h-8 [&>a]:items-center md:flex"
-          aria-label="Main navigation"
-        >
-          <Link
-            href="/docs/introduction"
-            className={
-              guides.some((guide) => path === `/docs/${guide.slug}`)
-                ? "text-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }
-          >
-            Documentation
-          </Link>
-          <Link
-            href="/components"
-            aria-current={path === "/components" ? "page" : undefined}
-            className={
-              path === "/components" ||
-              catalog.some((item) => path === `/docs/${item.slug}`) ||
-              uiCatalog.some((item) => path === `/docs/${item.slug}`)
-                ? "text-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }
-          >
-            Components
-          </Link>
-          <Link
-            href="/playground"
-            className={
-              path.startsWith("/playground")
-                ? "text-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }
-          >
-            Playground
-          </Link>
-        </nav>
-        <div className="flex items-center gap-3">
+      }
+      navigation={<nav aria-label="Main navigation">{links}</nav>}
+      actions={
+        <>
           <GitHubLink />
-          <span className="hidden h-4 border-l sm:block" />
-          <Button
-            size="icon-sm"
-            variant="ghost"
-            aria-label={dark ? "Use light theme" : "Use dark theme"}
-            onClick={() => {
-              setTheme(dark ? "light" : "dark");
-            }}
+          <ThemeSwitcher
+            value={preference}
+            onValueChange={(value) => setTheme(value)}
+          />
+        </>
+      }
+      mobileMenu={
+        <Sheet>
+          <SheetTrigger
+            render={<Button variant="ghost" size="icon-sm" aria-label="Open menu" />}
           >
-            {dark ? <Sun className="size-4" /> : <Moon className="size-4" />}
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            className="md:hidden"
-            aria-label="Toggle navigation"
-            aria-expanded={menu}
-            onClick={() => setMenu(!menu)}
-          >
-            {menu ? <X /> : <Menu />}
-          </Button>
-        </div>
-      </div>
-      {menu && (
-        <nav
-          aria-label="Mobile navigation"
-          className="flex flex-col gap-4 border-t px-6 py-5 text-sm md:hidden"
-        >
-          <Link href="/docs/introduction">Documentation</Link>
-          <Link href="/components">Components</Link>
-          <Link href="/playground">Playground</Link>
-        </nav>
-      )}
-    </header>
+            <Menu />
+          </SheetTrigger>
+          <SheetContent side="right">
+            <SheetHeader>
+              <SheetTitle>Fabrials UI</SheetTitle>
+            </SheetHeader>
+            <nav aria-label="Mobile navigation" className="flex flex-col gap-1 px-4 pb-6">
+              {links}
+            </nav>
+          </SheetContent>
+        </Sheet>
+      }
+    />
   );
 }
 export function SiteFrame({ children }: { children: ReactNode }) {

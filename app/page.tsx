@@ -1,7 +1,5 @@
 import Link from "next/link";
 import {
-  ArrowRight,
-  ArrowUpRight,
   Code2,
   MousePointer2,
   Terminal,
@@ -82,10 +80,9 @@ export default function Home() {
           <Link href="/docs/compatibility" className="mb-7 inline-flex">
             <Badge tone="success">
               WebMCP + MCP 2026-07-28
-              <ArrowUpRight aria-hidden className="size-3" />
             </Badge>
           </Link>
-          <h1 className="text-[clamp(2.7rem,5.5vw,4.8rem)] leading-[1.07] font-medium tracking-[-.055em]">
+          <h1 className="font-serif text-[clamp(2.7rem,5.5vw,4.8rem)] leading-[1.07] font-medium tracking-tight">
             Built for people.
             <br />
             <span className="text-muted-foreground">Ready for agents.</span>
@@ -99,7 +96,7 @@ export default function Home() {
               href="/docs/installation"
               className={buttonVariants({ size: "lg" })}
             >
-              Start building <ArrowRight />
+              Start building
             </Link>
             <a
               href="#try-it"
@@ -150,7 +147,7 @@ export default function Home() {
               href="/docs/comparison"
               className={buttonVariants({ variant: "outline", size: "sm" })}
             >
-              Build this interaction <ArrowUpRight />
+              Build this interaction
             </Link>
           }
         />
@@ -177,7 +174,7 @@ export default function Home() {
               href="/playground"
               className={buttonVariants({ variant: "outline", size: "sm" })}
             >
-              Explore the playground <ArrowRight />
+              Explore the playground
             </Link>
           }
         />
@@ -191,7 +188,6 @@ export default function Home() {
               <Card className="flex h-full min-h-56 flex-col justify-between transition-colors group-hover:bg-muted/40">
                 <span className="flex justify-between font-mono text-xs text-muted-foreground">
                   0{i + 1} / {w.label}
-                  <ArrowUpRight aria-hidden className="size-4" />
                 </span>
                 <div className="mt-8">
                   <CardTitle as="h3" className="text-2xl font-medium">
@@ -214,8 +210,7 @@ export default function Home() {
               href="/components"
               className={buttonVariants({ variant: "outline", size: "sm" })}
             >
-              Browse {catalog.length + uiCatalog.length} components{" "}
-              <ArrowRight />
+              Browse {catalog.length + uiCatalog.length} components
             </Link>
           }
         />
@@ -237,7 +232,7 @@ export default function Home() {
                   className: "mt-5 self-start px-0",
                 })}
               >
-                {card.label} <ArrowUpRight />
+                {card.label}
               </Link>
             </Card>
           ))}
@@ -256,7 +251,7 @@ export default function Home() {
           </div>
           <div className="flex flex-wrap gap-2">
             <Link href="/playground" className={buttonVariants()}>
-              Open playground <ArrowRight />
+              Open playground
             </Link>
             <Link
               href="/docs/installation"

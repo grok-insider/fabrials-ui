@@ -361,7 +361,7 @@ function CoffeeWorkbench() {
         <div className="min-w-0 p-5 sm:p-7">
           <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="mb-2 text-[10px] font-medium uppercase tracking-[.16em] text-muted-foreground">
+              <p className="mb-2 text-sm text-muted-foreground">
                 Make room for better mornings
               </p>
               <h3 className="text-2xl font-medium tracking-tight sm:text-3xl">
@@ -520,7 +520,7 @@ function CoffeeWorkbench() {
                     key={e.id}
                     className="break-words rounded-lg border bg-background p-3"
                   >
-                    <div className="mb-1 flex justify-between text-[10px] uppercase tracking-wide text-muted-foreground">
+                    <div className="mb-1 flex justify-between text-xs text-muted-foreground">
                       <span>
                         {e.source === "agent"
                           ? "Browser agent"

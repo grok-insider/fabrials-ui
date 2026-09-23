@@ -69,10 +69,9 @@
   margin: 0;
   padding-inline: var(--fui-space-2);
   color: var(--muted-foreground);
-  font-family: var(--fui-font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-family: var(--fui-font-sans);
+  font-size: var(--fui-text-sm);
+  letter-spacing: 0;
 }
 .docs-nav-heading {
   display: flex;
@@ -676,10 +675,9 @@ h3.docs-heading {
 .docs-search [cmdk-group-heading] {
   padding: var(--fui-space-2) var(--fui-space-2) var(--fui-space-1);
   color: var(--muted-foreground);
-  font-family: var(--fui-font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-family: var(--fui-font-sans);
+  font-size: var(--fui-text-sm);
+  letter-spacing: 0;
 }
 .docs-search [data-slot="command-item"] {
   display: flex;

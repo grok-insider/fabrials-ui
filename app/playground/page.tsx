@@ -17,10 +17,7 @@ export default function Playground() {
       className="w-full space-y-10 px-6 py-12 lg:px-12 2xl:px-16"
     >
       <header>
-        <p className="mb-4 text-[11px] uppercase tracking-[.15em] text-muted-foreground">
-          Made from the registry
-        </p>
-        <h1 className="text-4xl font-medium tracking-tight">Playground</h1>
+        <h1 className="font-serif text-4xl font-medium tracking-tight">Playground</h1>
         <p className="mt-4 max-w-xl text-base leading-7 text-muted-foreground">
           Choose a scenario. Edit tool arguments and execute them against the
           live interface, then try a manual correction. Inspect every result and
