@@ -4,18 +4,26 @@ import type { ComponentProps } from "react";
 import { Button as BaseButton } from "@base-ui/react/button";
 import { Checkbox as BaseCheckbox } from "@base-ui/react/checkbox";
 import { Switch as BaseSwitch } from "@base-ui/react/switch";
-import { Check, Minus } from "lucide-react";
+import { Check, LoaderCircle, Minus } from "lucide-react";
 import { classes, type StyledProps } from "./shared";
 
 export { buttonVariants } from "./button-variants";
 import type { ButtonStyleProps } from "./button-variants";
 
-export type ButtonProps = StyledProps<BaseButton.Props> & ButtonStyleProps;
+export type ButtonProps = StyledProps<BaseButton.Props> &
+  ButtonStyleProps & {
+    /** Keeps the label, adds a spinner and blocks repeated activation. */
+    loading?: boolean;
+  };
 
 export function Button({
   className,
   variant = "default",
   size = "default",
+  loading = false,
+  disabled,
+  focusableWhenDisabled,
+  children,
   ...props
 }: ButtonProps) {
   return (
@@ -24,8 +32,17 @@ export function Button({
       className={classes("fui-button", className)}
       data-variant={variant}
       data-size={size}
+      data-loading={loading || undefined}
+      aria-busy={loading || undefined}
+      disabled={disabled || loading}
+      focusableWhenDisabled={focusableWhenDisabled ?? loading}
       {...props}
-    />
+    >
+      {loading ? (
+        <LoaderCircle aria-hidden className="fui-button-spinner fui-spin" />
+      ) : null}
+      {children}
+    </BaseButton>
   );
 }
 
@@ -84,9 +101,9 @@ export function Checkbox({
     >
       <BaseCheckbox.Indicator className="fui-control-indicator">
         {indeterminate ? (
-          <Minus aria-hidden size={14} />
+          <Minus aria-hidden size={12} strokeWidth={3} />
         ) : (
-          <Check aria-hidden size={14} />
+          <Check aria-hidden size={12} strokeWidth={3} />
         )}
       </BaseCheckbox.Indicator>
     </BaseCheckbox.Root>

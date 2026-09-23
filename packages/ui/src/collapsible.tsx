@@ -1,5 +1,5 @@
+"use client";
 // Origin: shadcn/ui (Base UI Collapsible), copied 2026-09-22. Fabrials will modify this.
-"use client"
 
 import { Collapsible as CollapsiblePrimitive } from "@base-ui/react/collapsible"
 

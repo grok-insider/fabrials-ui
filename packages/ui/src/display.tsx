@@ -4,26 +4,47 @@ import type { ComponentProps } from "react";
 import { Tabs as BaseTabs } from "@base-ui/react/tabs";
 import { classes, type StyledProps } from "./shared";
 
-export type Tone = "neutral" | "success" | "warning" | "danger";
+export type Tone = "neutral" | "info" | "success" | "warning" | "danger";
 
 export function Badge({
   className,
   tone = "neutral",
+  variant = "soft",
+  dot = false,
+  children,
   ...props
-}: ComponentProps<"span"> & { tone?: Tone }) {
+}: ComponentProps<"span"> & {
+  tone?: Tone | "accent";
+  variant?: "soft" | "outline" | "solid";
+  /** Adds a leading status dot; the text remains the accessible meaning. */
+  dot?: boolean;
+}) {
   return (
     <span
+      data-slot="badge"
       className={classes("fui-badge", className)}
-      data-tone={tone}
+      data-tone={tone === "accent" ? "info" : tone}
+      data-variant={variant}
       {...props}
-    />
+    >
+      {dot ? <span aria-hidden className="fui-badge-dot" /> : null}
+      {children}
+    </span>
   );
 }
 
-export function Card({ className, ...props }: ComponentProps<"section">) {
+export function Card({
+  className,
+  interactive = false,
+  ...props
+}: ComponentProps<"section"> & {
+  /** Hover and focus-within affordance for cards that contain one primary link. */
+  interactive?: boolean;
+}) {
   return (
     <section
       data-slot="card"
+      data-interactive={interactive || undefined}
       className={classes("fui-card", className)}
       {...props}
     />
@@ -64,6 +85,16 @@ export function CardDescription({ className, ...props }: ComponentProps<"p">) {
   );
 }
 
+export function CardAction({ className, ...props }: ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="card-action"
+      className={classes("fui-card-action", className)}
+      {...props}
+    />
+  );
+}
+
 export function CardContent({ className, ...props }: ComponentProps<"div">) {
   return (
     <div
@@ -88,10 +119,13 @@ export function Alert({
   className,
   variant = "default",
   ...props
-}: ComponentProps<"div"> & { variant?: "default" | "destructive" }) {
+}: ComponentProps<"div"> & {
+  variant?: "default" | "info" | "success" | "warning" | "destructive";
+}) {
   return (
     <div
       role={variant === "destructive" ? "alert" : "status"}
+      data-slot="alert"
       data-variant={variant}
       className={classes("fui-alert", className)}
       {...props}
@@ -107,11 +141,21 @@ export function AlertDescription({
   className,
   ...props
 }: ComponentProps<"div">) {
-  return <div className={classes("fui-description", className)} {...props} />;
+  return (
+    <div
+      className={classes("fui-description", "fui-alert-description", className)}
+      {...props}
+    />
+  );
 }
 
 export function AlertAction({ className, ...props }: ComponentProps<"div">) {
-  return <div className={classes("fui-actions", className)} {...props} />;
+  return (
+    <div
+      className={classes("fui-actions", "fui-alert-action", className)}
+      {...props}
+    />
+  );
 }
 
 export function Separator({
@@ -122,6 +166,7 @@ export function Separator({
   return (
     <hr
       data-orientation={orientation}
+      aria-orientation={orientation === "vertical" ? "vertical" : undefined}
       className={classes("fui-separator", className)}
       {...props}
     />
@@ -138,19 +183,31 @@ export function Skeleton({ className, ...props }: ComponentProps<"div">) {
   );
 }
 
-export function Progress({ className, ...props }: ComponentProps<"progress">) {
-  return <progress className={classes("fui-progress", className)} {...props} />;
+export function Progress({
+  className,
+  tone = "neutral",
+  ...props
+}: ComponentProps<"progress"> & { tone?: Tone }) {
+  return (
+    <progress
+      data-tone={tone}
+      className={classes("fui-progress", className)}
+      {...props}
+    />
+  );
 }
 
 export function Table({
   className,
   children,
   regionLabel,
+  stickyHeader = false,
   ...props
-}: ComponentProps<"table"> & { regionLabel?: string }) {
+}: ComponentProps<"table"> & { regionLabel?: string; stickyHeader?: boolean }) {
   return (
     <div
       className="fui-table-scroll"
+      data-sticky-header={stickyHeader || undefined}
       tabIndex={0}
       role="region"
       aria-label={
@@ -181,11 +238,17 @@ export function TableFooter(props: ComponentProps<"tfoot">) {
 export function TableRow(props: ComponentProps<"tr">) {
   return <tr {...props} />;
 }
-export function TableHead(props: ComponentProps<"th">) {
-  return <th scope="col" {...props} />;
+export function TableHead({
+  numeric,
+  ...props
+}: ComponentProps<"th"> & { numeric?: boolean }) {
+  return <th scope="col" data-numeric={numeric || undefined} {...props} />;
 }
-export function TableCell(props: ComponentProps<"td">) {
-  return <td {...props} />;
+export function TableCell({
+  numeric,
+  ...props
+}: ComponentProps<"td"> & { numeric?: boolean }) {
+  return <td data-numeric={numeric || undefined} {...props} />;
 }
 export function TableCaption(props: ComponentProps<"caption">) {
   return <caption {...props} />;
@@ -193,10 +256,20 @@ export function TableCaption(props: ComponentProps<"caption">) {
 
 export function TabsList({
   className,
+  variant = "underline",
   ...props
-}: StyledProps<BaseTabs.List.Props>) {
+}: StyledProps<BaseTabs.List.Props> & { variant?: "underline" | "segmented" }) {
   return (
-    <BaseTabs.List className={classes("fui-tabs-list", className)} {...props} />
+    <BaseTabs.List
+      data-variant={variant}
+      className={classes("fui-tabs-list", className)}
+      {...props}
+    >
+      {props.children}
+      {variant === "segmented" ? null : (
+        <BaseTabs.Indicator className="fui-tabs-indicator" />
+      )}
+    </BaseTabs.List>
   );
 }
 

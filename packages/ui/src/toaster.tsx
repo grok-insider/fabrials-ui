@@ -1,42 +1,59 @@
-// Origin: shadcn/ui sonner wrapper, copied 2026-09-22. Fabrials will modify this.
 "use client";
+// Origin: shadcn/ui sonner wrapper, copied 2026-09-22. Restyled with fui- tokens in 0.4.
 
 import { useEffect, useState, type CSSProperties } from "react";
 import { Toaster as Sonner, type ToasterProps } from "sonner";
-import { CircleCheckIcon, InfoIcon, Loader2Icon, OctagonXIcon, TriangleAlertIcon } from "lucide-react";
+import {
+  CircleCheckIcon,
+  InfoIcon,
+  LoaderCircle,
+  OctagonXIcon,
+  TriangleAlertIcon,
+} from "lucide-react";
 
 function useDocumentTheme(): "light" | "dark" {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   useEffect(() => {
     const root = document.documentElement;
-    const read = () => setTheme(root.classList.contains("dark") ? "dark" : "light");
+    const read = () =>
+      setTheme(
+        root.classList.contains("dark") || root.dataset.theme === "dark"
+          ? "dark"
+          : "light",
+      );
     read();
     const observer = new MutationObserver(read);
-    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
+    observer.observe(root, {
+      attributes: true,
+      attributeFilter: ["class", "data-theme"],
+    });
     return () => observer.disconnect();
   }, []);
   return theme;
 }
 
-export function Toaster({ theme, ...props }: ToasterProps) {
+export function Toaster({ theme, className, style, ...props }: ToasterProps) {
   const detected = useDocumentTheme();
   return (
     <Sonner
       theme={theme ?? detected}
-      className="toaster group"
+      className={["fui-toaster", "toaster", "group", className].filter(Boolean).join(" ")}
       icons={{
-        success: <CircleCheckIcon className="size-4" />,
-        info: <InfoIcon className="size-4" />,
-        warning: <TriangleAlertIcon className="size-4" />,
-        error: <OctagonXIcon className="size-4" />,
-        loading: <Loader2Icon className="size-4 animate-spin" />,
+        success: <CircleCheckIcon aria-hidden className="fui-toast-icon" data-tone="success" />,
+        info: <InfoIcon aria-hidden className="fui-toast-icon" data-tone="info" />,
+        warning: <TriangleAlertIcon aria-hidden className="fui-toast-icon" data-tone="warning" />,
+        error: <OctagonXIcon aria-hidden className="fui-toast-icon" data-tone="danger" />,
+        loading: <LoaderCircle aria-hidden className="fui-toast-icon fui-spin" />,
       }}
-      style={{
-        "--normal-bg": "var(--popover)",
-        "--normal-text": "var(--popover-foreground)",
-        "--normal-border": "var(--border)",
-        "--border-radius": "var(--radius)",
-      } as CSSProperties}
+      style={
+        {
+          "--normal-bg": "var(--popover)",
+          "--normal-text": "var(--popover-foreground)",
+          "--normal-border": "var(--border)",
+          "--border-radius": "var(--fui-radius-lg)",
+          ...style,
+        } as CSSProperties
+      }
       {...props}
     />
   );

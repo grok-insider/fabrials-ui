@@ -1,5 +1,5 @@
-// Origin: Spectrum UI number ticker (beUI, Apache-2.0), copied 2026-09-22. Fabrials will modify this.
 "use client";
+// Origin: Spectrum UI number ticker (beUI, Apache-2.0), copied 2026-09-22. Restyled with fui- classes in 0.4.
 
 import { animate, motion, useInView, useReducedMotion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -74,7 +74,7 @@ export function NumberTicker({
         {glyphs.map(({ char, id }, index) => {
           if (!/\d/.test(char)) {
             return (
-              <span key={id} className="inline-block">
+              <span key={id} className="fui-ticker-char">
                 {char}
               </span>
             );

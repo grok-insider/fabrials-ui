@@ -1,8 +1,26 @@
 import { classes } from "./shared";
 
+export type ButtonVariant =
+  | "default"
+  | "accent"
+  | "outline"
+  | "secondary"
+  | "ghost"
+  | "destructive"
+  | "link";
+
+export type ButtonSize =
+  | "default"
+  | "xs"
+  | "sm"
+  | "lg"
+  | "icon"
+  | "icon-xs"
+  | "icon-sm";
+
 export type ButtonStyleProps = {
-  variant?: "default" | "outline" | "secondary" | "ghost" | "destructive" | "link";
-  size?: "default" | "sm" | "lg" | "icon" | "icon-sm";
+  variant?: ButtonVariant;
+  size?: ButtonSize;
   className?: string;
 };
 

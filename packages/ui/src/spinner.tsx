@@ -1,12 +1,22 @@
-// Origin: shadcn/ui, copied 2026-09-22. Fabrials will modify this.
+// Origin: shadcn/ui, copied 2026-09-22. Restyled with fui- classes in 0.4 so it renders without Tailwind.
 import type { ComponentProps } from "react";
-import { Loader2Icon } from "lucide-react";
+import { LoaderCircle } from "lucide-react";
 import { classes as cn } from "./shared";
 
-function Spinner({ className, ...props }: ComponentProps<"svg">) {
+function Spinner({
+  className,
+  label = "Loading",
+  ...props
+}: ComponentProps<"svg"> & { label?: string }) {
   return (
-    <Loader2Icon data-slot="spinner" role="status" aria-label="Loading" className={cn("size-4 animate-spin", className)} {...props} />
-  )
+    <LoaderCircle
+      data-slot="spinner"
+      role="status"
+      aria-label={label}
+      className={cn("fui-spinner", "fui-spin", className)}
+      {...props}
+    />
+  );
 }
 
-export { Spinner }
+export { Spinner };

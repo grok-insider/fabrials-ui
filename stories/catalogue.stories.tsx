@@ -40,6 +40,9 @@ import {
   SectionHeader,
   Separator,
   SeriesChart,
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -71,7 +74,7 @@ function CatalogueGallery() {
       />
       <section className="catalogue-stack" aria-label="Navigation">
         <SectionHeader title="Navigation" />
-        <div className="max-w-full overflow-x-auto">
+        <div style={{ maxWidth: "100%", overflowX: "auto" }}>
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
@@ -86,7 +89,7 @@ function CatalogueGallery() {
             </NavigationMenuList>
           </NavigationMenu>
         </div>
-        <Command className="max-w-sm rounded-lg border" label="Command palette">
+        <Command className="catalogue-command" label="Command palette">
           <CommandInput aria-label="Search destinations" placeholder="Search destinations" />
           <CommandList>
             <CommandEmpty>No matching destination.</CommandEmpty>
@@ -99,15 +102,21 @@ function CatalogueGallery() {
         <p>
           Shortcut <Kbd>Ctrl</Kbd> <Kbd>K</Kbd>
         </p>
-        <SidebarProvider className="w-full max-w-xs rounded-lg border bg-sidebar p-2 text-sidebar-foreground">
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton isActive>Overview</SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton>Accounts</SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
+        <SidebarProvider className="catalogue-sidebar-demo" style={{ minHeight: 0 }}>
+          <Sidebar collapsible="none">
+            <SidebarContent>
+              <SidebarGroup>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton isActive>Overview</SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton>Accounts</SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroup>
+            </SidebarContent>
+          </Sidebar>
         </SidebarProvider>
       </section>
       <section className="catalogue-stack" aria-label="Overlays and composition" id="catalogue-nav">
@@ -126,15 +135,15 @@ function CatalogueGallery() {
             <Button variant="outline">Week</Button>
           </ButtonGroup>
         </div>
-        <InputGroup className="max-w-sm">
+        <InputGroup style={{ maxWidth: "24rem" }}>
           <InputGroupAddon>https://</InputGroupAddon>
           <InputGroupInput aria-label="Host" placeholder="fabrials.com" />
         </InputGroup>
         <Collapsible>
-          <CollapsibleTrigger className="text-sm font-medium">Reasoning</CollapsibleTrigger>
+          <CollapsibleTrigger render={<Button variant="ghost" size="sm" />}>Reasoning</CollapsibleTrigger>
           <CollapsibleContent>Checked three synthetic sources.</CollapsibleContent>
         </Collapsible>
-        <ScrollArea aria-label="Suggestions" className="h-24 max-w-sm rounded-md border p-3">
+        <ScrollArea aria-label="Suggestions" className="catalogue-scroll">
           <p>Compare usage</p>
           <p>Open accounts</p>
           <p>Refresh the pool</p>
@@ -147,7 +156,7 @@ function CatalogueGallery() {
             <CarouselContent>
               {["Usage report", "Account list"].map((item) => (
                 <CarouselItem key={item}>
-                  <div className="rounded-lg border p-6 text-sm">{item}</div>
+                  <div className="catalogue-slide">{item}</div>
                 </CarouselItem>
               ))}
             </CarouselContent>
@@ -158,7 +167,7 @@ function CatalogueGallery() {
         <Separator />
         <Label htmlFor="catalogue-workspace">Workspace</Label>
         <Combobox.Root items={["North", "South"]}>
-          <Combobox.Input id="catalogue-workspace" placeholder="Filter workspaces" className="fui-input max-w-xs" />
+          <Combobox.Input id="catalogue-workspace" placeholder="Filter workspaces" className="catalogue-combobox" />
           <Combobox.Portal>
             <Combobox.Positioner>
               <Combobox.Popup>
@@ -181,7 +190,7 @@ function CatalogueGallery() {
       </section>
       <section className="catalogue-stack" aria-label="Metrics">
         <SectionHeader title="Metrics" />
-        <p className="text-3xl font-medium">
+        <p className="catalogue-ticker">
           <NumberTicker value={12840} startOnView={false} />
         </p>
         <SeriesChart

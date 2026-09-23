@@ -1,17 +1,27 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
+const stories: Record<string, string> = {
+  controls: "fabrials-foundation--controls",
+  accounts: "fabrials-foundation--accounts",
+  states: "fabrials-foundation--states",
+  enterprise: "fabrials-enterprise--preferences",
+  catalogue: "fabrials-catalogue--gallery",
+  "brand-tokens": "fabrials-brand--tokens",
+  "brand-lockups": "fabrials-brand--lockups",
+  components: "fabrials-components--gallery",
+  console: "fabrials-patterns--console",
+  "public-site": "fabrials-patterns--public-site",
+  "sign-in": "fabrials-patterns--sign-in",
+  settings: "fabrials-patterns--settings",
+};
+
 for (const theme of ["light", "dark"]) {
   for (const width of [390, 768, 1440]) {
-    for (const story of ["controls", "accounts", "states", "enterprise", "catalogue"]) {
+    for (const story of Object.keys(stories)) {
       test(`${story} ${theme} ${width}`, async ({ page }) => {
         await page.setViewportSize({ width, height: 960 });
-        const id =
-          story === "enterprise"
-            ? "fabrials-enterprise--preferences"
-            : story === "catalogue"
-              ? "fabrials-catalogue--gallery"
-              : `fabrials-foundation--${story}`;
+        const id = stories[story];
         await page.goto(
           `/iframe.html?id=${id}&viewMode=story&globals=theme:${theme}`,
         );
