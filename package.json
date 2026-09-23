@@ -17,6 +17,9 @@
     "test:visual:container": "node scripts/visual.mjs",
     "vendor": "node scripts/vendor.mjs"
   },
+  "overrides": {
+    "axe-core": "4.13.0"
+  },
   "devDependencies": {
     "@base-ui/react": "1.7.0",
     "@fabrials/ui": "workspace:*",
@@ -25,7 +28,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@playwright/test": "1.58.2",
-    "@axe-core/playwright": "4.11.1",
+    "@axe-core/playwright": "4.13.0",
     "@storybook/react-vite": "10.6.0",
     "@storybook/addon-a11y": "10.6.0",
     "storybook": "10.6.0",
