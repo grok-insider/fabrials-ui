@@ -1,6 +1,6 @@
 "use client";
 import { ToolPlayground } from "@/components/tool-playground";
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import {
   ArrowRight,
   Check,
@@ -41,7 +41,7 @@ export function CoffeeDemo({ playground = false }: { playground?: boolean }) {
     </WebMCPProvider>
   );
 }
-function CoffeeWorkbench() {
+export function useCoffeeStore() {
   const mcp = useWebMCP();
   const [width, setWidth] = useState(32);
   const [fitting, setFitting] = useState("58 mm");
@@ -175,6 +175,158 @@ function CoffeeWorkbench() {
     },
     Boolean(cart.id),
   );
+  function reset() {
+    updateCart({ id: null, filter: false });
+    setCompared(null);
+    setWidth(32);
+    setFitting("58 mm");
+    setReview(false);
+    setError("");
+    mcp.clearHistory();
+  }
+  return {
+    mcp,
+    width,
+    setWidth,
+    fitting,
+    setFitting,
+    compared,
+    cart,
+    review,
+    setReview,
+    saved,
+    setSaved,
+    error,
+    busy,
+    match,
+    total,
+    active,
+    run,
+    reset,
+  };
+}
+export type CoffeeStore = ReturnType<typeof useCoffeeStore>;
+export function CoffeeComparison({
+  store,
+  action,
+}: {
+  store: CoffeeStore;
+  action?: (product: (typeof coffeeProducts)[number]) => ReactNode;
+}) {
+  const { compared, match, cart, busy, run } = store;
+  return (
+    <Comparison
+      caption="Find your fit"
+      note={
+        compared ? (
+          match ? (
+            <>
+              <strong>{match.name} fits your setup.</strong>{" "}
+              {match.reasons.join(". ")}. Independent steam makes milk
+              preparation easier.
+            </>
+          ) : (
+            "Neither machine meets both constraints. Adjust your requirements or compare the tradeoffs below."
+          )
+        ) : undefined
+      }
+      columns={coffeeProducts.map((p) => ({
+        id: p.id,
+        title: p.name,
+        subtitle: money(p.price),
+        visual: (
+          <CoffeeMachine
+            color={p.color}
+            className="mx-auto h-32 w-full max-w-48"
+          />
+        ),
+        action: action?.(p) ?? (
+          <Button
+            size="sm"
+            variant={cart.id === p.id ? "secondary" : "outline"}
+            disabled={busy}
+            onClick={() =>
+              void run("set_coffee_cart", {
+                productId: cart.id === p.id ? "" : p.id,
+              })
+            }
+          >
+            {cart.id === p.id ? (
+              <>
+                <Check /> Selected
+              </>
+            ) : (
+              <>
+                <Plus /> Choose
+              </>
+            )}
+          </Button>
+        ),
+      }))}
+      rows={[
+        {
+          id: "width",
+          label: "Counter space",
+          highlighted: Boolean(compared),
+          values: Object.fromEntries(
+            coffeeProducts.map((p) => [
+              p.id,
+              <span key={p.id}>
+                {p.width} cm
+                {compared && (
+                  <span className="mt-1 block text-xs">
+                    {p.width <= compared.width ? "Fits your space" : "Too wide"}
+                  </span>
+                )}
+              </span>,
+            ]),
+          ),
+        },
+        {
+          id: "fitting",
+          label: "Accessory fit",
+          highlighted: Boolean(compared),
+          values: Object.fromEntries(
+            coffeeProducts.map((p) => [
+              p.id,
+              <span key={p.id}>
+                {p.fitting}
+                {compared && (
+                  <span className="mt-1 block text-xs">
+                    {p.fitting === compared.fitting
+                      ? "Keep your accessories"
+                      : "Different fitting"}
+                  </span>
+                )}
+              </span>,
+            ]),
+          ),
+        },
+        {
+          id: "milk",
+          label: "Two flat whites",
+          values: Object.fromEntries(coffeeProducts.map((p) => [p.id, p.milk])),
+        },
+      ]}
+    />
+  );
+}
+function CoffeeWorkbench() {
+  const store = useCoffeeStore();
+  const {
+    mcp,
+    width,
+    setWidth,
+    fitting,
+    setFitting,
+    cart,
+    saved,
+    error,
+    busy,
+    total,
+    active,
+    run,
+  } = store;
   return (
     <div className="overflow-hidden rounded-[1.5rem] border bg-card shadow-[0_20px_70px_-45px_#25311b55]">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b px-5 py-4 sm:px-7">
@@ -199,15 +351,7 @@ function CoffeeWorkbench() {
             variant="ghost"
             size="icon-sm"
             aria-label="Reset coffee demo"
-            onClick={() => {
-              updateCart({ id: null, filter: false });
-              setCompared(null);
-              setWidth(32);
-              setFitting("58 mm");
-              setReview(false);
-              setError("");
-              mcp.clearHistory();
-            }}
+            onClick={store.reset}
           >
             <RotateCcw className="size-3.5" />
           </Button>
@@ -270,104 +414,7 @@ function CoffeeWorkbench() {
               Compare
             </Button>
           </div>
-          <Comparison
-            caption="Find your fit"
-            note={
-              compared ? (
-                match ? (
-                  <>
-                    <strong>{match.name} fits your setup.</strong>{" "}
-                    {match.reasons.join(". ")}. Independent steam makes milk
-                    preparation easier.
-                  </>
-                ) : (
-                  "Neither machine meets both constraints. Adjust your requirements or compare the tradeoffs below."
-                )
-              ) : undefined
-            }
-            columns={coffeeProducts.map((p) => ({
-              id: p.id,
-              title: p.name,
-              subtitle: money(p.price),
-              visual: (
-                <CoffeeMachine
-                  color={p.color}
-                  className="mx-auto h-32 w-full max-w-48"
-                />
-              ),
-              action: (
-                <Button
-                  size="sm"
-                  variant={cart.id === p.id ? "secondary" : "outline"}
-                  disabled={busy}
-                  onClick={() =>
-                    void run("set_coffee_cart", {
-                      productId: cart.id === p.id ? "" : p.id,
-                    })
-                  }
-                >
-                  {cart.id === p.id ? (
-                    <>
-                      <Check /> Selected
-                    </>
-                  ) : (
-                    <>
-                      <Plus /> Choose
-                    </>
-                  )}
-                </Button>
-              ),
-            }))}
-            rows={[
-              {
-                id: "width",
-                label: "Counter space",
-                highlighted: Boolean(compared),
-                values: Object.fromEntries(
-                  coffeeProducts.map((p) => [
-                    p.id,
-                    <span key={p.id}>
-                      {p.width} cm
-                      {compared && (
-                        <span className="mt-1 block text-xs">
-                          {p.width <= compared.width
-                            ? "Fits your space"
-                            : "Too wide"}
-                        </span>
-                      )}
-                    </span>,
-                  ]),
-                ),
-              },
-              {
-                id: "fitting",
-                label: "Accessory fit",
-                highlighted: Boolean(compared),
-                values: Object.fromEntries(
-                  coffeeProducts.map((p) => [
-                    p.id,
-                    <span key={p.id}>
-                      {p.fitting}
-                      {compared && (
-                        <span className="mt-1 block text-xs">
-                          {p.fitting === compared.fitting
-                            ? "Keep your accessories"
-                            : "Different fitting"}
-                        </span>
-                      )}
-                    </span>,
-                  ]),
-                ),
-              },
-              {
-                id: "milk",
-                label: "Two flat whites",
-                values: Object.fromEntries(
-                  coffeeProducts.map((p) => [p.id, p.milk]),
-                ),
-              },
-            ]}
-          />
+          <CoffeeComparison store={store} />
         </div>
         <aside
           className="flex flex-col border-t bg-muted/30 p-5 sm:p-7 lg:border-t-0 lg:border-l"
@@ -496,22 +543,28 @@ function CoffeeWorkbench() {
           )}
         </aside>
       </div>
-      <ConfirmationDialog
-        open={review}
-        onOpenChange={setReview}
-        title="Your morning setup"
-        description="Review your selection. This example saves a local demo state only; no order or payment is created."
-        confirmLabel="Save demo selection"
-        onConfirm={() => setSaved(true)}
-      >
-        <div className="flex justify-between rounded-xl bg-muted p-4 text-sm">
-          <span>
-            {active?.name}
-            {cart.filter ? " + water filter" : ""}
-          </span>
-          <strong>{money(total)}</strong>
-        </div>
-      </ConfirmationDialog>
+      <CoffeeReviewDialog store={store} />
     </div>
+  );
+}
+export function CoffeeReviewDialog({ store }: { store: CoffeeStore }) {
+  const { review, setReview, setSaved, active, cart, total } = store;
+  return (
+    <ConfirmationDialog
+      open={review}
+      onOpenChange={setReview}
+      title="Your morning setup"
+      description="Review your selection. This example saves a local demo state only; no order or payment is created."
+      confirmLabel="Save demo selection"
+      onConfirm={() => setSaved(true)}
+    >
+      <div className="flex justify-between rounded-xl bg-muted p-4 text-sm">
+        <span>
+          {active?.name}
+          {cart.filter ? " + water filter" : ""}
+        </span>
+        <strong>{money(total)}</strong>
+      </div>
+    </ConfirmationDialog>
   );
 }

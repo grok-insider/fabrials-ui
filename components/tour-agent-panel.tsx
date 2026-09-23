@@ -8,7 +8,7 @@ import {
   ArrowRight,
   UserRound,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@fabrials/ui";
 import { tourCues, tourSnapshot } from "@/lib/coffee-tour";
 import {
   landingPrompt,
