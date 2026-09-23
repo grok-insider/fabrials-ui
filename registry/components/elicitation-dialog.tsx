@@ -1,12 +1,12 @@
 "use client";
 import {
+  Button,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+} from "@fabrials/ui";
 import { ArgumentsForm } from "@/registry/components/arguments-form";
 import { safeUrl } from "@/registry/components/result-view";
 import type { Elicitation } from "@/registry/mcp/provider";

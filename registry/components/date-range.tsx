@@ -1,15 +1,15 @@
 "use client";
 import { useId } from "react";
 import { CalendarDays } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import {
+  Button,
+  Input,
+  Label,
   Popover,
-  PopoverTrigger,
   PopoverContent,
-} from "@/components/ui/popover";
+  PopoverTrigger,
+} from "@fabrials/ui";
+import { Calendar } from "@/components/ui/calendar";
 export interface DateRangeValue {
   from: string;
   to: string;

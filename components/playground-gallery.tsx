@@ -5,6 +5,7 @@ import {
   useSyncExternalStore,
   type ReactNode,
 } from "react";
+import { NativeSelect } from "@fabrials/ui";
 const scenarios = [
   ["comparison", "Shopping assistant", "Compare, select and review"],
   ["explorer", "Project explorer", "Search, filter and select"],
@@ -32,10 +33,10 @@ export function PlaygroundGallery({ children }: { children: ReactNode }) {
   }
   return (
     <div className="grid items-start gap-8 xl:grid-cols-[220px_minmax(0,1fr)]">
-      <label className="space-y-2 text-sm font-medium xl:hidden">
+      <label className="block space-y-2 text-sm font-medium xl:hidden">
         Choose a scenario
-        <select
-          className="mt-2 h-11 w-full rounded-lg border bg-background px-3"
+        <NativeSelect
+          className="mt-2"
           value={selected}
           onChange={(e) => select(e.target.value)}
         >
@@ -44,7 +45,7 @@ export function PlaygroundGallery({ children }: { children: ReactNode }) {
               {title}
             </option>
           ))}
-        </select>
+        </NativeSelect>
       </label>
       <nav
         aria-label="Playground scenarios"
@@ -59,10 +60,12 @@ export function PlaygroundGallery({ children }: { children: ReactNode }) {
               e.preventDefault();
               select(id);
             }}
-            className={`rounded-xl border p-3 transition-colors ${selected === id ? "border-foreground bg-foreground text-background" : "bg-card hover:bg-muted"}`}
+            className={`rounded-xl border p-3 transition-colors ${selected === id ? "border-[var(--brand)] bg-[var(--brand-soft)] text-foreground" : "bg-card hover:bg-accent"}`}
           >
             <span className="flex items-center gap-2">
-              <span className="text-xs font-mono">0{i + 1}</span>
+              <span className="text-xs tabular-nums text-muted-foreground">
+                0{i + 1}
+              </span>
               <span className="text-sm font-medium">{title}</span>
             </span>
             <span className="mt-1 block text-xs leading-5">{description}</span>

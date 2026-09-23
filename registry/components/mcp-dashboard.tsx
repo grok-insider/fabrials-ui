@@ -1,7 +1,7 @@
 "use client";
 import type { JsonSchema } from "@/registry/mcp/types";
 import { useState } from "react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@fabrials/ui";
 import { MCPProvider, useMCPClient } from "@/registry/mcp/provider";
 import { ConnectionPanel } from "@/registry/components/connection-panel";
 import { ToolCatalog, ToolDetail } from "@/registry/components/tool-catalog";

@@ -29,7 +29,7 @@ export function Comparison({
     <div className="comparison-view">
       {note && (
         <div
-          className="mb-5 rounded-xl border border-lime-700/20 bg-lime-100 px-5 py-4 text-sm leading-6 text-lime-950"
+          className="mb-5 rounded-xl border border-[color-mix(in_oklab,var(--brand)_28%,transparent)] bg-[var(--brand-soft)] px-5 py-4 text-sm leading-6 text-foreground"
           role="status"
         >
           {note}
@@ -56,7 +56,7 @@ export function Comparison({
               {rows.map((row) => (
                 <div
                   key={row.id}
-                  className={`flex items-center justify-between gap-3 border-t px-4 py-3 text-sm ${row.highlighted ? "bg-lime-100 text-lime-950" : ""}`}
+                  className={`flex items-center justify-between gap-3 border-t px-4 py-3 text-sm ${row.highlighted ? "bg-[var(--brand-soft)] text-foreground" : ""}`}
                 >
                   <dt>{row.label}</dt>
                   <dd className="text-right">{row.values[column.id] ?? "—"}</dd>
@@ -69,7 +69,7 @@ export function Comparison({
           </article>
         ))}
       </div>
-      <div className="comparison-table hidden overflow-x-auto rounded-2xl border bg-card sm:block">
+      <div className="comparison-table hidden overflow-x-auto rounded-[var(--fui-radius-lg)] border bg-card sm:block">
         <table className="w-full min-w-[570px] table-fixed text-left text-sm">
           <caption className="sr-only">{caption}</caption>
           <thead>
@@ -97,7 +97,7 @@ export function Comparison({
               <tr
                 key={row.id}
                 data-highlighted={row.highlighted || undefined}
-                className={`border-t transition-colors duration-300 motion-reduce:transition-none ${row.highlighted ? "bg-lime-100 text-lime-950" : ""}`}
+                className={`border-t transition-colors duration-300 motion-reduce:transition-none ${row.highlighted ? "bg-[var(--brand-soft)] text-foreground" : ""}`}
               >
                 <th scope="row" className="px-5 py-4 font-normal">
                   {row.label}

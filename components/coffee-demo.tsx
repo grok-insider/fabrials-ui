@@ -2,7 +2,6 @@
 import { ToolPlayground } from "@/components/tool-playground";
 import { useRef, useState, type ReactNode } from "react";
 import {
-  ArrowRight,
   Check,
   Braces,
   RotateCcw,
@@ -10,9 +9,14 @@ import {
   Plus,
   Minus,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Alert,
+  AlertDescription,
+  Button,
+  Input,
+  Label,
+  NativeSelect,
+} from "@fabrials/ui";
 import {
   WebMCPProvider,
   useWebMCP,
@@ -328,18 +332,13 @@ function CoffeeWorkbench() {
     run,
   } = store;
   return (
-    <div className="overflow-hidden rounded-[1.5rem] border bg-card shadow-[0_20px_70px_-45px_#25311b55]">
+    <div className="overflow-hidden rounded-[var(--fui-radius-lg)] border bg-card">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b px-5 py-4 sm:px-7">
-        <div className="flex items-center gap-3">
-          <span className="grid size-8 place-items-center rounded-lg bg-foreground text-background">
-            <ShoppingBag className="size-4" />
-          </span>
-          <div>
-            <p className="text-sm font-medium">The morning ritual</p>
-            <p className="text-xs text-muted-foreground">
-              Interactive store · fictional products
-            </p>
-          </div>
+        <div>
+          <p className="text-sm font-medium">The morning ritual</p>
+          <p className="text-xs text-muted-foreground">
+            Interactive store · fictional products
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <span className="text-xs text-muted-foreground">
@@ -374,7 +373,7 @@ function CoffeeWorkbench() {
           </div>
           <div className="mb-6 flex flex-wrap items-end gap-3 rounded-xl bg-muted/60 p-4">
             <div>
-              <Label htmlFor="coffee-width" className="mb-2 text-xs">
+              <Label htmlFor="coffee-width" className="mb-2 block">
                 Counter width (cm)
               </Label>
               <Input
@@ -384,22 +383,22 @@ function CoffeeWorkbench() {
                 max={100}
                 value={width}
                 onChange={(e) => setWidth(Number(e.target.value))}
-                className="h-9 w-28 bg-background"
+                className="w-28"
               />
             </div>
             <div>
-              <Label htmlFor="coffee-fitting" className="mb-2 text-xs">
+              <Label htmlFor="coffee-fitting" className="mb-2 block">
                 Your accessories
               </Label>
-              <select
+              <NativeSelect
                 id="coffee-fitting"
                 value={fitting}
                 onChange={(e) => setFitting(e.target.value)}
-                className="h-9 rounded-md border bg-background px-3 text-sm"
+                className="w-auto"
               >
                 <option>58 mm</option>
                 <option>54 mm</option>
-              </select>
+              </NativeSelect>
             </div>
             <Button
               variant="outline"
@@ -446,7 +445,7 @@ function CoffeeWorkbench() {
               )
             }
           >
-            Find the right fit <ArrowRight />
+            Find the right fit
           </Button>
           <div className="my-6 border-t" />
           <div className="flex items-center justify-between text-sm font-medium">
@@ -459,8 +458,9 @@ function CoffeeWorkbench() {
                 <span>{active.name}</span>
                 <span>{money(active.price)}</span>
               </div>
-              <button
-                className="flex w-full items-center justify-between gap-2 rounded-lg border bg-background p-3 text-left text-xs"
+              <Button
+                variant="outline"
+                className="w-full justify-between py-3 text-left"
                 onClick={() =>
                   void run("set_coffee_filter", { included: !cart.filter })
                 }
@@ -468,16 +468,12 @@ function CoffeeWorkbench() {
               >
                 <span>
                   {cart.filter ? "Filter added" : "Add compatible filter"}
-                  <span className="mt-1 block text-muted-foreground">
+                  <span className="mt-1 block text-xs font-normal text-muted-foreground">
                     Universal · €24
                   </span>
                 </span>
-                {cart.filter ? (
-                  <Minus className="size-4" />
-                ) : (
-                  <Plus className="size-4" />
-                )}
-              </button>
+                {cart.filter ? <Minus /> : <Plus />}
+              </Button>
               <div className="flex justify-between border-t pt-4 text-sm font-medium">
                 <span>Total</span>
                 <span>{money(total)}</span>
@@ -487,7 +483,7 @@ function CoffeeWorkbench() {
                 className="w-full"
                 onClick={() => void run("review_coffee_cart", {})}
               >
-                Review selection <ArrowRight />
+                Review selection
               </Button>
               <p className="text-[11px] leading-5 text-muted-foreground">
                 Demo only. No payment or order is created.
@@ -499,12 +495,9 @@ function CoffeeWorkbench() {
             </div>
           )}
           {saved && (
-            <p
-              role="status"
-              className="mt-4 rounded-lg bg-lime-100 p-3 text-sm text-lime-950"
-            >
-              Selection saved for this demo.
-            </p>
+            <Alert variant="success" className="mt-4">
+              <AlertDescription>Selection saved for this demo.</AlertDescription>
+            </Alert>
           )}
           <div className="mt-auto pt-6">
             <details className="text-xs">

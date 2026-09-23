@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@fabrials/ui";
 import type { Support } from "@/registry/mcp/types";
 export function SupportBadge({
   support,
@@ -13,12 +13,15 @@ export function SupportBadge({
     legacy: "WebMCP · legacy API",
     unsupported: "Native WebMCP unavailable",
   };
+  const tone =
+    support === "native" || support === "legacy"
+      ? "success"
+      : support === "unsupported"
+        ? "warning"
+        : "neutral";
   return (
     <div className="space-y-2">
-      <Badge variant="outline" role="status">
-        <span
-          className={`mr-1 size-1.5 rounded-full ${support === "native" || support === "legacy" ? "bg-emerald-500" : "bg-muted-foreground"}`}
-        />
+      <Badge variant="outline" tone={tone} dot role="status">
         {labels[support]}
       </Badge>
       {error && (

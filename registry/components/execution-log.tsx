@@ -1,8 +1,6 @@
 "use client";
 import { Check, Circle, Loader2, X } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+import { Badge, Button, Progress } from "@fabrials/ui";
 import { ResultView } from "@/registry/components/result-view";
 import type { Execution } from "@/registry/mcp/types";
 export function ExecutionLog({
@@ -45,14 +43,12 @@ export function ExecutionLog({
             {e.status === "running" ? (
               <Loader2 className="size-3.5 animate-spin motion-reduce:animate-none" />
             ) : e.status === "success" ? (
-              <Check className="size-3.5 text-emerald-600 dark:text-emerald-400" />
+              <Check className="size-3.5 text-[var(--fui-success-ink)]" />
             ) : (
               <X className="size-3.5 text-destructive" />
             )}
             <span className="flex-1 font-mono">{e.name}</span>
-            <Badge variant="secondary" className="text-[10px]">
-              {e.source}
-            </Badge>
+            <Badge variant="soft">{e.source}</Badge>
             <span role="status" className="text-muted-foreground">
               {e.status}
             </span>
@@ -61,10 +57,11 @@ export function ExecutionLog({
             {e.progress && (
               <>
                 <Progress
+                  max={100}
                   value={
                     e.progress.total
                       ? (e.progress.progress / e.progress.total) * 100
-                      : null
+                      : undefined
                   }
                 />
                 <p role="status" className="text-xs text-muted-foreground">

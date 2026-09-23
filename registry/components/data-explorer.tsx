@@ -1,17 +1,18 @@
 "use client";
 import { useId, useMemo, useState, type ReactNode } from "react";
 import { ArrowDown, ArrowUp, Search } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import {
+  Button,
+  Checkbox,
+  Input,
+  NativeSelect,
   Table,
-  TableHeader,
-  TableHead,
   TableBody,
-  TableRow,
   TableCell,
-} from "@/components/ui/table";
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@fabrials/ui";
 export interface DataColumn<T> {
   key: keyof T & string;
   label: string;
@@ -36,13 +37,13 @@ export function SearchFilter({
   return (
     <div className="flex flex-wrap gap-3">
       <div className="relative min-w-48 flex-1">
-        <Search className="absolute top-2.5 left-3 size-4 text-muted-foreground" />
+        <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           aria-label={placeholder}
           value={query}
           placeholder={placeholder}
           onChange={(e) => onQueryChange(e.target.value)}
-          className="h-9 pl-9"
+          className="pl-9"
         />
       </div>
       {options.length > 0 && (
@@ -50,11 +51,11 @@ export function SearchFilter({
           <label className="sr-only" htmlFor={id}>
             Filter records
           </label>
-          <select
+          <NativeSelect
             id={id}
+            className="w-auto"
             value={filter}
             onChange={(e) => onFilterChange?.(e.target.value)}
-            className="h-9 rounded-md border bg-background px-3 text-sm"
           >
             <option value="">All categories</option>
             {options.map((option) => (
@@ -62,7 +63,7 @@ export function SearchFilter({
                 {option.label}
               </option>
             ))}
-          </select>
+          </NativeSelect>
         </>
       )}
     </div>
@@ -169,7 +170,6 @@ export function DataTable<T extends { id: string }>({
                             : selected.filter((id) => id !== row.id),
                         )
                       }
-                      className="size-4"
                     />
                   </TableCell>
                 )}

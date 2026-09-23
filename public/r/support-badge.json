@@ -6,15 +6,9 @@
   "description": "Show native support, legacy compatibility or manual mode.",
   "author": "Fabrials <admin@grokinsider.net>",
   "dependencies": [
-    "@base-ui/react@^1.8.0",
-    "class-variance-authority@^0.7.1",
-    "clsx@^2.1.1",
-    "tailwind-merge@^3.6.0",
-    "tw-animate-css@^1.4.0"
+    "@fabrials/ui@0.4.0"
   ],
-  "registryDependencies": [
-    "badge"
-  ],
+  "registryDependencies": [],
   "files": [
     {
       "path": "registry/mcp/types.ts",
@@ -26,7 +20,7 @@
       "path": "registry/components/support-badge.tsx",
       "type": "registry:component",
       "target": "components/webmcp/support-badge.tsx",
-      "content": "import { Badge } from \"@/components/ui/badge\";\nimport type { Support } from \"@/lib/mcp/types\";\nexport function SupportBadge({\n  support,\n  error,\n}: {\n  support: Support;\n  error?: string;\n}) {\n  const labels: Record<Support, string> = {\n    checking: \"Checking browser…\",\n    native: \"WebMCP available\",\n    legacy: \"WebMCP · legacy API\",\n    unsupported: \"Native WebMCP unavailable\",\n  };\n  return (\n    <div className=\"space-y-2\">\n      <Badge variant=\"outline\" role=\"status\">\n        <span\n          className={`mr-1 size-1.5 rounded-full ${support === \"native\" || support === \"legacy\" ? \"bg-emerald-500\" : \"bg-muted-foreground\"}`}\n        />\n        {labels[support]}\n      </Badge>\n      {error && (\n        <p role=\"alert\" className=\"text-xs text-destructive\">\n          {error}\n        </p>\n      )}\n    </div>\n  );\n}\n"
+      "content": "import { Badge } from \"@fabrials/ui\";\nimport type { Support } from \"@/lib/mcp/types\";\nexport function SupportBadge({\n  support,\n  error,\n}: {\n  support: Support;\n  error?: string;\n}) {\n  const labels: Record<Support, string> = {\n    checking: \"Checking browser…\",\n    native: \"WebMCP available\",\n    legacy: \"WebMCP · legacy API\",\n    unsupported: \"Native WebMCP unavailable\",\n  };\n  const tone =\n    support === \"native\" || support === \"legacy\"\n      ? \"success\"\n      : support === \"unsupported\"\n        ? \"warning\"\n        : \"neutral\";\n  return (\n    <div className=\"space-y-2\">\n      <Badge variant=\"outline\" tone={tone} dot role=\"status\">\n        {labels[support]}\n      </Badge>\n      {error && (\n        <p role=\"alert\" className=\"text-xs text-destructive\">\n          {error}\n        </p>\n      )}\n    </div>\n  );\n}\n"
     }
   ]
 }

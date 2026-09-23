@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Comparison } from "@/registry/components/comparison";
-import { Button } from "@/components/ui/button";
+import { Button } from "@fabrials/ui";
 
 /** A minimal, controlled example without a store, cart or agent registration. */
 export function ComparisonDemo() {
