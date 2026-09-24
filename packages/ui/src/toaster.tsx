@@ -32,12 +32,25 @@ function useDocumentTheme(): "light" | "dark" {
   return theme;
 }
 
-export function Toaster({ theme, className, style, ...props }: ToasterProps) {
+export function Toaster({
+  theme,
+  className,
+  style,
+  expand,
+  closeButton,
+  gap,
+  richColors: _richColors,
+  icons: _icons,
+  ...props
+}: ToasterProps) {
   const detected = useDocumentTheme();
   return (
     <Sonner
       theme={theme ?? detected}
-      className={["fui-toaster", "toaster", "group", className].filter(Boolean).join(" ")}
+      expand={expand ?? true}
+      closeButton={closeButton ?? true}
+      gap={gap ?? 12}
+      className={["fui-toaster", className].filter(Boolean).join(" ")}
       icons={{
         success: <CircleCheckIcon aria-hidden className="fui-toast-icon" data-tone="success" />,
         info: <InfoIcon aria-hidden className="fui-toast-icon" data-tone="info" />,
@@ -47,11 +60,23 @@ export function Toaster({ theme, className, style, ...props }: ToasterProps) {
       }}
       style={
         {
-          "--normal-bg": "var(--popover)",
-          "--normal-text": "var(--popover-foreground)",
-          "--normal-border": "var(--border)",
-          "--border-radius": "var(--fui-radius-lg)",
           ...style,
+          "--normal-bg": "var(--popover)",
+          "--normal-text": "var(--foreground)",
+          "--normal-border": "var(--border)",
+          "--border-radius": "var(--fui-radius-xl)",
+          "--success-bg": "color-mix(in oklab, var(--success) 9%, var(--popover))",
+          "--success-border": "color-mix(in oklab, var(--fui-success-ink) 30%, var(--border))",
+          "--success-text": "var(--foreground)",
+          "--error-bg": "color-mix(in oklab, var(--destructive) 8%, var(--popover))",
+          "--error-border": "color-mix(in oklab, var(--fui-danger-ink) 40%, var(--border))",
+          "--error-text": "var(--foreground)",
+          "--warning-bg": "color-mix(in oklab, var(--warning) 11%, var(--popover))",
+          "--warning-border": "color-mix(in oklab, var(--fui-warning-ink) 32%, var(--border))",
+          "--warning-text": "var(--foreground)",
+          "--info-bg": "color-mix(in oklab, var(--brand) 8%, var(--popover))",
+          "--info-border": "color-mix(in oklab, var(--brand-ink) 30%, var(--border))",
+          "--info-text": "var(--foreground)",
         } as CSSProperties
       }
       {...props}
