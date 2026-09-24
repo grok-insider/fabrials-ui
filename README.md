@@ -1,6 +1,6 @@
 # Fabrials UI
 
-Local 0.3 adoption for a shared operational interface across Fabrials products.
+Local 0.4 "Stormlight" adoption for a shared operational interface across Fabrials products.
 
 - `packages/ui`: generic presentation primitives, patterns, tokens and fonts.
 - `packages/ai-ui`: provider, quota, history and migration presentation.
@@ -8,7 +8,7 @@ Local 0.3 adoption for a shared operational interface across Fabrials products.
 - `skills/fabrials-design-system`: maintained Codex skill linked on this host.
 
 Read [DESIGN.md](DESIGN.md) before extending the public surface. Read the
-[migration guide](docs/migration-0.3.md) before updating a consumer.
+[migration guide](docs/migration-0.4.md) before updating a consumer.
 
 ```sh
 bun install --frozen-lockfile
@@ -22,9 +22,10 @@ Node 22 builds the packages; Bun manages dependencies. Container browser tests
 require Linux and Docker. `bun run vendor ai-relay --write` explicitly generates
 the consumer distributions; it does not publish, commit or deploy anything.
 
-AI Relay, enterprise Open Mail, the Spanreed desktop, Radiant, fabrials.com
-product routes, and admin consume generated 0.3 copies. ui.fabrials.com imports
-the shared font and tokens only.
-`bun run vendor open-email --write` distributes only the generic package to
-`apps/web/vendor`, without introducing AI-domain dependencies into mail.
-See the [delivery record](docs/delivery-0.3.md) for the 2026-09-15 verification.
+AI Relay and the Spanreed desktop consume the paired `fabrials-{ui,ai-ui}-0.4.0`
+copies. Open Email, Grok Insider, fabrials.com, ui.fabrials.com, Radiant, admin
+and Ditox consume the generic package only.
+`bun run vendor open-email --write` writes `open-email/vendor` in the standalone
+repository and `open-email/apps/web/vendor` when the enterprise layout is present.
+See [docs/migration-0.4.md](docs/migration-0.4.md). The 0.3 delivery record remains
+at [docs/delivery-0.3.md](docs/delivery-0.3.md).

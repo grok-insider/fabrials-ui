@@ -16,16 +16,19 @@ export function PageHeader({
   description,
   actions,
   eyebrow,
+  className,
 }: {
   title: ReactNode;
   description?: ReactNode;
   actions?: ReactNode;
+  /** Context above the title, e.g. a Breadcrumb. Sentence case, not a tracked label. */
   eyebrow?: ReactNode;
+  className?: string;
 }) {
   return (
-    <header className="fui-page-header">
+    <header className={classes("fui-page-header", className)}>
       <div className="fui-page-heading">
-        {eyebrow && <p className="fui-eyebrow">{eyebrow}</p>}
+        {eyebrow && <div className="fui-eyebrow">{eyebrow}</div>}
         <h1>{title}</h1>
         {description && <p className="fui-description">{description}</p>}
       </div>
@@ -38,13 +41,15 @@ export function SectionHeader({
   title,
   description,
   actions,
+  className,
 }: {
   title: ReactNode;
   description?: ReactNode;
   actions?: ReactNode;
+  className?: string;
 }) {
   return (
-    <header className="fui-section-header">
+    <header className={classes("fui-section-header", className)}>
       <div>
         <h2>{title}</h2>
         {description && <p className="fui-description">{description}</p>}
@@ -111,6 +116,7 @@ export function StatePanel({
   headingLevel = 2,
   className,
   icon,
+  align = "start",
 }: {
   state: keyof typeof stateIcons;
   title: ReactNode;
@@ -119,6 +125,7 @@ export function StatePanel({
   headingLevel?: 2 | 3 | 4;
   className?: string;
   icon?: ReactNode;
+  align?: "start" | "center";
 }) {
   const Icon = stateIcons[state];
   const Heading = `h${headingLevel}` as "h2" | "h3" | "h4";
@@ -126,15 +133,22 @@ export function StatePanel({
     <div
       className={classes("fui-state-panel", className)}
       data-state={state}
+      data-align={align}
       role={state === "error" ? "alert" : "status"}
       aria-busy={state === "loading" || undefined}
     >
-      {icon ? <span aria-hidden className="fui-state-icon">{icon}</span> : <Icon
-        aria-hidden
-        size={22}
-        className={state === "loading" ? "fui-spin" : undefined}
-      />}
-      <div>
+      {icon ? (
+        <span aria-hidden className="fui-state-icon">
+          {icon}
+        </span>
+      ) : (
+        <Icon
+          aria-hidden
+          size={20}
+          className={classes("fui-state-icon", state === "loading" && "fui-spin")}
+        />
+      )}
+      <div className="fui-state-text">
         <Heading>{title}</Heading>
         {description && <p className="fui-description">{description}</p>}
       </div>
@@ -216,6 +230,85 @@ export function WorkspaceShell({
         <main className="fui-workspace-content" id={contentId} tabIndex={-1}>
           {children}
         </main>
+      </div>
+    </div>
+  );
+}
+
+export function SiteHeader({
+  brand,
+  navigation,
+  actions,
+  mobileMenu,
+  sticky = true,
+  className,
+  ...props
+}: Omit<ComponentProps<"header">, "children"> & {
+  brand: ReactNode;
+  navigation?: ReactNode;
+  actions?: ReactNode;
+  /** Shown instead of the navigation below 768px, e.g. a Sheet trigger. */
+  mobileMenu?: ReactNode;
+  sticky?: boolean;
+}) {
+  return (
+    <header
+      data-slot="site-header"
+      data-sticky={sticky || undefined}
+      className={classes("fui-site-header", className)}
+      {...props}
+    >
+      <div className="fui-site-header-inner">
+        <div className="fui-site-brand">{brand}</div>
+        {navigation ? <div className="fui-site-nav">{navigation}</div> : null}
+        <div className="fui-site-actions">
+          {actions}
+          {mobileMenu ? <div className="fui-site-mobile-menu">{mobileMenu}</div> : null}
+        </div>
+      </div>
+    </header>
+  );
+}
+
+export function AuthLayout({
+  brand,
+  title,
+  description,
+  children,
+  footer,
+  aside,
+  headingLevel = 1,
+  className,
+}: {
+  brand?: ReactNode;
+  title: ReactNode;
+  description?: ReactNode;
+  children: ReactNode;
+  /** A short note about what the session can and cannot do. */
+  footer?: ReactNode;
+  /** Optional editorial panel shown beside the card on wide screens. */
+  aside?: ReactNode;
+  headingLevel?: 1 | 2;
+  className?: string;
+}) {
+  const Heading = `h${headingLevel}` as "h1" | "h2";
+  return (
+    <div
+      data-slot="auth-layout"
+      data-aside={aside ? "" : undefined}
+      className={classes("fui-auth", className)}
+    >
+      {aside ? <aside className="fui-auth-aside">{aside}</aside> : null}
+      <div className="fui-auth-main">
+        {brand ? <div className="fui-auth-brand">{brand}</div> : null}
+        <section className="fui-auth-card">
+          <header className="fui-auth-header">
+            <Heading className="fui-auth-title">{title}</Heading>
+            {description ? <p className="fui-description">{description}</p> : null}
+          </header>
+          {children}
+        </section>
+        {footer ? <p className="fui-auth-footer">{footer}</p> : null}
       </div>
     </div>
   );

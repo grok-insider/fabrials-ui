@@ -7,13 +7,13 @@ description: Develop or review Fabrials product interfaces using the shared @fab
 
 Use the maintained Fabrials foundation instead of choosing a new visual style per product. Explicit user choices and the requested scope take precedence.
 
-Resolve this skill's symlink to locate the source repository, two directories above this folder. Read its `DESIGN.md` before UI work. Read `docs/migration-0.2.md` when adopting or upgrading packages. Component source and Storybook stories in that repository are the implementation reference; do not duplicate the token specification here.
+Resolve this skill's symlink to locate the source repository, two directories above this folder. Read its `DESIGN.md` before UI work. Read `docs/migration-0.4.md` when adopting or upgrading to 0.4; `docs/migration-0.2.md` and `docs/migration-0.3.md` remain the notes for those releases. Component source and Storybook stories in that repository are the implementation reference; do not duplicate the token specification here.
 
 Before changing a product, read its own AGENTS.md and DESIGN.md. Confirm its installed package version: a product still using 0.1 is not permission to migrate it. Reuse its existing accessible behavior until the scoped migration has tests.
 
 Use shared tokens and generic components from `@fabrials/ui`. Provider, quota and migration presentation belongs in `@fabrials/ai-ui`. Routing, requests, authentication, theme storage and native window integration belong to host adapters. Change canonical source, build it, and use the verified distribution script; never patch vendor copies.
 
-The style is neutral and operational, with Plex typography and semantic state colors. Apply `shadcn-ui` for component work and the Scandinavian/UX skills as supporting guidance only when useful; their generic defaults must not override the maintained brand or reduce task density.
+The 0.4 style is stone and graphite, IBM Plex, and one interaction color (Stormlight). A product gem (`data-gem`) signs the lockup and nothing else. Primary buttons are ink. Shared components use `fui-` classes and work without Tailwind; Tailwind hosts may import `@fabrials/ui/tailwind.css`. Apply `shadcn-ui` for component work and the Scandinavian/UX skills as supporting guidance only when useful; their generic defaults must not override the maintained brand or reduce task density.
 
 For a requested visual change, compare the actual affected flow in both themes and at desktop/mobile sizes. Use browser-automation and chrome-devtools for local/browser verification; use the host's syl workflow when testing native integration. Keep previews and test data synthetic. Report untested states honestly. Approval to style a screen does not authorize account mutations, publication or deployment.
 

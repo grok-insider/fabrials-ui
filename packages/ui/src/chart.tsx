@@ -1,5 +1,5 @@
-// Origin: shadcn/ui chart (Recharts), adapted 2026-09-22 for Fabrials metric series. Fabrials will modify this.
 "use client";
+// Origin: shadcn/ui chart (Recharts), adapted 2026-09-22 for Fabrials metric series. Restyled with fui- classes in 0.4.
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -21,6 +21,7 @@ const PALETTE = [
   "var(--chart-3)",
   "var(--chart-4)",
   "var(--chart-5)",
+  "var(--chart-6)",
 ];
 
 export type ChartSeries = {
@@ -123,8 +124,8 @@ export function SeriesChart({
   );
 
   return (
-    <div ref={frameRef} className={classes("grid min-w-0 gap-3", className)}>
-      <div className="w-full min-w-0" style={{ height }}>
+    <div ref={frameRef} className={classes("fui-chart", className)}>
+      <div className="fui-chart-frame" style={{ height }}>
         {frameWidth > 0 ? (
         <ResponsiveContainer
           width={frameWidth}
@@ -141,7 +142,7 @@ export function SeriesChart({
                   dataKey={item.key}
                   name={item.label}
                   stroke={item.color}
-                  strokeWidth={item.dashed ? 2 : 1.5}
+                  strokeWidth={2}
                   strokeDasharray={item.dashed ? "5 4" : undefined}
                   dot={false}
                   connectNulls
@@ -159,6 +160,8 @@ export function SeriesChart({
                   name={item.label}
                   fill={item.color}
                   stackId={stacked ? "series" : undefined}
+                  radius={stacked ? undefined : [4, 4, 0, 0]}
+                  maxBarSize={48}
                   isAnimationActive={false}
                 />
               ))}
@@ -189,25 +192,25 @@ export function SeriesChart({
         </tbody>
       </table>
       {painted.length > 1 ? (
-        <div className="flex flex-wrap gap-x-3 gap-y-1">
+        <div className="fui-chart-legend">
           {painted.map((item) => {
             const shown = !hidden.has(item.key);
             return (
-              <span key={item.key} className="inline-flex items-center">
+              <span key={item.key} className="fui-chart-legend-item">
                 <button
                   type="button"
                   aria-pressed={shown}
                   aria-label={shown ? `Hide ${item.label}` : `Show ${item.label}`}
-                  className="inline-flex min-h-11 items-center gap-2 rounded-lg px-1.5 text-xs focus-visible:outline-2 focus-visible:outline-offset-2"
+                  className="fui-chart-legend-toggle"
                   onClick={() => toggle(item.key)}
                 >
-                  <span aria-hidden className="size-2.5 rounded-full" style={{ background: item.color }} />
-                  <span className={shown ? "text-foreground" : "text-muted-foreground line-through"}>{item.label}</span>
+                  <span aria-hidden className="fui-chart-swatch" style={{ background: item.color }} />
+                  <span data-hidden={shown ? undefined : ""}>{item.label}</span>
                 </button>
                 <button
                   type="button"
                   aria-label={`Show only ${item.label}`}
-                  className="min-h-11 rounded-lg px-1.5 text-[11px] text-muted-foreground"
+                  className="fui-chart-legend-only"
                   onClick={() => setHidden(new Set(painted.filter((entry) => entry.key !== item.key).map((entry) => entry.key)))}
                 >
                   Only
@@ -218,7 +221,7 @@ export function SeriesChart({
           {visible.length !== painted.length ? (
             <button
               type="button"
-              className="min-h-11 rounded-lg px-2 text-xs font-medium"
+              className="fui-chart-legend-reset"
               onClick={() => setHidden(new Set())}
             >
               Show all
@@ -255,16 +258,16 @@ function SeriesTooltip({
   const total = payload.reduce((sum, item) => sum + numeric(item.value), 0);
   return (
     <div className="fui-chart-tip">
-      <p className="font-medium">{String(title ?? "")}</p>
+      <p className="fui-chart-tip-title">{String(title ?? "")}</p>
       {rows.length ? (
-        <ul className="grid gap-1">
+        <ul className="fui-chart-tip-list">
           {rows.map((item) => (
-            <li className="flex items-center justify-between gap-4" key={String(item.name)}>
-              <span className="flex min-w-0 items-center gap-2">
-                <span aria-hidden className="size-2 shrink-0 rounded-full" style={{ background: item.color }} />
-                <span className="truncate">{String(item.name ?? "")}</span>
+            <li className="fui-chart-tip-row" key={String(item.name)}>
+              <span className="fui-chart-tip-name">
+                <span aria-hidden className="fui-chart-swatch" style={{ background: item.color }} />
+                <span>{String(item.name ?? "")}</span>
               </span>
-              <span className="font-mono">{yFormat(numeric(item.value))}</span>
+              <span className="fui-chart-tip-value">{yFormat(numeric(item.value))}</span>
             </li>
           ))}
         </ul>
@@ -272,7 +275,7 @@ function SeriesTooltip({
         <p>No value</p>
       )}
       {payload.length > 1 ? (
-        <p className="flex justify-between gap-4 border-t pt-2 font-mono">
+        <p className="fui-chart-tip-total">
           <span>Total</span>
           <span>{yFormat(total)}</span>
         </p>

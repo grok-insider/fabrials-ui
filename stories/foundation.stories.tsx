@@ -43,6 +43,7 @@ import {
   Input,
   Label,
   PageHeader,
+  ProductLockup,
   Progress,
   SectionHeader,
   Select,
@@ -96,6 +97,8 @@ function ControlsDemo() {
           </Button>
           <Button disabled>Unavailable</Button>
           <Button variant="link">Read documentation</Button>
+          <Button variant="accent">Connect</Button>
+          <Button loading>Saving…</Button>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger
@@ -378,8 +381,7 @@ function AccountsDemo() {
       navigation={
         <aside className="catalogue-nav">
           <div className="catalogue-brand">
-            <Activity aria-hidden size={20} />
-            Fabrials
+            <ProductLockup product="ai-relay" tagline="Operator console" gem="sapphire" />
           </div>
           <nav aria-label="Main navigation">{navigation}</nav>
         </aside>

@@ -1,5 +1,5 @@
-// Origin: shadcn/ui (Embla Carousel), copied 2026-09-22. Fabrials will modify this.
-"use client"
+"use client";
+// Origin: shadcn/ui (Embla Carousel), copied 2026-09-22. Restyled with fui- classes in 0.4 so it renders without Tailwind.
 
 import * as React from "react"
 import useEmblaCarousel, {
@@ -121,7 +121,8 @@ function Carousel({
     >
       <div
         onKeyDownCapture={handleKeyDown}
-        className={cn("relative", className)}
+        className={cn("fui-carousel", className)}
+        data-orientation={orientation || (opts?.axis === "y" ? "vertical" : "horizontal")}
         role="region"
         aria-roledescription="carousel"
         data-slot="carousel"
@@ -139,15 +140,12 @@ function CarouselContent({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       ref={carouselRef}
-      className="overflow-hidden"
+      className="fui-carousel-viewport"
       data-slot="carousel-content"
     >
       <div
-        className={cn(
-          "flex",
-          orientation === "horizontal" ? "-ml-4" : "-mt-4 flex-col",
-          className
-        )}
+        className={cn("fui-carousel-track", className)}
+        data-orientation={orientation}
         {...props}
       />
     </div>
@@ -162,11 +160,8 @@ function CarouselItem({ className, ...props }: React.ComponentProps<"div">) {
       role="group"
       aria-roledescription="slide"
       data-slot="carousel-item"
-      className={cn(
-        "min-w-0 shrink-0 grow-0 basis-full",
-        orientation === "horizontal" ? "pl-4" : "pt-4",
-        className
-      )}
+      data-orientation={orientation}
+      className={cn("fui-carousel-item", className)}
       {...props}
     />
   )
@@ -185,18 +180,13 @@ function CarouselPrevious({
       data-slot="carousel-previous"
       variant={variant}
       size={size}
-      className={cn(
-        "absolute touch-manipulation rounded-full",
-        orientation === "horizontal"
-          ? "inset-y-0 -left-12 my-auto"
-          : "-top-12 left-1/2 -translate-x-1/2 rotate-90",
-        className
-      )}
+      data-orientation={orientation}
+      className={cn("fui-carousel-control", "fui-carousel-previous", className)}
       disabled={!canScrollPrev}
       onClick={scrollPrev}
       {...props}
     >
-      <ChevronLeftIcon />
+      <ChevronLeftIcon aria-hidden />
       <span className="fui-sr-only">Previous slide</span>
     </Button>
   )
@@ -215,18 +205,13 @@ function CarouselNext({
       data-slot="carousel-next"
       variant={variant}
       size={size}
-      className={cn(
-        "absolute touch-manipulation rounded-full",
-        orientation === "horizontal"
-          ? "inset-y-0 -right-12 my-auto"
-          : "-bottom-12 left-1/2 -translate-x-1/2 rotate-90",
-        className
-      )}
+      data-orientation={orientation}
+      className={cn("fui-carousel-control", "fui-carousel-next", className)}
       disabled={!canScrollNext}
       onClick={scrollNext}
       {...props}
     >
-      <ChevronRightIcon />
+      <ChevronRightIcon aria-hidden />
       <span className="fui-sr-only">Next slide</span>
     </Button>
   )

@@ -1,12 +1,15 @@
 "use client";
 
+import type { ComponentProps } from "react";
 import { Menu as BaseMenu } from "@base-ui/react/menu";
 import { Tooltip as BaseTooltip } from "@base-ui/react/tooltip";
+import { Check, Dot } from "lucide-react";
 import { classes, type StyledProps } from "./shared";
 
 export const DropdownMenu = BaseMenu.Root;
 export const DropdownMenuTrigger = BaseMenu.Trigger;
 export const DropdownMenuGroup = BaseMenu.Group;
+export const DropdownMenuRadioGroup = BaseMenu.RadioGroup;
 
 export function DropdownMenuContent({
   className,
@@ -54,6 +57,55 @@ export function DropdownMenuItem({
   );
 }
 
+export function DropdownMenuCheckboxItem({
+  className,
+  children,
+  ...props
+}: StyledProps<BaseMenu.CheckboxItem.Props>) {
+  return (
+    <BaseMenu.CheckboxItem
+      className={classes("fui-menu-item", className)}
+      {...props}
+    >
+      {children}
+      <BaseMenu.CheckboxItemIndicator className="fui-menu-indicator">
+        <Check aria-hidden size={16} />
+      </BaseMenu.CheckboxItemIndicator>
+    </BaseMenu.CheckboxItem>
+  );
+}
+
+export function DropdownMenuRadioItem({
+  className,
+  children,
+  ...props
+}: StyledProps<BaseMenu.RadioItem.Props>) {
+  return (
+    <BaseMenu.RadioItem
+      className={classes("fui-menu-item", className)}
+      {...props}
+    >
+      {children}
+      <BaseMenu.RadioItemIndicator className="fui-menu-indicator">
+        <Dot aria-hidden size={20} strokeWidth={4} />
+      </BaseMenu.RadioItemIndicator>
+    </BaseMenu.RadioItem>
+  );
+}
+
+export function DropdownMenuShortcut({
+  className,
+  ...props
+}: ComponentProps<"span">) {
+  return (
+    <span
+      aria-hidden
+      className={classes("fui-menu-shortcut", className)}
+      {...props}
+    />
+  );
+}
+
 export function DropdownMenuLabel({
   className,
   ...props
@@ -72,7 +124,7 @@ export function DropdownMenuSeparator({
 }: StyledProps<BaseMenu.Separator.Props>) {
   return (
     <BaseMenu.Separator
-      className={classes("fui-separator", className)}
+      className={classes("fui-separator", "fui-menu-separator", className)}
       {...props}
     />
   );
@@ -93,7 +145,7 @@ export function TooltipContent({
   return (
     <BaseTooltip.Portal>
       <BaseTooltip.Positioner
-        className="fui-positioner"
+        className="fui-positioner fui-tooltip-positioner"
         sideOffset={sideOffset}
         side={side}
         align={align}

@@ -5,6 +5,9 @@ import {
   BulkActions,
   Field,
   Input,
+  ProductLockup,
+  Snippet,
+  Stat,
   WorkspaceShell,
 } from "../../packages/ui/src/index";
 
@@ -63,4 +66,22 @@ test("shell renders supplied navigation without manufacturing routes or platform
   assert.match(html, /href="\/accounts"/);
   assert.doesNotMatch(html, /data-tauri|localStorage/);
   assert.equal((html.match(/<main/g) ?? []).length, 1);
+});
+
+test("lockup, stat and snippet keep their names and copy text", () => {
+  const html = renderToStaticMarkup(
+    <>
+      <ProductLockup product="Spanreed" tagline="by Fabrials" gem="ruby" />
+      <Stat label="Requests" value="12" />
+      <Snippet label="Install">curl example</Snippet>
+    </>,
+  );
+  assert.match(html, /data-gem="ruby"/);
+  assert.match(html, /Spanreed/);
+  assert.match(html, /by Fabrials/);
+  assert.match(html, /Requests/);
+  assert.match(html, />12</);
+  assert.match(html, /aria-label="Install"/);
+  assert.match(html, /curl example/);
+  assert.match(html, /aria-label="Copy command"/);
 });
