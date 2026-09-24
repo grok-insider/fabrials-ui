@@ -17,3 +17,27 @@ test("known providers keep their marks", () => {
   expect(providerBrand("nous")).toBe("nousresearch");
   expect(providerBrand("mystery")).toBe(null);
 });
+
+test("spanreed providers resolve to a mark", () => {
+  for (const id of [
+    "amp",
+    "zai",
+    "minimax",
+    "kimi",
+    "moonshot",
+    "copilot",
+    "github",
+    "devin",
+    "kiro",
+    "antigravity",
+    "perplexity",
+    "factory",
+    "synthetic",
+    "jetbrains",
+    "jetbrains-ai-assistant",
+  ]) {
+    const brand = providerBrand(id);
+    expect(brand).not.toBe(null);
+    expect(providerIcons[brand]).toContain("<title>");
+  }
+});
