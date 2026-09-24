@@ -38,10 +38,13 @@ export function HostedMigration({
   api: migrationApi,
   origin,
   authorize,
+  heading = true,
 }: {
   api: HostedMigrationApi;
   origin: string;
   authorize: (request: MigrationAuthorization) => React.ReactNode;
+  /** The host already shows the page title. */
+  heading?: boolean;
 }) {
   const [authorized, setAuthorized] = React.useState<string[]>([]);
   const [direction, setDirection] =
@@ -106,7 +109,12 @@ export function HostedMigration({
   }
   return (
     <div className="fb-form">
-      <PageHeader title="Account migration" description="Pair Spanreed with this hosted workspace. Review the destination and selected accounts before approving a transfer." />
+      {heading ? (
+        <PageHeader
+          title="Account migration"
+          description="Pair Spanreed with this relay. Review the destination and the selected accounts before you approve a transfer."
+        />
+      ) : null}
       <section className="fb-form" aria-label="Create migration invitation">
         <Label>
           Direction
@@ -139,9 +147,9 @@ export function HostedMigration({
         </Button>
         {invitation && (
           <div className="fb-form">
-            <p>
-              Enter these details in Spanreed → Migration. The invitation
-              expires {new Date(invitation.expiresAtMs).toLocaleTimeString()}.
+            <p className="fb-muted">
+              Enter these details in Spanreed, on Account migration. The invitation
+              expires {formatWhen(invitation.expiresAtMs)}. The secret stays on this page until you leave it.
             </p>
             <Label>
               Hosted origin
@@ -202,38 +210,31 @@ export function HostedMigration({
         )}
       </section>
       <section className="fb-form" aria-label="Migration sessions">
-        <h2>Sessions</h2>
-        <p className="fb-muted">
-          Completed receipts remain available for 30 days after the transfer
-          window closes.
-        </p>
-        <Button
-          variant="outline"
-          className=""
-          disabled={busy}
-          onClick={() => void run(refresh)}
-        >
-          Refresh sessions
-        </Button>
-        {!sessions.length && <p className="fb-muted">No migration sessions.</p>}
-        {sessions.map((session) => (
-          <Button
-            variant="outline"
-            className=""
-            key={session.id}
-            disabled={busy}
-            onClick={() => void run(async () => open(session.id))}
-          >
-            <span style={{ overflowWrap: "anywhere" }}>
-              {session.direction === "hostedToLocal"
-                ? "ai-relay → Spanreed"
-                : "Spanreed → ai-relay"}{" "}
-              · {session.phase}
-              <br />
-              {session.id}
-            </span>
+        <div className="fb-row">
+          <h2>Sessions</h2>
+          <Button variant="outline" disabled={busy} onClick={() => void run(refresh)}>
+            Refresh sessions
           </Button>
-        ))}
+        </div>
+        <p className="fb-muted">Completed receipts stay available for 30 days after the transfer window closes.</p>
+        {!sessions.length ? <p className="fb-muted">No migration sessions yet. Create an invitation to start one.</p> : null}
+        {sessions.length ? (
+          <div className="fb-log">
+            {sessions.map((session) => (
+              <button
+                className="fb-log-button"
+                disabled={busy}
+                key={session.id}
+                onClick={() => void run(async () => open(session.id))}
+                type="button"
+              >
+                <strong>{directionLabel(session.direction)}</strong>
+                <span className="fb-muted">{phaseLabel(session.phase)}</span>
+                <code className="fb-mono" style={{ overflowWrap: "anywhere" }}>{session.id}</code>
+              </button>
+            ))}
+          </div>
+        ) : null}
       </section>
       {selected && (
         <section className="fb-form" aria-label="Selected migration">
@@ -429,4 +430,24 @@ export function HostedMigration({
       )}
     </div>
   );
+}
+
+function directionLabel(direction: MigrationDirection): string {
+  return direction === "hostedToLocal" ? "ai-relay to Spanreed" : "Spanreed to ai-relay";
+}
+
+function phaseLabel(phase: string): string {
+  const labels: Record<string, string> = {
+    pairing: "Waiting to pair",
+    paired: "Paired",
+    reviewing: "Ready to review",
+    approved: "Approved",
+    completed: "Completed",
+    cancelled: "Cancelled",
+  };
+  return labels[phase] ?? phase;
+}
+
+function formatWhen(ms: number): string {
+  return new Intl.DateTimeFormat("en", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(ms);
 }
