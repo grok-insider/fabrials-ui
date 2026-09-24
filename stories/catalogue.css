@@ -17,6 +17,21 @@ select {
   margin-inline: auto;
   overflow-x: clip;
 }
+.catalogue-toast-stage {
+  min-height: 100dvh;
+  padding: 1.5rem;
+}
+.catalogue-toast-stage h1 {
+  margin: 0;
+  font-size: var(--fui-text-title);
+  font-weight: var(--fui-weight-semibold);
+  letter-spacing: var(--fui-tracking-tight);
+  line-height: var(--fui-leading-title);
+}
+.catalogue-toast-stage p {
+  max-width: 42rem;
+  color: var(--muted-foreground);
+}
 .catalogue > section {
   margin-top: 2rem;
   min-width: 0;
