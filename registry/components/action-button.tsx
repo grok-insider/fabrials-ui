@@ -1,7 +1,7 @@
 "use client";
 import { useRef, useState, type ReactNode } from "react";
 import { Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@fabrials/ui";
 import { errorMessage } from "@/registry/mcp/types";
 export function ActionButton({
   action,

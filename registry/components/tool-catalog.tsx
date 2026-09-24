@@ -1,9 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Search, ArrowUpRight, Braces } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge, Button, Input } from "@fabrials/ui";
 import { ArgumentsForm } from "@/registry/components/arguments-form";
 import type { ToolDefinition } from "@/registry/mcp/types";
 import { cn } from "@/lib/utils";
@@ -27,13 +25,13 @@ export function ToolCatalog({
   return (
     <div className={cn("space-y-4", className)}>
       <div className="relative">
-        <Search className="pointer-events-none absolute top-2.5 left-3 size-4 text-muted-foreground" />
+        <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           aria-label="Search tools"
           placeholder="Search tools…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="h-9 pl-9"
+          className="pl-9"
         />
       </div>
       <div className="grid gap-2">
@@ -45,7 +43,8 @@ export function ToolCatalog({
             onClick={() => onSelect(tool)}
             className={cn(
               "group flex w-full items-start gap-3 rounded-lg border p-4 text-left transition-colors hover:bg-muted/60 focus-visible:outline-2 focus-visible:outline-ring",
-              selected === tool.name && "border-foreground/35 bg-muted/60",
+              selected === tool.name &&
+                "border-[var(--brand)] bg-[var(--brand-soft)]",
             )}
           >
             <Braces className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
@@ -91,7 +90,7 @@ export function ToolDetail({
         <div className="flex flex-wrap items-center gap-2">
           <h3 className="font-medium">{tool.title ?? tool.name}</h3>
           {tool.annotations?.readOnlyHint && (
-            <Badge variant="secondary">Read-only hint</Badge>
+            <Badge variant="soft">Read-only hint</Badge>
           )}
         </div>
         <p className="text-sm text-muted-foreground">{tool.description}</p>

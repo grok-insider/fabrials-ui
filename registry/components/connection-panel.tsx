@@ -1,10 +1,7 @@
 "use client";
 import { useId, useState } from "react";
 import { Plug, Unplug } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
+import { Badge, Button, Input, Label, NativeSelect } from "@fabrials/ui";
 import { BrowserOAuthProvider } from "@/registry/mcp/oauth";
 import type { ConnectionOptions } from "@/registry/mcp/client";
 export function ConnectionPanel({
@@ -78,9 +75,8 @@ export function ConnectionPanel({
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
           <Label htmlFor={`${id}-auth`}>Authentication</Label>
-          <select
+          <NativeSelect
             id={`${id}-auth`}
-            className="h-9 w-full rounded-md border bg-background px-2 text-sm"
             value={auth}
             onChange={(e) => {
               setAuth(e.target.value);
@@ -91,13 +87,12 @@ export function ConnectionPanel({
             <option value="none">None</option>
             <option value="bearer">Bearer token</option>
             <option value="oauth">OAuth / PKCE</option>
-          </select>
+          </NativeSelect>
         </div>
         <div className="space-y-1.5">
           <Label htmlFor={`${id}-version`}>Protocol</Label>
-          <select
+          <NativeSelect
             id={`${id}-version`}
-            className="h-9 w-full rounded-md border bg-background px-2 text-sm"
             value={version}
             onChange={(e) => setVersion(e.target.value as typeof version)}
             disabled={connected || busy}
@@ -105,7 +100,7 @@ export function ConnectionPanel({
             <option value="auto">Auto · prefer latest</option>
             <option value="current">2026-07-28</option>
             <option value="legacy">Legacy handshake</option>
-          </select>
+          </NativeSelect>
         </div>
       </div>
       {auth === "bearer" && !connected && (

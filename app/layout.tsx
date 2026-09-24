@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { SiteFrame } from "@/components/site-shell";
+import { DocsSearchDialog } from "@/components/docs/docs-search-dialog";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import "@fabrials/ui/fonts.css";
-import "@fabrials/ui/tokens.css";
-import "@fabrials/ui/styles.css";
 import "./globals.css";
 import { RootProvider } from "fumadocs-ui/provider/next";
 export const metadata: Metadata = {
@@ -25,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" data-gem="zircon" suppressHydrationWarning>
       <body>
         <a
           href="#main-content"
@@ -35,6 +33,7 @@ export default function RootLayout({
         </a>
         <RootProvider
           theme={{ storageKey: "fabrials-ui-theme", hotKey: false }}
+          search={{ SearchDialog: DocsSearchDialog }}
         >
           <TooltipProvider>
             <SiteFrame>{children}</SiteFrame>

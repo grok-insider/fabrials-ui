@@ -1,9 +1,7 @@
 "use client";
 import { ToolPlayground } from "@/components/tool-playground";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { Button, Input, Label, NativeSelect } from "@fabrials/ui";
 import { Comparison } from "@/registry/components/comparison";
 import { ConfirmationDialog } from "@/registry/components/confirmation-dialog";
 import { Wizard } from "@/registry/components/wizard";
@@ -198,15 +196,15 @@ function SupportQueue() {
         <h3 className="font-medium">Support inbox</h3>
         <label className="flex items-center gap-2 text-sm">
           Priority
-          <select
+          <NativeSelect
+            className="w-auto"
             value={priority}
             onChange={(e) => setPriority(e.target.value)}
-            className="rounded-md border bg-background px-3 py-2"
           >
             {["All", "High", "Normal"].map((v) => (
               <option key={v}>{v}</option>
             ))}
-          </select>
+          </NativeSelect>
         </label>
       </div>
       <ul className="divide-y rounded-xl border">
@@ -337,15 +335,14 @@ function WorkspaceSetup() {
           content: (
             <label className="flex flex-col gap-2 text-sm">
               Team size
-              <select
+              <NativeSelect
                 value={size}
                 onChange={(e) => setSize(e.target.value)}
-                className="rounded-md border bg-background p-3"
               >
                 {["Just me", "2–10", "11–50"].map((v) => (
                   <option key={v}>{v}</option>
                 ))}
-              </select>
+              </NativeSelect>
             </label>
           ),
         },

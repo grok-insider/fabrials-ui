@@ -1,14 +1,14 @@
 "use client";
 import { useState, type ReactNode } from "react";
 import {
+  Button,
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+  DialogHeader,
+  DialogTitle,
+} from "@fabrials/ui";
 import { errorMessage } from "@/registry/mcp/types";
 export function ConfirmationDialog({
   open,

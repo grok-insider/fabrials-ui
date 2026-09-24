@@ -26,7 +26,7 @@ export function DemoVideo() {
     >
       <div className="mb-7 flex flex-wrap items-end justify-between gap-5">
         <div>
-          <p className="text-[11px] uppercase tracking-[.15em] text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             Watch it work · {Math.round(timing.durationInFrames / timing.fps)}{" "}
             seconds
           </p>

@@ -1,6 +1,6 @@
 "use client";
 import { useId, useRef, useState, type ReactNode } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@fabrials/ui";
 import { errorMessage } from "@/registry/mcp/types";
 export interface WizardStep {
   title: string;
@@ -34,7 +34,7 @@ export function Wizard({
             className={`flex items-center gap-2 text-xs ${i === step ? "text-foreground" : "text-muted-foreground"}`}
           >
             <span
-              className={`flex size-6 items-center justify-center rounded-full border ${i === step ? "bg-foreground text-background" : ""}`}
+              className={`flex size-6 items-center justify-center rounded-full border tabular-nums ${i === step ? "border-transparent bg-[var(--brand)] text-[var(--brand-foreground)]" : ""}`}
             >
               {i + 1}
             </span>

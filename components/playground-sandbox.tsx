@@ -1,7 +1,7 @@
 "use client";
 import { Fragment, useState, type ReactNode } from "react";
 import { RotateCcw } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@fabrials/ui";
 export function PlaygroundSandbox({ children }: { children: ReactNode }) {
   const [revision, setRevision] = useState(0);
   return (

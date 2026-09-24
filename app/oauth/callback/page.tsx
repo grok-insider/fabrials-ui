@@ -3,6 +3,12 @@ import { useEffect, useRef, useState } from "react";
 import { BrowserOAuthProvider } from "@/registry/mcp/oauth";
 import { MCPProvider, useMCPClient } from "@/registry/mcp/provider";
 import { MCPDashboardContent } from "@/registry/components/mcp-dashboard";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  PageHeader,
+} from "@fabrials/ui";
 function Callback() {
   const started = useRef(false);
   const [error, setError] = useState("");
@@ -35,18 +41,16 @@ function Callback() {
     })();
   }, [mcp]);
   return (
-    <main id="main-content" className="mx-auto max-w-4xl px-6 py-14">
-      <h1 className="mb-4 text-3xl font-medium tracking-tight">
-        Your MCP connection
-      </h1>
-      <p className="mb-8 text-sm text-muted-foreground">
-        Authorization returns to this console. Tokens remain in this tab until
-        you disconnect or leave.
-      </p>
+    <main id="main-content" className="mx-auto w-full max-w-4xl px-6 py-14">
+      <PageHeader
+        title="Your MCP connection"
+        description="Authorization returns to this console. Tokens remain in this tab until you disconnect or leave."
+      />
       {error ? (
-        <p role="alert" className="text-destructive">
-          {error}
-        </p>
+        <Alert variant="destructive" role="alert">
+          <AlertTitle>Authorization failed</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
       ) : (
         <MCPDashboardContent />
       )}

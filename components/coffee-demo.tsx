@@ -1,8 +1,7 @@
 "use client";
 import { ToolPlayground } from "@/components/tool-playground";
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import {
-  ArrowRight,
   Check,
   Braces,
   RotateCcw,
@@ -10,9 +9,14 @@ import {
   Plus,
   Minus,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Alert,
+  AlertDescription,
+  Button,
+  Input,
+  Label,
+  NativeSelect,
+} from "@fabrials/ui";
 import {
   WebMCPProvider,
   useWebMCP,
@@ -41,7 +45,7 @@ export function CoffeeDemo({ playground = false }: { playground?: boolean }) {
     </WebMCPProvider>
   );
 }
-function CoffeeWorkbench() {
+export function useCoffeeStore() {
   const mcp = useWebMCP();
   const [width, setWidth] = useState(32);
   const [fitting, setFitting] = useState("58 mm");
@@ -175,19 +179,166 @@ function CoffeeWorkbench() {
     },
     Boolean(cart.id),
   );
+  function reset() {
+    updateCart({ id: null, filter: false });
+    setCompared(null);
+    setWidth(32);
+    setFitting("58 mm");
+    setReview(false);
+    setError("");
+    mcp.clearHistory();
+  }
+  return {
+    mcp,
+    width,
+    setWidth,
+    fitting,
+    setFitting,
+    compared,
+    cart,
+    review,
+    setReview,
+    saved,
+    setSaved,
+    error,
+    busy,
+    match,
+    total,
+    active,
+    run,
+    reset,
+  };
+}
+export type CoffeeStore = ReturnType<typeof useCoffeeStore>;
+export function CoffeeComparison({
+  store,
+  action,
+}: {
+  store: CoffeeStore;
+  action?: (product: (typeof coffeeProducts)[number]) => ReactNode;
+}) {
+  const { compared, match, cart, busy, run } = store;
   return (
-    <div className="overflow-hidden rounded-[1.5rem] border bg-card shadow-[0_20px_70px_-45px_#25311b55]">
+    <Comparison
+      caption="Find your fit"
+      note={
+        compared ? (
+          match ? (
+            <>
+              <strong>{match.name} fits your setup.</strong>{" "}
+              {match.reasons.join(". ")}. Independent steam makes milk
+              preparation easier.
+            </>
+          ) : (
+            "Neither machine meets both constraints. Adjust your requirements or compare the tradeoffs below."
+          )
+        ) : undefined
+      }
+      columns={coffeeProducts.map((p) => ({
+        id: p.id,
+        title: p.name,
+        subtitle: money(p.price),
+        visual: (
+          <CoffeeMachine
+            color={p.color}
+            className="mx-auto h-32 w-full max-w-48"
+          />
+        ),
+        action: action?.(p) ?? (
+          <Button
+            size="sm"
+            variant={cart.id === p.id ? "secondary" : "outline"}
+            disabled={busy}
+            onClick={() =>
+              void run("set_coffee_cart", {
+                productId: cart.id === p.id ? "" : p.id,
+              })
+            }
+          >
+            {cart.id === p.id ? (
+              <>
+                <Check /> Selected
+              </>
+            ) : (
+              <>
+                <Plus /> Choose
+              </>
+            )}
+          </Button>
+        ),
+      }))}
+      rows={[
+        {
+          id: "width",
+          label: "Counter space",
+          highlighted: Boolean(compared),
+          values: Object.fromEntries(
+            coffeeProducts.map((p) => [
+              p.id,
+              <span key={p.id}>
+                {p.width} cm
+                {compared && (
+                  <span className="mt-1 block text-xs">
+                    {p.width <= compared.width ? "Fits your space" : "Too wide"}
+                  </span>
+                )}
+              </span>,
+            ]),
+          ),
+        },
+        {
+          id: "fitting",
+          label: "Accessory fit",
+          highlighted: Boolean(compared),
+          values: Object.fromEntries(
+            coffeeProducts.map((p) => [
+              p.id,
+              <span key={p.id}>
+                {p.fitting}
+                {compared && (
+                  <span className="mt-1 block text-xs">
+                    {p.fitting === compared.fitting
+                      ? "Keep your accessories"
+                      : "Different fitting"}
+                  </span>
+                )}
+              </span>,
+            ]),
+          ),
+        },
+        {
+          id: "milk",
+          label: "Two flat whites",
+          values: Object.fromEntries(coffeeProducts.map((p) => [p.id, p.milk])),
+        },
+      ]}
+    />
+  );
+}
+function CoffeeWorkbench() {
+  const store = useCoffeeStore();
+  const {
+    mcp,
+    width,
+    setWidth,
+    fitting,
+    setFitting,
+    cart,
+    saved,
+    error,
+    busy,
+    total,
+    active,
+    run,
+  } = store;
+  return (
+    <div className="overflow-hidden rounded-[var(--fui-radius-lg)] border bg-card">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b px-5 py-4 sm:px-7">
-        <div className="flex items-center gap-3">
-          <span className="grid size-8 place-items-center rounded-lg bg-foreground text-background">
-            <ShoppingBag className="size-4" />
-          </span>
-          <div>
-            <p className="text-sm font-medium">The morning ritual</p>
-            <p className="text-xs text-muted-foreground">
-              Interactive store · fictional products
-            </p>
-          </div>
+        <div>
+          <p className="text-sm font-medium">The morning ritual</p>
+          <p className="text-xs text-muted-foreground">
+            Interactive store · fictional products
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <span className="text-xs text-muted-foreground">
@@ -199,15 +350,7 @@ function CoffeeWorkbench() {
             variant="ghost"
             size="icon-sm"
             aria-label="Reset coffee demo"
-            onClick={() => {
-              updateCart({ id: null, filter: false });
-              setCompared(null);
-              setWidth(32);
-              setFitting("58 mm");
-              setReview(false);
-              setError("");
-              mcp.clearHistory();
-            }}
+            onClick={store.reset}
           >
             <RotateCcw className="size-3.5" />
           </Button>
@@ -217,7 +360,7 @@ function CoffeeWorkbench() {
         <div className="min-w-0 p-5 sm:p-7">
           <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="mb-2 text-[10px] font-medium uppercase tracking-[.16em] text-muted-foreground">
+              <p className="mb-2 text-sm text-muted-foreground">
                 Make room for better mornings
               </p>
               <h3 className="text-2xl font-medium tracking-tight sm:text-3xl">
@@ -230,7 +373,7 @@ function CoffeeWorkbench() {
           </div>
           <div className="mb-6 flex flex-wrap items-end gap-3 rounded-xl bg-muted/60 p-4">
             <div>
-              <Label htmlFor="coffee-width" className="mb-2 text-xs">
+              <Label htmlFor="coffee-width" className="mb-2 block">
                 Counter width (cm)
               </Label>
               <Input
@@ -240,22 +383,22 @@ function CoffeeWorkbench() {
                 max={100}
                 value={width}
                 onChange={(e) => setWidth(Number(e.target.value))}
-                className="h-9 w-28 bg-background"
+                className="w-28"
               />
             </div>
             <div>
-              <Label htmlFor="coffee-fitting" className="mb-2 text-xs">
+              <Label htmlFor="coffee-fitting" className="mb-2 block">
                 Your accessories
               </Label>
-              <select
+              <NativeSelect
                 id="coffee-fitting"
                 value={fitting}
                 onChange={(e) => setFitting(e.target.value)}
-                className="h-9 rounded-md border bg-background px-3 text-sm"
+                className="w-auto"
               >
                 <option>58 mm</option>
                 <option>54 mm</option>
-              </select>
+              </NativeSelect>
             </div>
             <Button
               variant="outline"
@@ -270,104 +413,7 @@ function CoffeeWorkbench() {
               Compare
             </Button>
           </div>
-          <Comparison
-            caption="Find your fit"
-            note={
-              compared ? (
-                match ? (
-                  <>
-                    <strong>{match.name} fits your setup.</strong>{" "}
-                    {match.reasons.join(". ")}. Independent steam makes milk
-                    preparation easier.
-                  </>
-                ) : (
-                  "Neither machine meets both constraints. Adjust your requirements or compare the tradeoffs below."
-                )
-              ) : undefined
-            }
-            columns={coffeeProducts.map((p) => ({
-              id: p.id,
-              title: p.name,
-              subtitle: money(p.price),
-              visual: (
-                <CoffeeMachine
-                  color={p.color}
-                  className="mx-auto h-32 w-full max-w-48"
-                />
-              ),
-              action: (
-                <Button
-                  size="sm"
-                  variant={cart.id === p.id ? "secondary" : "outline"}
-                  disabled={busy}
-                  onClick={() =>
-                    void run("set_coffee_cart", {
-                      productId: cart.id === p.id ? "" : p.id,
-                    })
-                  }
-                >
-                  {cart.id === p.id ? (
-                    <>
-                      <Check /> Selected
-                    </>
-                  ) : (
-                    <>
-                      <Plus /> Choose
-                    </>
-                  )}
-                </Button>
-              ),
-            }))}
-            rows={[
-              {
-                id: "width",
-                label: "Counter space",
-                highlighted: Boolean(compared),
-                values: Object.fromEntries(
-                  coffeeProducts.map((p) => [
-                    p.id,
-                    <span key={p.id}>
-                      {p.width} cm
-                      {compared && (
-                        <span className="mt-1 block text-xs">
-                          {p.width <= compared.width
-                            ? "Fits your space"
-                            : "Too wide"}
-                        </span>
-                      )}
-                    </span>,
-                  ]),
-                ),
-              },
-              {
-                id: "fitting",
-                label: "Accessory fit",
-                highlighted: Boolean(compared),
-                values: Object.fromEntries(
-                  coffeeProducts.map((p) => [
-                    p.id,
-                    <span key={p.id}>
-                      {p.fitting}
-                      {compared && (
-                        <span className="mt-1 block text-xs">
-                          {p.fitting === compared.fitting
-                            ? "Keep your accessories"
-                            : "Different fitting"}
-                        </span>
-                      )}
-                    </span>,
-                  ]),
-                ),
-              },
-              {
-                id: "milk",
-                label: "Two flat whites",
-                values: Object.fromEntries(
-                  coffeeProducts.map((p) => [p.id, p.milk]),
-                ),
-              },
-            ]}
-          />
+          <CoffeeComparison store={store} />
         </div>
         <aside
           className="flex flex-col border-t bg-muted/30 p-5 sm:p-7 lg:border-t-0 lg:border-l"
@@ -399,7 +445,7 @@ function CoffeeWorkbench() {
               )
             }
           >
-            Find the right fit <ArrowRight />
+            Find the right fit
           </Button>
           <div className="my-6 border-t" />
           <div className="flex items-center justify-between text-sm font-medium">
@@ -412,8 +458,9 @@ function CoffeeWorkbench() {
                 <span>{active.name}</span>
                 <span>{money(active.price)}</span>
               </div>
-              <button
-                className="flex w-full items-center justify-between gap-2 rounded-lg border bg-background p-3 text-left text-xs"
+              <Button
+                variant="outline"
+                className="w-full justify-between py-3 text-left"
                 onClick={() =>
                   void run("set_coffee_filter", { included: !cart.filter })
                 }
@@ -421,16 +468,12 @@ function CoffeeWorkbench() {
               >
                 <span>
                   {cart.filter ? "Filter added" : "Add compatible filter"}
-                  <span className="mt-1 block text-muted-foreground">
+                  <span className="mt-1 block text-xs font-normal text-muted-foreground">
                     Universal · €24
                   </span>
                 </span>
-                {cart.filter ? (
-                  <Minus className="size-4" />
-                ) : (
-                  <Plus className="size-4" />
-                )}
-              </button>
+                {cart.filter ? <Minus /> : <Plus />}
+              </Button>
               <div className="flex justify-between border-t pt-4 text-sm font-medium">
                 <span>Total</span>
                 <span>{money(total)}</span>
@@ -440,7 +483,7 @@ function CoffeeWorkbench() {
                 className="w-full"
                 onClick={() => void run("review_coffee_cart", {})}
               >
-                Review selection <ArrowRight />
+                Review selection
               </Button>
               <p className="text-[11px] leading-5 text-muted-foreground">
                 Demo only. No payment or order is created.
@@ -452,12 +495,9 @@ function CoffeeWorkbench() {
             </div>
           )}
           {saved && (
-            <p
-              role="status"
-              className="mt-4 rounded-lg bg-lime-100 p-3 text-sm text-lime-950"
-            >
-              Selection saved for this demo.
-            </p>
+            <Alert variant="success" className="mt-4">
+              <AlertDescription>Selection saved for this demo.</AlertDescription>
+            </Alert>
           )}
           <div className="mt-auto pt-6">
             <details className="text-xs">
@@ -473,7 +513,7 @@ function CoffeeWorkbench() {
                     key={e.id}
                     className="break-words rounded-lg border bg-background p-3"
                   >
-                    <div className="mb-1 flex justify-between text-[10px] uppercase tracking-wide text-muted-foreground">
+                    <div className="mb-1 flex justify-between text-xs text-muted-foreground">
                       <span>
                         {e.source === "agent"
                           ? "Browser agent"
@@ -496,22 +536,28 @@ function CoffeeWorkbench() {
           )}
         </aside>
       </div>
-      <ConfirmationDialog
-        open={review}
-        onOpenChange={setReview}
-        title="Your morning setup"
-        description="Review your selection. This example saves a local demo state only; no order or payment is created."
-        confirmLabel="Save demo selection"
-        onConfirm={() => setSaved(true)}
-      >
-        <div className="flex justify-between rounded-xl bg-muted p-4 text-sm">
-          <span>
-            {active?.name}
-            {cart.filter ? " + water filter" : ""}
-          </span>
-          <strong>{money(total)}</strong>
-        </div>
-      </ConfirmationDialog>
+      <CoffeeReviewDialog store={store} />
     </div>
+  );
+}
+export function CoffeeReviewDialog({ store }: { store: CoffeeStore }) {
+  const { review, setReview, setSaved, active, cart, total } = store;
+  return (
+    <ConfirmationDialog
+      open={review}
+      onOpenChange={setReview}
+      title="Your morning setup"
+      description="Review your selection. This example saves a local demo state only; no order or payment is created."
+      confirmLabel="Save demo selection"
+      onConfirm={() => setSaved(true)}
+    >
+      <div className="flex justify-between rounded-xl bg-muted p-4 text-sm">
+        <span>
+          {active?.name}
+          {cart.filter ? " + water filter" : ""}
+        </span>
+        <strong>{money(total)}</strong>
+      </div>
+    </ConfirmationDialog>
   );
 }

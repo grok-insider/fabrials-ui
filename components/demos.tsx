@@ -9,10 +9,15 @@ import {
   Check,
   LoaderCircle,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Badge,
+  Button,
+  Input,
+  Label,
+} from "@fabrials/ui";
 import {
   WebMCPProvider,
   useWebMCP,
@@ -172,10 +177,11 @@ function Explorer({ compact = false }: { compact?: boolean }) {
             key: "status",
             label: "Status",
             render: (p) => (
-              <Badge variant="outline" className="font-normal">
-                <span
-                  className={`mr-1 size-1 rounded-full ${p.status === "Stable" ? "bg-emerald-500" : "bg-amber-500"}`}
-                />
+              <Badge
+                variant="outline"
+                tone={p.status === "Stable" ? "success" : "warning"}
+                dot
+              >
                 {p.status}
               </Badge>
             ),
@@ -314,11 +320,11 @@ function Booking() {
     <div className="space-y-6">
       <SupportBadge support={mcp.support} />
       {confirmed ? (
-        <div className="rounded-lg border border-emerald-600/25 bg-emerald-500/5 p-6">
-          <h3 className="font-medium">Example reservation confirmed</h3>
-          <p className="mt-2 text-sm text-muted-foreground">
+        <Alert variant="success">
+          <AlertTitle>Example reservation confirmed</AlertTitle>
+          <AlertDescription>
             {name} · {dates.from} → {dates.to}
-          </p>
+          </AlertDescription>
           <Button
             className="mt-4"
             variant="outline"
@@ -329,7 +335,7 @@ function Booking() {
           >
             Start again
           </Button>
-        </div>
+        </Alert>
       ) : (
         <Wizard
           step={step}

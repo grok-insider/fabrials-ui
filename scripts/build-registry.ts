@@ -9,6 +9,13 @@ function target(path: string) {
     .replace("registry/mcp/", "lib/mcp/")
     .replace("registry/server/", "lib/mcp-server/");
 }
+async function dependencySpec(packageName: string, version: string) {
+  if (!version.startsWith("file:")) return `${packageName}@${version}`;
+  const manifest = JSON.parse(
+    await readFile(`${version.slice("file:".length)}/package.json`, "utf8"),
+  ) as { version?: string };
+  return `${packageName}@${manifest.version ?? version}`;
+}
 await mkdir("public/r", { recursive: true });
 const items = [];
 for (const item of catalog) {
@@ -52,7 +59,7 @@ for (const item of catalog) {
           ? name.split("/").slice(0, 2).join("/")
           : name.split("/")[0];
         const version = pkg.dependencies[packageName];
-        if (version) deps.add(`${packageName}@${version}`);
+        if (version) deps.add(await dependencySpec(packageName, version));
       }
     }
     source = source

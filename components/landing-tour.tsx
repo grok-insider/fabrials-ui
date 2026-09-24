@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Play, Pause, RotateCcw, Volume2, VolumeX, Check } from "lucide-react";
 import { TourAgentPanel } from "@/components/tour-agent-panel";
-import { Button } from "@/components/ui/button";
+import { Button } from "@fabrials/ui";
 import { Comparison } from "@/registry/components/comparison";
 import { CoffeeMachine } from "@/components/coffee-machine";
 import { coffeeProducts } from "@/lib/coffee-demo";

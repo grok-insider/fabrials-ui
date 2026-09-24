@@ -3,59 +3,13 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Search } from "lucide-react";
-import { Card, Cards } from "fumadocs-ui/components/card";
-import { catalog } from "@/lib/catalog";
-import { uiCatalog, uiGroups } from "@/lib/ui-catalog";
-import { Button } from "@/components/ui/button";
-
-const agentGroups = [
-  {
-    name: "Interaction",
-    description: "Forms, choices and actions for a shared interface.",
-  },
-  {
-    name: "WebMCP",
-    description: "Expose your interface to agents in the browser.",
-  },
-  {
-    name: "MCP",
-    description: "Discover tools, connect to servers and display results.",
-  },
-  {
-    name: "Foundation",
-    description: "Clients and adapters that connect everything.",
-  },
-];
-
-const sections = [
-  ...uiGroups.map((group) => ({
-    name: group.name,
-    description: group.description,
-    items: uiCatalog
-      .filter((item) => item.group === group.name)
-      .map((item) => ({
-        slug: item.slug,
-        title: item.title,
-        description: item.description,
-      })),
-  })),
-  ...agentGroups.map((group) => ({
-    name: group.name,
-    description: group.description,
-    items: catalog
-      .filter((item) => item.category === group.name)
-      .map((item) => ({
-        slug: item.slug,
-        title: item.title,
-        description: item.description,
-      })),
-  })),
-];
+import { Button, Input, StatePanel } from "@fabrials/ui";
+import { componentSections } from "@/lib/docs-nav";
 
 export function ComponentIndex() {
   const [query, setQuery] = useState("");
   const needle = query.trim().toLowerCase();
-  const visible = sections
+  const visible = componentSections
     .map((section) => ({
       ...section,
       items: section.items
@@ -70,65 +24,56 @@ export function ComponentIndex() {
   const count = visible.reduce((sum, section) => sum + section.items.length, 0);
   return (
     <>
-      <div className="mt-9 flex flex-wrap items-center justify-between gap-4 border-b pb-6">
-        <div className="relative w-full sm:max-w-sm">
-          <Search
-            aria-hidden="true"
-            className="absolute left-3 top-3 size-4 text-muted-foreground"
-          />
-          <input
+      <div className="docs-index-toolbar">
+        <div className="docs-index-search">
+          <Search aria-hidden="true" />
+          <Input
+            type="search"
             aria-label="Search components"
             placeholder="Search components…"
-            className="h-10 w-full rounded-lg border bg-card pl-10 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
           />
         </div>
-        <p role="status" className="text-sm text-muted-foreground">
+        <p role="status" className="fui-description">
           {count} {count === 1 ? "component" : "components"}
         </p>
       </div>
       {visible.map((section) => (
-        <section
-          key={section.name}
-          id={section.name.toLowerCase()}
-          className="scroll-mt-28 py-9"
-        >
-          <h2 className="text-xl font-medium tracking-tight">{section.name}</h2>
-          <p className="mt-2 text-sm text-muted-foreground">{section.description}</p>
-          <Cards className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        <section key={section.name} className="docs-section" aria-labelledby={section.id}>
+          <h2 id={section.id} className="docs-heading">
+            <a href={`#${section.id}`} className="docs-heading-anchor">
+              {section.name}
+            </a>
+          </h2>
+          <p>{section.description}</p>
+          <ul className="docs-index-grid">
             {section.items.map((item) => (
-              <Card
-                key={item.slug}
-                title={item.title}
-                description={item.description}
-                href={`/docs/${item.slug}`}
-              />
+              <li key={item.slug}>
+                <Link href={`/docs/${item.slug}`}>
+                  <span className="docs-index-title">{item.title}</span>
+                  <span className="docs-index-description">{item.description}</span>
+                </Link>
+              </li>
             ))}
-          </Cards>
+          </ul>
         </section>
       ))}
       {!count && (
-        <div className="py-16 text-center">
-          <h2 className="font-medium">No components found</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Try a name like “button”, “chart” or “form”.
-          </p>
-          <Button className="mt-5" variant="outline" onClick={() => setQuery("")}>
-            Clear search
-          </Button>
-        </div>
+        <StatePanel
+          state="empty"
+          title="No components found"
+          description="Try a name like “button”, “chart” or “form”."
+          actions={
+            <Button variant="outline" onClick={() => setQuery("")}>
+              Clear search
+            </Button>
+          }
+        />
       )}
-      <div className="mt-5 border-t py-8 text-sm text-muted-foreground">
-        Looking for a complete flow?{" "}
-        <Link
-          href="/playground"
-          className="font-medium text-foreground underline underline-offset-4"
-        >
-          Open the playground
-        </Link>
-        .
-      </div>
+      <p className="docs-index-footer">
+        Looking for a complete flow? <Link href="/playground">Open the playground</Link>.
+      </p>
     </>
   );
 }

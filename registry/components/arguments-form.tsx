@@ -1,9 +1,13 @@
 "use client";
 import { useId, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import {
+  Button,
+  Input,
+  Label,
+  NativeCheckbox,
+  NativeSelect,
+  Textarea,
+} from "@fabrials/ui";
 import { simpleFields, validateArguments } from "@/registry/mcp/schema";
 import { errorMessage, type JsonSchema } from "@/registry/mcp/types";
 export function ArgumentsForm({
@@ -83,14 +87,13 @@ export function ArgumentsForm({
                 )}
               </Label>
               {field.enum ? (
-                <select
+                <NativeSelect
                   id={fieldId}
                   name={name}
                   required={required}
                   defaultValue={String(
                     initialValues[name] ?? field.default ?? "",
                   )}
-                  className="h-9 w-full rounded-md border bg-background px-3 text-sm"
                   disabled={pending || disabled}
                 >
                   <option value="">Select…</option>
@@ -99,15 +102,13 @@ export function ArgumentsForm({
                       {String(value)}
                     </option>
                   ))}
-                </select>
+                </NativeSelect>
               ) : field.type === "boolean" ? (
-                <input
+                <NativeCheckbox
                   id={fieldId}
                   name={name}
-                  type="checkbox"
                   defaultChecked={Boolean(initialValues[name] ?? field.default)}
                   disabled={pending || disabled}
-                  className="size-4 accent-current"
                 />
               ) : (
                 <Input

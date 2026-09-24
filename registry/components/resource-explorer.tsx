@@ -5,7 +5,7 @@ import type {
   ResourceTemplateType,
   Prompt,
 } from "@modelcontextprotocol/client";
-import { Button } from "@/components/ui/button";
+import { Button } from "@fabrials/ui";
 import { ArgumentsForm } from "@/registry/components/arguments-form";
 import { ResultView } from "@/registry/components/result-view";
 import { errorMessage } from "@/registry/mcp/types";
