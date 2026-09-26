@@ -9,7 +9,7 @@ import { PrivateHistoryView } from "./private-history.js";
 import { ConsumptionView } from "./consumption.js";
 import { SynchronizedConsumption } from "./synchronized-consumption.js";
 import { CodeBlock, codeFilename, useCopyToClipboard } from "./code-block.js";
-import { CitationChip, CitationProvider, SourceCard, SourceFavicon, Sources, hostnameFromUrl, sourceLabel, sourcePath, sourcesLabel, useCitation } from "./citations.js";
+import { CitationChip, CitationProvider, LinkPreviewCard, LinkWithPreview, SourceCard, SourceFavicon, Sources, hostnameFromUrl, sourceLabel, sourcePath, sourcesLabel, useCitation, useLinkPreview } from "./citations.js";
 import { ActivityDisclosure, ActivityIcon, ReasoningDisclosure, SearchStepList, SearchStepsDisclosure, countSearches, reasoningLabel, searchDoneLabel, searchLabel, searchPhase, searchStepLabel } from "./activity.js";
 import { AttachmentChip, Attachments, attachmentCategory, attachmentDetail, formatBytes } from "./attachments.js";
 import { DEFAULT_MAX_RECORDING_MS, VoiceInputButton, VoiceInputButtonView, describeMicError, formatElapsed, insertDictation, isVoiceInputSupported, pickRecorderMimeType } from "./voice-input.js";
@@ -34,6 +34,8 @@ export {
   CopyMessageAction,
   DEFAULT_MAX_RECORDING_MS,
   HostedMigration,
+  LinkPreviewCard,
+  LinkWithPreview,
   LinkedAccountUsage,
   MessageAction,
   MessageActions,
@@ -78,5 +80,6 @@ export {
   sourcesLabel,
   useCitation,
   useClock,
-  useCopyToClipboard
+  useCopyToClipboard,
+  useLinkPreview
 };

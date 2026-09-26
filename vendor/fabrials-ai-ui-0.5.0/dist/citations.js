@@ -3,6 +3,34 @@ import { jsxs, jsx } from "react/jsx-runtime";
 import { useState, useCallback, useMemo, useContext, useEffect, createContext } from "react";
 import { HoverCard, HoverCardTrigger, HoverCardContent, Collapsible, CollapsibleTrigger, CollapsibleContent } from "@fabrials/ui";
 import { ChevronDownIcon } from "./chat-icons.js";
+const previewCache = /* @__PURE__ */ new Map();
+function loadPreview(loader, url) {
+  let pending = previewCache.get(url);
+  if (!pending) {
+    pending = loader(url).catch(() => null);
+    previewCache.set(url, pending);
+  }
+  return pending;
+}
+function useLinkPreview(url, loader, enabled = true) {
+  const [state, setState] = useState({
+    preview: null,
+    loading: false
+  });
+  useEffect(() => {
+    if (!url || !loader || !enabled) return;
+    let alive = true;
+    setState({ url, preview: null, loading: true });
+    void loadPreview(loader, url).then((preview) => {
+      if (alive) setState({ url, preview, loading: false });
+    });
+    return () => {
+      alive = false;
+    };
+  }, [url, loader, enabled]);
+  if (state.url !== url) return { preview: null, loading: Boolean(url && loader && enabled) };
+  return state;
+}
 function hostnameFromUrl(value) {
   try {
     return new URL(value).hostname.replace(/^www\./, "");
@@ -41,6 +69,7 @@ function numbered(sources) {
 function CitationProvider({
   sources,
   faviconUrl,
+  previewLoader,
   children
 }) {
   const [active, setActiveState] = useState(null);
@@ -51,8 +80,8 @@ function CitationProvider({
   );
   const map = useMemo(() => numbered(sources), [sources]);
   const value = useMemo(
-    () => ({ sources: map, active, faviconUrl, setActive, clearActive }),
-    [map, active, faviconUrl, setActive, clearActive]
+    () => ({ sources: map, active, faviconUrl, previewLoader, setActive, clearActive }),
+    [map, active, faviconUrl, previewLoader, setActive, clearActive]
   );
   return /* @__PURE__ */ jsx(CitationContext.Provider, { value, children });
 }
@@ -84,7 +113,8 @@ function useCitation(n) {
     active: n != null && ctx?.active === n,
     handlers,
     source: n == null ? void 0 : ctx?.sources.get(n),
-    faviconUrl: ctx?.faviconUrl
+    faviconUrl: ctx?.faviconUrl,
+    previewLoader: ctx?.previewLoader
   };
 }
 function join(...values) {
@@ -123,6 +153,7 @@ function CitationChip({
   source,
   active,
   faviconUrl,
+  previewLoader,
   delay = 200,
   className,
   onMouseEnter,
@@ -174,18 +205,63 @@ function CitationChip({
         children: number
       }
     ),
-    /* @__PURE__ */ jsx(HoverCardContent, { align: "start", className: "fui-citation-card", side: "top", children: /* @__PURE__ */ jsxs("a", { className: "fui-citation-card-link", href, rel: "noreferrer", target: "_blank", children: [
-      /* @__PURE__ */ jsx(SourceFavicon, { faviconUrl: icon, url: href }),
-      /* @__PURE__ */ jsxs("span", { className: "fui-citation-card-text", children: [
-        /* @__PURE__ */ jsx("span", { className: "fui-citation-card-title", children: label }),
-        /* @__PURE__ */ jsxs("span", { className: "fui-citation-card-meta", children: [
-          "Source ",
-          number,
-          " · ",
-          host
-        ] })
-      ] })
-    ] }) })
+    /* @__PURE__ */ jsx(HoverCardContent, { align: "start", className: "fui-citation-card", side: "top", children: /* @__PURE__ */ jsx(
+      LinkPreviewCard,
+      {
+        faviconUrl: icon,
+        label,
+        meta: number != null ? `Source ${number} · ${host}` : host,
+        previewLoader: previewLoader ?? citation.previewLoader,
+        url: href
+      }
+    ) })
+  ] });
+}
+function LinkPreviewCard({
+  url,
+  label,
+  meta,
+  faviconUrl,
+  previewLoader
+}) {
+  const { preview, loading } = useLinkPreview(url, previewLoader);
+  const [brokenImage, setBrokenImage] = useState(null);
+  const host = hostnameFromUrl(url);
+  const title = preview?.title?.trim() || label || host;
+  const image = preview?.image && brokenImage !== preview.image ? preview.image : null;
+  return /* @__PURE__ */ jsxs("a", { className: "fui-citation-card-link", "data-loading": loading || void 0, href: url, rel: "noreferrer", target: "_blank", children: [
+    image ? /* @__PURE__ */ jsx(
+      "img",
+      {
+        alt: "",
+        className: "fui-link-preview-image",
+        loading: "lazy",
+        onError: () => setBrokenImage(image),
+        referrerPolicy: "no-referrer",
+        src: image
+      }
+    ) : null,
+    /* @__PURE__ */ jsxs("span", { className: "fui-link-preview-body", children: [
+      /* @__PURE__ */ jsxs("span", { className: "fui-link-preview-site", children: [
+        /* @__PURE__ */ jsx(SourceFavicon, { faviconUrl, url }),
+        /* @__PURE__ */ jsx("span", { children: preview?.siteName?.trim() || meta || host })
+      ] }),
+      /* @__PURE__ */ jsx("span", { className: "fui-citation-card-title", children: title }),
+      preview?.description ? /* @__PURE__ */ jsx("span", { className: "fui-link-preview-description", children: preview.description }) : loading ? /* @__PURE__ */ jsx("span", { "aria-hidden": true, className: "fui-link-preview-skeleton" }) : null,
+      preview?.siteName && meta ? /* @__PURE__ */ jsx("span", { className: "fui-citation-card-meta", children: meta }) : null
+    ] })
+  ] });
+}
+function LinkWithPreview({ href, previewLoader, faviconUrl, delay = 300, children, ...props }) {
+  const ctx = useContext(CitationContext);
+  const loader = previewLoader ?? ctx?.previewLoader;
+  const icon = faviconUrl ?? ctx?.faviconUrl;
+  if (!loader || !/^https?:/i.test(href)) {
+    return /* @__PURE__ */ jsx("a", { ...props, href, rel: "noreferrer", target: "_blank", children });
+  }
+  return /* @__PURE__ */ jsxs(HoverCard, { children: [
+    /* @__PURE__ */ jsx(HoverCardTrigger, { delay, render: /* @__PURE__ */ jsx("a", { ...props, href, rel: "noreferrer", target: "_blank" }), children }),
+    /* @__PURE__ */ jsx(HoverCardContent, { align: "start", className: "fui-citation-card", side: "top", children: /* @__PURE__ */ jsx(LinkPreviewCard, { faviconUrl: icon, previewLoader: loader, url: href }) })
   ] });
 }
 function SourceCard({
@@ -194,6 +270,7 @@ function SourceCard({
   number,
   active,
   faviconUrl,
+  previewLoader,
   className,
   onMouseEnter,
   onMouseLeave,
@@ -204,7 +281,8 @@ function SourceCard({
   const citation = useCitation(number);
   const isActive = active ?? citation.active;
   const host = hostnameFromUrl(url);
-  const label = sourceLabel({ url, title });
+  const { preview } = useLinkPreview(url, previewLoader ?? citation.previewLoader);
+  const label = preview?.title?.trim() || sourceLabel({ url, title });
   const secondary = label === host ? sourcePath(url) : host;
   return /* @__PURE__ */ jsxs(
     "a",
@@ -232,14 +310,12 @@ function SourceCard({
       },
       rel: "noreferrer",
       target: "_blank",
-      title: url,
+      title: `${label} — ${url}`,
       children: [
         typeof number === "number" ? /* @__PURE__ */ jsx("span", { "aria-label": `Source ${number}`, className: "fui-source-number", children: number }) : null,
-        /* @__PURE__ */ jsx(SourceFavicon, { faviconUrl, url }),
-        /* @__PURE__ */ jsxs("span", { className: "fui-source-text", children: [
-          /* @__PURE__ */ jsx("span", { className: "fui-source-title", children: label }),
-          secondary ? /* @__PURE__ */ jsx("span", { className: "fui-source-meta", children: secondary }) : null
-        ] })
+        /* @__PURE__ */ jsx(SourceFavicon, { faviconUrl: faviconUrl ?? citation.faviconUrl, url }),
+        /* @__PURE__ */ jsx("span", { className: "fui-source-title", children: label }),
+        secondary ? /* @__PURE__ */ jsx("span", { className: "fui-source-meta", children: secondary }) : null
       ]
     }
   );
@@ -276,16 +352,15 @@ function Sources({
           /* @__PURE__ */ jsx("span", { children: label(sources.length) }),
           /* @__PURE__ */ jsx(ChevronDownIcon, { className: "fui-disclosure-chevron" })
         ] }),
-        /* @__PURE__ */ jsx(CollapsibleContent, { className: "fui-sources-grid", children: sources.map((source, index) => /* @__PURE__ */ jsx(
+        /* @__PURE__ */ jsx(CollapsibleContent, { className: "fui-sources-grid", render: /* @__PURE__ */ jsx("ol", {}), children: sources.map((source, index) => /* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx(
           SourceCard,
           {
             faviconUrl,
             number: source.number ?? index + 1,
             title: source.title,
             url: source.url
-          },
-          `${source.url}-${index}`
-        )) })
+          }
+        ) }, `${source.url}-${index}`)) })
       ]
     }
   );
@@ -293,6 +368,8 @@ function Sources({
 export {
   CitationChip,
   CitationProvider,
+  LinkPreviewCard,
+  LinkWithPreview,
   SourceCard,
   SourceFavicon,
   Sources,
@@ -300,5 +377,6 @@ export {
   sourceLabel,
   sourcePath,
   sourcesLabel,
-  useCitation
+  useCitation,
+  useLinkPreview
 };
