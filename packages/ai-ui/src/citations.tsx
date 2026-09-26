@@ -28,6 +28,46 @@ export type CitationSource = {
 
 export type FaviconResolver = (url: string) => string | null | undefined;
 
+export type LinkPreview = {
+  title?: string;
+  description?: string;
+  image?: string;
+  siteName?: string;
+};
+
+export type LinkPreviewLoader = (url: string) => Promise<LinkPreview | null>;
+
+const previewCache = new Map<string, Promise<LinkPreview | null>>();
+
+function loadPreview(loader: LinkPreviewLoader, url: string) {
+  let pending = previewCache.get(url);
+  if (!pending) {
+    pending = loader(url).catch(() => null);
+    previewCache.set(url, pending);
+  }
+  return pending;
+}
+
+export function useLinkPreview(url: string | undefined, loader: LinkPreviewLoader | undefined, enabled = true) {
+  const [state, setState] = useState<{ url?: string; preview: LinkPreview | null; loading: boolean }>({
+    preview: null,
+    loading: false,
+  });
+  useEffect(() => {
+    if (!url || !loader || !enabled) return;
+    let alive = true;
+    setState({ url, preview: null, loading: true });
+    void loadPreview(loader, url).then((preview) => {
+      if (alive) setState({ url, preview, loading: false });
+    });
+    return () => {
+      alive = false;
+    };
+  }, [url, loader, enabled]);
+  if (state.url !== url) return { preview: null, loading: Boolean(url && loader && enabled) };
+  return state;
+}
+
 export function hostnameFromUrl(value: string): string {
   try {
     return new URL(value).hostname.replace(/^www\./, "");
@@ -60,6 +100,7 @@ type CitationState = {
   sources: ReadonlyMap<number, CitationSource>;
   active: number | null;
   faviconUrl?: FaviconResolver;
+  previewLoader?: LinkPreviewLoader;
   setActive: (n: number) => void;
   clearActive: (n: number) => void;
 };
@@ -79,10 +120,12 @@ function numbered(sources: readonly CitationSource[] | ReadonlyMap<number, Citat
 export function CitationProvider({
   sources,
   faviconUrl,
+  previewLoader,
   children,
 }: {
   sources?: readonly CitationSource[] | ReadonlyMap<number, CitationSource>;
   faviconUrl?: FaviconResolver;
+  previewLoader?: LinkPreviewLoader;
   children: ReactNode;
 }) {
   const [active, setActiveState] = useState<number | null>(null);
@@ -93,8 +136,8 @@ export function CitationProvider({
   );
   const map = useMemo(() => numbered(sources), [sources]);
   const value = useMemo(
-    () => ({ sources: map, active, faviconUrl, setActive, clearActive }),
-    [map, active, faviconUrl, setActive, clearActive],
+    () => ({ sources: map, active, faviconUrl, previewLoader, setActive, clearActive }),
+    [map, active, faviconUrl, previewLoader, setActive, clearActive],
   );
   return <CitationContext.Provider value={value}>{children}</CitationContext.Provider>;
 }
@@ -132,6 +175,7 @@ export function useCitation(n: number | null | undefined) {
     handlers,
     source: n == null ? undefined : ctx?.sources.get(n),
     faviconUrl: ctx?.faviconUrl,
+    previewLoader: ctx?.previewLoader,
   };
 }
 
@@ -180,6 +224,7 @@ export type CitationChipProps = Omit<ComponentProps<"a">, "href" | "children"> &
   source?: { url: string; title?: string };
   active?: boolean;
   faviconUrl?: FaviconResolver;
+  previewLoader?: LinkPreviewLoader;
   delay?: number;
 };
 
@@ -189,6 +234,7 @@ export function CitationChip({
   source,
   active,
   faviconUrl,
+  previewLoader,
   delay = 200,
   className,
   onMouseEnter,
@@ -239,15 +285,90 @@ export function CitationChip({
         {number}
       </HoverCardTrigger>
       <HoverCardContent align="start" className="fui-citation-card" side="top">
-        <a className="fui-citation-card-link" href={href} rel="noreferrer" target="_blank">
-          <SourceFavicon faviconUrl={icon} url={href} />
-          <span className="fui-citation-card-text">
-            <span className="fui-citation-card-title">{label}</span>
-            <span className="fui-citation-card-meta">
-              Source {number} · {host}
-            </span>
-          </span>
-        </a>
+        <LinkPreviewCard
+          faviconUrl={icon}
+          label={label}
+          meta={number != null ? `Source ${number} · ${host}` : host}
+          previewLoader={previewLoader ?? citation.previewLoader}
+          url={href}
+        />
+      </HoverCardContent>
+    </HoverCard>
+  );
+}
+
+export function LinkPreviewCard({
+  url,
+  label,
+  meta,
+  faviconUrl,
+  previewLoader,
+}: {
+  url: string;
+  label?: string;
+  meta?: string;
+  faviconUrl?: FaviconResolver;
+  previewLoader?: LinkPreviewLoader;
+}) {
+  const { preview, loading } = useLinkPreview(url, previewLoader);
+  const [brokenImage, setBrokenImage] = useState<string | null>(null);
+  const host = hostnameFromUrl(url);
+  const title = preview?.title?.trim() || label || host;
+  const image = preview?.image && brokenImage !== preview.image ? preview.image : null;
+  return (
+    <a className="fui-citation-card-link" data-loading={loading || undefined} href={url} rel="noreferrer" target="_blank">
+      {image ? (
+        <img
+          alt=""
+          className="fui-link-preview-image"
+          loading="lazy"
+          onError={() => setBrokenImage(image)}
+          referrerPolicy="no-referrer"
+          src={image}
+        />
+      ) : null}
+      <span className="fui-link-preview-body">
+        <span className="fui-link-preview-site">
+          <SourceFavicon faviconUrl={faviconUrl} url={url} />
+          <span>{preview?.siteName?.trim() || meta || host}</span>
+        </span>
+        <span className="fui-citation-card-title">{title}</span>
+        {preview?.description ? (
+          <span className="fui-link-preview-description">{preview.description}</span>
+        ) : loading ? (
+          <span aria-hidden className="fui-link-preview-skeleton" />
+        ) : null}
+        {preview?.siteName && meta ? <span className="fui-citation-card-meta">{meta}</span> : null}
+      </span>
+    </a>
+  );
+}
+
+export type LinkWithPreviewProps = ComponentProps<"a"> & {
+  href: string;
+  previewLoader?: LinkPreviewLoader;
+  faviconUrl?: FaviconResolver;
+  delay?: number;
+};
+
+export function LinkWithPreview({ href, previewLoader, faviconUrl, delay = 300, children, ...props }: LinkWithPreviewProps) {
+  const ctx = useContext(CitationContext);
+  const loader = previewLoader ?? ctx?.previewLoader;
+  const icon = faviconUrl ?? ctx?.faviconUrl;
+  if (!loader || !/^https?:/i.test(href)) {
+    return (
+      <a {...props} href={href} rel="noreferrer" target="_blank">
+        {children}
+      </a>
+    );
+  }
+  return (
+    <HoverCard>
+      <HoverCardTrigger delay={delay} render={<a {...props} href={href} rel="noreferrer" target="_blank" />}>
+        {children}
+      </HoverCardTrigger>
+      <HoverCardContent align="start" className="fui-citation-card" side="top">
+        <LinkPreviewCard faviconUrl={icon} previewLoader={loader} url={href} />
       </HoverCardContent>
     </HoverCard>
   );
@@ -259,6 +380,7 @@ export type SourceCardProps = Omit<ComponentProps<"a">, "title" | "href"> & {
   number?: number;
   active?: boolean;
   faviconUrl?: FaviconResolver;
+  previewLoader?: LinkPreviewLoader;
 };
 
 export function SourceCard({
@@ -267,6 +389,7 @@ export function SourceCard({
   number,
   active,
   faviconUrl,
+  previewLoader,
   className,
   onMouseEnter,
   onMouseLeave,
@@ -277,7 +400,8 @@ export function SourceCard({
   const citation = useCitation(number);
   const isActive = active ?? citation.active;
   const host = hostnameFromUrl(url);
-  const label = sourceLabel({ url, title });
+  const { preview } = useLinkPreview(url, previewLoader ?? citation.previewLoader);
+  const label = preview?.title?.trim() || sourceLabel({ url, title });
   const secondary = label === host ? sourcePath(url) : host;
   return (
     <a
@@ -304,18 +428,16 @@ export function SourceCard({
       }}
       rel="noreferrer"
       target="_blank"
-      title={url}
+      title={`${label} — ${url}`}
     >
       {typeof number === "number" ? (
         <span aria-label={`Source ${number}`} className="fui-source-number">
           {number}
         </span>
       ) : null}
-      <SourceFavicon faviconUrl={faviconUrl} url={url} />
-      <span className="fui-source-text">
-        <span className="fui-source-title">{label}</span>
-        {secondary ? <span className="fui-source-meta">{secondary}</span> : null}
-      </span>
+      <SourceFavicon faviconUrl={faviconUrl ?? citation.faviconUrl} url={url} />
+      <span className="fui-source-title">{label}</span>
+      {secondary ? <span className="fui-source-meta">{secondary}</span> : null}
     </a>
   );
 }
@@ -371,15 +493,16 @@ export function Sources({
         <span>{label(sources.length)}</span>
         <ChevronDownIcon className="fui-disclosure-chevron" />
       </CollapsibleTrigger>
-      <CollapsibleContent className="fui-sources-grid">
+      <CollapsibleContent className="fui-sources-grid" render={<ol />}>
         {sources.map((source, index) => (
-          <SourceCard
-            faviconUrl={faviconUrl}
-            key={`${source.url}-${index}`}
-            number={source.number ?? index + 1}
-            title={source.title}
-            url={source.url}
-          />
+          <li key={`${source.url}-${index}`}>
+            <SourceCard
+              faviconUrl={faviconUrl}
+              number={source.number ?? index + 1}
+              title={source.title}
+              url={source.url}
+            />
+          </li>
         ))}
       </CollapsibleContent>
     </Collapsible>

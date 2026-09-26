@@ -800,21 +800,63 @@
     color: var(--brand-ink);
   }
   .fui-citation-card {
-    width: 18rem;
+    width: 20rem;
     max-width: calc(100vw - 2rem);
-    padding: var(--fui-space-3);
+    padding: 0;
+    overflow: hidden;
   }
   .fui-citation-card-link {
     display: flex;
     min-width: 0;
-    align-items: flex-start;
-    gap: var(--fui-space-2-5);
-    border-radius: var(--fui-radius-md);
+    flex-direction: column;
     color: inherit;
     text-decoration: none;
   }
-  .fui-citation-card-link .fui-source-favicon {
-    margin-top: 0.125rem;
+  .fui-link-preview-image {
+    display: block;
+    width: 100%;
+    height: 8.5rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--muted);
+    object-fit: cover;
+  }
+  .fui-link-preview-body {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: var(--fui-space-1);
+    padding: var(--fui-space-3);
+  }
+  .fui-link-preview-site {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: var(--fui-space-1-5);
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+  }
+  .fui-link-preview-site > span:last-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .fui-link-preview-description {
+    display: -webkit-box;
+    overflow: hidden;
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+    line-height: 1.125rem;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+  }
+  .fui-link-preview-skeleton {
+    display: block;
+    width: 80%;
+    height: 0.75rem;
+    margin-top: var(--fui-space-1);
+    border-radius: var(--fui-radius-xs);
+    background: var(--muted);
   }
   .fui-citation-card-text,
   .fui-source-text {
@@ -927,37 +969,35 @@
     transform: rotate(180deg);
   }
   .fui-sources-grid {
-    display: grid;
+    display: flex;
     width: 100%;
-    gap: var(--fui-space-1-5);
-    margin-top: var(--fui-space-2);
-  }
-  @media (min-width: 640px) {
-    .fui-sources-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+    max-height: 15rem;
+    flex-direction: column;
+    margin: var(--fui-space-1-5) 0 0;
+    padding: var(--fui-space-1) 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border: 1px solid var(--border);
+    border-radius: var(--fui-radius-md);
+    background: var(--card);
+    list-style: none;
   }
   .fui-source-card {
     display: flex;
     min-width: 0;
     align-items: center;
-    gap: var(--fui-space-2-5);
-    padding: var(--fui-space-2) var(--fui-space-2-5);
-    border: 1px solid var(--border);
-    border-radius: var(--fui-radius-md);
-    background: var(--card);
+    gap: var(--fui-space-2);
+    height: 1.875rem;
+    padding: 0 var(--fui-space-2-5);
     color: inherit;
     font-size: var(--fui-text-xs);
     text-decoration: none;
-    transition:
-      background-color var(--fui-duration) var(--fui-ease),
-      border-color var(--fui-duration) var(--fui-ease);
+    transition: background-color var(--fui-duration) var(--fui-ease);
   }
-  .fui-source-card:hover {
+  .fui-source-card:is(:hover, :focus-visible) {
     background: color-mix(in oklab, var(--muted) 60%, var(--card));
   }
   .fui-source-card[data-active] {
-    border-color: color-mix(in oklab, var(--brand) 40%, transparent);
     background: color-mix(in oklab, var(--brand) 10%, var(--card));
   }
   .fui-source-number {
@@ -965,25 +1005,32 @@
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    min-width: 1.25rem;
-    height: 1.25rem;
+    min-width: 1.125rem;
+    height: 1.125rem;
     padding: 0 0.25rem;
     border-radius: var(--fui-radius-xs);
     background: var(--muted);
     color: var(--muted-foreground);
     font-size: 0.6875rem;
     font-weight: var(--fui-weight-medium);
+    font-variant-numeric: tabular-nums;
   }
   .fui-source-card[data-active] .fui-source-number {
     background: color-mix(in oklab, var(--brand) 15%, transparent);
     color: var(--brand-ink);
   }
   .fui-source-title {
+    min-width: 0;
+    flex: 0 1 auto;
     overflow: hidden;
     color: var(--foreground);
     font-weight: var(--fui-weight-medium);
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  .fui-source-card .fui-source-meta {
+    min-width: 3rem;
+    flex: 1 1 0;
   }
 
   .fui-activity {

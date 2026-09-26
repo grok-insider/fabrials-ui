@@ -13,6 +13,8 @@ import {
   sourceLabel,
   sourcePath,
   sourcesLabel,
+  LinkPreviewCard,
+  LinkWithPreview,
 } from "../../packages/ai-ui/src/index";
 
 test("code block renders language, one line per span and accessible actions", () => {
@@ -110,4 +112,17 @@ test("sources render a collapsed count trigger and nothing when empty", () => {
   assert.match(open, /aria-expanded="true"/);
   assert.match(open, /fui-source-card/);
   assert.match(open, /First/);
+  assert.match(open, /<ol[^>]*fui-sources-grid/);
+  assert.match(open, /<li><a[^>]*fui-source-card/);
+});
+
+test("link previews fall back to the host until a loader is provided", () => {
+  const plain = renderToStaticMarkup(<LinkWithPreview href="https://news.example/story">story</LinkWithPreview>);
+  assert.match(plain, /<a[^>]*href="https:\/\/news.example\/story"[^>]*>story<\/a>/);
+  const card = renderToStaticMarkup(
+    <LinkPreviewCard meta="Source 2 · news.example" url="https://news.example/story" />,
+  );
+  assert.match(card, /news.example/);
+  assert.match(card, /Source 2 · news.example/);
+  assert.doesNotMatch(card, /fui-link-preview-image/);
 });
