@@ -41,5 +41,34 @@ catalog source does not import Radix. `cmdk` 1.1.1 still depends on
 Left in the host on purpose:
 
 - fabrials.com `bubble` and `message` are product composition, not catalog controls.
-- Radiant chat keeps Streamdown, `motion`, and `@radix-ui/react-use-controllable-state` for reasoning state.
+- Radiant chat keeps Streamdown and its Shiki highlighter; the chat presentation moved to `@fabrials/ai-ui` in 0.5.
 - news-monitor, grok-desktop-portable, and the Ditox GUI were not switched in this pass.
+
+## 0.5.0 additions from Radiant
+
+These controls were moved out of the Radiant redesign on 2026-09-26 so other
+products can reuse them. Radiant consumes them from the vendor copy.
+
+| File | Origin | Requested by |
+| --- | --- | --- |
+| `ui/moon-phase.tsx` (`MoonPhase`, `Starfield`, `lunarPhase`) | Fabrials | Radiant sign-in page |
+| `ui/confirm-dialog.tsx` | Fabrials | Radiant admin ban, restore and revoke |
+| `ui/truncated-text.tsx` | Fabrials | Radiant sidebar chat titles |
+| `ui/settings-section.tsx` | Fabrials | Radiant settings |
+| `ui/filter-chip.tsx` | Fabrials | Radiant admin filters |
+| `ui/file-thumb.tsx` | Fabrials | Radiant admin files |
+| `ui/recency.ts` (`groupByRecency`) | Fabrials | Radiant sidebar chat groups |
+| `ui/suggestion-card.tsx` | Vercel AI Elements suggestion (Apache-2.0) | Radiant new-chat screen |
+| `ui/shimmer-text.tsx` | Vercel AI Elements shimmer (Apache-2.0), now pure CSS | Radiant reasoning and media labels |
+| `ai-ui/chat-message.tsx` | Vercel AI Elements message (Apache-2.0) | Radiant messages and action row |
+| `ai-ui/attachments.tsx` | Vercel AI Elements attachments (Apache-2.0) | Radiant composer files |
+| `ai-ui/code-block.tsx` and `.fui-markdown` | Vercel AI Elements code block (Apache-2.0) and Radiant markdown styles | Radiant answers |
+| `ai-ui/activity.tsx` | Vercel AI Elements reasoning (Apache-2.0) and Radiant activity rows | Radiant thinking and web search |
+| `ai-ui/citations.tsx` | Vercel AI Elements sources (Apache-2.0) and Radiant citation chips | Radiant inline citations |
+| `ai-ui/composer.tsx` | Vercel AI Elements prompt input (Apache-2.0), reduced to a shell | Radiant composer |
+| `ai-ui/voice-input.tsx` | Fabrials (Radiant dictation) | Radiant composer mic |
+| `ai-ui/chat-icons.tsx` | Lucide icon paths (ISC) | Keeps ai-ui free of an icon dependency |
+
+`MoonPhase` and `Starfield` are decorative sign-in and landing effects. They
+are the documented exception to the no-glow and no-perpetual-motion rule and
+stop animating under reduced motion.

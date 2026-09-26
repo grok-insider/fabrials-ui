@@ -23,8 +23,8 @@ require Linux and Docker. `bun run vendor ai-relay --write` explicitly generates
 the consumer distributions; it does not publish, commit or deploy anything.
 
 AI Relay and the Spanreed desktop consume the paired `fabrials-{ui,ai-ui}-0.4.0`
-copies. Open Email, Grok Insider, fabrials.com, ui.fabrials.com, Radiant, admin
-and Ditox consume the generic package only.
+copies, and Radiant the paired `0.5.0` copies. Open Email, Grok Insider,
+fabrials.com, ui.fabrials.com, admin and Ditox consume the generic package only.
 `bun run vendor open-email --write` writes `open-email/vendor` in the standalone
 repository and `open-email/apps/web/vendor` when the enterprise layout is present.
 See [docs/migration-0.4.md](docs/migration-0.4.md). The 0.3 delivery record remains

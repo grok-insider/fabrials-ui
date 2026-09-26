@@ -40,7 +40,7 @@ for (const name of ["ui", "ai-ui"]) {
           preserveModules: true,
           preserveModulesRoot: resolve(directory, "src"),
           entryFileNames: "[name].js",
-          banner: chunk => /(?:button-variants|shared)\.[jt]s$/.test(chunk.facadeModuleId ?? "") ? "" : '"use client";',
+          banner: chunk => /(?:button-variants|shared|moon-math)\.[jt]s$/.test(chunk.facadeModuleId ?? "") ? "" : '"use client";',
         },
       },
     },

@@ -1,6 +1,6 @@
 # Fabrials design system
 
-Version: 0.4.0 "Stormlight". AI Relay, enterprise Open Mail, the Spanreed desktop, Radiant, the fabrials.com product routes, admin.fabrials.com, ui.fabrials.com and Grok Insider consume generated 0.4 distributions. ui.fabrials.com documents every `@fabrials/ui` control next to its WebMCP catalogue. Those design-system pages are live previews and usage notes, not registry install items. Distribution of `@fabrials/ui` remains a verified vendor copy, not an npm release.
+Version: 0.5.0 "Stormlight". Radiant consumes 0.5. AI Relay, enterprise Open Mail, the Spanreed desktop, the fabrials.com product routes, admin.fabrials.com, ui.fabrials.com and Grok Insider consume generated 0.4 distributions. ui.fabrials.com documents every `@fabrials/ui` control next to its WebMCP catalogue. Those design-system pages are live previews and usage notes, not registry install items. Distribution of `@fabrials/ui` remains a verified vendor copy, not an npm release.
 
 ## Identity
 
@@ -34,6 +34,8 @@ The catalogue lives in Storybook (`bun run storybook`, localhost:6041) and is do
 - Data: Stat, StatGroup, Sparkline, Meter and StatusDot. Color always has a text or symbol companion.
 - Brand and chrome: ProductLockup, FabrialsGem, Avatar, Snippet, CopyButton, SiteHeader and AuthLayout.
 - Patterns: WorkspaceShell, Sidebar, PageHeader, SectionHeader, CollectionToolbar, BulkActions and StatePanel.
+- Added in 0.5: ConfirmDialog, TruncatedText, SettingsSection, FilterChip, FileThumb, SuggestionCard, ShimmerText and `groupByRecency`; `MoonPhase` and `Starfield` for sign-in and landing surfaces.
+- `@fabrials/ai-ui` chat pieces (0.5): ChatMessage and message actions, ChatComposer, CodeBlock with `.fui-markdown`, citations and sources, activity disclosures, attachments and VoiceInputButton.
 
 Use named exports for React server/client compatibility. Shared interactive entries retain `use client`; tokens and styles have no React dependency. Each control keeps Base UI/native semantics and an accessible name. Form validation belongs to the host; `Field` connects the label, hint and error with the control.
 
@@ -45,7 +47,7 @@ Light, dark and system themes share semantic names. Hosts apply `.dark` to the d
 
 Focus is a visible 2px outline with offset. Preserve keyboard traversal, Escape handling and focus restoration through Base UI. Use AA contrast for meaningful text and controls; verify actual surfaces, not token values in isolation. Check 390/768/1440 widths and 200% text/viewport zoom. Data tables can scroll inside their labeled region; the page must not overflow horizontally.
 
-Motion uses the 140ms feedback token. Continuous motion is reserved for genuine loading indicators and stops under reduced motion. Do not add enter animations to frequently repeated navigation.
+Motion uses the 140ms feedback token. Continuous motion is reserved for genuine loading indicators and stops under reduced motion. The one sanctioned exception is `MoonPhase`/`Starfield` on sign-in and landing surfaces; they also stop under reduced motion. Do not add enter animations to frequently repeated navigation.
 
 ## Extending the system
 

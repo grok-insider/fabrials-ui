@@ -3439,3 +3439,396 @@
     transition: none;
   }
 }
+
+@layer components {
+  .fui-moon-phase {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--fui-space-3);
+    flex-shrink: 0;
+  }
+  .fui-moon-phase-box {
+    position: relative;
+    display: block;
+  }
+  .fui-moon-phase-art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .fui-moon-phase-shadow {
+    fill: oklch(0.16 0.01 260);
+  }
+  .fui-moon-phase-tint {
+    mix-blend-mode: multiply;
+  }
+  .fui-moon-phase-ring {
+    stroke: #dce8ff;
+    stroke-width: 5;
+  }
+  .fui-moon-phase-caption {
+    min-height: 1rem;
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-sans);
+    font-size: var(--fui-text-xs, 0.75rem);
+    line-height: 1rem;
+    white-space: nowrap;
+    transition: opacity var(--fui-duration) var(--fui-ease);
+  }
+
+  .fui-starfield {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    --fui-star: color-mix(in oklch, var(--foreground) 85%, transparent);
+  }
+  .fui-starfield-near,
+  .fui-starfield-far {
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(1.2px 1.2px at 12% 18%, var(--fui-star), transparent 60%),
+      radial-gradient(1.2px 1.2px at 27% 62%, var(--fui-star), transparent 60%),
+      radial-gradient(1.5px 1.5px at 41% 9%, var(--fui-star), transparent 60%),
+      radial-gradient(1.2px 1.2px at 58% 33%, var(--fui-star), transparent 60%),
+      radial-gradient(1.2px 1.2px at 69% 78%, var(--fui-star), transparent 60%),
+      radial-gradient(1.5px 1.5px at 83% 21%, var(--fui-star), transparent 60%),
+      radial-gradient(1.2px 1.2px at 91% 56%, var(--fui-star), transparent 60%),
+      radial-gradient(1.2px 1.2px at 6% 84%, var(--fui-star), transparent 60%),
+      radial-gradient(1.2px 1.2px at 48% 91%, var(--fui-star), transparent 60%),
+      radial-gradient(1.2px 1.2px at 76% 4%, var(--fui-star), transparent 60%);
+  }
+  .fui-starfield-near {
+    background-size: 420px 420px;
+    opacity: 0.9;
+    mask-image: linear-gradient(to bottom, black 10%, transparent 85%);
+  }
+  .fui-starfield-far {
+    background-size: 260px 260px;
+    background-position: 130px 70px;
+    opacity: 0.55;
+    mask-image: linear-gradient(to bottom, black 5%, transparent 70%);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .fui-starfield-twinkle {
+      animation: fui-starfield-twinkle 5s ease-in-out infinite;
+    }
+  }
+  @keyframes fui-starfield-twinkle {
+    0%,
+    100% {
+      opacity: 0.35;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+}
+
+@layer components {
+  .fui-confirm-dialog-title {
+    overflow-wrap: anywhere;
+  }
+  .fui-confirm-dialog-body {
+    display: grid;
+    gap: var(--fui-space-3);
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .fui-truncated-text {
+    display: block;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .fui-positioner:has(> .fui-truncated-text-tooltip),
+  .fui-truncated-text-tooltip {
+    pointer-events: none;
+  }
+  .fui-truncated-text-tooltip {
+    overflow-wrap: anywhere;
+  }
+
+  .fui-settings-section {
+    display: grid;
+    gap: var(--fui-space-4);
+    padding-top: var(--fui-space-6);
+    border-top: 1px solid var(--border);
+    color: var(--foreground);
+    font-family: var(--fui-font-sans);
+  }
+  .fui-settings-section:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+  .fui-settings-section-intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--fui-space-1);
+    min-width: 0;
+  }
+  .fui-settings-section-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--fui-space-2);
+    min-width: 0;
+  }
+  .fui-settings-section-title {
+    margin: 0;
+    font-size: var(--fui-text-md);
+    font-weight: var(--fui-weight-semibold);
+    line-height: var(--fui-leading-md);
+    letter-spacing: var(--fui-tracking-tight);
+    overflow-wrap: anywhere;
+  }
+  .fui-settings-section-description {
+    margin: 0;
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-sm);
+    line-height: var(--fui-leading-sm);
+    text-wrap: pretty;
+  }
+  .fui-settings-section-body {
+    min-width: 0;
+  }
+  @media (min-width: 768px) {
+    .fui-settings-section {
+      grid-template-columns: minmax(0, 13rem) minmax(0, 1fr);
+      gap: var(--fui-space-8);
+    }
+  }
+
+  .fui-filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--fui-space-1-5);
+    max-width: 100%;
+    min-width: 0;
+    min-height: 2rem;
+    margin: 0;
+    padding: 0 var(--fui-space-3);
+    border: 1px solid var(--border);
+    border-radius: var(--fui-radius-full);
+    background: var(--card);
+    color: var(--foreground);
+    font: inherit;
+    font-family: var(--fui-font-sans);
+    font-size: var(--fui-text-xs);
+    line-height: var(--fui-leading-xs);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color var(--fui-duration) var(--fui-ease);
+  }
+  .fui-filter-chip:hover {
+    background: var(--muted);
+  }
+  .fui-filter-chip:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+  .fui-filter-chip-label {
+    flex: none;
+    color: var(--muted-foreground);
+  }
+  .fui-filter-chip-value {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: var(--fui-weight-medium);
+  }
+  .fui-filter-chip-icon {
+    flex: none;
+    width: 0.875rem;
+    height: 0.875rem;
+    color: var(--muted-foreground);
+  }
+
+  .fui-suggestion-grid {
+    display: flex;
+    gap: var(--fui-space-2);
+    margin: 0;
+    padding: 0 0 var(--fui-space-1);
+    list-style: none;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+  }
+  .fui-suggestion-grid-item {
+    display: flex;
+    flex: none;
+    width: min(15rem, 70vw);
+    min-width: 0;
+    scroll-snap-align: start;
+  }
+  @media (min-width: 768px) {
+    .fui-suggestion-grid {
+      display: grid;
+      grid-template-columns: repeat(var(--fui-suggestion-columns, 2), minmax(0, 1fr));
+      padding-bottom: 0;
+      overflow: visible;
+      scroll-snap-type: none;
+    }
+    .fui-suggestion-grid-item {
+      width: auto;
+    }
+  }
+  .fui-suggestion-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--fui-space-3);
+    width: 100%;
+    min-width: 0;
+    min-height: 2.75rem;
+    margin: 0;
+    padding: var(--fui-space-3) 0.875rem;
+    border: 1px solid var(--border);
+    border-radius: var(--fui-radius-md);
+    background: var(--card);
+    color: var(--foreground);
+    font: inherit;
+    font-family: var(--fui-font-sans);
+    text-align: left;
+    cursor: pointer;
+    transition:
+      background-color var(--fui-duration) var(--fui-ease),
+      border-color var(--fui-duration) var(--fui-ease);
+  }
+  .fui-suggestion-card:hover:not(:disabled) {
+    border-color: color-mix(in oklab, var(--foreground) 20%, transparent);
+    background: color-mix(in oklab, var(--muted) 60%, var(--card));
+  }
+  .fui-suggestion-card:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+  .fui-suggestion-card-icon {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 1rem;
+    height: 1rem;
+    margin-top: 0.125rem;
+    color: var(--muted-foreground);
+    transition: color var(--fui-duration) var(--fui-ease);
+  }
+  .fui-suggestion-card-icon svg {
+    width: 1rem;
+    height: 1rem;
+  }
+  .fui-suggestion-card:hover:not(:disabled) .fui-suggestion-card-icon {
+    color: var(--foreground);
+  }
+  .fui-suggestion-card-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--fui-space-0-5);
+    min-width: 0;
+  }
+  .fui-suggestion-card-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--fui-text-sm);
+    font-weight: var(--fui-weight-medium);
+    line-height: var(--fui-leading-sm);
+  }
+  .fui-suggestion-card-description {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+    line-height: 1.625;
+  }
+
+  .fui-shimmer-text {
+    position: relative;
+    display: inline-block;
+    color: var(--muted-foreground);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .fui-shimmer-text {
+      background-image:
+        linear-gradient(
+          90deg,
+          transparent calc(50% - var(--fui-shimmer-spread, 32px)),
+          var(--foreground),
+          transparent calc(50% + var(--fui-shimmer-spread, 32px))
+        ),
+        linear-gradient(var(--muted-foreground), var(--muted-foreground));
+      background-size: 250% 100%, auto;
+      background-repeat: no-repeat, padding-box;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: fui-shimmer-text var(--fui-shimmer-duration, 2s) linear infinite;
+    }
+  }
+  @media (forced-colors: active) {
+    .fui-shimmer-text {
+      background: none;
+      color: CanvasText;
+      animation: none;
+    }
+  }
+  @keyframes fui-shimmer-text {
+    from {
+      background-position: 100% center;
+    }
+    to {
+      background-position: 0% center;
+    }
+  }
+
+  .fui-file-thumb {
+    flex: none;
+    width: var(--fui-file-thumb-size, 2.5rem);
+    height: var(--fui-file-thumb-size, 2.5rem);
+    border: 1px solid var(--border);
+    border-radius: var(--fui-radius-md);
+    background: var(--muted);
+  }
+  .fui-file-thumb-image {
+    display: block;
+    object-fit: cover;
+  }
+  .fui-file-thumb-tile {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--fui-space-0-5);
+    background: color-mix(in oklab, var(--muted) 50%, var(--card));
+    color: var(--muted-foreground);
+  }
+  .fui-file-thumb-icon {
+    display: flex;
+  }
+  .fui-file-thumb-icon svg {
+    width: 1rem;
+    height: 1rem;
+  }
+  .fui-file-thumb-ext {
+    font-family: var(--fui-font-mono);
+    font-size: var(--fui-text-xs);
+    line-height: 1;
+  }
+
+  @media (max-width: 767px), (pointer: coarse) {
+    .fui-filter-chip {
+      min-height: 2.75rem;
+    }
+  }
+}

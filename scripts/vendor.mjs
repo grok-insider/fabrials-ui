@@ -35,10 +35,8 @@ const targets = {
 const genericOnly = new Set([
   "open-email",
   "grok-insider-web",
-  "radiant",
   "web",
   "admin",
-  "fabrials-webmcp",
   "ditox",
 ]);
 const [consumer, mode = "--check"] = process.argv.slice(2);
