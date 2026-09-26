@@ -15,7 +15,9 @@ test("shared toast keeps success, error and neutral distinct without gem color",
   assert.match(toastCss, /--fui-danger-ink/);
   assert.match(toastCss, /--popover/);
   assert.doesNotMatch(toastCss, /var\(--gem\)/);
-  assert.match(source, /expand=\{expand \?\? true\}/);
+  assert.match(source, /expand=\{expand \?\? false\}/);
+  assert.match(source, /closeButton=\{closeButton \?\? false\}/);
+  assert.match(toastCss, /width: fit-content/);
   assert.doesNotMatch(source, /richColors=\{/);
   assert.match(source, /data-tone="success"/);
   assert.match(source, /data-tone="danger"/);

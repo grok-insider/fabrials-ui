@@ -1,6 +1,6 @@
 # Fabrials design system
 
-Version: 0.5.0 "Stormlight". Radiant consumes 0.5. AI Relay, enterprise Open Mail, the Spanreed desktop, the fabrials.com product routes, admin.fabrials.com, ui.fabrials.com and Grok Insider consume generated 0.4 distributions. ui.fabrials.com documents every `@fabrials/ui` control next to its WebMCP catalogue. Those design-system pages are live previews and usage notes, not registry install items. Distribution of `@fabrials/ui` remains a verified vendor copy, not an npm release.
+Version: 0.5.1 "Stormlight". Radiant consumes 0.5.1 (compact toasts without a close button; one-line toasts are centred pills on phones). AI Relay, enterprise Open Mail, the Spanreed desktop, the fabrials.com product routes, admin.fabrials.com, ui.fabrials.com and Grok Insider consume generated 0.4 distributions. ui.fabrials.com documents every `@fabrials/ui` control next to its WebMCP catalogue. Those design-system pages are live previews and usage notes, not registry install items. Distribution of `@fabrials/ui` remains a verified vendor copy, not an npm release.
 
 ## Identity
 

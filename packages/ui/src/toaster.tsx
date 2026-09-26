@@ -47,9 +47,9 @@ export function Toaster({
   return (
     <Sonner
       theme={theme ?? detected}
-      expand={expand ?? true}
-      closeButton={closeButton ?? true}
-      gap={gap ?? 12}
+      expand={expand ?? false}
+      closeButton={closeButton ?? false}
+      gap={gap ?? 8}
       className={["fui-toaster", className].filter(Boolean).join(" ")}
       icons={{
         success: <CircleCheckIcon aria-hidden className="fui-toast-icon" data-tone="success" />,
