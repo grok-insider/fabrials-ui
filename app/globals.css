@@ -4,6 +4,7 @@
 @import "@fabrials/ui/tokens.css";
 @import "@fabrials/ui/fonts.css";
 @import "@fabrials/ui/styles.css";
+@import "@fabrials/ai-ui/styles.css";
 @import "@fabrials/ui/tailwind.css";
 @custom-variant dark (&:is(.dark *));
 

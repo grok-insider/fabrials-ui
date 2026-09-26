@@ -22,7 +22,8 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
-    "@fabrials/ui": "file:vendor/fabrials-ui-0.4.0",
+    "@fabrials/ai-ui": "file:vendor/fabrials-ai-ui-0.5.0",
+    "@fabrials/ui": "file:vendor/fabrials-ui-0.5.0",
     "@modelcontextprotocol/client": "2.0.0",
     "@modelcontextprotocol/server": "2.0.0",
     "ajv": "^8.20.0",
@@ -76,7 +77,7 @@
   },
   "packageManager": "bun@1.4.2",
   "overrides": {
-    "@fabrials/ui": "file:vendor/fabrials-ui-0.4.0"
+    "@fabrials/ui": "file:vendor/fabrials-ui-0.5.0"
   },
   "engines": {
     "node": ">=22.19.0",

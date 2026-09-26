@@ -179,7 +179,7 @@ export default async function Docs({
           description={item?.description ?? page?.description}
           actions={
             item && (
-              <Badge>{uiItem ? "@fabrials/ui" : "Registry"}</Badge>
+              <Badge>{uiItem ? uiItem.package : "Registry"}</Badge>
             )
           }
         />
@@ -213,7 +213,7 @@ export default async function Docs({
               <ol className="docs-steps">
                 <li className="docs-step">
                   <p>
-                    Import the control from <code>@fabrials/ui</code>. Fabrials products consume a
+                    Import the control from <code>{uiItem.package}</code>. Fabrials products consume a
                     vendored copy. This page is not a registry install.
                   </p>
                   <CodeBlock code={usage} label="TypeScript" />

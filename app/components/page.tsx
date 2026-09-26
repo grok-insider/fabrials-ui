@@ -22,7 +22,7 @@ export default function Components() {
         <PageHeader
           eyebrow="The registry"
           title="Components"
-          description="Shared controls from @fabrials/ui, plus WebMCP and MCP blocks you can copy into an app. Design-system pages are previews. Agent blocks stay installable from the registry."
+          description="Shared controls from @fabrials/ui and @fabrials/ai-ui, plus WebMCP and MCP blocks you can copy into an app. Design-system pages are previews. Agent blocks stay installable from the registry."
           actions={
             <>
               <Link className={buttonVariants({ variant: "outline", size: "sm" })} href="/docs/installation">

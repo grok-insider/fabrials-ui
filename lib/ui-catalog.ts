@@ -5,7 +5,11 @@ export type UiGroup =
   | "Navigation"
   | "Composition"
   | "Metrics"
-  | "Patterns";
+  | "Patterns"
+  | "Effects"
+  | "AI chat";
+
+export type UiPackage = "@fabrials/ui" | "@fabrials/ai-ui";
 
 export interface UiCatalogItem {
   slug: string;
@@ -16,6 +20,7 @@ export interface UiCatalogItem {
   props: [string, string, string][];
   note: string;
   usage: string;
+  package: UiPackage;
 }
 
 export const uiGroups: { name: UiGroup; description: string }[] = [
@@ -47,6 +52,14 @@ export const uiGroups: { name: UiGroup; description: string }[] = [
     name: "Patterns",
     description: "Page structure shared by operational screens.",
   },
+  {
+    name: "Effects",
+    description: "Decorative moonlight for sign-in and landing pages only.",
+  },
+  {
+    name: "AI chat",
+    description: "Presentational chat pieces from @fabrials/ai-ui. The host supplies the data.",
+  },
 ];
 
 function ui(
@@ -57,6 +70,7 @@ function ui(
   exports: string[],
   props: UiCatalogItem["props"],
   note: string,
+  pkg: UiPackage = "@fabrials/ui",
 ): UiCatalogItem {
   return {
     slug,
@@ -66,8 +80,23 @@ function ui(
     exports,
     props,
     note,
-    usage: `import { ${exports.join(", ")} } from "@fabrials/ui";`,
+    usage:
+      pkg === "@fabrials/ai-ui"
+        ? `import { ${exports.join(", ")} } from "${pkg}";\nimport "@fabrials/ai-ui/styles.css";`
+        : `import { ${exports.join(", ")} } from "${pkg}";`,
+    package: pkg,
   };
+}
+
+function aiUi(
+  slug: string,
+  title: string,
+  description: string,
+  exports: string[],
+  props: UiCatalogItem["props"],
+  note: string,
+): UiCatalogItem {
+  return ui(slug, title, "AI chat", description, exports, props, note, "@fabrials/ai-ui");
 }
 
 export const uiCatalog: UiCatalogItem[] = [
@@ -572,6 +601,250 @@ export const uiCatalog: UiCatalogItem[] = [
       ["actions", "ReactNode", "The recovery action."],
     ],
     "A stale observation is not shown as a fresh value. A configured connection is not proof that it can be reached.",
+  ),
+  ui(
+    "confirm-dialog",
+    "Confirm dialog",
+    "Overlays",
+    "Confirm first, then run an async action with a pending state and an inline error.",
+    ["ConfirmDialog", "ConfirmActionButton"],
+    [
+      ["title", "ReactNode", "What will happen."],
+      ["description", "ReactNode", "What it affects."],
+      ["details", "ReactNode", "Optional list of the affected records."],
+      ["confirmLabel", "ReactNode", "Names the action."],
+      ["pendingLabel", "ReactNode", "Shown while the action runs."],
+      ["destructive", "boolean", "Uses the destructive confirm button."],
+      ["onConfirm", "() => Promise", "Resolve { ok: false, error } or throw to keep the dialog open with the error."],
+      ["open", "boolean", "ConfirmDialog is controlled with onOpenChange. ConfirmActionButton owns its trigger and state."],
+    ],
+    "The confirm button shows a spinner while the action runs and cannot be pressed twice. A failure stays inline and keeps the dialog open; success closes it. The host performs the action.",
+  ),
+  ui(
+    "filter-chip",
+    "Filter chip",
+    "Controls",
+    "An active filter with a one-click clear, as a link or a button.",
+    ["FilterChip"],
+    [
+      ["label", "string", "The filter name."],
+      ["value", "string", "Its current value."],
+      ["href", "string", "Renders a link that clears the filter."],
+      ["onRemove", "() => void", "Renders a button that clears the filter."],
+      ["clearLabel", "string", "Accessible name of the clear action."],
+    ],
+    "Pass either href or onRemove. Long values truncate inside the chip. The target is 44px on touch.",
+  ),
+  ui(
+    "truncated-text",
+    "Truncated text",
+    "Composition",
+    "A single line that shows its full text in a tooltip only when it is cut off.",
+    ["TruncatedText"],
+    [
+      ["children", "string", "The full text."],
+      ["side", "top | right | bottom | left", "Where the tooltip opens. sideOffset and align refine it."],
+    ],
+    "The tooltip never intercepts clicks on row actions next to it. Text that fits has no tooltip.",
+  ),
+  ui(
+    "shimmer-text",
+    "Shimmer text",
+    "Composition",
+    "A CSS-only loading label with a light sweep.",
+    ["ShimmerText"],
+    [
+      ["children", "string", "The label."],
+      ["as", "ElementType", "Element to render. Defaults to p."],
+      ["duration", "number", "Sweep length in seconds. spread sets the highlight width."],
+    ],
+    "Use it for a short pending label, not for content. Under reduced motion it is plain muted text.",
+  ),
+  ui(
+    "file-thumb",
+    "File thumbnail",
+    "Collections",
+    "An image preview or a file-type tile for file lists.",
+    ["FileThumb", "fileTypeLabel"],
+    [
+      ["src", "string | null", "Image to preview. A broken image falls back to the tile."],
+      ["mime", "string | null", "Labels the tile with filename, for example PDF or CSV."],
+      ["icon", "ReactNode", "Replaces the default tile icon."],
+      ["size", "number", "Square size in pixels."],
+      ["alt", "string", "Text alternative for the preview."],
+    ],
+    "fileTypeLabel returns the same short label for use elsewhere. The host decides which URLs are safe to preview.",
+  ),
+  ui(
+    "recency-groups",
+    "Recency groups",
+    "Collections",
+    "Groups a history by Today, Yesterday, Previous 7 days, Previous 30 days, then month.",
+    ["groupByRecency", "RECENCY_LABELS", "TruncatedText"],
+    [
+      ["items", "readonly T[]", "Records to group, in the order to keep inside each group."],
+      ["getDate", "(item) => Date", "Reads the date of one record. Strings and numbers work too."],
+      ["now", "Date", "Reference time. Defaults to the current time."],
+      ["options", "object", "timeZone, locale and label overrides."],
+    ],
+    "A helper, not a component. Buckets follow calendar days in the given time zone. The host renders the groups.",
+  ),
+  ui(
+    "settings-section",
+    "Settings section",
+    "Patterns",
+    "A settings row with the title, description and status on the left and the controls on the right.",
+    ["SettingsSection"],
+    [
+      ["title", "ReactNode", "Section heading."],
+      ["description", "ReactNode", "What the setting changes."],
+      ["status", "ReactNode", "A badge such as Saved, Loading or Error."],
+      ["headingLevel", "2 | 3 | 4", "Heading level for the title."],
+      ["children", "ReactNode", "The controls."],
+    ],
+    "The two columns stack on narrow screens. Saving and validation belong to the host.",
+  ),
+  ui(
+    "suggestion-card",
+    "Suggestion card",
+    "Patterns",
+    "Empty-state prompts in a grid on wide screens and a scroll row on narrow ones.",
+    ["SuggestionCard", "SuggestionGrid"],
+    [
+      ["title", "ReactNode", "The prompt."],
+      ["description", "ReactNode", "A short explanation. Clamps at two lines."],
+      ["icon", "ReactNode", "Optional leading icon."],
+      ["onClick", "() => void", "Each card is a button and accepts disabled."],
+      ["columns", "1 | 2 | 3 | 4", "SuggestionGrid columns on wide screens."],
+    ],
+    "Give the grid an aria-label. What a suggestion does is up to the host.",
+  ),
+  ui(
+    "moon-phase",
+    "Moon phase",
+    "Effects",
+    "The moon at a given phase, optionally cycling, with rare moon types and lunar phase helpers.",
+    ["MoonPhase", "MOON_VARIANTS", "pickMoonVariant", "lunarPhase", "lunarPhaseName"],
+    [
+      ["phase", "number", "0 new, 0.5 full, 1 new again."],
+      ["animate", "boolean", "Cycles through the phases over cycleMs."],
+      ["size", "number | string", "Width and height."],
+      ["halo", "boolean", "Glow drawn from the lit side only, so it follows the shadow."],
+      ["variant", "id | \"random\"", "Moon type. Random rolls a weighted type at each new moon."],
+      ["caption", "boolean", "Shows the type and rarity while it is visible."],
+      ["label", "string", "Accessible name. Without it the moon is decorative."],
+      ["lunarPhase", "(date) => number", "Phase for a date. lunarPhaseName names it."],
+    ],
+    "Types: earthshine (crescents), moon halo, harvest, supermoon, micromoon, blue, blood and the legendary super blood moon; full-moon types only show near full. Server code imports the helpers from @fabrials/ui/moon. MoonPhase and Starfield are the only sanctioned glow and continuous motion in Fabrials UI, for sign-in and landing surfaces only. The cycle stops under reduced motion.",
+  ),
+  ui(
+    "starfield",
+    "Starfield",
+    "Effects",
+    "A decorative star layer behind sign-in and landing content.",
+    ["Starfield"],
+    [
+      ["twinkle", "boolean", "Slow twinkle on the far layer."],
+      ["className", "string", "Positioning overrides. It fills a positioned parent."],
+    ],
+    "Hidden from assistive technology and never takes pointer events. Like MoonPhase, it is only for sign-in and landing surfaces, and the twinkle stops under reduced motion.",
+  ),
+  aiUi(
+    "chat-message",
+    "Chat message",
+    "A user or assistant turn with copy, edit, retry and timestamp actions.",
+    ["ChatMessage", "MessageActions", "MessageAction", "CopyMessageAction", "MessageTimestamp"],
+    [
+      ["from", "ChatRole", "user, assistant or system. User turns sit in a bubble."],
+      ["actions", "ReactNode", "MessageActions for this turn."],
+      ["pinActions", "boolean", "Keeps actions visible instead of revealing them on hover and focus."],
+      ["text", "string", "CopyMessageAction writes it to the clipboard. A function works too."],
+      ["dateTime", "string", "MessageTimestamp shows label with detail in a tooltip."],
+    ],
+    "Presentational. The host supplies the rendered content, including its markdown renderer, and decides what edit and retry do.",
+  ),
+  aiUi(
+    "chat-composer",
+    "Chat composer",
+    "The message field with tools, attachments, send and stop.",
+    ["ChatComposer", "ComposerToggle", "ComposerButton"],
+    [
+      ["value", "string", "Controlled with onValueChange. defaultValue works uncontrolled."],
+      ["onSubmit", "(value) => void", "Enter sends; Shift+Enter adds a line."],
+      ["status", "ChatComposerStatus", "ready, submitting or streaming. Streaming turns send into stop, which calls onStop."],
+      ["tools", "ReactNode", "ComposerButton and ComposerToggle on the left. trailing holds voice input."],
+      ["attachments", "ReactNode", "Attachments shown above the field."],
+      ["onPasteFiles", "(files) => void", "Receives pasted files. Backspace in an empty field calls the remove-last handler."],
+    ],
+    "Presentational. The host sends the message, uploads pasted files and owns the tool state.",
+  ),
+  aiUi(
+    "code-block",
+    "Code block and markdown",
+    "Answer styles for rendered markdown and a code block with copy and download.",
+    ["CodeBlock"],
+    [
+      ["code", "string", "Raw code used by copy and download."],
+      ["language", "string", "Shown in the header and used for the download name."],
+      ["children", "ReactNode", "Highlighted lines. Without it the raw code is shown."],
+      ["lineNumbers", "boolean", "Numbers each line."],
+      ["download", "boolean", "Adds a download action named after filename. A function replaces it."],
+      ["fui-markdown", "class", "Styles headings, lists, quotes, tables and code, including Streamdown data-streamdown output."],
+    ],
+    "Presentational. The host supplies the markdown renderer and syntax highlighting; these pieces only style the result.",
+  ),
+  aiUi(
+    "citations",
+    "Citations and sources",
+    "Numbered citation chips linked to a list of source cards.",
+    ["CitationProvider", "CitationChip", "Sources", "SourceCard", "SourceFavicon"],
+    [
+      ["sources", "CitationSource[]", "CitationProvider sources by number. Hovering a chip highlights its card."],
+      ["number", "number", "CitationChip number and href. Shows a source preview."],
+      ["Sources", "component", "Collapsible list of SourceCard links."],
+      ["faviconUrl", "(url) => string", "Host resolver for favicons. Without it a letter mark is shown."],
+    ],
+    "Presentational. The host supplies the sources and any favicon service; nothing is fetched by these components.",
+  ),
+  aiUi(
+    "activity-disclosure",
+    "Activity disclosure",
+    "Collapsible reasoning, search steps and tool activity inside an answer.",
+    ["ActivityDisclosure", "ActivityIcon", "ReasoningDisclosure", "SearchStepsDisclosure"],
+    [
+      ["streaming", "boolean", "ReasoningDisclosure shows Thinking, then Thought for durationSeconds."],
+      ["phase", "SearchPhase", "For search steps: searching, reading or done, with steps and sourceCount."],
+      ["live", "boolean", "ActivityDisclosure for any other activity. ActivityIcon marks the live state."],
+      ["open", "boolean", "Controlled open state. defaultOpen works uncontrolled."],
+    ],
+    "Presentational. The host maps its stream events to these props. Live indicators stop under reduced motion.",
+  ),
+  aiUi(
+    "attachments",
+    "Attachments",
+    "Files attached to a message, inline, as a grid or as a list.",
+    ["Attachments", "AttachmentChip"],
+    [
+      ["items", "AttachmentItem[]", "id, name, mediaType, url, size, status and error."],
+      ["variant", "inline | grid | list", "Layout."],
+      ["onRemove", "(id) => void", "Shows a remove button on each file."],
+      ["empty", "ReactNode", "Shown when there are no files."],
+    ],
+    "Presentational. The host uploads the files and reports uploading and error states.",
+  ),
+  aiUi(
+    "voice-input",
+    "Voice input",
+    "A microphone button that records a clip and hands it to the host for transcription.",
+    ["VoiceInputButton", "VoiceInputButtonView"],
+    [
+      ["onRecorded", "(blob) => Promise", "Host transcription. Resolves to the text."],
+      ["onTranscript", "(text) => void", "Receives the text to insert."],
+      ["maxDurationMs", "number", "Stops recording at this length."],
+      ["showLevel", "boolean", "Shows the input level while recording."],
+      ["status", "VoiceInputStatus", "idle, requesting, recording, transcribing or error. The stateless view uses it for custom recorders."],
+    ],
+    "Presentational. The microphone is only requested after a press. The host supplies transcription; nothing is sent by the component.",
   ),
 ];
 
