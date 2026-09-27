@@ -10,6 +10,12 @@ import { classes, type StyledProps } from "./shared";
 export const Dialog = BaseDialog.Root;
 export const DialogTrigger = BaseDialog.Trigger;
 export const DialogClose = BaseDialog.Close;
+export const DialogPortal = BaseDialog.Portal;
+
+/** The scrim behind a dialog. DialogContent already renders one; use this with DialogPortal for a custom layout. */
+export function DialogOverlay({ className, ...props }: StyledProps<BaseDialog.Backdrop.Props>) {
+  return <BaseDialog.Backdrop className={classes("fui-backdrop", className)} {...props} />;
+}
 
 export type DialogContentProps = StyledProps<BaseDialog.Popup.Props> & {
   closeLabel?: string;
@@ -91,6 +97,7 @@ export const SheetClose = DialogClose;
 export const SheetHeader = DialogHeader;
 export const SheetTitle = DialogTitle;
 export const SheetDescription = DialogDescription;
+export const SheetFooter = DialogFooter;
 
 export function SheetContent({
   side = "right",
@@ -108,6 +115,16 @@ export function SheetContent({
 export const AlertDialog = BaseAlertDialog.Root;
 export const AlertDialogTrigger = BaseAlertDialog.Trigger;
 export const AlertDialogClose = BaseAlertDialog.Close;
+export const AlertDialogPortal = BaseAlertDialog.Portal;
+
+export function AlertDialogOverlay({ className, ...props }: StyledProps<BaseAlertDialog.Backdrop.Props>) {
+  return <BaseAlertDialog.Backdrop className={classes("fui-backdrop", className)} {...props} />;
+}
+
+/** An icon above the alert title; decorative, the title still states the risk. */
+export function AlertDialogMedia({ className, ...props }: ComponentProps<"div">) {
+  return <div aria-hidden className={classes("fui-alert-dialog-media", className)} {...props} />;
+}
 export const AlertDialogHeader = DialogHeader;
 export const AlertDialogFooter = DialogFooter;
 export const AlertDialogAction = Button;

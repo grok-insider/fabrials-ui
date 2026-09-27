@@ -3,13 +3,38 @@
 import type { ComponentProps } from "react";
 import { Menu as BaseMenu } from "@base-ui/react/menu";
 import { Tooltip as BaseTooltip } from "@base-ui/react/tooltip";
-import { Check, Dot } from "lucide-react";
+import { Check, ChevronRight, Dot } from "lucide-react";
 import { classes, type StyledProps } from "./shared";
 
 export const DropdownMenu = BaseMenu.Root;
 export const DropdownMenuTrigger = BaseMenu.Trigger;
 export const DropdownMenuGroup = BaseMenu.Group;
 export const DropdownMenuRadioGroup = BaseMenu.RadioGroup;
+export const DropdownMenuPortal = BaseMenu.Portal;
+export const DropdownMenuSub = BaseMenu.SubmenuRoot;
+
+export function DropdownMenuSubTrigger({ className, children, ...props }: StyledProps<BaseMenu.SubmenuTrigger.Props>) {
+  return (
+    <BaseMenu.SubmenuTrigger className={classes("fui-menu-item", className)} {...props}>
+      {children}
+      <ChevronRight aria-hidden size={16} className="fui-menu-submenu-icon" />
+    </BaseMenu.SubmenuTrigger>
+  );
+}
+
+export function DropdownMenuSubContent({
+  className,
+  sideOffset = 4,
+  ...props
+}: StyledProps<BaseMenu.Popup.Props> & Pick<BaseMenu.Positioner.Props, "sideOffset">) {
+  return (
+    <BaseMenu.Portal>
+      <BaseMenu.Positioner className="fui-positioner" side="right" align="start" sideOffset={sideOffset}>
+        <BaseMenu.Popup className={classes("fui-menu", className)} {...props} />
+      </BaseMenu.Positioner>
+    </BaseMenu.Portal>
+  );
+}
 
 export function DropdownMenuContent({
   className,

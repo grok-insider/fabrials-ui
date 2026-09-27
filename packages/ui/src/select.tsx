@@ -1,12 +1,36 @@
 "use client";
 
 import { Select as BaseSelect } from "@base-ui/react/select";
-import { Check, ChevronDown } from "lucide-react";
+import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import { classes, type StyledProps } from "./shared";
 
 export const Select = BaseSelect.Root;
 export const SelectValue = BaseSelect.Value;
 export const SelectGroup = BaseSelect.Group;
+
+export function SelectLabel({ className, ...props }: StyledProps<BaseSelect.GroupLabel.Props>) {
+  return <BaseSelect.GroupLabel className={classes("fui-menu-label", className)} {...props} />;
+}
+
+export function SelectSeparator({ className, ...props }: StyledProps<BaseSelect.Separator.Props>) {
+  return <BaseSelect.Separator className={classes("fui-menu-separator", "fui-separator", className)} {...props} />;
+}
+
+export function SelectScrollUpButton({ className, ...props }: StyledProps<BaseSelect.ScrollUpArrow.Props>) {
+  return (
+    <BaseSelect.ScrollUpArrow className={classes("fui-menu-scroll-arrow", className)} {...props}>
+      <ChevronUp aria-hidden size={16} />
+    </BaseSelect.ScrollUpArrow>
+  );
+}
+
+export function SelectScrollDownButton({ className, ...props }: StyledProps<BaseSelect.ScrollDownArrow.Props>) {
+  return (
+    <BaseSelect.ScrollDownArrow className={classes("fui-menu-scroll-arrow", className)} {...props}>
+      <ChevronDown aria-hidden size={16} />
+    </BaseSelect.ScrollDownArrow>
+  );
+}
 
 export function SelectTrigger({
   className,

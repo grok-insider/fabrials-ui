@@ -16,7 +16,8 @@ export type ButtonSize =
   | "lg"
   | "icon"
   | "icon-xs"
-  | "icon-sm";
+  | "icon-sm"
+  | "icon-lg";
 
 export type ButtonStyleProps = {
   variant?: ButtonVariant;

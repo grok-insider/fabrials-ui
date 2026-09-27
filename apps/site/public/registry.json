@@ -862,6 +862,32 @@
       ]
     },
     {
+      "name": "alert-dialog",
+      "type": "registry:ui",
+      "title": "Alert dialog",
+      "description": "shadcn's alert-dialog, backed by @fabrials/ui. A confirmation for a destructive or hard-to-undo action.",
+      "author": "Fabrials <admin@grokinsider.net>",
+      "dependencies": [
+        "@fabrials/ui@^0.7.0"
+      ],
+      "registryDependencies": [
+        "https://ui.fabrials.com/r/styles.json"
+      ],
+      "meta": {
+        "source": "shim",
+        "tier": "fabrials",
+        "license": "MIT",
+        "category": "Shims",
+        "shadcn": "alert-dialog"
+      },
+      "files": [
+        {
+          "path": "registry/shims/alert-dialog.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "breadcrumb",
       "type": "registry:ui",
       "title": "Breadcrumb",
@@ -1070,6 +1096,58 @@
       ]
     },
     {
+      "name": "dialog",
+      "type": "registry:ui",
+      "title": "Dialog",
+      "description": "shadcn's dialog, backed by @fabrials/ui. A modal task with a title, an explanation and explicit actions.",
+      "author": "Fabrials <admin@grokinsider.net>",
+      "dependencies": [
+        "@fabrials/ui@^0.7.0"
+      ],
+      "registryDependencies": [
+        "https://ui.fabrials.com/r/styles.json"
+      ],
+      "meta": {
+        "source": "shim",
+        "tier": "fabrials",
+        "license": "MIT",
+        "category": "Shims",
+        "shadcn": "dialog"
+      },
+      "files": [
+        {
+          "path": "registry/shims/dialog.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "dropdown-menu",
+      "type": "registry:ui",
+      "title": "Dropdown menu",
+      "description": "shadcn's dropdown-menu, backed by @fabrials/ui. A small list of actions for one record.",
+      "author": "Fabrials <admin@grokinsider.net>",
+      "dependencies": [
+        "@fabrials/ui@^0.7.0"
+      ],
+      "registryDependencies": [
+        "https://ui.fabrials.com/r/styles.json"
+      ],
+      "meta": {
+        "source": "shim",
+        "tier": "fabrials",
+        "license": "MIT",
+        "category": "Shims",
+        "shadcn": "dropdown-menu"
+      },
+      "files": [
+        {
+          "path": "registry/shims/dropdown-menu.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "hover-card",
       "type": "registry:ui",
       "title": "Hover card",
@@ -1143,6 +1221,32 @@
       "files": [
         {
           "path": "registry/shims/input-group.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "kbd",
+      "type": "registry:ui",
+      "title": "Kbd",
+      "description": "shadcn's kbd, backed by @fabrials/ui. A flat hint for a keyboard shortcut.",
+      "author": "Fabrials <admin@grokinsider.net>",
+      "dependencies": [
+        "@fabrials/ui@^0.7.0"
+      ],
+      "registryDependencies": [
+        "https://ui.fabrials.com/r/styles.json"
+      ],
+      "meta": {
+        "source": "shim",
+        "tier": "fabrials",
+        "license": "MIT",
+        "category": "Shims",
+        "shadcn": "kbd"
+      },
+      "files": [
+        {
+          "path": "registry/shims/kbd.tsx",
           "type": "registry:ui"
         }
       ]
@@ -1252,6 +1356,32 @@
       ]
     },
     {
+      "name": "radio-group",
+      "type": "registry:ui",
+      "title": "Radio Group",
+      "description": "shadcn's radio-group, backed by @fabrials/ui.",
+      "author": "Fabrials <admin@grokinsider.net>",
+      "dependencies": [
+        "@fabrials/ui@^0.7.0"
+      ],
+      "registryDependencies": [
+        "https://ui.fabrials.com/r/styles.json"
+      ],
+      "meta": {
+        "source": "shim",
+        "tier": "fabrials",
+        "license": "MIT",
+        "category": "Shims",
+        "shadcn": "radio-group"
+      },
+      "files": [
+        {
+          "path": "registry/shims/radio-group.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "scroll-area",
       "type": "registry:ui",
       "title": "Scroll area",
@@ -1278,6 +1408,32 @@
       ]
     },
     {
+      "name": "select",
+      "type": "registry:ui",
+      "title": "Select",
+      "description": "shadcn's select, backed by @fabrials/ui. A closed list of options.",
+      "author": "Fabrials <admin@grokinsider.net>",
+      "dependencies": [
+        "@fabrials/ui@^0.7.0"
+      ],
+      "registryDependencies": [
+        "https://ui.fabrials.com/r/styles.json"
+      ],
+      "meta": {
+        "source": "shim",
+        "tier": "fabrials",
+        "license": "MIT",
+        "category": "Shims",
+        "shadcn": "select"
+      },
+      "files": [
+        {
+          "path": "registry/shims/select.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "separator",
       "type": "registry:ui",
       "title": "Separator",
@@ -1299,6 +1455,32 @@
       "files": [
         {
           "path": "registry/shims/separator.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "sheet",
+      "type": "registry:ui",
+      "title": "Sheet",
+      "description": "shadcn's sheet, backed by @fabrials/ui. A side panel for filters and secondary tasks.",
+      "author": "Fabrials <admin@grokinsider.net>",
+      "dependencies": [
+        "@fabrials/ui@^0.7.0"
+      ],
+      "registryDependencies": [
+        "https://ui.fabrials.com/r/styles.json"
+      ],
+      "meta": {
+        "source": "shim",
+        "tier": "fabrials",
+        "license": "MIT",
+        "category": "Shims",
+        "shadcn": "sheet"
+      },
+      "files": [
+        {
+          "path": "registry/shims/sheet.tsx",
           "type": "registry:ui"
         }
       ]

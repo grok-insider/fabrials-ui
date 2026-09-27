@@ -85,3 +85,11 @@ test("lockup, stat and snippet keep their names and copy text", () => {
   assert.match(html, /curl example/);
   assert.match(html, /aria-label="Copy command"/);
 });
+
+test("0.7 parts render with shadcn's names", async () => {
+  const { AlertDialogMedia, KbdGroup, Kbd, RadioGroupItem, Radio, SheetFooter, DialogFooter } = await import("../../packages/ui/src/index");
+  assert.equal(RadioGroupItem, Radio);
+  assert.equal(SheetFooter, DialogFooter);
+  assert.match(renderToStaticMarkup(<KbdGroup><Kbd>Ctrl</Kbd><Kbd>K</Kbd></KbdGroup>), /class="fui-kbd-group"/);
+  assert.match(renderToStaticMarkup(<AlertDialogMedia>!</AlertDialogMedia>), /aria-hidden="true" class="fui-alert-dialog-media"/);
+});

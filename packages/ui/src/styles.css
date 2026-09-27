@@ -196,10 +196,15 @@
   }
   :is(.fui-button[data-size="icon"], .fui-button-size-icon),
   :is(.fui-button[data-size="icon-sm"], .fui-button-size-icon-sm),
-  :is(.fui-button[data-size="icon-xs"], .fui-button-size-icon-xs) {
+  :is(.fui-button[data-size="icon-xs"], .fui-button-size-icon-xs),
+  :is(.fui-button[data-size="icon-lg"], .fui-button-size-icon-lg) {
     aspect-ratio: 1;
     padding: 0;
     min-width: var(--fui-control-height);
+  }
+  :is(.fui-button[data-size="icon-lg"], .fui-button-size-icon-lg) {
+    min-height: var(--fui-control-height-lg);
+    min-width: var(--fui-control-height-lg);
   }
   :is(.fui-button[data-size="icon-sm"], .fui-button-size-icon-sm) {
     min-width: var(--fui-control-height-sm);
@@ -561,6 +566,39 @@
   .fui-menu-separator,
   .fui-menu .fui-separator {
     margin: var(--fui-space-1) calc(var(--fui-space-1) * -1);
+  }
+  /* 0.7: submenus, select scroll arrows, alert dialog media, key groups */
+  .fui-menu-item .fui-menu-submenu-icon {
+    margin-inline-start: auto;
+    color: var(--muted-foreground);
+  }
+  .fui-menu-scroll-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 1.5rem;
+    color: var(--muted-foreground);
+    cursor: default;
+  }
+  .fui-alert-dialog-media {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-bottom: var(--fui-space-2);
+    border-radius: var(--fui-radius-md);
+    background: var(--muted);
+    color: var(--foreground);
+  }
+  .fui-alert-dialog-media svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  .fui-kbd-group {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--fui-space-1);
   }
   .fui-combobox-chips {
     display: flex;
@@ -3259,7 +3297,8 @@
     }
     :is(.fui-button[data-size="icon"], .fui-button-size-icon),
     :is(.fui-button[data-size="icon-sm"], .fui-button-size-icon-sm),
-    :is(.fui-button[data-size="icon-xs"], .fui-button-size-icon-xs) {
+    :is(.fui-button[data-size="icon-xs"], .fui-button-size-icon-xs),
+    :is(.fui-button[data-size="icon-lg"], .fui-button-size-icon-lg) {
       min-width: 2.75rem;
     }
     .fui-input,

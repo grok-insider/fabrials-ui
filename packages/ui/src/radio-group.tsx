@@ -17,6 +17,9 @@ export function RadioGroup({
   );
 }
 
+/** shadcn's name for Radio. */
+export const RadioGroupItem = Radio;
+
 export function Radio({
   className,
   ...props

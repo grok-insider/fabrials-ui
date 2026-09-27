@@ -36,6 +36,18 @@ check a host's screens after updating; nothing in its code has to change.
   `GEM_HEX`, `stormField`, `stormBandField`, `gemField`, `fbm`,
   `valueNoise`, `DITHER_BACKGROUND`.
 
+### shadcn's names
+
+So shadcn primitives map onto Fabrials controls one to one (and third-party
+components can use the shims), 0.7 adds the parts shadcn names that were
+missing: `DialogPortal`, `DialogOverlay`, `SheetFooter`,
+`AlertDialogPortal`, `AlertDialogOverlay`, `AlertDialogMedia`,
+`DropdownMenuPortal`, `DropdownMenuSub`, `DropdownMenuSubTrigger`,
+`DropdownMenuSubContent`, `SelectLabel`, `SelectSeparator`,
+`SelectScrollUpButton`, `SelectScrollDownButton`, `RadioGroupItem` (the same
+component as `Radio`), `KbdGroup`, and the `icon-lg` button size. Nothing
+existing changes.
+
 ## New in `@fabrials/ai-ui`
 
 Nothing; the version moves with `@fabrials/ui`.
