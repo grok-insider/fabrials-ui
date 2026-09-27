@@ -367,7 +367,7 @@ function CoffeeWorkbench() {
                 A good fit. In every way.
               </h3>
             </div>
-            <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
+            <span className="rounded-md border px-3 py-1 text-xs text-muted-foreground">
               2 machines to compare
             </span>
           </div>
@@ -423,7 +423,7 @@ function CoffeeWorkbench() {
             <span className="flex items-center gap-2 text-xs font-medium">
               <Braces className="size-4" /> Try a tool
             </span>
-            <span className="rounded-full border px-2 py-1 text-[10px] text-muted-foreground">
+            <span className="rounded-md border px-2 py-1 text-[10px] text-muted-foreground">
               Simulation
             </span>
           </div>

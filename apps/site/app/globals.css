@@ -6,6 +6,7 @@
 @import "@fabrials/ui/styles.css";
 @import "@fabrials/ai-ui/styles.css";
 @import "@fabrials/ui/tailwind.css";
+@import "./external.css";
 @custom-variant dark (&:is(.dark *));
 
 :root {
@@ -87,7 +88,7 @@
   padding: 1.25rem;
   background: var(--muted);
   border: 1px solid var(--border);
-  border-radius: 0.65rem;
+  border-radius: var(--fui-radius-lg);
   font-size: 0.75rem;
   line-height: 1.75;
   color: var(--foreground);
@@ -137,7 +138,7 @@ html {
 }
 
 .tour-theatre .comparison-table {
-  border-radius: 0.75rem;
+  border-radius: var(--fui-radius-lg);
 }
 .tour-theatre .comparison-table th,
 .tour-theatre .comparison-table td {
@@ -211,4 +212,19 @@ html {
   max-width: 100%;
   overflow: hidden;
   padding-inline: 3rem;
+}
+
+/* Home hero: the Highstorm front fills the right of the hero and fades into the page. */
+.home-storm.fui-dither-scene {
+  left: 40%;
+}
+@media (max-width: 767px) {
+  .home-storm.fui-dither-scene {
+    left: 0;
+    top: auto;
+    height: 12rem;
+  }
+  .home-hero {
+    padding-bottom: 14rem;
+  }
 }

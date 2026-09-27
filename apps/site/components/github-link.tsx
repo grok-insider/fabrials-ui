@@ -15,7 +15,7 @@ export function GitHubLink() {
   }, []);
   return (
     <a
-      href="https://github.com/grok-insider/fabrials-webmcp"
+      href="https://github.com/grok-insider/fabrials-ui"
       target="_blank"
       rel="noopener noreferrer"
       aria-label={`GitHub repository${stars === null ? "" : ` · ${stars} stars`}`}

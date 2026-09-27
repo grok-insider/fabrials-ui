@@ -1,18 +1,13 @@
 import Link from "next/link";
 import {
-  Code2,
-  MousePointer2,
-  Terminal,
-} from "lucide-react";
-import {
-  Badge,
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+  DitherScene,
   SectionHeader,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
   Tabs,
   TabsContent,
   TabsList,
@@ -23,130 +18,96 @@ import { CodeBlock } from "@/components/code-block";
 import { LandingDemo } from "@/components/landing-demo";
 import { LandingTour } from "@/components/landing-tour";
 import { catalog } from "@/lib/catalog";
+import { externalIndex } from "@/lib/external-index.generated";
+import { shimIndex } from "@/lib/shims-index.generated";
 import { uiCatalog } from "@/lib/ui-catalog";
 
-const workflows = [
+const externalCount = externalIndex.reduce((sum, library) => sum + library.items.length, 0);
+
+const kinds = [
   {
-    id: "travel",
-    label: "Travel planning",
-    title: "A quiet stay, within budget.",
-    detail: "Compare options and build a shortlist.",
+    count: uiCatalog.length + catalog.length,
+    title: "Fabrials components",
+    text: "The controls, patterns and chat pieces Fabrials products are built with, plus WebMCP and MCP blocks for interfaces people and agents share.",
+    href: "/components",
+    label: "Browse components",
   },
   {
-    id: "support",
-    label: "Customer support",
-    title: "A clearer queue. A human decision.",
-    detail: "Filter tickets and review each resolution.",
+    count: shimIndex.length,
+    title: "Shims",
+    text: "shadcn's button, dialog, select and more, backed by the Fabrials controls. Code written for shadcn keeps working and matches the app.",
+    href: "/docs/shims",
+    label: "How shims work",
   },
   {
-    id: "onboarding",
-    label: "Workspace setup",
-    title: "From blank form to ready to go.",
-    detail: "Validate details across a guided flow.",
-  },
-];
-const collection = [
-  {
-    title: "Agent-ready interactions",
-    icon: MousePointer2,
-    text: "Forms, filters, tables and multi-step flows. Familiar to people. Explicit to agents.",
-    href: "/docs/webmcp-form",
-    label: "Explore WebMCP",
-  },
-  {
-    title: "A window into your tools",
-    icon: Terminal,
-    text: "Discover tools, inspect results, and follow execution. Bring your own MCP server.",
-    href: "/docs/mcp-dashboard",
-    label: "Explore MCP components",
-  },
-  {
-    title: "Your code, your decisions",
-    icon: Code2,
-    text: "Copy what you need. Adapt every detail. No opaque runtime or hosted dependency.",
-    href: "/docs/installation",
-    label: "Install from the registry",
+    count: externalCount,
+    title: "From other libraries",
+    text: `Components from ${externalIndex.map((library) => library.title).join(" and ")}, copied at a reviewed snapshot with their license checked and credited.`,
+    href: "/libraries",
+    label: "See the libraries",
   },
 ];
 
 export default function Home() {
   return (
-    <main
-      id="main-content"
-      className="w-full px-5 sm:px-8 lg:px-12 2xl:px-16 [&_.fui-section-header]:mb-8 [&_.fui-section-header_h2]:text-3xl [&_.fui-section-header_h2]:font-medium [&_.fui-section-header_h2]:tracking-tight"
-    >
-      <section className="grid gap-10 pt-16 pb-14 lg:grid-cols-[1.25fr_1fr] lg:items-end lg:pt-24">
-        <div>
-          <Link href="/docs/compatibility" className="mb-7 inline-flex">
-            <Badge tone="success">
-              WebMCP + MCP 2026-07-28
-            </Badge>
-          </Link>
-          <h1 className="font-serif text-[clamp(2.7rem,5.5vw,4.8rem)] leading-[1.07] font-medium tracking-tight">
-            Built for people.
-            <br />
-            <span className="text-muted-foreground">Ready for agents.</span>
+    <main id="main-content" className="w-full px-5 sm:px-8 lg:px-12 2xl:px-16">
+      <section className="home-hero relative -mx-5 px-5 pt-16 pb-24 sm:-mx-8 sm:px-8 lg:-mx-12 lg:px-12 lg:pt-24 2xl:-mx-16 2xl:px-16" aria-labelledby="home-title">
+        <DitherScene className="home-storm" />
+        <div className="relative z-10 max-w-[38rem]">
+          <h1
+            id="home-title"
+            className="font-display text-[clamp(2.5rem,6vw,4.75rem)] leading-[0.98] font-semibold tracking-[-0.015em] text-balance"
+          >
+            The Fabrials design system, ready to install.
           </h1>
-          <p className="mt-7 max-w-md text-base leading-7 text-muted-foreground">
-            Components for a web we use together. Accessible interfaces,
-            structured tools, and shared state. Built on shadcn. Yours to shape.
+          <p className="mt-6 max-w-[46ch] text-lg leading-7 text-muted-foreground">
+            Fabrials components, shims that give shadcn primitives the Fabrials look, and open-source components from
+            other libraries with their license checked. One command sets an app up.
           </p>
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Link
-              href="/docs/installation"
-              className={buttonVariants({ size: "lg" })}
-            >
-              Start building
+          <div className="mt-8 max-w-[34rem]">
+            <CodeBlock variant="command" code="npx shadcn@latest init https://ui.fabrials.com/r/init.json" label="Terminal" />
+          </div>
+          <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
+            <Link href="/docs/installation" className={buttonVariants({ size: "lg" })}>
+              Set an app up
             </Link>
-            <a
-              href="#try-it"
-              className={buttonVariants({ variant: "outline", size: "lg" })}
-            >
-              Try the live demo
-            </a>
-            <Link
-              href="/playground"
-              className={buttonVariants({ variant: "ghost", size: "lg" })}
-            >
-              Open playground
+            <Link href="/components" className="text-sm text-foreground underline underline-offset-4">
+              Browse components
             </Link>
           </div>
         </div>
-        <Card>
-          <CardHeader>
-            <p className="fui-eyebrow">From interface to capability</p>
-            <CardTitle className="text-xl leading-8 font-medium tracking-tight">
-              The comparison. The selection. The reason behind the
-              recommendation.
-            </CardTitle>
-            <CardDescription>
-              Give agents useful actions in the interface your users already
-              understand.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <CodeBlock
-              variant="command"
-              code="bunx shadcn@latest add https://ui.fabrials.com/r/webmcp-provider.json"
-            />
-          </CardContent>
-          <CardFooter className="text-xs text-muted-foreground">
-            <Badge>{catalog.length} WebMCP & MCP blocks</Badge>
-            <Badge>{uiCatalog.length} shared controls</Badge>
-            <span>MIT licensed</span>
-          </CardFooter>
-        </Card>
       </section>
 
-      <section id="try-it" className="scroll-mt-24 pb-16">
+      <section className="border-t py-14" aria-labelledby="kinds-title">
+        <h2 id="kinds-title" className="font-display text-[1.75rem] leading-tight font-semibold">
+          What you can install
+        </h2>
+        <p className="mt-2 max-w-[58ch] text-muted-foreground">
+          Every entry installs as source you own, through the shadcn CLI.
+        </p>
+        <ul className="mt-8 border-t">
+          {kinds.map((kind) => (
+            <li
+              key={kind.title}
+              className="grid grid-cols-[4rem_minmax(0,1fr)] items-baseline gap-x-4 gap-y-1 border-b py-5 md:grid-cols-[5rem_minmax(0,3fr)_minmax(0,6fr)_minmax(0,2fr)] md:gap-x-6"
+            >
+              <span className="font-display text-3xl font-semibold tabular-nums">{kind.count}</span>
+              <h3 className="font-display text-[1.375rem] leading-tight font-semibold">{kind.title}</h3>
+              <p className="col-start-2 text-muted-foreground md:col-start-auto">{kind.text}</p>
+              <Link href={kind.href} className="col-start-2 text-sm text-brand-ink underline underline-offset-4 md:col-start-auto md:justify-self-end">
+                {kind.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section id="try-it" className="scroll-mt-24 border-t py-14">
         <SectionHeader
           title="Watch an agent use the interface you use."
           description="Every step is a real WebMCP tool call against this page's state. Run the built-in agent, take over at any moment, or connect your browser's own agent. You make the final decision."
           actions={
-            <Link
-              href="/docs/comparison"
-              className={buttonVariants({ variant: "outline", size: "sm" })}
-            >
+            <Link href="/docs/comparison" className={buttonVariants({ variant: "outline", size: "sm" })}>
               Build this interaction
             </Link>
           }
@@ -154,7 +115,7 @@ export default function Home() {
         <Tabs defaultValue="live">
           <TabsList aria-label="Demo format">
             <TabsTrigger value="live">Live demo</TabsTrigger>
-            <TabsTrigger value="tour">Narrated tour · 53 s</TabsTrigger>
+            <TabsTrigger value="tour">Narrated tour, 53 s</TabsTrigger>
           </TabsList>
           <TabsContent value="live" keepMounted>
             <LandingDemo />
@@ -165,102 +126,57 @@ export default function Home() {
         </Tabs>
       </section>
 
-      <section className="border-t py-14">
+      <section className="border-t py-14" aria-labelledby="libraries-title">
         <SectionHeader
-          title="More ways to put agents to work."
-          description="Different tasks. Shared building blocks."
+          title={<span id="libraries-title">Components from other libraries</span>}
+          description="Published unchanged with their license at the top of every file. Each page says where the component departs from the Fabrials principles."
           actions={
-            <Link
-              href="/playground"
-              className={buttonVariants({ variant: "outline", size: "sm" })}
-            >
-              Explore the playground
+            <Link href="/libraries" className={buttonVariants({ variant: "outline", size: "sm" })}>
+              How a library gets in
             </Link>
           }
         />
-        <div className="grid gap-4 md:grid-cols-3">
-          {workflows.map((w, i) => (
-            <Link
-              key={w.id}
-              href={`/playground#${w.id}`}
-              className="group rounded-(--fui-radius-lg) focus-visible:outline-2 focus-visible:outline-offset-3"
-            >
-              <Card className="flex h-full min-h-56 flex-col justify-between transition-colors group-hover:bg-muted/40">
-                <span className="flex justify-between font-mono text-xs text-muted-foreground">
-                  0{i + 1} / {w.label}
-                </span>
-                <div className="mt-8">
-                  <CardTitle as="h3" className="text-2xl font-medium">
-                    {w.title}
-                  </CardTitle>
-                  <CardDescription className="mt-2">{w.detail}</CardDescription>
-                </div>
-              </Card>
-            </Link>
-          ))}
-        </div>
+        <Table aria-label="Libraries">
+          <TableHeader>
+            <TableRow>
+              <TableHead>Library</TableHead>
+              <TableHead>License</TableHead>
+              <TableHead>Components</TableHead>
+              <TableHead>Snapshot</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {externalIndex.map((library) => (
+              <TableRow key={library.name}>
+                <TableCell>
+                  <Link href={`/libraries#${library.name}`}>{library.title}</Link>
+                </TableCell>
+                <TableCell>{library.license}</TableCell>
+                <TableCell>{library.items.map((item) => item.title).join(", ")}</TableCell>
+                <TableCell className="tabular-nums">{library.fetchedAt}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </section>
 
-      <section className="border-t py-14">
-        <SectionHeader
-          title="Small pieces. Real possibilities."
-          description="The collection."
-          actions={
-            <Link
-              href="/components"
-              className={buttonVariants({ variant: "outline", size: "sm" })}
-            >
-              Browse {catalog.length + uiCatalog.length} components
-            </Link>
-          }
-        />
-        <div className="grid gap-4 md:grid-cols-3">
-          {collection.map((card) => (
-            <Card key={card.title} className="flex flex-col">
-              <card.icon aria-hidden className="size-5 text-muted-foreground" />
-              <CardTitle as="h3" className="mt-6">
-                {card.title}
-              </CardTitle>
-              <CardDescription className="mt-2 flex-1">
-                {card.text}
-              </CardDescription>
-              <Link
-                href={card.href}
-                className={buttonVariants({
-                  variant: "link",
-                  size: "sm",
-                  className: "mt-5 self-start px-0",
-                })}
-              >
-                {card.label}
-              </Link>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      <section className="border-t py-12">
-        <Card className="flex flex-wrap items-center justify-between gap-6">
+      <section className="border-t py-12" aria-labelledby="start-title">
+        <div className="flex flex-wrap items-center justify-between gap-6">
           <div>
-            <CardTitle as="h2" className="text-lg font-medium">
+            <h2 id="start-title" className="font-display text-xl font-semibold">
               Start with a working example.
-            </CardTitle>
-            <CardDescription className="mt-1">
-              A product comparison, a reservation flow, and a live MCP console.
-            </CardDescription>
+            </h2>
+            <p className="mt-1 text-muted-foreground">A product comparison, a reservation flow and a live MCP console.</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Link href="/playground" className={buttonVariants()}>
-              Open playground
+              Open the playground
             </Link>
-            <Link
-              href="/docs/installation"
-              className={buttonVariants({ variant: "outline" })}
-            >
-              Read the installation guide
+            <Link href="/docs/design" className={buttonVariants({ variant: "outline" })}>
+              Read the design principles
             </Link>
           </div>
-        </Card>
+        </div>
       </section>
     </main>
   );

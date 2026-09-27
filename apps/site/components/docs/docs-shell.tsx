@@ -20,7 +20,7 @@ import { docsNav, docsNeighbours } from "@/lib/docs-nav";
 import { DocsTocList, useActiveHeading, type DocsTocItem } from "@/components/docs/docs-toc";
 import "./docs.css";
 
-const sections = ["Guides", "Components", "Agents"] as const;
+const sections = ["Guides", "Components", "Agents", "Libraries"] as const;
 
 function DocsNav({ path }: { path: string }) {
   return (

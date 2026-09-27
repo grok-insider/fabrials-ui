@@ -93,7 +93,7 @@ export function LandingTour() {
     maximumFractionDigits: 0,
   });
   return (
-    <div className="tour-theatre overflow-clip rounded-2xl border bg-card">
+    <div className="tour-theatre overflow-clip rounded-xl border bg-card">
       <audio
         ref={media}
         src="/api/demo-media/landing-audio.m4a?v=1"
@@ -175,10 +175,10 @@ export function LandingTour() {
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-muted-foreground">Find the right fit.</p>
             <div className="flex gap-2 text-xs">
-              <span className="rounded-full border px-3 py-1">
+              <span className="rounded-md border px-3 py-1">
                 32 cm counter
               </span>
-              <span className="rounded-full border px-3 py-1">
+              <span className="rounded-md border px-3 py-1">
                 58 mm accessories
               </span>
             </div>
@@ -198,7 +198,7 @@ export function LandingTour() {
               action: (
                 <span
                   data-selected={state.id === p.id || undefined}
-                  className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs transition-colors ${state.id === p.id ? "bg-foreground text-background" : "bg-muted text-muted-foreground"}`}
+                  className={`inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-xs transition-colors ${state.id === p.id ? "bg-foreground text-background" : "bg-muted text-muted-foreground"}`}
                 >
                   {state.id === p.id ? (
                     <>

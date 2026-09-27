@@ -1,0 +1,26 @@
+A shim is a shadcn primitive backed by a Fabrials control. It installs as `components/ui/<name>.tsx` and re-exports the `@fabrials/ui` component under the names shadcn uses:
+
+```tsx
+// components/ui/button.tsx, installed from @fabrials/button
+export { Button, buttonVariants } from "@fabrials/ui";
+```
+
+Code written for shadcn, including components from [other libraries](/libraries), imports `@/components/ui/button` and gets the Fabrials button: the same focus ring, density, dark mode and Stormlight accent as the rest of the app.
+
+## When a primitive gets a shim
+
+Only when `@fabrials/ui` exports every name shadcn's file exports, checked against a recorded copy of shadcn's Base UI style. A primitive Fabrials covers only partly stays shadcn's, so nothing that imports it breaks. When Fabrials adds the missing parts, the shim appears on the next build.
+
+The props follow Fabrials. Most match shadcn's Base UI style; where they differ, TypeScript tells you. Components from other libraries are only listed here when they compile against the shims.
+
+## Install
+
+```bash
+npx shadcn@latest add @fabrials/button @fabrials/dialog @fabrials/select
+```
+
+Every shim depends on `@fabrials/styles`, which imports the Fabrials CSS once.
+
+## Available shims
+
+<ShimTable />

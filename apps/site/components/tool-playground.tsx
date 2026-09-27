@@ -22,7 +22,7 @@ export function ToolPlayground() {
             interface above.
           </p>
         </div>
-        <span className="rounded-full border bg-background px-3 py-1 text-xs">
+        <span className="rounded-md border bg-background px-3 py-1 text-xs">
           Local tool runner
         </span>
       </div>

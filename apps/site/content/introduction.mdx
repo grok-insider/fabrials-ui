@@ -1,4 +1,14 @@
-Fabrials UI is an open-source collection of React components for interfaces shared by people and agents. Install the source with the shadcn CLI, adapt it, and keep ownership of every line.
+Fabrials UI is the design system behind the Fabrials products, published as a shadcn registry. It gives an app three kinds of component, all installed as source you own:
+
+- **Fabrials components.** The controls Fabrials products use (from `@fabrials/ui` and `@fabrials/ai-ui`) and the WebMCP and MCP blocks for interfaces people and agents share.
+- **Shims.** shadcn primitives such as `button`, `dialog` or `select`, backed by the Fabrials controls. Code written for shadcn keeps working and looks like the rest of the app.
+- **Components from other libraries.** Open-source components from libraries such as [Magic UI](/docs/magicui-marquee) and [Kibo UI](/docs/kibo-kanban), copied at a reviewed snapshot, with their license checked and their origin kept. See [how a library gets in](/libraries).
+
+## Start
+
+- [Set an app up](/docs/installation): one command gives a shadcn app the Fabrials palette, IBM Plex and the component styles.
+- [Browse the components](/components): filter by where they come from.
+- [Read the design principles](/docs/design): the palette, type, density, dithering and motion rules the components follow.
 
 ## Two protocols, one interface
 
@@ -8,8 +18,6 @@ Fabrials UI is an open-source collection of React components for interfaces shar
 
 These integrations have separate providers. Visual components accept props and callbacks, so you can also use them with your own state management or transport.
 
-## Choose your starting point
-
 - [Agent-ready form](/docs/webmcp-form): expose a semantic HTML form.
 - [WebMCP provider](/docs/webmcp-provider): expose structured application actions.
 - [MCP dashboard](/docs/mcp-dashboard): install a complete remote tool console.
@@ -17,6 +25,4 @@ These integrations have separate providers. Visual components accept props and c
 
 ## The foundation
 
-React 19, TypeScript, Tailwind CSS 4, shadcn Base UI / Nova, and the official MCP TypeScript SDK v2. The documentation uses IBM Plex Sans; installed components inherit your application's font and color tokens.
-
-The registry is MIT licensed. There is no Fabrials runtime service required by the installed components.
+React 19, TypeScript, Tailwind CSS 4, Base UI and the official MCP TypeScript SDK v2. Fabrials components are MIT licensed; components from other libraries keep their own permissive license, printed at the top of every file. Nothing you install calls a Fabrials service.

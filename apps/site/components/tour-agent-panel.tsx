@@ -69,7 +69,7 @@ export function TourAgentPanel({ time }: { time: number }) {
   return (
     <aside
       aria-label="MCP tour activity"
-      className="self-start rounded-2xl border bg-background shadow-xl shadow-black/5 xl:sticky xl:top-40"
+      className="self-start rounded-xl border bg-background shadow-xl shadow-black/5 xl:sticky xl:top-40"
     >
       <div className="flex items-center justify-between gap-2 border-b p-4">
         <div className="flex items-center gap-2">

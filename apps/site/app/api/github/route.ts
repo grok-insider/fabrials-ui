@@ -1,7 +1,7 @@
 export async function GET() {
   try {
     const response = await fetch(
-      "https://api.github.com/repos/grok-insider/fabrials-webmcp",
+      "https://api.github.com/repos/grok-insider/fabrials-ui",
       {
         headers: { Accept: "application/vnd.github+json" },
         next: { revalidate: 3600 },

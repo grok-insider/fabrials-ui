@@ -7,14 +7,14 @@ import { RootProvider } from "fumadocs-ui/provider/next";
 export const metadata: Metadata = {
   metadataBase: new URL("https://ui.fabrials.com"),
   title: {
-    default: "Fabrials UI — Built for people. Ready for agents.",
+    default: "Fabrials UI",
     template: "%s · Fabrials UI",
   },
   description:
-    "Open-source shadcn components for WebMCP and MCP. Build interfaces that people and AI agents can use together.",
+    "The Fabrials design system as a shadcn registry: Fabrials components, shims and license-checked components from other open-source libraries.",
   openGraph: {
-    title: "Fabrials WebMCP UI",
-    description: "Open code. Shared interfaces. Built with shadcn.",
+    title: "Fabrials UI",
+    description: "The Fabrials design system, ready to install with shadcn.",
   },
 };
 export default function RootLayout({

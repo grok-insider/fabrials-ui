@@ -1,4 +1,5 @@
 import { catalog, guides } from "@/lib/catalog";
+import { externalIndex } from "@/lib/external-index.generated";
 import { uiCatalog, uiGroups } from "@/lib/ui-catalog";
 
 export interface DocsNavPage {
@@ -9,13 +10,15 @@ export interface DocsNavPage {
 
 export interface DocsNavGroup {
   name: string;
-  section: "Guides" | "Components" | "Agents";
+  section: "Guides" | "Components" | "Agents" | "Libraries";
   pages: DocsNavPage[];
 }
 
 const guideDescriptions: Record<string, string> = {
-  introduction: "Components for interfaces shared by people and agents.",
-  installation: "Add the registry, a provider and your first tool.",
+  introduction: "Fabrials components, shims and components from other libraries.",
+  installation: "Set an app up, then add components by name.",
+  design: "Palette, type, density, dithering and motion.",
+  shims: "shadcn primitives backed by Fabrials controls.",
   webmcp: "Expose page actions to browser agents with WebMCP.",
   "interactive-demo": "Try tools on a live page and a real MCP server.",
   authentication: "Connect remote MCP servers with OAuth.",
@@ -63,6 +66,18 @@ export const docsNav: DocsNavGroup[] = [
       .map((item) => ({ title: item.title, href: `/docs/${item.slug}`, description: item.description }))
       .sort(byTitle),
   })),
+  {
+    name: "Overview",
+    section: "Libraries" as const,
+    pages: [{ title: "All libraries", href: "/libraries", description: "Where they come from and how they get in." }],
+  },
+  ...externalIndex.map((library) => ({
+    name: library.title,
+    section: "Libraries" as const,
+    pages: library.items
+      .map((item) => ({ title: item.title, href: `/docs/${item.slug}`, description: item.description }))
+      .sort(byTitle),
+  })),
 ];
 
 export const docsPages = docsNav.flatMap((group) =>
@@ -97,11 +112,23 @@ const agentGroupDescriptions = [
   },
 ];
 
-export const componentSections = [
+export type ComponentSource = "fabrials" | "external";
+
+export type ComponentSection = {
+  id: string;
+  name: string;
+  description: string;
+  source: ComponentSource;
+  license?: string;
+  items: { slug: string; title: string; description: string; notes?: number }[];
+};
+
+export const componentSections: ComponentSection[] = [
   ...uiGroups.map((group) => ({
-    id: group.name.toLowerCase(),
+    id: group.name.toLowerCase().replace(/\s+/g, "-"),
     name: group.name,
     description: group.description,
+    source: "fabrials" as const,
     items: uiCatalog
       .filter((item) => item.group === group.name)
       .map((item) => ({
@@ -114,6 +141,7 @@ export const componentSections = [
     id: group.name.toLowerCase(),
     name: group.name,
     description: group.description,
+    source: "fabrials" as const,
     items: catalog
       .filter((item) => item.category === group.name)
       .map((item) => ({
@@ -122,5 +150,17 @@ export const componentSections = [
         description: item.description,
       })),
   })),
+  ...externalIndex.map((library) => ({
+    id: library.name,
+    name: library.title,
+    description: `${library.description} ${library.license}, ${library.tier === "community" ? "community tier" : "Fabrials tier"}.`,
+    source: "external" as const,
+    license: library.license,
+    items: library.items.map((item) => ({
+      slug: item.slug,
+      title: item.title,
+      description: item.description,
+      notes: item.conformance.length,
+    })),
+  })),
 ];
-

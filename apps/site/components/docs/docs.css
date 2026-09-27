@@ -45,7 +45,7 @@
   justify-content: flex-start;
   gap: var(--fui-space-2);
   width: 100%;
-  border-radius: 999px;
+  border-radius: var(--fui-radius-md);
   background: var(--card);
   color: var(--muted-foreground);
   font-weight: 400;
@@ -147,7 +147,7 @@
   min-width: 0;
   padding: var(--fui-space-8) 2.5rem;
   border: 1px solid var(--border);
-  border-radius: 0.875rem;
+  border-radius: var(--fui-radius-lg);
   background: var(--card);
 }
 .docs-article .fui-page-header {
@@ -462,8 +462,19 @@ h3.docs-heading {
   outline-offset: -2px;
 }
 .docs-index-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--fui-space-2);
   color: var(--foreground);
   font-weight: 500;
+}
+.docs-index-note {
+  color: var(--fui-warning-ink);
+  font-size: var(--fui-text-xs);
+}
+.docs-index-count {
+  margin: 0;
 }
 .docs-index-description {
   color: var(--muted-foreground);
@@ -789,4 +800,58 @@ h3.docs-heading {
   .docs-pager a[data-direction="next"] {
     grid-column: 1;
   }
+}
+
+/* Components from other libraries */
+.docs-external-stage {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 16rem;
+}
+.docs-preview-credit {
+  margin: var(--fui-space-3) 0 0;
+  color: var(--muted-foreground);
+  font-size: var(--fui-text-xs);
+}
+.docs-findings {
+  display: grid;
+  gap: var(--fui-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.docs-findings li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--fui-space-1) var(--fui-space-3);
+  padding: var(--fui-space-3) 0;
+  border-top: 1px solid var(--border);
+}
+.docs-findings li:last-child {
+  border-bottom: 1px solid var(--border);
+}
+.docs-findings code {
+  grid-column: 2;
+  justify-self: start;
+  color: var(--muted-foreground);
+}
+.docs-deps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--fui-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.docs-section > p a,
+.docs-step p a,
+.docs-findings a {
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklab, currentColor 45%, transparent);
+  text-underline-offset: 4px;
+}
+.docs-section > p a:hover,
+.docs-step p a:hover {
+  text-decoration-color: currentColor;
 }

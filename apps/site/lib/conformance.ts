@@ -54,7 +54,7 @@ export function checkConformance({ sources, css, cssVars }: ConformanceInput): C
   const continuous =
     firstMatch(all, /\binfinite\b/) ?? firstMatch(code, /repeat:\s*Infinity|repeatType:\s*["']loop/);
   add("continuous-motion", "Runs a continuous animation. DESIGN.md reserves continuous motion for loading indicators.", continuous);
-  const animates = continuous ?? firstMatch(all, /@keyframes|\banimate-\w|from ["']motion|from ["']framer-motion|transition=\{/);
+  const animates = continuous ?? firstMatch(all, /@keyframes [\w-]+|\banimate-[\w-]+|from ["']motion[^"']*["']|from ["']framer-motion["']|transition=\{/);
   const respectsReducedMotion = /prefers-reduced-motion|motion-reduce:|motion-safe:|useReducedMotion|reducedMotion/.test(all);
   if (animates && !respectsReducedMotion)
     add("ignores-reduced-motion", "Animates without checking reduced motion; people who ask the system for less motion still get it.", animates);
