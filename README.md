@@ -1,6 +1,6 @@
 # Fabrials UI
 
-Local 0.4 "Stormlight" adoption for a shared operational interface across Fabrials products.
+Fabrials UI 0.7 "Highstorm": the shared interface and brand (dithered storm, gems) of Fabrials products.
 
 - `packages/ui`: generic presentation primitives, patterns, tokens and fonts.
 - `packages/ai-ui`: provider, quota, history and migration presentation.
@@ -8,7 +8,7 @@ Local 0.4 "Stormlight" adoption for a shared operational interface across Fabria
 - `skills/fabrials-design-system`: maintained Codex skill linked on this host.
 
 Read [DESIGN.md](DESIGN.md) before extending the public surface. Read the
-[migration guide](docs/migration-0.4.md) before updating a consumer.
+[migration guide](docs/migration-0.7.md) before updating a consumer.
 
 ```sh
 bun install --frozen-lockfile

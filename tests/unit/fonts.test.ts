@@ -45,7 +45,10 @@ test("Plex covers Polish, Czech, Cyrillic, Greek and Vietnamese text, not only L
     ["IBM Plex Mono", "600"],
     ["IBM Plex Serif", "400"],
     ["IBM Plex Serif", "500 700"],
+    ["IBM Plex Sans Condensed", "600"],
   ] as const) {
-    for (const cp of [0x17c, 0x416]) assert.ok(covers(list, family, weight, cp), `${family} ${weight} misses U+${cp.toString(16)}`);
+    // Fontsource ships no plain cyrillic subset for Sans Condensed; cyrillic-ext is covered.
+    for (const cp of family === "IBM Plex Sans Condensed" ? [0x17c, 0x1ea1] : [0x17c, 0x416])
+      assert.ok(covers(list, family, weight, cp), `${family} ${weight} misses U+${cp.toString(16)}`);
   }
 });

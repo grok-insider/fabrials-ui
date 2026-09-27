@@ -1475,6 +1475,7 @@
   }
   .fui-lockup-product {
     overflow: hidden;
+    font-family: var(--fui-font-display);
     font-size: 0.9375rem;
     font-weight: var(--fui-weight-semibold);
     letter-spacing: -0.01em;
@@ -1651,7 +1652,6 @@
   .fui-snippet-code {
     margin: 0;
     padding: var(--fui-space-3) 3rem var(--fui-space-3) var(--fui-space-4);
-    overflow-x: auto;
     border-radius: inherit;
     color: var(--foreground);
     font-family: var(--fui-font-mono);
@@ -1662,9 +1662,15 @@
   .fui-snippet-code code {
     font: inherit;
   }
+  /* Long commands wrap (0.7) instead of scrolling; a prompt line hangs its continuation. */
   .fui-snippet-line {
     display: block;
-    white-space: pre;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .fui-snippet-line[data-prompt] {
+    padding-left: 2ch;
+    text-indent: -2ch;
   }
   .fui-snippet-line[data-prompt]::before {
     content: attr(data-prompt) " ";
@@ -1702,6 +1708,7 @@
   }
   .fui-page-heading h1 {
     margin: 0;
+    font-family: var(--fui-font-display);
     font-size: var(--fui-text-title);
     font-weight: var(--fui-weight-semibold);
     line-height: var(--fui-leading-title);
@@ -1974,6 +1981,7 @@
   }
   .fui-auth-title {
     margin: 0;
+    font-family: var(--fui-font-display);
     font-size: var(--fui-text-xl);
     font-weight: var(--fui-weight-semibold);
     line-height: var(--fui-leading-lg);
@@ -3863,6 +3871,30 @@
   }
   .fui-dither-canvas[data-painted] {
     opacity: 1;
+  }
+
+  /* 0.7: Highstorm brand pieces */
+  .fui-dither-scene {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    isolation: isolate;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .fui-dither-band {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    height: var(--fui-band-height, 4.5rem);
+    pointer-events: none;
+  }
+  .fui-dither-gem {
+    position: relative;
+    isolation: isolate;
+    display: inline-block;
+    flex-shrink: 0;
+    vertical-align: middle;
   }
 
   .fui-activity-strip {

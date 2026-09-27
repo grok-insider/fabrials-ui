@@ -94,3 +94,16 @@ suffix are the Fontsource `latin` subsets; since 0.6.2 the `-latin-ext`,
 from the same Fontsource releases, byte for byte, and `src/fonts.css` gives each
 one the Fontsource `unicode-range`. X Tracker asked for them: it shows Polish
 posts, whose letters (`ż`, `ł`, `ę`…) Latin-1 does not cover.
+
+IBM Plex Sans Condensed 500/600 (0.7) comes from Fontsource
+`@fontsource/ibm-plex-sans-condensed` 5.3.0 (OFL-1.1), byte for byte: the
+latin, latin-ext, cyrillic-ext and vietnamese subsets, each with the
+Fontsource `unicode-range`. Fontsource publishes no plain cyrillic or greek
+subset for it; those scripts fall back to Plex Sans.
+
+## 0.7 additions (2026-09-28)
+
+| File | Origin | Requested by |
+| --- | --- | --- |
+| `dither-presets.ts` | Fabrials: the Highstorm style study (storm front, cloud band, octagonal gem) | fabrials.com and every product landing and sign-in |
+| `dither-brand.tsx` (`DitherScene`, `DitherBand`, `DitherGem`) | Fabrials, on top of `DitherCanvas` | Same |

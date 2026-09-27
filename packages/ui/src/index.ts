@@ -42,6 +42,7 @@ export * from "./shimmer-text";
 export * from "./recency";
 export * from "./file-thumb";
 export * from "./dither-canvas";
+export * from "./dither-brand";
 export * from "./activity-strip";
 export * from "./timeline";
 export * from "./relative-time";

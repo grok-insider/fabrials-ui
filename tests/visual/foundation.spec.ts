@@ -30,6 +30,8 @@ const stories: Record<string, string> = {
   "sign-in": "fabrials-patterns--sign-in",
   settings: "fabrials-patterns--settings-page",
   monitoring: "fabrials-monitoring--gallery",
+  highstorm: "fabrials-highstorm--landing",
+  "highstorm-sign-in": "fabrials-highstorm--sign-in",
 };
 
 for (const theme of ["light", "dark"]) {

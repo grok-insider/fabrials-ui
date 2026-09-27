@@ -57,6 +57,7 @@
   --font-sans: var(--fui-font-sans);
   --font-mono: var(--fui-font-mono);
   --font-serif: var(--fui-font-serif);
+  --font-display: var(--fui-font-display);
   --font-heading: var(--fui-font-sans);
 
   --radius-xs: var(--fui-radius-xs);

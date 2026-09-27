@@ -1,13 +1,17 @@
 "use client";
 
 import { useEffect, useRef, useSyncExternalStore, type CSSProperties } from "react";
-import { hexToRgb, paintField, seeded, type BrightnessField } from "./dither";
+import { hexToRgb, paintField, paintRampField, seeded, type BrightnessField, type Rgb } from "./dither";
+import { DITHER_BACKGROUND } from "./dither-presets";
 import { classes } from "./shared";
 
 export type DitherTheme = "light" | "dark";
 
-/** Builds the brightness field for one paint; called again on resize and theme change. */
-export type DitherFieldFactory = (theme: DitherTheme, size: { width: number; height: number }) => BrightnessField;
+/**
+ * Builds the brightness field for one paint; called again on resize and theme
+ * change. `progress` runs 0 → 1 once when `reveal` is set, and is 1 otherwise.
+ */
+export type DitherFieldFactory = (theme: DitherTheme, size: { width: number; height: number }, progress: number) => BrightnessField;
 
 export type DitherStars = {
   /** Stars per 1,000 dots. */
@@ -19,8 +23,16 @@ export type DitherStars = {
 };
 
 export type DitherCanvasProps = {
-  /** Colours dark → light (any order; sorted by brightness). One ramp, or one per theme. */
+  /**
+   * Colours, one ramp or one per theme. With `order="brightness"` (default)
+   * any order, sorted dark → light. With `order="ramp"` the order is kept:
+   * field 0 is the first colour, 1 the last. A stop named "background" is the
+   * surface behind the canvas (`--fui-dither-bg`, else `--background`).
+   */
   ramp: string[] | { light: string[]; dark: string[] };
+  order?: "brightness" | "ramp";
+  /** Milliseconds for a one-time reveal (the field gets progress 0 → 1). Skipped under reduced motion. */
+  reveal?: number;
   field: DitherFieldFactory;
   /** CSS pixels per dither dot. */
   cell?: number;
@@ -44,6 +56,26 @@ function themeOf(element: Element): DitherTheme {
   return element.closest('.dark, [data-theme="dark"]') ? "dark" : element.closest('[data-theme="light"]') ? "light" : readTheme();
 }
 
+/** Any CSS colour (oklch, var-substituted) as RGB, read back from a 1×1 canvas. */
+function cssColor(value: string): Rgb | undefined {
+  const probe = document.createElement("canvas").getContext("2d", { willReadFrequently: true });
+  if (!probe || !value) return undefined;
+  probe.fillStyle = "#000";
+  probe.fillStyle = value;
+  probe.fillRect(0, 0, 1, 1);
+  const [r, g, b] = probe.getImageData(0, 0, 1, 1).data;
+  return [r!, g!, b!];
+}
+
+function resolveRamp(canvas: HTMLCanvasElement, colors: string[]): Rgb[] {
+  const style = getComputedStyle(canvas);
+  return colors.map((color) => {
+    if (color !== DITHER_BACKGROUND) return hexToRgb(color);
+    const surface = style.getPropertyValue("--fui-dither-bg").trim() || style.getPropertyValue("--background").trim();
+    return cssColor(surface) ?? [22, 26, 33];
+  });
+}
+
 function subscribeTheme(onChange: () => void) {
   const observer = new MutationObserver(onChange);
   observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class", "data-theme"] });
@@ -58,7 +90,7 @@ function subscribeTheme(onChange: () => void) {
  * is no animation loop. The parent must be positioned and isolated
  * (`position: relative; isolation: isolate`) unless `fixed` is set.
  */
-export function DitherCanvas({ ramp, field, cell = 2, stars, fixed = false, paintKey, className, style }: DitherCanvasProps) {
+export function DitherCanvas({ ramp, field, cell = 2, order = "brightness", reveal, stars, fixed = false, paintKey, className, style }: DitherCanvasProps) {
   const ref = useRef<HTMLCanvasElement>(null);
   const fieldRef = useRef(field);
   const theme = useSyncExternalStore(subscribeTheme, readTheme, () => "dark" as DitherTheme);
@@ -73,8 +105,8 @@ export function DitherCanvas({ ramp, field, cell = 2, stars, fixed = false, pain
     const canvas = ref.current;
     if (!canvas) return;
     const current = themeOf(canvas);
-    const colors = (Array.isArray(ramp) ? ramp : ramp[current]).map(hexToRgb);
-    const paint = () => {
+    const colors = resolveRamp(canvas, Array.isArray(ramp) ? ramp : ramp[current]);
+    const paint = (progress = 1) => {
       // Decoration only: a paint failure must never take the page down.
       try {
         const rect = canvas.getBoundingClientRect();
@@ -85,7 +117,9 @@ export function DitherCanvas({ ramp, field, cell = 2, stars, fixed = false, pain
         const ctx = canvas.getContext("2d", { willReadFrequently: true });
         if (!ctx) return;
         const image = ctx.createImageData(width, height);
-        paintField(image.data, width, height, fieldRef.current(current, { width, height }), colors);
+        const brightness = fieldRef.current(current, { width, height }, progress);
+        if (order === "ramp") paintRampField(image.data, width, height, brightness, colors);
+        else paintField(image.data, width, height, brightness, colors);
         ctx.putImageData(image, 0, 0);
         if (stars && current === "dark") {
           const random = seeded(stars.seed ?? 11);
@@ -105,7 +139,20 @@ export function DitherCanvas({ ramp, field, cell = 2, stars, fixed = false, pain
         console.warn("[fabrials-ui] DitherCanvas paint failed", error);
       }
     };
-    paint();
+    let frame = 0;
+    const animate = reveal && !canvas.dataset.revealed && !matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (animate) {
+      // One orchestrated moment, then the resting picture: no loop.
+      canvas.dataset.revealed = "";
+      const start = performance.now();
+      const step = (now: number) => {
+        const t = Math.min(1, (now - start) / reveal);
+        paint(1 - Math.pow(1 - t, 3));
+        if (t < 1) frame = requestAnimationFrame(step);
+      };
+      paint(0);
+      frame = requestAnimationFrame(step);
+    } else paint();
     let timer = 0;
     let size = `${canvas.clientWidth}x${canvas.clientHeight}`;
     const observer = new ResizeObserver(() => {
@@ -113,15 +160,19 @@ export function DitherCanvas({ ramp, field, cell = 2, stars, fixed = false, pain
       if (next === size) return;
       size = next;
       window.clearTimeout(timer);
-      timer = window.setTimeout(paint, 120);
+      timer = window.setTimeout(() => {
+        cancelAnimationFrame(frame);
+        paint();
+      }, 120);
     });
     observer.observe(canvas);
     return () => {
       observer.disconnect();
       window.clearTimeout(timer);
+      cancelAnimationFrame(frame);
     };
     // ramp and stars are compared by value through their keys.
-  }, [theme, cell, rampKey, starsKey, paintKey]);
+  }, [theme, cell, order, reveal, rampKey, starsKey, paintKey]);
 
   return (
     <canvas

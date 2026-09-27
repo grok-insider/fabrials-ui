@@ -158,3 +158,30 @@ export function paintField(data: Uint8ClampedArray, width: number, height: numbe
   }
   ditherToRamp(data, width, sorted);
 }
+
+/**
+ * Like `paintField`, but the ramp keeps its order: field 0 is `ramp[0]` (the
+ * surface behind the canvas) and 1 is the last colour (the brightest light).
+ * Brand scenes use it because in the light theme the "light" is darker than
+ * the background, which a brightness-sorted ramp cannot express.
+ */
+export function paintRampField(data: Uint8ClampedArray, width: number, height: number, field: BrightnessField, ramp: Rgb[]): void {
+  if (ramp.length < 2) throw new Error("paintRampField needs at least two colours");
+  const last = ramp.length - 1;
+  for (let y = 0, i = 0; y < height; y++) {
+    const row = (y & 7) << 3;
+    const v = height > 1 ? y / (height - 1) : 0;
+    for (let x = 0; x < width; x++, i += 4) {
+      const b = field(width > 1 ? x / (width - 1) : 0, v);
+      const t = Math.min(1, Math.max(0, Number.isFinite(b) ? b : 0)) * last;
+      const lo = Math.min(last - 1, Math.floor(t));
+      const [r, g, bl] = ramp[t - lo > BAYER_8[row | (x & 7)]! ? lo + 1 : lo]!;
+      data[i] = r;
+      data[i + 1] = g;
+      data[i + 2] = bl;
+      data[i + 3] = 255;
+    }
+  }
+}
+
+export * from "./dither-presets";
