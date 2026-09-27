@@ -1,0 +1,35 @@
+name: Publish packages
+# Runs only for a version tag pushed on purpose (v0.7.0 and so on). It needs the
+# NPM_TOKEN secret and the @fabrials organisation on npm; see docs/registry.md.
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  publish:
+    runs-on: [self-hosted, linux, fabrials]
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      - run: bun install --frozen-lockfile
+      - run: bun run check
+      - run: bun run stage:publish
+      - name: Tag matches the package version
+        run: test "${GITHUB_REF_NAME#v}" = "$(node -p "require('./packages/ui/package.json').version")"
+      - run: npm publish --provenance --access public
+        working-directory: packages/ui
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: npm publish --provenance --access public
+        working-directory: packages/ai-ui
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

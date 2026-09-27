@@ -1,11 +1,19 @@
 name: Design system checks
-on: [push, pull_request]
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
 permissions:
   contents: read
+concurrency:
+  group: fabrials-ui-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
-  foundation:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 15
+  check:
+    # GitHub-hosted runners are blocked by billing; puck-2 runs the house's ephemeral runners.
+    runs-on: [self-hosted, linux, fabrials]
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -15,9 +23,12 @@ jobs:
         with:
           bun-version: 1.4.2
       - run: bun install --frozen-lockfile
+      # Packages: types, lint, unit tests, build. Site: types, lint, tests (including the
+      # registry --check and the offline license gate).
       - run: bun run check
       - run: bun run build:storybook
       - run: bun run test:visual:container
+      - run: bun run --cwd apps/site build
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
@@ -25,3 +36,9 @@ jobs:
           path: |
             playwright-report/
             test-results/
+  image:
+    runs-on: [self-hosted, linux, fabrials]
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -f Dockerfile.site -t fabrials-ui-site:ci .

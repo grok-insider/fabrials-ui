@@ -13,12 +13,18 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint packages stories tests scripts .storybook --max-warnings=0",
     "test": "bun test packages/ai-ui/tests tests/unit",
-    "check": "bun run typecheck && bun run lint && bun run test && bun run build",
+    "check": "bun run typecheck && bun run lint && bun run test && bun run build && bun run check:site",
     "storybook": "storybook dev --host 127.0.0.1 -p 6041 --no-open --disable-telemetry",
     "build:storybook": "storybook build --disable-telemetry",
     "test:visual": "playwright test",
     "test:visual:container": "node scripts/visual.mjs",
-    "vendor": "node scripts/vendor.mjs"
+    "vendor": "node scripts/vendor.mjs",
+    "check:site": "bun run --cwd apps/site check && bun run --cwd apps/site test",
+    "dev:site": "bun run --cwd apps/site dev",
+    "build:site": "bun run build && bun run --cwd apps/site build",
+    "registry:sync": "bun run --cwd apps/site registry:sync",
+    "registry:build": "bun run --cwd apps/site registry:shims && bun run --cwd apps/site registry:external && bun run --cwd apps/site registry:build",
+    "stage:publish": "node scripts/stage-publish.mjs"
   },
   "overrides": {
     "axe-core": "4.13.0"

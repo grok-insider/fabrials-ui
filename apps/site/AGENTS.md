@@ -1,15 +1,6 @@
-# Fabrials WebMCP UI
+# AGENTS.md: ui.fabrials.com
 
-Public MIT shadcn registry and documentation at https://ui.fabrials.com.
-Independent repository; master is the default branch. Git identity: Grok Insider <admin@grokinsider.net>.
-
-- Registry source in registry/. Docs and demos must import that source, never duplicate components.
-- React 19, TypeScript, Tailwind 4, shadcn Base UI. Preserve keyboard operation and human interaction without WebMCP.
-- Protocol target: MCP 2026-07-28. Keep legacy compatibility isolated. Never silently replay tool mutations.
-- Browser tokens are memory-only. Never log credentials, arguments, or tool results server-side.
-- Node connector is optional and uses operator-configured destinations; never expose an arbitrary public proxy.
-- Run bun run check and bun run test, build the registry/site, and smoke-test the published registry before shipping.
-- Use Bun 1.4.2 with the frozen bun.lock for dependencies and scripts. Build/start Next.js with Node. Deploy via Coolify API/UI; secrets only in Coolify.
+This app is part of the Fabrials UI repository; the rules are in the root `AGENTS.md` and `DESIGN.md`. The registry is described in `docs/registry.md`.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

@@ -1,41 +1,23 @@
-# Fabrials WebMCP UI
+# ui.fabrials.com
 
-Open-source shadcn components for interfaces shared by people and agents.
-
-**Documentation and registry:** https://ui.fabrials.com
+The documentation site, playground and shadcn registry of Fabrials UI. It lives in the Fabrials UI repository and builds against the workspace packages.
 
 ```sh
-bunx shadcn@latest add https://ui.fabrials.com/r/mcp-dashboard.json
+bun run dev                 # http://127.0.0.1:3210
+bun run check && bun run test
+bun run registry:build      # public/r, registry.json, llms.txt
+bun run registry:sync       # re-snapshot third-party libraries (network, GITHUB_TOKEN recommended)
 ```
 
-React 19 · TypeScript · Tailwind 4 · shadcn Base UI · MIT
+From the repository root, `bun run build:site` builds the packages and the site, and `docker build -f Dockerfile.site .` builds the production image. Health: `/api/health`.
 
-## Included
-
-19 registry entries: browser WebMCP integration, semantic forms, search/table selection, date ranges, wizards, confirmations, a remote MCP client, OAuth, tools, results, progress, elicitation, resources, prompts, a dashboard and an optional Node connector.
-
-MCP target: **2026-07-28**, using official SDK v2. Legacy **2025-11-25** is a separate tested path. WebMCP support is experimental; the UI works without it and simulators are labeled.
-
-## Develop
+Install from the registry:
 
 ```sh
-bun install --frozen-lockfile
-bun run dev             # http://localhost:3210
-bun run check
-bun run test
-bun run build           # registry + Next.js
+npx shadcn@latest init https://ui.fabrials.com/r/init.json
+npx shadcn@latest add @fabrials/mcp-dashboard
 ```
 
-Docs/demos import registry source directly. `bun run registry:build` generates public JSON entries and llms.txt. Consumers own the copied code; no npm library or hosted Fabrials runtime is required.
+WebMCP support is experimental; the UI works without it and simulators are labelled. MCP target 2026-07-28 with the official SDK v2; legacy 2025-11-25 is a separate tested path. No user data is persisted by the demos.
 
-See `content/` for installation, OAuth callback integration, connector hosting and compatibility. Server-held credentials belong to the host's OAuth flow and credential store. The public site is not an arbitrary MCP proxy.
-
-## Deployment
-
-Bun 1.4.2 installs dependencies using the committed `bun.lock`; scripts use `bun run`. Next.js builds and serves with Node 22 in Docker, Coolify on fabrials-1, master branch. Health: `/api/health`. The Node runtime also supports the optional Undici connector. No user data is persisted by the demo. Roll back via Coolify to a previous successful commit/image.
-
-Type checking uses TypeScript 7.0.2. The `typescript` alias exposes Microsoft’s TypeScript 6 compatibility API for Next.js and typescript-eslint; ESLint 10 uses the official `@eslint/compat` wrapper for React rules.
-
-## License
-
-MIT. shadcn/ui and Base UI are MIT; dependency licenses remain with their authors. IBM Plex Sans is distributed under the SIL Open Font License in `public/fonts/OFL.txt`.
+MIT. Components from other libraries keep their own licenses, printed at the top of every file and listed at `/libraries`.

@@ -5,3 +5,8 @@ test-results/
 playwright-report/
 *.tsbuildinfo
 .DS_Store
+packages/*/LICENSE
+packages/*/LOBE-ICONS-LICENSE
+packages/ui/DESIGN.md
+packages/ui/verify.mjs
+packages/ui/integrity.mjs

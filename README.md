@@ -1,31 +1,68 @@
 # Fabrials UI
 
-Fabrials UI 0.7 "Highstorm": the shared interface and brand (dithered storm, gems) of Fabrials products.
+The Fabrials design system, version 0.7 "Highstorm": the interface every Fabrials product shares, and the shadcn registry at [ui.fabrials.com](https://ui.fabrials.com) that lets any React app use it.
 
-- `packages/ui`: generic presentation primitives, patterns, tokens and fonts.
-- `packages/ai-ui`: provider, quota, history and migration presentation.
-- `stories`: synthetic component and workflow examples.
-- `skills/fabrials-design-system`: maintained Codex skill linked on this host.
+Read [DESIGN.md](DESIGN.md) before changing anything visible.
 
-Read [DESIGN.md](DESIGN.md) before extending the public surface. Read the
-[migration guide](docs/migration-0.7.md) before updating a consumer.
+## What is here
+
+| Path | What it is |
+| --- | --- |
+| `packages/ui` | `@fabrials/ui`: tokens, IBM Plex, controls, patterns, charts and the dithered brand pieces |
+| `packages/ai-ui` | `@fabrials/ai-ui`: provider, quota, history and chat presentation |
+| `apps/site` | ui.fabrials.com: the documentation, the playground and the registry |
+| `apps/site/registry` | Registry sources: Fabrials blocks, shims, and the snapshots of other libraries |
+| `apps/site/upstreams` | Which third-party components to aggregate, one manifest per library |
+| `stories` | Storybook stories, all with synthetic data |
+| `tests` | Unit tests and the visual suite (Playwright in a container, with axe) |
+| `skills/fabrials-design-system` | The agent skill that points at this repository |
+
+## Two ways to use it
+
+**As packages.** Fabrials products import `@fabrials/ui` and `@fabrials/ai-ui` from a verified copy in their `vendor/` folder:
+
+```sh
+bun run vendor radiant --write   # writes radiant/vendor/fabrials-{ui,ai-ui}-<version>
+bun run vendor radiant --check   # fails if the copy differs from the build
+```
+
+**As a registry.** Any shadcn app installs from ui.fabrials.com:
+
+```sh
+npx shadcn@latest init https://ui.fabrials.com/r/init.json
+npx shadcn@latest add @fabrials/mcp-dashboard @fabrials/button @fabrials/kibo-kanban
+```
+
+The registry has Fabrials components, **shims** (shadcn primitives backed by `@fabrials/ui`) and **components from other libraries** that passed the license gate. See [docs/registry.md](docs/registry.md).
+
+## Develop
+
+Bun manages dependencies; Node 22 builds. Container browser tests need Linux and Docker.
 
 ```sh
 bun install --frozen-lockfile
-bun run check
-bun run storybook
-bun run test:visual:container
-bun run vendor ai-relay --check
+bun run check                  # types, lint, unit tests, package build, site checks and tests
+bun run storybook              # http://127.0.0.1:6041
+bun run dev:site               # http://127.0.0.1:3210
+bun run test:visual:container  # visual and accessibility suite
+bun run registry:build         # regenerate shims, external previews and public/r
+bun run registry:sync          # re-snapshot the third-party libraries (network)
 ```
 
-Node 22 builds the packages; Bun manages dependencies. Container browser tests
-require Linux and Docker. `bun run vendor ai-relay --write` explicitly generates
-the consumer distributions; it does not publish, commit or deploy anything.
+`bun run build:site` builds the packages and the site. The site's Docker image builds from the repository root: `docker build -f Dockerfile.site .`.
 
-AI Relay and the Spanreed desktop consume the paired `fabrials-{ui,ai-ui}-0.4.0`
-copies, and Radiant the paired `0.5.0` copies. Open Email, Grok Insider,
-fabrials.com, ui.fabrials.com, admin and Ditox consume the generic package only.
-`bun run vendor open-email --write` writes `open-email/vendor` in the standalone
-repository and `open-email/apps/web/vendor` when the enterprise layout is present.
-See [docs/migration-0.4.md](docs/migration-0.4.md). The 0.3 delivery record remains
-at [docs/delivery-0.3.md](docs/delivery-0.3.md).
+## Who consumes which version
+
+| Product | Version |
+| --- | --- |
+| ui.fabrials.com (this repository) | workspace |
+| X Tracker, Radiant | 0.6.2 |
+| AI Relay, Spanreed desktop | 0.4.0 |
+| fabrials.com | 0.4.0 (0.7.0 on its `feat/highstorm` branch) |
+| admin.fabrials.com, Open Mail, Ditox | 0.3.0 |
+
+Upgrading a product is that product's decision; read [docs/migration-0.7.md](docs/migration-0.7.md) first. The 0.3 delivery record is [docs/delivery-0.3.md](docs/delivery-0.3.md).
+
+## Licenses
+
+Fabrials UI is MIT. IBM Plex is under the SIL Open Font License. Components copied from other projects keep their licenses; see [THIRD_PARTY.md](THIRD_PARTY.md) and [docs/provenance.md](docs/provenance.md).
