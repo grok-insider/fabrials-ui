@@ -2007,6 +2007,11 @@
       padding: var(--fui-space-12);
       border-inline-end: 1px solid var(--border);
       background: var(--sidebar);
+      /* 0.7: the aside can hold a DitherScene that fades into it. */
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      --fui-dither-bg: var(--sidebar);
     }
   }
 
