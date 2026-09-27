@@ -1,0 +1,16 @@
+{
+  "name": "magicui",
+  "title": "Magic UI",
+  "homepage": "https://magicui.design",
+  "repository": "magicuidesign/magicui",
+  "registry": "https://magicui.design/r/{name}.json",
+  "tier": "community",
+  "description": "Animated components and effects for landing pages, built on Tailwind and Motion.",
+  "items": [
+    { "name": "file-tree", "demo": "file-tree-demo" },
+    { "name": "terminal", "demo": "terminal-demo" },
+    { "name": "animated-list", "demo": "animated-list-demo" },
+    { "name": "marquee", "demo": "marquee-demo" },
+    { "name": "dot-pattern", "demo": "dot-pattern-demo" }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "name": "kibo",
+  "title": "Kibo UI",
+  "homepage": "https://www.kibo-ui.com",
+  "repository": "haydenbleasel/kibo",
+  "registry": "https://www.kibo-ui.com/r/{name}.json",
+  "tier": "community",
+  "description": "Larger, composable pieces for product interfaces: boards, uploads, calendars and more.",
+  "items": [
+    {
+      "name": "kanban"
+    },
+    {
+      "name": "contribution-graph"
+    },
+    {
+      "name": "dropzone"
+    },
+    {
+      "name": "rating"
+    }
+  ]
+}

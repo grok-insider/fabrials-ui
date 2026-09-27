@@ -8,6 +8,8 @@ export default defineConfig([
     ".next/**",
     "artifacts/**",
     "public/r/**",
+    "components/external/**",
+    "registry/external/**",
     "vendor/**",
     "next-env.d.ts",
   ]),

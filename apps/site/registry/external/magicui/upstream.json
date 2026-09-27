@@ -1,0 +1,179 @@
+{
+  "name": "magicui",
+  "title": "Magic UI",
+  "homepage": "https://magicui.design",
+  "repository": "magicuidesign/magicui",
+  "registry": "https://magicui.design/r/{name}.json",
+  "tier": "community",
+  "description": "Animated components and effects for landing pages, built on Tailwind and Motion.",
+  "commit": "d7207e5692d14c00dceafa8488d6d01f197fa0e4",
+  "fetchedAt": "2026-09-27",
+  "license": {
+    "spdx": "MIT",
+    "github": "MIT",
+    "path": "LICENSE.md",
+    "sha256": "0147b84235ed916b8b4e89c1f80655351c5afe7d211b629be61f553a227b34ba",
+    "copyright": "Copyright (c) Magic UI"
+  },
+  "items": [
+    {
+      "name": "animated-list",
+      "title": "Animated List",
+      "description": "A list that animates each item in sequence with a delay. Used to showcase notifications or events on your landing page.",
+      "type": "registry:ui",
+      "sha256": "a95ae266e0eda12b8230724c690818a434d22bad0a2093a8197417cc997d298b",
+      "dependencies": [
+        {
+          "name": "motion",
+          "version": "13.4.4",
+          "license": "MIT",
+          "declared": true
+        }
+      ],
+      "registryDependencies": [],
+      "conformance": [
+        {
+          "check": "ignores-reduced-motion",
+          "message": "Animates without checking reduced motion; people who ask the system for less motion still get it.",
+          "evidence": "from \"motion"
+        }
+      ],
+      "demo": {
+        "name": "animated-list-demo",
+        "sha256": "bd5f699bae21ba1f9038a93c31cfd0a20957bc30f978cda8f619fa9312d479a1"
+      }
+    },
+    {
+      "name": "dot-pattern",
+      "title": "Dot Pattern",
+      "description": "A background dot pattern made with SVGs, fully customizable using Tailwind CSS.",
+      "type": "registry:ui",
+      "sha256": "ff4f9d159cc8e681b74c94f2a673c47faa411e59c7e9424e4987ba08f61e9757",
+      "dependencies": [
+        {
+          "name": "motion",
+          "version": "13.4.4",
+          "license": "MIT",
+          "declared": false
+        }
+      ],
+      "registryDependencies": [],
+      "conformance": [
+        {
+          "check": "literal-colours",
+          "message": "Uses literal colours instead of theme tokens, so it will not follow the Fabrials palette or dark mode on its own.",
+          "evidence": "text-neutral-400"
+        },
+        {
+          "check": "continuous-motion",
+          "message": "Runs a continuous animation. DESIGN.md reserves continuous motion for loading indicators.",
+          "evidence": "repeat: Infinity"
+        },
+        {
+          "check": "ignores-reduced-motion",
+          "message": "Animates without checking reduced motion; people who ask the system for less motion still get it.",
+          "evidence": "repeat: Infinity"
+        }
+      ],
+      "demo": {
+        "name": "dot-pattern-demo",
+        "sha256": "a02c973130b823d66f762daa517a28e5b3d6d990e23767cd7fddb95c0149d0af"
+      }
+    },
+    {
+      "name": "file-tree",
+      "title": "File Tree",
+      "description": "A component used to showcase the folder and file structure of a directory.",
+      "type": "registry:ui",
+      "sha256": "a4b8c998d7a3d7f42db01976970b4b52cc7526edd5de466e6a202b3a767ac5b5",
+      "dependencies": [
+        {
+          "name": "@radix-ui/react-accordion",
+          "version": "1.2.20",
+          "license": "MIT",
+          "declared": false
+        },
+        {
+          "name": "lucide-react",
+          "version": "1.48.0",
+          "license": "ISC",
+          "declared": false
+        }
+      ],
+      "registryDependencies": [],
+      "conformance": [
+        {
+          "check": "literal-colours",
+          "message": "Uses literal colours instead of theme tokens, so it will not follow the Fabrials palette or dark mode on its own.",
+          "evidence": "bg-slate-300"
+        },
+        {
+          "check": "ignores-reduced-motion",
+          "message": "Animates without checking reduced motion; people who ask the system for less motion still get it.",
+          "evidence": "animate-a"
+        }
+      ],
+      "demo": {
+        "name": "file-tree-demo",
+        "sha256": "2a6c0f5eb5cc9f947b7751558285efbc7d5ec171cf9e7633af459a024b4e42c2"
+      }
+    },
+    {
+      "name": "marquee",
+      "title": "Marquee",
+      "description": "An infinite scrolling component that can be used to display text, images, or videos.",
+      "type": "registry:ui",
+      "sha256": "6378d12f6ac7b383bcbe25cbfcd21ad567d4726ff9979bf07991598a7bdef1ce",
+      "dependencies": [],
+      "registryDependencies": [],
+      "conformance": [
+        {
+          "check": "continuous-motion",
+          "message": "Runs a continuous animation. DESIGN.md reserves continuous motion for loading indicators.",
+          "evidence": "infinite"
+        },
+        {
+          "check": "ignores-reduced-motion",
+          "message": "Animates without checking reduced motion; people who ask the system for less motion still get it.",
+          "evidence": "infinite"
+        }
+      ],
+      "demo": {
+        "name": "marquee-demo",
+        "sha256": "fd049dadda00e2194f9e6194ba1c92aed3bda2670b3c8eac7c05ec043028af72"
+      }
+    },
+    {
+      "name": "terminal",
+      "title": "Terminal",
+      "description": "A terminal component",
+      "type": "registry:ui",
+      "sha256": "05f5c6ae595956464eee5b60e40f25dd2824413ca10bbb5ee0dcaf027758299d",
+      "dependencies": [
+        {
+          "name": "motion",
+          "version": "13.4.4",
+          "license": "MIT",
+          "declared": false
+        }
+      ],
+      "registryDependencies": [],
+      "conformance": [
+        {
+          "check": "literal-colours",
+          "message": "Uses literal colours instead of theme tokens, so it will not follow the Fabrials palette or dark mode on its own.",
+          "evidence": "bg-red-500"
+        },
+        {
+          "check": "ignores-reduced-motion",
+          "message": "Animates without checking reduced motion; people who ask the system for less motion still get it.",
+          "evidence": "from \"motion"
+        }
+      ],
+      "demo": {
+        "name": "terminal-demo",
+        "sha256": "8ccdf028e3f6fc9164fdbfa9e631bdab72ccc082ee540e44a69d40c4f7703201"
+      }
+    }
+  ]
+}

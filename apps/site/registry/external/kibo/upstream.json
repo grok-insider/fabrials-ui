@@ -1,0 +1,123 @@
+{
+  "name": "kibo",
+  "title": "Kibo UI",
+  "homepage": "https://www.kibo-ui.com",
+  "repository": "haydenbleasel/kibo",
+  "registry": "https://www.kibo-ui.com/r/{name}.json",
+  "tier": "community",
+  "description": "Larger, composable pieces for product interfaces: boards, uploads, calendars and more.",
+  "commit": "3d63cdb15b79d972e3dc38a10997987672f9b263",
+  "fetchedAt": "2026-09-27",
+  "license": {
+    "spdx": "MIT",
+    "github": "MIT",
+    "path": "license.md",
+    "sha256": "1fe9198b595ddadef7e2d99e3e1698c036db61c81e91c7b42df90d59f563b2ba",
+    "copyright": "Copyright (c) 2023 — Present shadcnblocks"
+  },
+  "items": [
+    {
+      "name": "contribution-graph",
+      "title": "Contribution Graph",
+      "description": "A GitHub-style contribution graph component that displays activity levels over time.",
+      "type": "registry:ui",
+      "sha256": "95402cab69895dc4db94be5d6fc5d63a9dc4b666421908edcd8a8ebd1fa5b353",
+      "dependencies": [
+        {
+          "name": "date-fns",
+          "version": "4.4.0",
+          "license": "MIT",
+          "declared": true
+        }
+      ],
+      "registryDependencies": [],
+      "conformance": []
+    },
+    {
+      "name": "dropzone",
+      "title": "Dropzone",
+      "description": "Allows users to drag-and-drop files into a container to upload or process them.",
+      "type": "registry:ui",
+      "sha256": "4bcd4ffadc9f8d88bf2d6168721ba108c26933656287cadf531d1aeef5b68fc5",
+      "dependencies": [
+        {
+          "name": "lucide-react",
+          "version": "1.48.0",
+          "license": "ISC",
+          "declared": true
+        },
+        {
+          "name": "react-dropzone",
+          "version": "20.1.2",
+          "license": "MIT",
+          "declared": true
+        }
+      ],
+      "registryDependencies": [
+        "button"
+      ],
+      "conformance": []
+    },
+    {
+      "name": "kanban",
+      "title": "Kanban",
+      "description": "A kanban board is a visual tool that helps you manage and visualize your work. It is a board with columns, and each column represents a status, e.g. \"Backlog\", \"In Progress\", \"Done\".",
+      "type": "registry:ui",
+      "sha256": "346d0ba69230146ac42a8eb6440ebc28db268c29b88a21894314620512420bd9",
+      "dependencies": [
+        {
+          "name": "@dnd-kit/core",
+          "version": "6.3.1",
+          "license": "MIT",
+          "declared": true
+        },
+        {
+          "name": "@dnd-kit/sortable",
+          "version": "10.0.0",
+          "license": "MIT",
+          "declared": true
+        },
+        {
+          "name": "@dnd-kit/utilities",
+          "version": "3.2.2",
+          "license": "MIT",
+          "declared": true
+        },
+        {
+          "name": "tunnel-rat",
+          "version": "0.1.2",
+          "license": "MIT",
+          "declared": true
+        }
+      ],
+      "registryDependencies": [
+        "card",
+        "scroll-area"
+      ],
+      "conformance": []
+    },
+    {
+      "name": "rating",
+      "title": "Rating",
+      "description": "A star rating component with keyboard navigation and hover effects.",
+      "type": "registry:ui",
+      "sha256": "5c40bd735d83ee461c7ce9602cae1a41c7f735ffd3cf0a6f180a79b41509cf9f",
+      "dependencies": [
+        {
+          "name": "@radix-ui/react-use-controllable-state",
+          "version": "1.2.6",
+          "license": "MIT",
+          "declared": true
+        },
+        {
+          "name": "lucide-react",
+          "version": "1.48.0",
+          "license": "ISC",
+          "declared": true
+        }
+      ],
+      "registryDependencies": [],
+      "conformance": []
+    }
+  ]
+}
