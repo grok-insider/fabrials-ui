@@ -820,7 +820,7 @@
       "name": "accordion",
       "type": "registry:ui",
       "title": "Accordion",
-      "description": "shadcn's accordion, backed by @fabrials/ui.",
+      "description": "shadcn's accordion, backed by @fabrials/ui. Questions and details that open in place.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
         "@fabrials/ui@^0.7.0"
@@ -898,7 +898,7 @@
       "name": "breadcrumb",
       "type": "registry:ui",
       "title": "Breadcrumb",
-      "description": "shadcn's breadcrumb, backed by @fabrials/ui.",
+      "description": "shadcn's breadcrumb, backed by @fabrials/ui. Where the page sits, with a way back up.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
         "@fabrials/ui@^0.7.0"
@@ -1287,8 +1287,8 @@
     {
       "name": "native-select",
       "type": "registry:ui",
-      "title": "Native Select",
-      "description": "shadcn's native-select, backed by @fabrials/ui.",
+      "title": "Native select",
+      "description": "shadcn's native-select, backed by @fabrials/ui. The browser's own select, styled, for long lists and forms that must work without JavaScript.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
         "@fabrials/ui@^0.7.0"
@@ -1340,7 +1340,7 @@
       "name": "pagination",
       "type": "registry:ui",
       "title": "Pagination",
-      "description": "shadcn's pagination, backed by @fabrials/ui.",
+      "description": "shadcn's pagination, backed by @fabrials/ui. Pages of a long collection.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
         "@fabrials/ui@^0.7.0"
@@ -1391,8 +1391,8 @@
     {
       "name": "radio-group",
       "type": "registry:ui",
-      "title": "Radio Group",
-      "description": "shadcn's radio-group, backed by @fabrials/ui.",
+      "title": "Radio group",
+      "description": "shadcn's radio-group, backed by @fabrials/ui. One choice from a short list that stays visible.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
         "@fabrials/ui@^0.7.0"
@@ -1703,8 +1703,8 @@
     {
       "name": "toggle-group",
       "type": "registry:ui",
-      "title": "Toggle Group",
-      "description": "shadcn's toggle-group, backed by @fabrials/ui.",
+      "title": "Toggle group",
+      "description": "shadcn's toggle-group, backed by @fabrials/ui. A segmented choice for ranges and views.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
         "@fabrials/ui@^0.7.0"
