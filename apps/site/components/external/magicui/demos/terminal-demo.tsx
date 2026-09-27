@@ -1,4 +1,10 @@
 "use client";
+import {
+  AnimatedSpan,
+  Terminal,
+  TypingAnimation,
+} from "@/components/external/magicui/terminal"
+
 /*
  * Terminal demo from Magic UI (https://magicui.design), MIT.
  * Distributed unchanged by ui.fabrials.com under the same license.
@@ -25,12 +31,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import {
-  AnimatedSpan,
-  Terminal,
-  TypingAnimation,
-} from "@/components/external/magicui/terminal"
-
 export default function TerminalDemo() {
   return (
     <Terminal>

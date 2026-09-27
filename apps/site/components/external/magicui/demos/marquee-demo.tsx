@@ -1,4 +1,7 @@
 "use client";
+import { cn } from "@/lib/utils"
+import { Marquee } from "@/components/external/magicui/marquee"
+
 /*
  * Marquee demo from Magic UI (https://magicui.design), MIT.
  * Distributed unchanged by ui.fabrials.com under the same license.
@@ -25,9 +28,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { cn } from "@/lib/utils"
-import { Marquee } from "@/components/external/magicui/marquee"
-
 const reviews = [
   {
     name: "Jack",

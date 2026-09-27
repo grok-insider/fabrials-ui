@@ -1,116 +1,88 @@
-import { mkdtemp, mkdir, readFile, writeFile } from "node:fs/promises";
+/**
+ * Installs the registry into a brand-new Next.js app the way a user would,
+ * then typechecks and builds it:
+ *
+ *   REGISTRY_ORIGIN=http://127.0.0.1:4390 FABRIALS_NPM_REGISTRY=http://127.0.0.1:4873/ bun run test:registry
+ *
+ * REGISTRY_ORIGIN serves `registry:build --out` output (defaults to the
+ * public site). FABRIALS_NPM_REGISTRY points the @fabrials scope at another
+ * npm registry, such as a local Verdaccio holding `npm pack` builds, for
+ * versions not yet on npm. See docs/registry.md.
+ */
+import { execFileSync } from "node:child_process";
+import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { execFileSync } from "node:child_process";
-const source = process.cwd();
-const origin = process.env.REGISTRY_ORIGIN ?? "http://localhost:3210";
+
+const origin = (process.env.REGISTRY_ORIGIN ?? "https://ui.fabrials.com").replace(/\/$/, "");
+const scope = process.env.FABRIALS_NPM_REGISTRY;
 const root = await mkdtemp(join(tmpdir(), "fabrials-registry-"));
-const run = (cmd: string, args: string[], cwd: string) =>
-  execFileSync(cmd, args, { cwd, stdio: "inherit", env: process.env });
-for (const template of ["vite", "next"]) {
-  const dir = join(root, template);
-  await mkdir(join(dir, "app"), { recursive: true });
-  await mkdir(join(dir, "lib"), { recursive: true });
-  const pkg = {
-    name: `registry-smoke-${template}`,
-    private: true,
-    type: "module",
-    scripts: { build: template === "vite" ? "vite build" : "next build" },
-    dependencies: {
-      react: "^19.2.0",
-      "react-dom": "^19.2.0",
-      ...(template === "next" ? { next: "16.3.4" } : {}),
-    },
-    devDependencies: {
-      typescript: "npm:@typescript/typescript6@^6.0.2",
-      "@typescript/native": "npm:typescript@^7.0.2",
-      "@types/react": "^19.0.0",
-      "@types/react-dom": "^19.0.0",
-      "@types/node": "^22.0.0",
-      tailwindcss: "^4.0.0",
-      "@tailwindcss/postcss": "^4.0.0",
-      ...(template === "vite" ? { vite: "latest" } : {}),
-    },
-  };
-  await writeFile(join(dir, "package.json"), JSON.stringify(pkg));
-  await writeFile(
-    join(dir, "env.d.ts"),
-    `/// <reference types="${template === "vite" ? "vite/client" : "next"}" />\n`,
+const run = (cmd: string, args: string[], cwd: string) => execFileSync(cmd, args, { cwd, stdio: "inherit", env: process.env });
+
+run(
+  "bunx",
+  ["create-next-app@16", "app", "--ts", "--tailwind", "--app", "--eslint", "--no-src-dir", "--import-alias", "@/*", "--use-bun", "--yes", "--disable-git"],
+  root,
+);
+const app = join(root, "app");
+if (scope) await writeFile(join(app, "bunfig.toml"), `[install.scopes]\n"@fabrials" = "${scope}"\n`);
+
+run("npx", ["-y", "shadcn@latest", "init", `${origin}/r/init.json`, "--yes"], app);
+const config = JSON.parse(await readFile(join(app, "components.json"), "utf8"));
+if (config.style !== "base-nova" || config.registries?.["@fabrials"] !== `${origin}/r/{name}.json`)
+  throw new Error("init did not configure the Base UI style and the @fabrials registry");
+
+const names = [
+  "mcp-dashboard",
+  "comparison",
+  "date-range",
+  "webmcp-form",
+  "button",
+  "dialog",
+  "select",
+  "dropdown-menu",
+  "magicui-file-tree",
+  "magicui-marquee",
+  "kibo-kanban",
+  "kibo-dropzone",
+];
+run("npx", ["-y", "shadcn@latest", "add", ...names.map((name) => `@fabrials/${name}`), "--yes", "--overwrite"], app);
+
+for (const [file, notice] of [
+  ["components/ui/marquee.tsx", "Magic UI"],
+  ["components/kibo-ui/kanban/index.tsx", "Kibo UI"],
+  ["components/ui/button.tsx", "Fabrials UI shim"],
+])
+  if (!(await readFile(join(app, file), "utf8")).includes(notice)) throw new Error(`${file} lost its notice on install`);
+
+await writeFile(
+  join(app, "app/page.tsx"),
+  `"use client";
+import { DitherGem } from "@fabrials/ui";
+import { Button } from "@/components/ui/button";
+import { Comparison } from "@/components/webmcp/comparison";
+import { MCPDashboard } from "@/components/webmcp/mcp-dashboard";
+import { Marquee } from "@/components/ui/marquee";
+import { Tree, Folder, File } from "@/components/ui/file-tree";
+import { Dropzone, DropzoneContent, DropzoneEmptyState } from "@/components/kibo-ui/dropzone";
+
+export default function Page() {
+  return (
+    <main className="grid gap-8 p-8">
+      <h1 className="font-display text-4xl font-semibold"><DitherGem gem="zircon" size={28} /> Registry smoke</h1>
+      <Button>Primary</Button>
+      <Comparison columns={[{ id: "a", title: "A" }]} rows={[]} caption="Compare" />
+      <Marquee><span>One</span><span>Two</span></Marquee>
+      <Tree elements={[{ id: "1", name: "src", children: [{ id: "2", name: "page.tsx" }] }]}>
+        <Folder element="src" value="1"><File value="2">page.tsx</File></Folder>
+      </Tree>
+      <Dropzone><DropzoneEmptyState /><DropzoneContent /></Dropzone>
+      <MCPDashboard />
+    </main>
   );
-  await writeFile(
-    join(dir, "tsconfig.json"),
-    JSON.stringify({
-      compilerOptions: {
-        target: "ES2022",
-        lib: ["dom", "dom.iterable", "esnext"],
-        skipLibCheck: true,
-        strict: true,
-        noEmit: true,
-        esModuleInterop: true,
-        module: "esnext",
-        moduleResolution: "bundler",
-        jsx: "react-jsx",
-        paths: { "@/*": ["./*"] },
-      },
-      include: ["**/*.ts", "**/*.tsx"],
-      exclude: ["node_modules"],
-    }),
-  );
-  await writeFile(
-    join(dir, "components.json"),
-    await readFile("components.json"),
-  );
-  await writeFile(join(dir, "lib/utils.ts"), await readFile("lib/utils.ts"));
-  await writeFile(join(dir, "app/globals.css"), '@import "tailwindcss";');
-  await writeFile(
-    join(dir, "postcss.config.mjs"),
-    "export default {plugins:{'@tailwindcss/postcss':{}}};",
-  );
-  run("bun", ["install"], dir);
-  const names = [
-    "comparison",
-    "mcp-dashboard",
-    "webmcp-provider",
-    "webmcp-form",
-    "data-explorer",
-    "date-range",
-    "wizard",
-    "confirmation-dialog",
-    "action-button",
-    "support-badge",
-    ...(template === "next" ? ["server-connector"] : []),
-  ];
-  run(
-    join(source, "node_modules/.bin/shadcn"),
-    ["add", ...names.map((n) => `${origin}/r/${n}.json`), "-y", "--overwrite"],
-    dir,
-  );
-  const component = `"use client";
-import {MCPDashboard} from '@/components/webmcp/mcp-dashboard';
-import {Comparison} from '@/components/webmcp/comparison';
-export default function App(){return <><Comparison columns={[{id:"demo",title:"Demo"}]} rows={[]} caption="Compare choices"/><MCPDashboard/></>;}`;
-  if (template === "vite") {
-    await writeFile(join(dir, "App.tsx"), component);
-    await writeFile(
-      join(dir, "main.tsx"),
-      "import {createRoot} from 'react-dom/client';import App from './App';import './app/globals.css';createRoot(document.getElementById('root')!).render(<App/>);",
-    );
-    await writeFile(
-      join(dir, "index.html"),
-      '<html><body><div id="root"></div><script type="module" src="/main.tsx"></script></body></html>',
-    );
-    await writeFile(
-      join(dir, "vite.config.ts"),
-      "import {defineConfig} from 'vite';import {fileURLToPath} from 'node:url';export default defineConfig({resolve:{alias:{'@':fileURLToPath(new URL('.',import.meta.url))}}});",
-    );
-  } else {
-    await writeFile(join(dir, "app/page.tsx"), component);
-    await writeFile(
-      join(dir, "app/layout.tsx"),
-      "import './globals.css';export default function Layout({children}:{children:React.ReactNode}){return <html lang='en'><body>{children}</body></html>;}",
-    );
-  }
-  run(join(dir, "node_modules/.bin/tsc"), ["--noEmit"], dir);
-  run("bun", ["run", "build"], dir);
 }
-console.log(`Registry installs and builds passed: ${root}`);
+`,
+);
+run("npx", ["tsc", "--noEmit"], app);
+run("bun", ["run", "build"], app);
+console.log(`The registry installs, typechecks and builds in a new app: ${app}`);

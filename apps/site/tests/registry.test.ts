@@ -14,6 +14,7 @@ import {
   primitivesOf,
   publishExternalItem,
   rewriteImports,
+  withNotice,
 } from "@/lib/upstreams";
 
 const MIT = `MIT License
@@ -99,6 +100,20 @@ describe("conformance", () => {
   });
 });
 
+describe("license notices", () => {
+  it("go after the imports, where the shadcn CLI keeps them", () => {
+    const notice = "/* N */\n";
+    expect(withNotice('import { a } from "a"\nimport {\n  b,\n} from "b"\n\nexport const x = 1\n', notice)).toBe(
+      'import { a } from "a"\nimport {\n  b,\n} from "b"\n\n/* N */\nexport const x = 1\n',
+    );
+    expect(withNotice('"use client";\n\nimport { a } from "a";\nconst y = import("z");\n', notice)).toBe(
+      '"use client";\n\nimport { a } from "a";\n\n/* N */\nconst y = import("z");\n',
+    );
+    expect(withNotice('export { A } from "@fabrials/ui";\n', notice)).toBe('export { A } from "@fabrials/ui";\n\n/* N */\n');
+    expect(withNotice("const z = 1\n", notice)).toBe("/* N */\nconst z = 1\n");
+  });
+});
+
 describe("aggregator transforms", () => {
   const upstream = { name: "magicui", registry: "https://magicui.design/r/{name}.json" };
 
@@ -172,7 +187,8 @@ describe("published registry", () => {
       shims: new Set(["button", "scroll-area"]),
     });
     expect(published.name).toBe("magicui-file-tree");
-    expect(published.files[0]!.content).toMatch(/^"use client"\n\/\*\n \* File Tree from Magic UI/);
+    // After the imports: shadcn drops comments above the first import on install.
+    expect(published.files[0]!.content).toMatch(/^"use client"\n\nimport React,[\s\S]*from "@\/components\/ui\/scroll-area"\n\n\/\*\n \* File Tree from Magic UI/);
     expect(published.files[0]!.content).toContain("Permission is hereby granted");
     expect(published.registryDependencies).toEqual(["https://ui.fabrials.com/r/button.json", "https://ui.fabrials.com/r/scroll-area.json"]);
     expect(published.meta).toMatchObject({ source: "external", license: "MIT", library: "magicui" });
@@ -187,7 +203,9 @@ describe("published registry", () => {
   it("gives the setup entries the Highstorm palette from the design system tokens", () => {
     const init = JSON.parse(readFileSync("public/r/init.json", "utf8"));
     const styles = JSON.parse(readFileSync("public/r/styles.json", "utf8"));
-    expect(init.type).toBe("registry:style");
+    expect(init.type).toBe("registry:base");
+    expect(init.config).toMatchObject({ style: "base-nova", registries: { "@fabrials": "https://ui.fabrials.com/r/{name}.json" } });
+    expect(init.cssVars.theme["font-sans"]).toBe("var(--fui-font-sans)");
     expect(init.cssVars.dark.background).toMatch(/^oklch\(/);
     expect(init.cssVars.light.radius).toBe("0.375rem");
     expect(Object.keys(styles.css)).toContain('@import "@fabrials/ui/tokens.css"');

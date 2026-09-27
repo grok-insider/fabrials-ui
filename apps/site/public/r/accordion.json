@@ -15,7 +15,7 @@
     {
       "path": "registry/shims/accordion.tsx",
       "type": "registry:ui",
-      "content": "// Fabrials UI shim for shadcn's accordion: https://ui.fabrials.com/docs/shims\n// The names match shadcn; the control is @fabrials/ui's. Import from\n// \"@fabrials/ui\" directly in new code.\nexport { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from \"@fabrials/ui\";\n"
+      "content": "export { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from \"@fabrials/ui\";\n\n// Fabrials UI shim for shadcn's accordion: https://ui.fabrials.com/docs/shims\n// The names match shadcn; the control is @fabrials/ui's. Import from\n// \"@fabrials/ui\" directly in new code.\n"
     }
   ],
   "meta": {

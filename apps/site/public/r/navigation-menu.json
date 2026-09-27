@@ -15,7 +15,7 @@
     {
       "path": "registry/shims/navigation-menu.tsx",
       "type": "registry:ui",
-      "content": "// Fabrials UI shim for shadcn's navigation-menu: https://ui.fabrials.com/docs/shims\n// The names match shadcn; the control is @fabrials/ui's. Import from\n// \"@fabrials/ui\" directly in new code.\nexport { NavigationMenu, NavigationMenuContent, NavigationMenuIndicator, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuPositioner, NavigationMenuTrigger, navigationMenuTriggerStyle } from \"@fabrials/ui\";\n"
+      "content": "export { NavigationMenu, NavigationMenuContent, NavigationMenuIndicator, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuPositioner, NavigationMenuTrigger, navigationMenuTriggerStyle } from \"@fabrials/ui\";\n\n// Fabrials UI shim for shadcn's navigation-menu: https://ui.fabrials.com/docs/shims\n// The names match shadcn; the control is @fabrials/ui's. Import from\n// \"@fabrials/ui\" directly in new code.\n"
     }
   ],
   "meta": {

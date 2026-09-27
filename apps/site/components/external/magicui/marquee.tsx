@@ -1,3 +1,7 @@
+import { type ComponentPropsWithoutRef } from "react"
+
+import { cn } from "@/lib/utils"
+
 /*
  * Marquee from Magic UI (https://magicui.design), MIT.
  * Distributed unchanged by ui.fabrials.com under the same license.
@@ -24,10 +28,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { type ComponentPropsWithoutRef } from "react"
-
-import { cn } from "@/lib/utils"
-
 interface MarqueeProps extends ComponentPropsWithoutRef<"div"> {
   /**
    * Optional CSS class name to apply custom styles

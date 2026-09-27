@@ -15,7 +15,7 @@
     {
       "path": "registry/shims/breadcrumb.tsx",
       "type": "registry:ui",
-      "content": "// Fabrials UI shim for shadcn's breadcrumb: https://ui.fabrials.com/docs/shims\n// The names match shadcn; the control is @fabrials/ui's. Import from\n// \"@fabrials/ui\" directly in new code.\nexport { Breadcrumb, BreadcrumbEllipsis, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from \"@fabrials/ui\";\n"
+      "content": "export { Breadcrumb, BreadcrumbEllipsis, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from \"@fabrials/ui\";\n\n// Fabrials UI shim for shadcn's breadcrumb: https://ui.fabrials.com/docs/shims\n// The names match shadcn; the control is @fabrials/ui's. Import from\n// \"@fabrials/ui\" directly in new code.\n"
     }
   ],
   "meta": {

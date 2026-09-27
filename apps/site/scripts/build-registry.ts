@@ -72,17 +72,29 @@ const pick = (source: Record<string, string>, fallback: Record<string, string> =
 items.push({
   $schema: "https://ui.shadcn.com/schema/registry-item.json",
   name: "init",
-  type: "registry:style",
+  type: "registry:base",
   title: "Fabrials UI",
-  description: "Sets a shadcn app up for Fabrials UI: the styles, the Highstorm palette in light and dark, and the radius.",
+  description:
+    "Sets a shadcn app up for Fabrials UI: Base UI primitives, the @fabrials registry, the styles, IBM Plex and the Highstorm palette in light and dark.",
   dependencies: [fabrialsUi],
   registryDependencies: [url("styles"), "utils"],
   files: [],
+  // components.json: shadcn's Base UI style (the one the shims match) and the @fabrials namespace.
+  config: {
+    style: "base-nova",
+    iconLibrary: "lucide",
+    registries: { "@fabrials": `${origin}/r/{name}.json` },
+  },
   cssVars: {
+    theme: {
+      "font-sans": "var(--fui-font-sans)",
+      "font-mono": "var(--fui-font-mono)",
+      "font-display": "var(--fui-font-display)",
+    },
     light: { ...pick(lightTokens), radius: lightTokens.radius },
     dark: pick(darkTokens, lightTokens),
   },
-  docs: `Fabrials UI is set up. Add components with: npx shadcn@latest add ${url("mcp-dashboard")}`,
+  docs: "Fabrials UI is set up. Add components by name, for example: npx shadcn@latest add @fabrials/button @fabrials/mcp-dashboard",
   meta: { source: "fabrials", tier: "fabrials", license: "MIT", category: "Setup" },
 });
 

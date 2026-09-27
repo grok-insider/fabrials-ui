@@ -1,4 +1,7 @@
 "use client";
+import { Tree } from "@/components/external/magicui/file-tree"
+import type { TreeViewElement } from "@/components/external/magicui/file-tree"
+
 /*
  * File Tree demo from Magic UI (https://magicui.design), MIT.
  * Distributed unchanged by ui.fabrials.com under the same license.
@@ -25,9 +28,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { Tree } from "@/components/external/magicui/file-tree"
-import type { TreeViewElement } from "@/components/external/magicui/file-tree"
-
 export default function FileTreeDemo() {
   return (
     <div className="bg-background relative flex h-[300px] w-full max-w-sm flex-col items-center justify-center overflow-hidden rounded-lg border">

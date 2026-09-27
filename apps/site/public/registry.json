@@ -22,9 +22,9 @@
     },
     {
       "name": "init",
-      "type": "registry:style",
+      "type": "registry:base",
       "title": "Fabrials UI",
-      "description": "Sets a shadcn app up for Fabrials UI: the styles, the Highstorm palette in light and dark, and the radius.",
+      "description": "Sets a shadcn app up for Fabrials UI: Base UI primitives, the @fabrials registry, the styles, IBM Plex and the Highstorm palette in light and dark.",
       "dependencies": [
         "@fabrials/ui@^0.7.0"
       ],
@@ -32,6 +32,13 @@
         "https://ui.fabrials.com/r/styles.json",
         "utils"
       ],
+      "config": {
+        "style": "base-nova",
+        "iconLibrary": "lucide",
+        "registries": {
+          "@fabrials": "https://ui.fabrials.com/r/{name}.json"
+        }
+      },
       "meta": {
         "source": "fabrials",
         "tier": "fabrials",

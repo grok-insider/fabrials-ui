@@ -7,7 +7,7 @@ ui.fabrials.com serves a shadcn registry built from `apps/site`. This is how it 
 | Entry | Source | Published as |
 | --- | --- | --- |
 | `styles` | `scripts/build-registry.ts` | Installs `@fabrials/ui` and adds its CSS imports |
-| `init` | `scripts/build-registry.ts`, palette from `packages/ui/src/tokens.css` | `registry:style`: `styles` plus the Highstorm palette as `cssVars` |
+| `init` | `scripts/build-registry.ts`, palette from `packages/ui/src/tokens.css` | `registry:base`: `styles`, the Highstorm palette and fonts as `cssVars`, and a `config` that sets the Base UI style (`base-nova`) and the `@fabrials` registry in `components.json` |
 | Fabrials blocks | `apps/site/registry/{components,webmcp,mcp,server}`, listed in `lib/catalog.ts` | `r/<slug>.json` |
 | Shims | Generated into `registry/shims/` and `components/ui/` | `r/<primitive>.json` |
 | Other libraries | Snapshots in `registry/external/<library>/` | `r/<library>-<item>.json` |
@@ -49,6 +49,28 @@ Items are republished unchanged except for a notice at the top of every file (or
 ### Tiers and design notes
 
 `lib/conformance.ts` reads each item's source and CSS for literal colours, continuous motion, animation without a reduced-motion check, gradients, glow and theme overrides. The notes appear on the item's page. `community` items keep their look; a `fabrials` item has no notes. Promoting one means adapting it to DESIGN.md and moving it into `packages/ui`, with a story, a keyboard test and a visual reference.
+
+### Notices survive the install
+
+The shadcn CLI drops comments above a file's first import when it rewrites import paths, so the license notice (and the shim header) goes right after the imports (`withNotice` in `lib/upstreams.ts`).
+
+## Smoke test
+
+`scripts/smoke-registry.ts` creates a Next.js app, runs `shadcn init` with `init`, adds blocks, shims and components from other libraries by name, checks the notices survived, then typechecks and builds. Against the public site:
+
+```sh
+bun run --cwd apps/site test:registry
+```
+
+Before a version is on npm, serve a local build and a local npm registry (nothing leaves the machine):
+
+```sh
+bunx verdaccio@6 --listen 127.0.0.1:4873            # config: @fabrials/* publish $authenticated
+bun run stage:publish && npm publish --registry http://127.0.0.1:4873 (in packages/ui and packages/ai-ui)
+REGISTRY_ORIGIN=http://127.0.0.1:4390 bun run --cwd apps/site registry:build --out /tmp/r
+python3 -m http.server 4390 -d /tmp/r
+REGISTRY_ORIGIN=http://127.0.0.1:4390 FABRIALS_NPM_REGISTRY=http://127.0.0.1:4873/ bun run --cwd apps/site test:registry
+```
 
 ### Refreshing
 

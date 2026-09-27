@@ -1,3 +1,8 @@
+"use client"
+
+import { cn } from "@/lib/utils"
+import { AnimatedList } from "@/components/external/magicui/animated-list"
+
 /*
  * Animated List demo from Magic UI (https://magicui.design), MIT.
  * Distributed unchanged by ui.fabrials.com under the same license.
@@ -24,11 +29,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-"use client"
-
-import { cn } from "@/lib/utils"
-import { AnimatedList } from "@/components/external/magicui/animated-list"
-
 interface Item {
   name: string
   description: string

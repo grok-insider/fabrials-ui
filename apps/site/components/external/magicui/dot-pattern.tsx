@@ -1,4 +1,10 @@
 "use client"
+
+import React, { useEffect, useId, useRef, useState } from "react"
+import { motion } from "motion/react"
+
+import { cn } from "@/lib/utils"
+
 /*
  * Dot Pattern from Magic UI (https://magicui.design), MIT.
  * Distributed unchanged by ui.fabrials.com under the same license.
@@ -25,12 +31,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-import React, { useEffect, useId, useRef, useState } from "react"
-import { motion } from "motion/react"
-
-import { cn } from "@/lib/utils"
-
 /**
  *  DotPattern Component Props
  *

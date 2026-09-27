@@ -14,7 +14,7 @@ For an existing shadcn app, add the same entry:
 npx shadcn@latest add https://ui.fabrials.com/r/init.json
 ```
 
-`init` installs `@fabrials/ui`, imports its tokens, IBM Plex and component styles into your global CSS, and sets the Highstorm palette for light and dark. shadcn asks before replacing an existing theme.
+`init` installs `@fabrials/ui`, imports its tokens, IBM Plex and component styles into your global CSS, sets the Highstorm palette for light and dark, and writes `components.json` with shadcn's Base UI style and the `@fabrials` registry. shadcn asks before replacing an existing theme.
 
 To keep your own palette, add only the styles. Fabrials components then take your colours from shadcn's tokens:
 
@@ -24,7 +24,7 @@ npx shadcn@latest add https://ui.fabrials.com/r/styles.json
 
 ## Add the registry
 
-Add the Fabrials registry to `components.json`, so you can add components by name:
+`init` adds the Fabrials registry for you. If you only added `styles`, add it to `components.json` yourself, so you can add components by name:
 
 ```json
 {

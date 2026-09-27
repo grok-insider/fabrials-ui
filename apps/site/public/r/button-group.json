@@ -15,7 +15,7 @@
     {
       "path": "registry/shims/button-group.tsx",
       "type": "registry:ui",
-      "content": "// Fabrials UI shim for shadcn's button-group: https://ui.fabrials.com/docs/shims\n// The names match shadcn; the control is @fabrials/ui's. Import from\n// \"@fabrials/ui\" directly in new code.\nexport { ButtonGroup, ButtonGroupSeparator, ButtonGroupText, buttonGroupVariants } from \"@fabrials/ui\";\n"
+      "content": "export { ButtonGroup, ButtonGroupSeparator, ButtonGroupText, buttonGroupVariants } from \"@fabrials/ui\";\n\n// Fabrials UI shim for shadcn's button-group: https://ui.fabrials.com/docs/shims\n// The names match shadcn; the control is @fabrials/ui's. Import from\n// \"@fabrials/ui\" directly in new code.\n"
     }
   ],
   "meta": {

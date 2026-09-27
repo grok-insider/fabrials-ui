@@ -15,7 +15,7 @@
     {
       "path": "registry/shims/sheet.tsx",
       "type": "registry:ui",
-      "content": "// Fabrials UI shim for shadcn's sheet: https://ui.fabrials.com/docs/shims\n// The names match shadcn; the control is @fabrials/ui's. Import from\n// \"@fabrials/ui\" directly in new code.\nexport { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from \"@fabrials/ui\";\n"
+      "content": "export { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from \"@fabrials/ui\";\n\n// Fabrials UI shim for shadcn's sheet: https://ui.fabrials.com/docs/shims\n// The names match shadcn; the control is @fabrials/ui's. Import from\n// \"@fabrials/ui\" directly in new code.\n"
     }
   ],
   "meta": {

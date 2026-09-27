@@ -1,4 +1,15 @@
 "use client"
+
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+  type ComponentPropsWithoutRef,
+} from "react"
+import { AnimatePresence, motion, type MotionProps } from "motion/react"
+
+import { cn } from "@/lib/utils"
+
 /*
  * Animated List from Magic UI (https://magicui.design), MIT.
  * Distributed unchanged by ui.fabrials.com under the same license.
@@ -25,17 +36,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-import React, {
-  useEffect,
-  useMemo,
-  useState,
-  type ComponentPropsWithoutRef,
-} from "react"
-import { AnimatePresence, motion, type MotionProps } from "motion/react"
-
-import { cn } from "@/lib/utils"
-
 export function AnimatedListItem({ children }: { children: React.ReactNode }) {
   const animations: MotionProps = {
     initial: { scale: 0, opacity: 0 },

@@ -8,7 +8,7 @@
 import { mkdir, readFile, rm, writeFile, readdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { loadExternal } from "../lib/external";
-import { cssText, materializedPath, noticeHeader, rewriteImports, dependenciesOf } from "../lib/upstreams";
+import { cssText, materializedPath, noticeHeader, rewriteImports, dependenciesOf, withNotice } from "../lib/upstreams";
 
 const check = process.argv.includes("--check");
 const libraries = loadExternal();
@@ -35,8 +35,7 @@ for (const { snapshot, licenseText, items } of libraries) {
   for (const { slug, item, raw, demo } of items) {
     const header = noticeHeader(item.title, snapshot, licenseText);
     for (const file of raw.files) {
-      const body = rewriteImports(file.content, snapshot.name);
-      const content = /^["']use client["'];?\n/.test(body) ? body.replace(/^(["']use client["'];?\n)/, `$1${header}`) : header + body;
+      const content = withNotice(rewriteImports(file.content, snapshot.name), header);
       out.set(join("components/external", snapshot.name, materializedPath(file)), content);
     }
     for (const [name, value] of Object.entries(raw.cssVars?.theme ?? {})) theme.push(`  --${name}: ${value};`);
@@ -47,7 +46,7 @@ for (const { snapshot, licenseText, items } of libraries) {
       const file = demo.files[0]!;
       const path = join("components/external", snapshot.name, "demos", `${item.demo!.name}.tsx`);
       const body = rewriteImports(file.content, snapshot.name);
-      out.set(path, (body.startsWith('"use client"') ? "" : '"use client";\n') + noticeHeader(`${item.title} demo`, snapshot, licenseText) + body);
+      out.set(path, withNotice(body.startsWith('"use client"') ? body : `"use client";\n${body}`, noticeHeader(`${item.title} demo`, snapshot, licenseText)));
       for (const dep of dependenciesOf(demo)) needed.set(dep.name, needed.get(dep.name) ?? "latest");
       const name = exportedComponent(body);
       const demoModule = `./${snapshot.name}/demos/${item.demo!.name}`;

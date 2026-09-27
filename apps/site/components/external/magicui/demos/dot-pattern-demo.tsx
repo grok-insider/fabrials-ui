@@ -1,3 +1,8 @@
+"use client"
+
+import { cn } from "@/lib/utils"
+import { DotPattern } from "@/components/external/magicui/dot-pattern"
+
 /*
  * Dot Pattern demo from Magic UI (https://magicui.design), MIT.
  * Distributed unchanged by ui.fabrials.com under the same license.
@@ -24,11 +29,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-"use client"
-
-import { cn } from "@/lib/utils"
-import { DotPattern } from "@/components/external/magicui/dot-pattern"
-
 export default function DotPatternDemo() {
   return (
     <div className="bg-background relative flex h-[500px] w-full flex-col items-center justify-center overflow-hidden rounded-lg border">

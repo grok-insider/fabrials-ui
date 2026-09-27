@@ -151,6 +151,28 @@ export function noticeHeader(title: string, snapshot: UpstreamSnapshot, licenseT
   return sourceComment([origin, via, "", ...licenseText.replace(/\r/g, "").trim().split("\n")]);
 }
 
+/**
+ * Places a notice after the file's imports. The shadcn CLI rewrites import
+ * paths on install and drops any comment above the first import, so a
+ * notice at the very top would not reach the app.
+ */
+export function withNotice(content: string, notice: string): string {
+  const statement =
+    /^(?:import\s[\s\S]*?\sfrom\s*["'][^"']+["']|import\s*["'][^"']+["']|export\s+(?:type\s+)?(?:\*|\{[^}]*\})\s*from\s*["'][^"']+["']);?[ \t]*$/gm;
+  const directive = /^(["']use (?:client|server)["'];?[ \t]*\n)/.exec(content);
+  let end = directive ? directive[0].length : 0;
+  for (const match of content.matchAll(statement)) {
+    const gap = content.slice(end, match.index);
+    // Stop at the first real statement between imports.
+    if (gap.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, "").trim()) break;
+    end = match.index! + match[0].length;
+  }
+  if (end === 0) return notice + content;
+  const before = content.slice(0, end);
+  const after = content.slice(end).replace(/^\n*/, "");
+  return `${before}\n\n${notice.endsWith("\n") ? notice : `${notice}\n`}${after}`;
+}
+
 /** The item as ui.fabrials.com publishes it. */
 export function publishExternalItem(
   raw: RegistryItemJson,
@@ -179,12 +201,7 @@ export function publishExternalItem(
     dependencies: item.dependencies.map((dep) => `${dep.name}@^${dep.version}`),
     ...(raw.devDependencies?.length ? { devDependencies: raw.devDependencies } : {}),
     registryDependencies,
-    files: raw.files.map((file) => ({
-      ...file,
-      content: file.content.startsWith('"use client"') || file.content.startsWith("'use client'")
-        ? file.content.replace(/^(["']use client["'];?\n)/, `$1${header}`)
-        : header + file.content,
-    })),
+    files: raw.files.map((file) => ({ ...file, content: withNotice(file.content, header) })),
     ...(raw.cssVars ? { cssVars: raw.cssVars } : {}),
     ...(raw.css ? { css: raw.css } : {}),
     ...(raw.docs ? { docs: raw.docs } : {}),

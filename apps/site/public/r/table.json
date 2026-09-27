@@ -15,7 +15,7 @@
     {
       "path": "registry/shims/table.tsx",
       "type": "registry:ui",
-      "content": "// Fabrials UI shim for shadcn's table: https://ui.fabrials.com/docs/shims\n// The names match shadcn; the control is @fabrials/ui's. Import from\n// \"@fabrials/ui\" directly in new code.\nexport { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from \"@fabrials/ui\";\n"
+      "content": "export { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from \"@fabrials/ui\";\n\n// Fabrials UI shim for shadcn's table: https://ui.fabrials.com/docs/shims\n// The names match shadcn; the control is @fabrials/ui's. Import from\n// \"@fabrials/ui\" directly in new code.\n"
     }
   ],
   "meta": {

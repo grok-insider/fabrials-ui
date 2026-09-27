@@ -15,7 +15,7 @@
     {
       "path": "registry/shims/command.tsx",
       "type": "registry:ui",
-      "content": "// Fabrials UI shim for shadcn's command: https://ui.fabrials.com/docs/shims\n// The names match shadcn; the control is @fabrials/ui's. Import from\n// \"@fabrials/ui\" directly in new code.\nexport { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, CommandShortcut } from \"@fabrials/ui\";\n"
+      "content": "export { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, CommandShortcut } from \"@fabrials/ui\";\n\n// Fabrials UI shim for shadcn's command: https://ui.fabrials.com/docs/shims\n// The names match shadcn; the control is @fabrials/ui's. Import from\n// \"@fabrials/ui\" directly in new code.\n"
     }
   ],
   "meta": {

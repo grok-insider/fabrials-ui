@@ -27,9 +27,11 @@ export function coveredPrimitives(exported: Iterable<string>, snapshot: ShadcnSn
 
 /** The source of one shim file. */
 export function shimSource(name: string, names: string[]) {
-  return `// Fabrials UI shim for shadcn's ${name}: https://ui.fabrials.com/docs/shims
+  // The comment follows the export: shadcn drops comments above the first statement.
+  return `export { ${names.join(", ")} } from "@fabrials/ui";
+
+// Fabrials UI shim for shadcn's ${name}: https://ui.fabrials.com/docs/shims
 // The names match shadcn; the control is @fabrials/ui's. Import from
 // "@fabrials/ui" directly in new code.
-export { ${names.join(", ")} } from "@fabrials/ui";
 `;
 }
