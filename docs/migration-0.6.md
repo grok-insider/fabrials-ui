@@ -39,3 +39,13 @@ the charts too (about 800 KB on Radiant's sign-in page). Nothing to change in
 hosts; bundles just get smaller.
 - `FileThumb` falls back to its file-type tile when a server-rendered image
   had already failed before hydration (its `onError` never fired).
+
+## 0.6.2
+
+`fonts.css` covers more than Latin-1. Each IBM Plex family now ships its
+Fontsource subsets as separate faces with a `unicode-range`: latin-ext (Polish,
+Czech, Turkish…), cyrillic, cyrillic-ext and vietnamese for Sans, Mono and
+Serif, plus greek for Sans. Before, letters such as `ż`, `ł` or `ř` fell back
+to a system font glyph by glyph and their accents could render detached. The
+Latin files are unchanged and browsers only download another subset when a page
+uses one of its characters. Nothing to change in hosts.

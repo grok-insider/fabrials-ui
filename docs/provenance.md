@@ -83,3 +83,14 @@ stop animating under reduced motion.
 | `timeline.tsx` | Fabrials, after the WebMCP `ExecutionLog` rows | X Tracker live activity |
 | `relative-time.tsx` | Fabrials | X Tracker feeds |
 | `nav-tabs.tsx` | Fabrials, styled like `TabsList variant="underline"` | X Tracker account sections |
+
+## Fonts
+
+`packages/ui/fonts/` holds IBM Plex (SIL Open Font License 1.1, `OFL.txt`) as
+published by Fontsource: IBM Plex Sans variable (`wght` 100–700, 3.201), Plex
+Mono 400/500/600 (2.3) and Plex Serif 400/500 (2.6). The files without a subset
+suffix are the Fontsource `latin` subsets; since 0.6.2 the `-latin-ext`,
+`-cyrillic`, `-cyrillic-ext`, `-vietnamese` and (Sans only) `-greek` files come
+from the same Fontsource releases, byte for byte, and `src/fonts.css` gives each
+one the Fontsource `unicode-range`. X Tracker asked for them: it shows Polish
+posts, whose letters (`ż`, `ł`, `ę`…) Latin-1 does not cover.

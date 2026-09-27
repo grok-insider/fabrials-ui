@@ -1,6 +1,6 @@
 # Fabrials design system
 
-Version: 0.6.0 "Stormlight". X Tracker consumes 0.6.0 (monitoring pieces: DitherCanvas, ActivityStrip, Timeline, RelativeTime, NavTabs). Radiant consumes 0.5.1 (compact toasts without a close button; one-line toasts are centred pills on phones). AI Relay, enterprise Open Mail, the Spanreed desktop, the fabrials.com product routes, admin.fabrials.com, ui.fabrials.com and Grok Insider consume generated 0.4 distributions. ui.fabrials.com documents every `@fabrials/ui` control next to its WebMCP catalogue. Those design-system pages are live previews and usage notes, not registry install items. Distribution of `@fabrials/ui` remains a verified vendor copy, not an npm release.
+Version: 0.6.2 "Stormlight". X Tracker consumes 0.6.2 (monitoring pieces: DitherCanvas, ActivityStrip, Timeline, RelativeTime, NavTabs; Plex subsets beyond Latin-1). Radiant consumes 0.6.1 (compact toasts without a close button; one-line toasts are centred pills on phones; barrels without "use client"). AI Relay, enterprise Open Mail, the Spanreed desktop, the fabrials.com product routes, admin.fabrials.com, ui.fabrials.com and Grok Insider consume generated 0.4 distributions. ui.fabrials.com documents every `@fabrials/ui` control next to its WebMCP catalogue. Those design-system pages are live previews and usage notes, not registry install items. Distribution of `@fabrials/ui` remains a verified vendor copy, not an npm release.
 
 ## Identity
 
@@ -12,7 +12,7 @@ The source of truth is `packages/ui/src/tokens.css`. Its semantic color names re
 
 ## Typography and density
 
-Use the token font stack: Plex Sans for interface text, Plex Mono for code and identifiers, Plex Serif for editorial display. Use tabular numerals. Body and controls use 14px, supporting metadata 12px, subsection headings 16px and page headings 24px. Do not reduce essential text contrast to suggest hierarchy.
+Use the token font stack: Plex Sans for interface text, Plex Mono for code and identifiers, Plex Serif for editorial display. `fonts.css` ships each family in Latin, Latin Extended, Cyrillic and Vietnamese subsets (Sans also Greek), each face limited by `unicode-range`, so user content in those scripts renders in Plex. Use tabular numerals. Body and controls use 14px, supporting metadata 12px, subsection headings 16px and page headings 24px. Do not reduce essential text contrast to suggest hierarchy.
 
 Spacing follows 4px increments. Standard controls are 40px; `data-density="compact"` uses 32px controls and tighter collection rows. Narrow/coarse-pointer layouts retain at least 44px control targets. Compact mode is a composition option, not a new stored user preference. Portaled menus and dialogs keep standard density. Avoid stacking a border around every label/control group.
 
