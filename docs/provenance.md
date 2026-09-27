@@ -72,3 +72,14 @@ products can reuse them. Radiant consumes them from the vendor copy.
 `MoonPhase` and `Starfield` are decorative sign-in and landing effects. They
 are the documented exception to the no-glow and no-perpetual-motion rule and
 stop animating under reduced motion.
+
+## 0.6 additions (2026-09-27)
+
+| File | Origin | Requested by |
+| --- | --- | --- |
+| `dither.ts` | Fabrials: Radiant's `src/lib/dither.ts` (packed `ditherToRamp`, `ditherChannels`) merged with X Tracker's helpers (`mixHex`, `sortByLuma`, `seeded`) | X Tracker backdrops; Radiant can move to it later |
+| `dither-canvas.tsx` | Fabrials: generalised from Radiant's `DitherBackdrop` and X Tracker's sign-in sky | X Tracker shell, account banners and empty states |
+| `activity-strip.tsx` | Fabrials | X Tracker posts per day and hour of day |
+| `timeline.tsx` | Fabrials, after the WebMCP `ExecutionLog` rows | X Tracker live activity |
+| `relative-time.tsx` | Fabrials | X Tracker feeds |
+| `nav-tabs.tsx` | Fabrials, styled like `TabsList variant="underline"` | X Tracker account sections |

@@ -1,6 +1,6 @@
 # Fabrials design system
 
-Version: 0.5.1 "Stormlight". Radiant consumes 0.5.1 (compact toasts without a close button; one-line toasts are centred pills on phones). AI Relay, enterprise Open Mail, the Spanreed desktop, the fabrials.com product routes, admin.fabrials.com, ui.fabrials.com and Grok Insider consume generated 0.4 distributions. ui.fabrials.com documents every `@fabrials/ui` control next to its WebMCP catalogue. Those design-system pages are live previews and usage notes, not registry install items. Distribution of `@fabrials/ui` remains a verified vendor copy, not an npm release.
+Version: 0.6.0 "Stormlight". X Tracker consumes 0.6.0 (monitoring pieces: DitherCanvas, ActivityStrip, Timeline, RelativeTime, NavTabs). Radiant consumes 0.5.1 (compact toasts without a close button; one-line toasts are centred pills on phones). AI Relay, enterprise Open Mail, the Spanreed desktop, the fabrials.com product routes, admin.fabrials.com, ui.fabrials.com and Grok Insider consume generated 0.4 distributions. ui.fabrials.com documents every `@fabrials/ui` control next to its WebMCP catalogue. Those design-system pages are live previews and usage notes, not registry install items. Distribution of `@fabrials/ui` remains a verified vendor copy, not an npm release.
 
 ## Identity
 
@@ -35,6 +35,7 @@ The catalogue lives in Storybook (`bun run storybook`, localhost:6041) and is do
 - Brand and chrome: ProductLockup, FabrialsGem, Avatar, Snippet, CopyButton, SiteHeader and AuthLayout.
 - Patterns: WorkspaceShell, Sidebar, PageHeader, SectionHeader, CollectionToolbar, BulkActions and StatePanel.
 - Added in 0.5: ConfirmDialog, TruncatedText, SettingsSection, FilterChip, FileThumb, SuggestionCard, ShimmerText and `groupByRecency`; `MoonPhase` and `Starfield` for sign-in and landing surfaces.
+- Added in 0.6, for live dashboards: `DitherCanvas` (a static ordered-dither background; the pure engine is `@fabrials/ui/dither`), `ActivityStrip` (intensity cells with a screen-reader table), `Timeline`/`TimelineItem` (event feed with a one-off `fresh` highlight), `RelativeTime` and `NavTabs`/`NavTab` (link tabs; the host passes its link through `render`).
 - `@fabrials/ai-ui` chat pieces (0.5): ChatMessage and message actions, ChatComposer, CodeBlock with `.fui-markdown`, citations and sources, activity disclosures, attachments and VoiceInputButton.
 
 Use named exports for React server/client compatibility. Shared interactive entries retain `use client`; tokens and styles have no React dependency. Each control keeps Base UI/native semantics and an accessible name. Form validation belongs to the host; `Field` connects the label, hint and error with the control.
@@ -47,7 +48,7 @@ Light, dark and system themes share semantic names. Hosts apply `.dark` to the d
 
 Focus is a visible 2px outline with offset. Preserve keyboard traversal, Escape handling and focus restoration through Base UI. Use AA contrast for meaningful text and controls; verify actual surfaces, not token values in isolation. Check 390/768/1440 widths and 200% text/viewport zoom. Data tables can scroll inside their labeled region; the page must not overflow horizontally.
 
-Motion uses the 140ms feedback token. Continuous motion is reserved for genuine loading indicators and stops under reduced motion. The one sanctioned exception is `MoonPhase`/`Starfield` on sign-in and landing surfaces; they also stop under reduced motion. Do not add enter animations to frequently repeated navigation.
+Motion uses the 140ms feedback token. Continuous motion is reserved for genuine loading indicators and stops under reduced motion. The one sanctioned exception is `MoonPhase`/`Starfield` on sign-in and landing surfaces; they also stop under reduced motion. `DitherCanvas` is the sanctioned texture: it paints once (again only on resize, theme or data change), never loops, and sits behind panels, never directly under body text. A `TimelineItem` marked `fresh` highlights once when a live item arrives; nothing loops. Do not add enter animations to frequently repeated navigation.
 
 ## Extending the system
 

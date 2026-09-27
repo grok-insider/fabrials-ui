@@ -28,7 +28,12 @@ for (const name of ["ui", "ai-ui"]) {
       outDir: "dist",
       emptyOutDir: true,
       lib: {
-        entry: resolve(directory, `src/index.${name === "ui" ? "ts" : "tsx"}`),
+        // Subpath exports that the index does not re-export are entries of their own,
+        // or tree-shaking drops what the index does not use.
+        entry:
+          name === "ui"
+            ? { index: resolve(directory, "src/index.ts"), dither: resolve(directory, "src/dither.ts") }
+            : resolve(directory, "src/index.tsx"),
         formats: ["es"],
       },
       rollupOptions: {
@@ -40,7 +45,7 @@ for (const name of ["ui", "ai-ui"]) {
           preserveModules: true,
           preserveModulesRoot: resolve(directory, "src"),
           entryFileNames: "[name].js",
-          banner: chunk => /(?:button-variants|shared|moon-math)\.[jt]s$/.test(chunk.facadeModuleId ?? "") ? "" : '"use client";',
+          banner: chunk => /(?:button-variants|shared|moon-math|dither)\.[jt]s$/.test(chunk.facadeModuleId ?? "") ? "" : '"use client";',
         },
       },
     },

@@ -3844,3 +3844,241 @@
     }
   }
 }
+
+/* 0.6: monitoring pieces — dither canvas, activity strip, timeline, relative time, nav tabs */
+@layer components {
+  .fui-dither-canvas {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    display: block;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    image-rendering: pixelated;
+    opacity: 0;
+  }
+  .fui-dither-canvas[data-fixed] {
+    position: fixed;
+  }
+  .fui-dither-canvas[data-painted] {
+    opacity: 1;
+  }
+
+  .fui-activity-strip {
+    display: grid;
+    gap: var(--fui-space-1-5);
+    margin: 0;
+    min-width: 0;
+    --fui-cell: var(--brand);
+    --fui-cell-height: 1.5rem;
+  }
+  .fui-activity-strip[data-size="sm"] {
+    --fui-cell-height: 1rem;
+  }
+  .fui-activity-strip[data-size="lg"] {
+    --fui-cell-height: 2rem;
+  }
+  .fui-activity-cells {
+    display: flex;
+    gap: 2px;
+    min-width: 0;
+    height: var(--fui-cell-height);
+  }
+  /* Many cells in a narrow strip shrink below the gap rather than overflow. */
+  .fui-activity-cell {
+    flex: 1 1 0;
+    min-width: 0;
+    border-radius: 2px;
+    background: color-mix(in oklab, var(--foreground) 7%, transparent);
+  }
+  .fui-activity-cell[data-tone="success"] {
+    --fui-cell: var(--success);
+  }
+  .fui-activity-cell[data-tone="warning"] {
+    --fui-cell: var(--warning);
+  }
+  .fui-activity-cell[data-tone="danger"] {
+    --fui-cell: var(--destructive);
+  }
+  .fui-activity-cell[data-level="1"] {
+    background: color-mix(in oklab, var(--fui-cell) 28%, transparent);
+  }
+  .fui-activity-cell[data-level="2"] {
+    background: color-mix(in oklab, var(--fui-cell) 50%, transparent);
+  }
+  .fui-activity-cell[data-level="3"] {
+    background: color-mix(in oklab, var(--fui-cell) 75%, transparent);
+  }
+  .fui-activity-cell[data-level="4"] {
+    background: var(--fui-cell);
+  }
+  .fui-activity-labels {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--fui-space-2);
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+  }
+
+  .fui-timeline {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .fui-timeline-item {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.75rem minmax(0, 1fr);
+    gap: var(--fui-space-3);
+    padding: var(--fui-space-2-5) var(--fui-space-2);
+    border-radius: var(--fui-radius-md);
+    --fui-timeline-color: var(--muted-foreground);
+  }
+  .fui-timeline-item[data-tone="info"] {
+    --fui-timeline-color: var(--fui-info-ink);
+  }
+  .fui-timeline-item[data-tone="success"] {
+    --fui-timeline-color: var(--fui-success-ink);
+  }
+  .fui-timeline-item[data-tone="warning"] {
+    --fui-timeline-color: var(--fui-warning-ink);
+  }
+  .fui-timeline-item[data-tone="danger"] {
+    --fui-timeline-color: var(--fui-danger-ink);
+  }
+  .fui-timeline-item:not(:last-child)::before {
+    content: "";
+    position: absolute;
+    top: calc(var(--fui-space-2-5) + 1.75rem + 2px);
+    bottom: calc(-1 * var(--fui-space-2-5) + 2px);
+    left: calc(var(--fui-space-2) + 0.875rem - 0.5px);
+    width: 1px;
+    background: var(--border);
+  }
+  .fui-timeline-marker {
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    overflow: hidden;
+    border-radius: var(--fui-radius-full);
+    background: color-mix(in oklab, var(--fui-timeline-color) 14%, var(--card));
+    color: var(--fui-timeline-color);
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--fui-timeline-color) 30%, transparent);
+  }
+  .fui-timeline-marker > svg {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+  .fui-timeline-marker > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .fui-timeline-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: var(--fui-radius-full);
+    background: currentColor;
+  }
+  .fui-timeline-body {
+    display: grid;
+    gap: var(--fui-space-1);
+    min-width: 0;
+    padding-top: 0.25rem;
+  }
+  .fui-timeline-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--fui-space-1) var(--fui-space-2);
+    min-width: 0;
+    font-size: var(--fui-text-sm);
+  }
+  .fui-timeline-title {
+    min-width: 0;
+    font-weight: var(--fui-weight-medium);
+  }
+  .fui-timeline-time {
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+    white-space: nowrap;
+  }
+  .fui-timeline-actions {
+    display: inline-flex;
+    gap: var(--fui-space-1);
+    margin-left: auto;
+  }
+  .fui-timeline-content {
+    min-width: 0;
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-sm);
+    overflow-wrap: anywhere;
+  }
+  .fui-timeline-item[data-fresh] {
+    background: color-mix(in oklab, var(--brand) 7%, transparent);
+  }
+
+  .fui-relative-time {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .fui-nav-tabs {
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .fui-nav-tabs > .fui-tabs-list {
+    flex-wrap: nowrap;
+    min-width: max-content;
+  }
+  .fui-nav-tab {
+    color: var(--muted-foreground);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .fui-nav-tab:focus-visible {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: -2px;
+  }
+  .fui-nav-tab-count {
+    min-width: 1.25rem;
+    padding: 0 var(--fui-space-1-5);
+    border-radius: var(--fui-radius-full);
+    background: var(--muted);
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.25rem;
+    text-align: center;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .fui-dither-canvas {
+      transition: opacity 600ms var(--fui-ease);
+    }
+    .fui-timeline-item[data-fresh] {
+      animation: fui-timeline-fresh 2.4s var(--fui-ease) both;
+    }
+    .fui-nav-tab:not([data-active]):hover {
+      color: var(--foreground);
+    }
+  }
+  @keyframes fui-timeline-fresh {
+    0% {
+      background: color-mix(in oklab, var(--brand) 18%, transparent);
+      transform: translateY(-4px);
+      opacity: 0;
+    }
+    15% {
+      opacity: 1;
+      transform: none;
+    }
+    100% {
+      background: transparent;
+    }
+  }
+}

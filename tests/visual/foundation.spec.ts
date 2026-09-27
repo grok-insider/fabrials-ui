@@ -29,6 +29,7 @@ const stories: Record<string, string> = {
   "public-site": "fabrials-patterns--public-site",
   "sign-in": "fabrials-patterns--sign-in",
   settings: "fabrials-patterns--settings-page",
+  monitoring: "fabrials-monitoring--gallery",
 };
 
 for (const theme of ["light", "dark"]) {

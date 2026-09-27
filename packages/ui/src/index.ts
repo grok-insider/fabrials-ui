@@ -41,3 +41,8 @@ export * from "./suggestion-card";
 export * from "./shimmer-text";
 export * from "./recency";
 export * from "./file-thumb";
+export * from "./dither-canvas";
+export * from "./activity-strip";
+export * from "./timeline";
+export * from "./relative-time";
+export * from "./nav-tabs";

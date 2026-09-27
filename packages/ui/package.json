@@ -1,12 +1,13 @@
 {
   "name": "@fabrials/ui",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "type": "module",
   "license": "MIT",
   "sideEffects": ["**/*.css"],
   "exports": {
     ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
     "./moon": { "types": "./dist/moon-math.d.ts", "import": "./dist/moon-math.js" },
+    "./dither": { "types": "./dist/dither.d.ts", "import": "./dist/dither.js" },
     "./button-variants": { "types": "./dist/button-variants.d.ts", "import": "./dist/button-variants.js" },
     "./tokens.css": "./dist/tokens.css",
     "./styles.css": "./dist/styles.css",
