@@ -4,7 +4,10 @@
   "private": true,
   "type": "module",
   "license": "MIT",
-  "workspaces": ["packages/*"],
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
     "build": "node scripts/build.mjs",
     "typecheck": "tsc --noEmit",

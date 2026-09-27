@@ -10,11 +10,13 @@ function target(path: string) {
     .replace("registry/server/", "lib/mcp-server/");
 }
 async function dependencySpec(packageName: string, version: string) {
-  if (!version.startsWith("file:")) return `${packageName}@${version}`;
+  if (!version.startsWith("workspace:")) return `${packageName}@${version}`;
+  // Workspace packages publish to npm under their own version.
+  const dir = packageName.replace("@fabrials/", "");
   const manifest = JSON.parse(
-    await readFile(`${version.slice("file:".length)}/package.json`, "utf8"),
-  ) as { version?: string };
-  return `${packageName}@${manifest.version ?? version}`;
+    await readFile(`../../packages/${dir}/package.json`, "utf8"),
+  ) as { version: string };
+  return `${packageName}@^${manifest.version}`;
 }
 await mkdir("public/r", { recursive: true });
 const items = [];

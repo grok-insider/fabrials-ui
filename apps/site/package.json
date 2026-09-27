@@ -1,5 +1,5 @@
 {
-  "name": "fabrials-webmcp",
+  "name": "@fabrials/site",
   "version": "0.1.0",
   "private": true,
   "license": "MIT",
@@ -22,8 +22,8 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
-    "@fabrials/ai-ui": "file:vendor/fabrials-ai-ui-0.5.0",
-    "@fabrials/ui": "file:vendor/fabrials-ui-0.5.0",
+    "@fabrials/ai-ui": "workspace:*",
+    "@fabrials/ui": "workspace:*",
     "@modelcontextprotocol/client": "2.0.0",
     "@modelcontextprotocol/server": "2.0.0",
     "ajv": "^8.20.0",
@@ -74,10 +74,6 @@
     "typescript": "npm:@typescript/typescript6@^6.0.2",
     "vitest": "^5.0.0",
     "webmcp-types": "^0.1.6"
-  },
-  "packageManager": "bun@1.4.2",
-  "overrides": {
-    "@fabrials/ui": "file:vendor/fabrials-ui-0.5.0"
   },
   "engines": {
     "node": ">=22.19.0",

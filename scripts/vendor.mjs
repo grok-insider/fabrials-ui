@@ -29,7 +29,6 @@ const targets = {
   radiant: resolve(workspace, "radiant/vendor"),
   web: resolve(workspace, "web/vendor"),
   admin: resolve(workspace, "admin/vendor"),
-  "fabrials-webmcp": resolve(workspace, "libs/fabrials-webmcp/vendor"),
   ditox: resolve(workspace, "ditox/gui/vendor"),
   "x-tracker": resolve(workspace, "x-tracker/vendor"),
 };
