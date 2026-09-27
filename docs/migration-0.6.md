@@ -29,3 +29,11 @@ dashboards, first used by X Tracker. A host that stays on 0.5 changes nothing.
 ## New in `@fabrials/ai-ui`
 
 Nothing; the version moves with `@fabrials/ui`.
+
+## 0.6.1
+
+The package index barrels (`@fabrials/ui`, `@fabrials/ai-ui`) no longer carry
+`"use client"`; each component module still does. A client-marked barrel made
+Next.js keep every export in the page bundle, so importing one button shipped
+the charts too (about 800 KB on Radiant's sign-in page). Nothing to change in
+hosts; bundles just get smaller.
