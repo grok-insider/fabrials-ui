@@ -4,6 +4,7 @@ import { readFile } from "node:fs/promises";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import rehypeSlug from "rehype-slug";
+import remarkGfm from "remark-gfm";
 import { getTableOfContents } from "fumadocs-core/content/toc";
 import { Info, Lightbulb } from "lucide-react";
 import {
@@ -331,7 +332,7 @@ export default async function Docs({
         <div className="docs-prose">
           <MDXRemote
             source={mdx}
-            options={{ mdxOptions: { rehypePlugins: [rehypeSlug], format: designDoc ? "md" : "mdx" } }}
+            options={{ mdxOptions: { remarkPlugins: [remarkGfm], rehypePlugins: [rehypeSlug], format: designDoc ? "md" : "mdx" } }}
             components={mdxComponents}
           />
         </div>
