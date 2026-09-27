@@ -12,7 +12,10 @@
     "ajv@^8.20.0",
     "lucide-react@^1.41.0"
   ],
-  "registryDependencies": [],
+  "registryDependencies": [
+    "https://ui.fabrials.com/r/styles.json",
+    "utils"
+  ],
   "files": [
     {
       "path": "registry/mcp/types.ts",
@@ -92,5 +95,11 @@
       "target": "components/webmcp/mcp-dashboard.tsx",
       "content": "\"use client\";\nimport type { JsonSchema } from \"@/lib/mcp/types\";\nimport { useState } from \"react\";\nimport { Tabs, TabsContent, TabsList, TabsTrigger } from \"@fabrials/ui\";\nimport { MCPProvider, useMCPClient } from \"@/lib/mcp/provider\";\nimport { ConnectionPanel } from \"@/components/webmcp/connection-panel\";\nimport { ToolCatalog, ToolDetail } from \"@/components/webmcp/tool-catalog\";\nimport { ExecutionLog } from \"@/components/webmcp/execution-log\";\nimport { ElicitationDialog } from \"@/components/webmcp/elicitation-dialog\";\nimport {\n  ResourceExplorer,\n  PromptCatalog,\n} from \"@/components/webmcp/resource-explorer\";\nexport function MCPDashboardContent({\n  defaultEndpoint,\n}: {\n  defaultEndpoint?: string;\n}) {\n  const mcp = useMCPClient();\n  const [selected, setSelected] = useState(\"\");\n  const tools = mcp.tools.map((t) => ({\n    ...t,\n    inputSchema: t.inputSchema as JsonSchema,\n  }));\n  const tool = tools.find((t) => t.name === selected) ?? tools[0];\n  return (\n    <div className=\"space-y-8\">\n      <ConnectionPanel\n        status={mcp.status}\n        error={mcp.error}\n        protocol={mcp.protocol}\n        onConnect={mcp.connect}\n        onDisconnect={mcp.disconnect}\n        defaultEndpoint={defaultEndpoint}\n      />\n      {mcp.status === \"connected\" && (\n        <>\n          <Tabs defaultValue=\"tools\">\n            <TabsList>\n              <TabsTrigger value=\"tools\">\n                Tools ({mcp.tools.length})\n              </TabsTrigger>\n              <TabsTrigger value=\"resources\">Resources</TabsTrigger>\n              <TabsTrigger value=\"prompts\">Prompts</TabsTrigger>\n            </TabsList>\n            <TabsContent value=\"tools\" className=\"mt-5\">\n              <div className=\"grid gap-6 md:grid-cols-2\">\n                <ToolCatalog\n                  tools={tools}\n                  selected={tool?.name}\n                  onSelect={(t) => setSelected(t.name)}\n                />\n                {tool ? (\n                  <div className=\"rounded-lg border p-5\">\n                    <ToolDetail\n                      key={tool.name}\n                      tool={tool}\n                      onRun={(args) => mcp.run(tool.name, args)}\n                    />\n                  </div>\n                ) : (\n                  <p className=\"text-sm text-muted-foreground\">\n                    This server has no tools.\n                  </p>\n                )}\n              </div>\n            </TabsContent>\n            <TabsContent value=\"resources\" className=\"mt-5\">\n              <ResourceExplorer\n                resources={mcp.resources}\n                templates={mcp.templates}\n                onRead={mcp.readResource}\n              />\n            </TabsContent>\n            <TabsContent value=\"prompts\" className=\"mt-5\">\n              <PromptCatalog prompts={mcp.prompts} onGet={mcp.getPrompt} />\n            </TabsContent>\n          </Tabs>\n          <ExecutionLog\n            executions={mcp.executions}\n            onCancel={mcp.cancel}\n            onClear={mcp.clearHistory}\n          />\n        </>\n      )}\n      <ElicitationDialog request={mcp.elicitations[0]} />\n    </div>\n  );\n}\nexport function MCPDashboard(props: { defaultEndpoint?: string }) {\n  return (\n    <MCPProvider>\n      <MCPDashboardContent {...props} />\n    </MCPProvider>\n  );\n}\n"
     }
-  ]
+  ],
+  "meta": {
+    "source": "fabrials",
+    "tier": "fabrials",
+    "license": "MIT",
+    "category": "MCP"
+  }
 }

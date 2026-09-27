@@ -1,0 +1,28 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "button",
+  "type": "registry:ui",
+  "title": "Button",
+  "description": "shadcn's button, backed by @fabrials/ui. The action control. One primary action per task, with quiet alternatives.",
+  "author": "Fabrials <admin@grokinsider.net>",
+  "dependencies": [
+    "@fabrials/ui@^0.7.0"
+  ],
+  "registryDependencies": [
+    "https://ui.fabrials.com/r/styles.json"
+  ],
+  "files": [
+    {
+      "path": "registry/shims/button.tsx",
+      "type": "registry:ui",
+      "content": "// Fabrials UI shim for shadcn's button: https://ui.fabrials.com/docs/shims\n// The names match shadcn; the control is @fabrials/ui's. Import from\n// \"@fabrials/ui\" directly in new code.\nexport { Button, buttonVariants } from \"@fabrials/ui\";\n"
+    }
+  ],
+  "meta": {
+    "source": "shim",
+    "tier": "fabrials",
+    "license": "MIT",
+    "category": "Shims",
+    "shadcn": "button"
+  }
+}

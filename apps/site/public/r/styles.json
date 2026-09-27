@@ -1,0 +1,24 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "styles",
+  "type": "registry:item",
+  "title": "Fabrials styles",
+  "description": "Installs @fabrials/ui and imports its tokens, IBM Plex and component styles. Every Fabrials block and shim depends on it.",
+  "dependencies": [
+    "@fabrials/ui@^0.7.0"
+  ],
+  "registryDependencies": [],
+  "files": [],
+  "css": {
+    "@import \"@fabrials/ui/tokens.css\"": {},
+    "@import \"@fabrials/ui/fonts.css\"": {},
+    "@import \"@fabrials/ui/styles.css\"": {},
+    "@import \"@fabrials/ui/tailwind.css\"": {}
+  },
+  "meta": {
+    "source": "fabrials",
+    "tier": "fabrials",
+    "license": "MIT",
+    "category": "Setup"
+  }
+}

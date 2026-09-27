@@ -94,6 +94,17 @@ export function dependenciesOf(item: RegistryItemJson): { name: string; spec: st
     .map((name) => ({ name, spec: declared.get(name) ?? "latest", declared: declared.has(name) }));
 }
 
+/** shadcn primitives the files import (`@/components/ui/<name>`), declared or not. */
+export function primitivesOf(item: RegistryItemJson): string[] {
+  const names = new Set<string>();
+  for (const file of item.files)
+    for (const specifier of importsOf(file.content)) {
+      const match = /^@\/components\/ui\/([\w-]+)$/.exec(specifier);
+      if (match) names.add(match[1]!);
+    }
+  return [...names].sort();
+}
+
 /** Where a registry dependency points, from one upstream's point of view. */
 export function classifyRegistryDependency(
   dependency: string,
@@ -148,7 +159,10 @@ export function publishExternalItem(
   licenseText: string,
   { origin, shims }: { origin: string; shims: Set<string> },
 ) {
-  const registryDependencies = (raw.registryDependencies ?? []).map((dependency) => {
+  // Upstreams sometimes import a primitive without declaring it; install what the code uses.
+  const declared = raw.registryDependencies ?? [];
+  const undeclared = primitivesOf(raw).filter((name) => !declared.includes(name));
+  const registryDependencies = [...declared, ...undeclared].map((dependency) => {
     const target = classifyRegistryDependency(dependency, snapshot);
     if (target.kind === "same") return `${origin}/r/${externalSlug(snapshot.name, target.name)}.json`;
     if (target.kind === "shadcn") return shims.has(target.name) ? `${origin}/r/${target.name}.json` : target.name;

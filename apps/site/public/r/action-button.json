@@ -9,7 +9,9 @@
     "@fabrials/ui@^0.7.0",
     "lucide-react@^1.41.0"
   ],
-  "registryDependencies": [],
+  "registryDependencies": [
+    "https://ui.fabrials.com/r/styles.json"
+  ],
   "files": [
     {
       "path": "registry/mcp/types.ts",
@@ -23,5 +25,11 @@
       "target": "components/webmcp/action-button.tsx",
       "content": "\"use client\";\nimport { useRef, useState, type ReactNode } from \"react\";\nimport { Loader2 } from \"lucide-react\";\nimport { Button } from \"@fabrials/ui\";\nimport { errorMessage } from \"@/lib/mcp/types\";\nexport function ActionButton({\n  action,\n  children,\n  disabled = false,\n}: {\n  action: () => unknown | Promise<unknown>;\n  children: ReactNode;\n  disabled?: boolean;\n}) {\n  const busy = useRef(false);\n  const [pending, setPending] = useState(false);\n  const [error, setError] = useState(\"\");\n  return (\n    <div className=\"space-y-2\">\n      <Button\n        disabled={disabled || pending}\n        aria-busy={pending}\n        onClick={async () => {\n          if (busy.current) return;\n          busy.current = true;\n          setPending(true);\n          setError(\"\");\n          try {\n            await action();\n          } catch (e) {\n            setError(errorMessage(e));\n          } finally {\n            setPending(false);\n            busy.current = false;\n          }\n        }}\n      >\n        {pending && (\n          <Loader2 className=\"size-4 animate-spin motion-reduce:animate-none\" />\n        )}\n        {children}\n      </Button>\n      {error && (\n        <p role=\"alert\" className=\"text-sm text-destructive\">\n          {error}\n        </p>\n      )}\n    </div>\n  );\n}\n"
     }
-  ]
+  ],
+  "meta": {
+    "source": "fabrials",
+    "tier": "fabrials",
+    "license": "MIT",
+    "category": "Interaction"
+  }
 }

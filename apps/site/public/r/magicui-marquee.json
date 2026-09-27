@@ -1,0 +1,56 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "magicui-marquee",
+  "type": "registry:ui",
+  "title": "Marquee",
+  "description": "An infinite scrolling component that can be used to display text, images, or videos.",
+  "author": "Magic UI (https://github.com/magicuidesign/magicui)",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/magicui/marquee.tsx",
+      "content": "/*\n * Marquee from Magic UI (https://magicui.design), MIT.\n * Distributed unchanged by ui.fabrials.com under the same license.\n *\n * MIT License\n *\n * Copyright (c) Magic UI\n *\n * Permission is hereby granted, free of charge, to any person obtaining a copy\n * of this software and associated documentation files (the \"Software\"), to deal\n * in the Software without restriction, including without limitation the rights\n * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n * copies of the Software, and to permit persons to whom the Software is\n * furnished to do so, subject to the following conditions:\n *\n * The above copyright notice and this permission notice shall be included in all\n * copies or substantial portions of the Software.\n *\n * THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n * SOFTWARE.\n */\nimport { type ComponentPropsWithoutRef } from \"react\"\n\nimport { cn } from \"@/lib/utils\"\n\ninterface MarqueeProps extends ComponentPropsWithoutRef<\"div\"> {\n  /**\n   * Optional CSS class name to apply custom styles\n   */\n  className?: string\n  /**\n   * Whether to reverse the animation direction\n   * @default false\n   */\n  reverse?: boolean\n  /**\n   * Whether to pause the animation on hover\n   * @default false\n   */\n  pauseOnHover?: boolean\n  /**\n   * Content to be displayed in the marquee\n   */\n  children: React.ReactNode\n  /**\n   * Whether to animate vertically instead of horizontally\n   * @default false\n   */\n  vertical?: boolean\n  /**\n   * Number of times to repeat the content\n   * @default 4\n   */\n  repeat?: number\n}\n\nexport function Marquee({\n  className,\n  reverse = false,\n  pauseOnHover = false,\n  children,\n  vertical = false,\n  repeat = 4,\n  ...props\n}: MarqueeProps) {\n  return (\n    <div\n      {...props}\n      className={cn(\n        \"group flex gap-(--gap) overflow-hidden p-2 [--duration:40s] [--gap:1rem]\",\n        {\n          \"flex-row\": !vertical,\n          \"flex-col\": vertical,\n        },\n        className\n      )}\n    >\n      {Array(repeat)\n        .fill(0)\n        .map((_, i) => (\n          <div\n            key={i}\n            className={cn(\"flex shrink-0 justify-around gap-(--gap)\", {\n              \"animate-marquee flex-row\": !vertical,\n              \"animate-marquee-vertical flex-col\": vertical,\n              \"group-hover:[animation-play-state:paused]\": pauseOnHover,\n              \"[animation-direction:reverse]\": reverse,\n            })}\n          >\n            {children}\n          </div>\n        ))}\n    </div>\n  )\n}\n",
+      "type": "registry:ui"
+    }
+  ],
+  "cssVars": {
+    "theme": {
+      "animate-marquee": "marquee var(--duration) infinite linear",
+      "animate-marquee-vertical": "marquee-vertical var(--duration) linear infinite"
+    }
+  },
+  "css": {
+    "@keyframes marquee": {
+      "from": {
+        "transform": "translateX(0)"
+      },
+      "to": {
+        "transform": "translateX(calc(-100% - var(--gap)))"
+      }
+    },
+    "@keyframes marquee-vertical": {
+      "from": {
+        "transform": "translateY(0)"
+      },
+      "to": {
+        "transform": "translateY(calc(-100% - var(--gap)))"
+      }
+    }
+  },
+  "meta": {
+    "source": "external",
+    "tier": "community",
+    "library": "magicui",
+    "libraryTitle": "Magic UI",
+    "license": "MIT",
+    "upstream": "https://magicui.design/r/marquee.json",
+    "repository": "https://github.com/magicuidesign/magicui",
+    "commit": "d7207e5692d14c00dceafa8488d6d01f197fa0e4",
+    "sha256": "6378d12f6ac7b383bcbe25cbfcd21ad567d4726ff9979bf07991598a7bdef1ce",
+    "conformance": [
+      "continuous-motion",
+      "ignores-reduced-motion"
+    ]
+  }
+}

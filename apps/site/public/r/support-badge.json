@@ -8,7 +8,9 @@
   "dependencies": [
     "@fabrials/ui@^0.7.0"
   ],
-  "registryDependencies": [],
+  "registryDependencies": [
+    "https://ui.fabrials.com/r/styles.json"
+  ],
   "files": [
     {
       "path": "registry/mcp/types.ts",
@@ -22,5 +24,11 @@
       "target": "components/webmcp/support-badge.tsx",
       "content": "import { Badge } from \"@fabrials/ui\";\nimport type { Support } from \"@/lib/mcp/types\";\nexport function SupportBadge({\n  support,\n  error,\n}: {\n  support: Support;\n  error?: string;\n}) {\n  const labels: Record<Support, string> = {\n    checking: \"Checking browser…\",\n    native: \"WebMCP available\",\n    legacy: \"WebMCP · legacy API\",\n    unsupported: \"Native WebMCP unavailable\",\n  };\n  const tone =\n    support === \"native\" || support === \"legacy\"\n      ? \"success\"\n      : support === \"unsupported\"\n        ? \"warning\"\n        : \"neutral\";\n  return (\n    <div className=\"space-y-2\">\n      <Badge variant=\"outline\" tone={tone} dot role=\"status\">\n        {labels[support]}\n      </Badge>\n      {error && (\n        <p role=\"alert\" className=\"text-xs text-destructive\">\n          {error}\n        </p>\n      )}\n    </div>\n  );\n}\n"
     }
-  ]
+  ],
+  "meta": {
+    "source": "fabrials",
+    "tier": "fabrials",
+    "license": "MIT",
+    "category": "WebMCP"
+  }
 }

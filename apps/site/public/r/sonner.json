@@ -1,0 +1,28 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "sonner",
+  "type": "registry:ui",
+  "title": "Sonner",
+  "description": "shadcn's sonner, backed by @fabrials/ui.",
+  "author": "Fabrials <admin@grokinsider.net>",
+  "dependencies": [
+    "@fabrials/ui@^0.7.0"
+  ],
+  "registryDependencies": [
+    "https://ui.fabrials.com/r/styles.json"
+  ],
+  "files": [
+    {
+      "path": "registry/shims/sonner.tsx",
+      "type": "registry:ui",
+      "content": "// Fabrials UI shim for shadcn's sonner: https://ui.fabrials.com/docs/shims\n// The names match shadcn; the control is @fabrials/ui's. Import from\n// \"@fabrials/ui\" directly in new code.\nexport { Toaster } from \"@fabrials/ui\";\n"
+    }
+  ],
+  "meta": {
+    "source": "shim",
+    "tier": "fabrials",
+    "license": "MIT",
+    "category": "Shims",
+    "shadcn": "sonner"
+  }
+}

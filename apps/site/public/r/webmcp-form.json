@@ -20,5 +20,11 @@
       "target": "lib/webmcp/form.tsx",
       "content": "\"use client\";\nimport { useRef, useState, type ComponentProps, type FormEvent } from \"react\";\nimport { errorMessage } from \"@/lib/mcp/types\";\ntype AgentSubmit = SubmitEvent & {\n  agentInvoked?: boolean;\n  respondWith?: (value: Promise<unknown>) => void;\n};\nexport function WebMCPForm({\n  toolName,\n  toolDescription,\n  autoSubmit = false,\n  onExecute,\n  children,\n  ...props\n}: Omit<ComponentProps<\"form\">, \"onSubmit\"> & {\n  toolName: string;\n  toolDescription: string;\n  autoSubmit?: boolean;\n  onExecute: (\n    data: FormData,\n    context: { agentInvoked: boolean },\n  ) => Promise<unknown>;\n}) {\n  const [error, setError] = useState(\"\");\n  const [pending, setPending] = useState(false);\n  const busy = useRef(false);\n  function submit(event: FormEvent<HTMLFormElement>) {\n    event.preventDefault();\n    const native = event.nativeEvent as AgentSubmit;\n    if (busy.current) {\n      if (native.agentInvoked)\n        native.respondWith?.(\n          Promise.resolve({ error: \"A submission is already running.\" }),\n        );\n      return;\n    }\n    busy.current = true;\n    setPending(true);\n    setError(\"\");\n    const data = new FormData(event.currentTarget, native.submitter);\n    const response = Promise.resolve()\n      .then(() =>\n        onExecute(data, { agentInvoked: native.agentInvoked === true }),\n      )\n      .catch((e) => {\n        setError(errorMessage(e));\n        return { error: errorMessage(e) };\n      })\n      .finally(() => {\n        busy.current = false;\n        setPending(false);\n      });\n    if (native.agentInvoked) native.respondWith?.(response);\n  }\n  return (\n    <form\n      {...props}\n      {...{\n        toolname: toolName,\n        tooldescription: toolDescription,\n        ...(autoSubmit ? { toolautosubmit: \"\" } : {}),\n      }}\n      onSubmit={submit}\n      aria-busy={pending}\n    >\n      {children}\n      {error && (\n        <p role=\"alert\" className=\"text-sm text-destructive\">\n          {error}\n        </p>\n      )}\n    </form>\n  );\n}\nexport function toolField(description: string) {\n  return { toolparamdescription: description };\n}\n"
     }
-  ]
+  ],
+  "meta": {
+    "source": "fabrials",
+    "tier": "fabrials",
+    "license": "MIT",
+    "category": "WebMCP"
+  }
 }

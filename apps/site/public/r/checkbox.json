@@ -1,0 +1,28 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "checkbox",
+  "type": "registry:ui",
+  "title": "Checkbox",
+  "description": "shadcn's checkbox, backed by @fabrials/ui. A binary choice that can sit in a form or a selection list.",
+  "author": "Fabrials <admin@grokinsider.net>",
+  "dependencies": [
+    "@fabrials/ui@^0.7.0"
+  ],
+  "registryDependencies": [
+    "https://ui.fabrials.com/r/styles.json"
+  ],
+  "files": [
+    {
+      "path": "registry/shims/checkbox.tsx",
+      "type": "registry:ui",
+      "content": "// Fabrials UI shim for shadcn's checkbox: https://ui.fabrials.com/docs/shims\n// The names match shadcn; the control is @fabrials/ui's. Import from\n// \"@fabrials/ui\" directly in new code.\nexport { Checkbox } from \"@fabrials/ui\";\n"
+    }
+  ],
+  "meta": {
+    "source": "shim",
+    "tier": "fabrials",
+    "license": "MIT",
+    "category": "Shims",
+    "shadcn": "checkbox"
+  }
+}

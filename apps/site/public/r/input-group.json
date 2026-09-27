@@ -1,0 +1,28 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "input-group",
+  "type": "registry:ui",
+  "title": "Input group",
+  "description": "shadcn's input-group, backed by @fabrials/ui. A field with an addon or an action attached to it.",
+  "author": "Fabrials <admin@grokinsider.net>",
+  "dependencies": [
+    "@fabrials/ui@^0.7.0"
+  ],
+  "registryDependencies": [
+    "https://ui.fabrials.com/r/styles.json"
+  ],
+  "files": [
+    {
+      "path": "registry/shims/input-group.tsx",
+      "type": "registry:ui",
+      "content": "// Fabrials UI shim for shadcn's input-group: https://ui.fabrials.com/docs/shims\n// The names match shadcn; the control is @fabrials/ui's. Import from\n// \"@fabrials/ui\" directly in new code.\nexport { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput, InputGroupText, InputGroupTextarea } from \"@fabrials/ui\";\n"
+    }
+  ],
+  "meta": {
+    "source": "shim",
+    "tier": "fabrials",
+    "license": "MIT",
+    "category": "Shims",
+    "shadcn": "input-group"
+  }
+}

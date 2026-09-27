@@ -1,56 +1,115 @@
-# Fabrials WebMCP UI
+# Fabrials UI
 
-React 19 / Tailwind 4 / shadcn Base UI registry. MIT.
-MCP target: 2026-07-28. WebMCP is a browser proposal, distinct from remote MCP.
+The Fabrials design system as a shadcn registry: Fabrials' own components, shims that back shadcn primitives with @fabrials/ui, and components from other open-source libraries under permissive licenses, each labelled with its license and origin.
+React 19, Tailwind 4, Base UI. MCP target 2026-07-28; WebMCP is a browser proposal, distinct from remote MCP.
 
-Browse the [component catalog](https://ui.fabrials.com/components) or explore [complete examples](https://ui.fabrials.com/playground).
+## Set up
+Namespace: add "registries": { "@fabrials": "https://ui.fabrials.com/r/{name}.json" } to components.json, then npx shadcn@latest add @fabrials/<name>.
+- New app: npx shadcn@latest init https://ui.fabrials.com/r/init.json
+- Existing app: npx shadcn@latest add https://ui.fabrials.com/r/init.json (palette and styles) or https://ui.fabrials.com/r/styles.json (styles only)
+- Design principles: https://ui.fabrials.com/docs/design
 
-## Components
+## Fabrials components
 - [Comparison](https://ui.fabrials.com/docs/comparison): Show choices side by side and highlight the evidence behind a recommendation.
-  Install: bunx shadcn@latest add https://ui.fabrials.com/r/comparison.json
+  Install: npx shadcn@latest add https://ui.fabrials.com/r/comparison.json
 - [WebMCP provider](https://ui.fabrials.com/docs/webmcp-provider): Give your interface a shared home for tools, state and agent activity.
-  Install: bunx shadcn@latest add https://ui.fabrials.com/r/webmcp-provider.json
+  Install: npx shadcn@latest add https://ui.fabrials.com/r/webmcp-provider.json
 - [Agent-ready form](https://ui.fabrials.com/docs/webmcp-form): Semantic forms that people and browser agents can fill together.
-  Install: bunx shadcn@latest add https://ui.fabrials.com/r/webmcp-form.json
+  Install: npx shadcn@latest add https://ui.fabrials.com/r/webmcp-form.json
 - [Browser support](https://ui.fabrials.com/docs/support-badge): Show native support, legacy compatibility or manual mode.
-  Install: bunx shadcn@latest add https://ui.fabrials.com/r/support-badge.json
+  Install: npx shadcn@latest add https://ui.fabrials.com/r/support-badge.json
 - [Action button](https://ui.fabrials.com/docs/action-button): A single action with pending, error and duplicate-click handling.
-  Install: bunx shadcn@latest add https://ui.fabrials.com/r/action-button.json
+  Install: npx shadcn@latest add https://ui.fabrials.com/r/action-button.json
 - [Arguments form](https://ui.fabrials.com/docs/arguments-form): Turn a tool schema into a usable form, with a JSON escape hatch.
-  Install: bunx shadcn@latest add https://ui.fabrials.com/r/arguments-form.json
+  Install: npx shadcn@latest add https://ui.fabrials.com/r/arguments-form.json
 - [Data explorer](https://ui.fabrials.com/docs/data-explorer): Search, filter, sort and select records with one shared state.
-  Install: bunx shadcn@latest add https://ui.fabrials.com/r/data-explorer.json
+  Install: npx shadcn@latest add https://ui.fabrials.com/r/data-explorer.json
 - [Date range](https://ui.fabrials.com/docs/date-range): Native date fields and an accessible calendar, working in tandem.
-  Install: bunx shadcn@latest add https://ui.fabrials.com/r/date-range.json
+  Install: npx shadcn@latest add https://ui.fabrials.com/r/date-range.json
 - [Multi-step flow](https://ui.fabrials.com/docs/wizard): Guide a shared human-agent workflow through review and completion.
-  Install: bunx shadcn@latest add https://ui.fabrials.com/r/wizard.json
+  Install: npx shadcn@latest add https://ui.fabrials.com/r/wizard.json
 - [Confirmation](https://ui.fabrials.com/docs/confirmation-dialog): Give an action a clear review point before it runs.
-  Install: bunx shadcn@latest add https://ui.fabrials.com/r/confirmation-dialog.json
+  Install: npx shadcn@latest add https://ui.fabrials.com/r/confirmation-dialog.json
 - [MCP client](https://ui.fabrials.com/docs/mcp-client): Connect to the current protocol, with isolated legacy compatibility.
-  Install: bunx shadcn@latest add https://ui.fabrials.com/r/mcp-client.json
+  Install: npx shadcn@latest add https://ui.fabrials.com/r/mcp-client.json
 - [Connection panel](https://ui.fabrials.com/docs/connection-panel): An endpoint, an auth method, and a clear connection state.
-  Install: bunx shadcn@latest add https://ui.fabrials.com/r/connection-panel.json
+  Install: npx shadcn@latest add https://ui.fabrials.com/r/connection-panel.json
 - [Tool catalog](https://ui.fabrials.com/docs/tool-catalog): Make tool discovery readable, searchable and keyboard accessible.
-  Install: bunx shadcn@latest add https://ui.fabrials.com/r/tool-catalog.json
+  Install: npx shadcn@latest add https://ui.fabrials.com/r/tool-catalog.json
 - [Tool detail](https://ui.fabrials.com/docs/tool-detail): A tool description, its arguments, and the action in one place.
-  Install: bunx shadcn@latest add https://ui.fabrials.com/r/tool-detail.json
+  Install: npx shadcn@latest add https://ui.fabrials.com/r/tool-detail.json
 - [Result viewer](https://ui.fabrials.com/docs/result-view): Readable text, structured content and media, with raw data one click away.
-  Install: bunx shadcn@latest add https://ui.fabrials.com/r/result-view.json
+  Install: npx shadcn@latest add https://ui.fabrials.com/r/result-view.json
 - [Execution history](https://ui.fabrials.com/docs/execution-log): Follow progress, inspect results, and cancel outstanding requests.
-  Install: bunx shadcn@latest add https://ui.fabrials.com/r/execution-log.json
+  Install: npx shadcn@latest add https://ui.fabrials.com/r/execution-log.json
 - [Elicitation](https://ui.fabrials.com/docs/elicitation-dialog): Answer the server when a tool needs another piece of information.
-  Install: bunx shadcn@latest add https://ui.fabrials.com/r/elicitation-dialog.json
+  Install: npx shadcn@latest add https://ui.fabrials.com/r/elicitation-dialog.json
 - [Resources & prompts](https://ui.fabrials.com/docs/resource-explorer): Read resources, resolve templates, and fill reusable prompts.
-  Install: bunx shadcn@latest add https://ui.fabrials.com/r/resource-explorer.json
+  Install: npx shadcn@latest add https://ui.fabrials.com/r/resource-explorer.json
 - [MCP dashboard](https://ui.fabrials.com/docs/mcp-dashboard): A complete working console, composed from the registry.
-  Install: bunx shadcn@latest add https://ui.fabrials.com/r/mcp-dashboard.json
+  Install: npx shadcn@latest add https://ui.fabrials.com/r/mcp-dashboard.json
 - [Server connector](https://ui.fabrials.com/docs/server-connector): An optional Node bridge for private credentials and endpoints without CORS.
-  Install: bunx shadcn@latest add https://ui.fabrials.com/r/server-connector.json
+  Install: npx shadcn@latest add https://ui.fabrials.com/r/server-connector.json
+
+## Shims (shadcn names, @fabrials/ui controls)
+- accordion: npx shadcn@latest add https://ui.fabrials.com/r/accordion.json
+- alert: npx shadcn@latest add https://ui.fabrials.com/r/alert.json
+- breadcrumb: npx shadcn@latest add https://ui.fabrials.com/r/breadcrumb.json
+- button: npx shadcn@latest add https://ui.fabrials.com/r/button.json
+- button-group: npx shadcn@latest add https://ui.fabrials.com/r/button-group.json
+- card: npx shadcn@latest add https://ui.fabrials.com/r/card.json
+- carousel: npx shadcn@latest add https://ui.fabrials.com/r/carousel.json
+- checkbox: npx shadcn@latest add https://ui.fabrials.com/r/checkbox.json
+- collapsible: npx shadcn@latest add https://ui.fabrials.com/r/collapsible.json
+- command: npx shadcn@latest add https://ui.fabrials.com/r/command.json
+- hover-card: npx shadcn@latest add https://ui.fabrials.com/r/hover-card.json
+- input: npx shadcn@latest add https://ui.fabrials.com/r/input.json
+- input-group: npx shadcn@latest add https://ui.fabrials.com/r/input-group.json
+- label: npx shadcn@latest add https://ui.fabrials.com/r/label.json
+- navigation-menu: npx shadcn@latest add https://ui.fabrials.com/r/navigation-menu.json
+- pagination: npx shadcn@latest add https://ui.fabrials.com/r/pagination.json
+- popover: npx shadcn@latest add https://ui.fabrials.com/r/popover.json
+- scroll-area: npx shadcn@latest add https://ui.fabrials.com/r/scroll-area.json
+- separator: npx shadcn@latest add https://ui.fabrials.com/r/separator.json
+- sidebar: npx shadcn@latest add https://ui.fabrials.com/r/sidebar.json
+- skeleton: npx shadcn@latest add https://ui.fabrials.com/r/skeleton.json
+- sonner: npx shadcn@latest add https://ui.fabrials.com/r/sonner.json
+- spinner: npx shadcn@latest add https://ui.fabrials.com/r/spinner.json
+- switch: npx shadcn@latest add https://ui.fabrials.com/r/switch.json
+- table: npx shadcn@latest add https://ui.fabrials.com/r/table.json
+- textarea: npx shadcn@latest add https://ui.fabrials.com/r/textarea.json
+- toggle-group: npx shadcn@latest add https://ui.fabrials.com/r/toggle-group.json
+- tooltip: npx shadcn@latest add https://ui.fabrials.com/r/tooltip.json
+
+## From other libraries
+### Kibo UI (MIT, community) https://www.kibo-ui.com
+- [Contribution Graph](https://ui.fabrials.com/docs/kibo-contribution-graph): A GitHub-style contribution graph component that displays activity levels over time.
+  Install: npx shadcn@latest add https://ui.fabrials.com/r/kibo-contribution-graph.json
+- [Dropzone](https://ui.fabrials.com/docs/kibo-dropzone): Allows users to drag-and-drop files into a container to upload or process them.
+  Install: npx shadcn@latest add https://ui.fabrials.com/r/kibo-dropzone.json
+- [Kanban](https://ui.fabrials.com/docs/kibo-kanban): A kanban board is a visual tool that helps you manage and visualize your work. It is a board with columns, and each column represents a status, e.g. "Backlog", "In Progress", "Done".
+  Install: npx shadcn@latest add https://ui.fabrials.com/r/kibo-kanban.json
+- [Rating](https://ui.fabrials.com/docs/kibo-rating): A star rating component with keyboard navigation and hover effects.
+  Install: npx shadcn@latest add https://ui.fabrials.com/r/kibo-rating.json
+
+### Magic UI (MIT, community) https://magicui.design
+- [Animated List](https://ui.fabrials.com/docs/magicui-animated-list): A list that animates each item in sequence with a delay. Used to showcase notifications or events on your landing page.
+  Install: npx shadcn@latest add https://ui.fabrials.com/r/magicui-animated-list.json
+- [Dot Pattern](https://ui.fabrials.com/docs/magicui-dot-pattern): A background dot pattern made with SVGs, fully customizable using Tailwind CSS.
+  Install: npx shadcn@latest add https://ui.fabrials.com/r/magicui-dot-pattern.json
+- [File Tree](https://ui.fabrials.com/docs/magicui-file-tree): A component used to showcase the folder and file structure of a directory.
+  Install: npx shadcn@latest add https://ui.fabrials.com/r/magicui-file-tree.json
+- [Marquee](https://ui.fabrials.com/docs/magicui-marquee): An infinite scrolling component that can be used to display text, images, or videos.
+  Install: npx shadcn@latest add https://ui.fabrials.com/r/magicui-marquee.json
+- [Terminal](https://ui.fabrials.com/docs/magicui-terminal): A terminal component
+  Install: npx shadcn@latest add https://ui.fabrials.com/r/magicui-terminal.json
 
 ## Guides
+- https://ui.fabrials.com/docs/introduction
 - https://ui.fabrials.com/docs/installation
 - https://ui.fabrials.com/docs/webmcp
 - https://ui.fabrials.com/docs/interactive-demo
 - https://ui.fabrials.com/docs/authentication
 - https://ui.fabrials.com/docs/server
 - https://ui.fabrials.com/docs/compatibility
+- https://ui.fabrials.com/libraries

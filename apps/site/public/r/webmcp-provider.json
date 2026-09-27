@@ -35,5 +35,11 @@
       "target": "lib/webmcp/provider.tsx",
       "content": "\"use client\";\nimport {\n  createContext,\n  useContext,\n  useEffect,\n  useRef,\n  useState,\n  useSyncExternalStore,\n  type ReactNode,\n} from \"react\";\nimport { WebMCPStore } from \"@/lib/webmcp/store\";\nimport type { WebTool } from \"@/lib/mcp/types\";\nconst Context = createContext<WebMCPStore | null>(null);\nexport function WebMCPProvider({ children }: { children: ReactNode }) {\n  const [store] = useState(() => new WebMCPStore());\n  useEffect(() => store.detect(), [store]);\n  return <Context.Provider value={store}>{children}</Context.Provider>;\n}\nexport function useWebMCP() {\n  const store = useContext(Context);\n  if (!store) throw new Error(\"Wrap this component in WebMCPProvider.\");\n  const snapshot = useSyncExternalStore(\n    store.subscribe,\n    store.getSnapshot,\n    store.getSnapshot,\n  );\n  return {\n    ...snapshot,\n    run: store.run.bind(store),\n    cancel: store.cancel,\n    clearHistory: store.clearHistory,\n  };\n}\nexport function useWebMCPTool(tool: WebTool, enabled = true) {\n  const store = useContext(Context);\n  if (!store) throw new Error(\"Wrap this component in WebMCPProvider.\");\n  const latest = useRef(tool.execute);\n  useEffect(() => {\n    latest.current = tool.execute;\n  }, [tool.execute]);\n  const metadata = JSON.stringify({\n    name: tool.name,\n    title: tool.title,\n    description: tool.description,\n    inputSchema: tool.inputSchema,\n    annotations: tool.annotations,\n  });\n  useEffect(() => {\n    if (!enabled) return;\n    return store.register({\n      ...JSON.parse(metadata),\n      execute: (args, context) => latest.current(args, context),\n    });\n  }, [store, metadata, enabled]);\n}\n"
     }
-  ]
+  ],
+  "meta": {
+    "source": "fabrials",
+    "tier": "fabrials",
+    "license": "MIT",
+    "category": "WebMCP"
+  }
 }

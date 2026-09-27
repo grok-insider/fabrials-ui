@@ -8,7 +8,10 @@
   "dependencies": [
     "@fabrials/ui@^0.7.0"
   ],
-  "registryDependencies": [],
+  "registryDependencies": [
+    "https://ui.fabrials.com/r/styles.json",
+    "utils"
+  ],
   "files": [
     {
       "path": "registry/components/result-view.tsx",
@@ -16,5 +19,11 @@
       "target": "components/webmcp/result-view.tsx",
       "content": "\"use client\";\nimport { useState } from \"react\";\nimport { Button } from \"@fabrials/ui\";\nimport { cn } from \"@/lib/utils\";\nexport function safeUrl(value: unknown): string | undefined {\n  if (typeof value !== \"string\") return;\n  try {\n    const url = new URL(value);\n    return [\"https:\", \"http:\"].includes(url.protocol) ? url.href : undefined;\n  } catch {\n    return;\n  }\n}\nfunction Json({ value }: { value: unknown }) {\n  return (\n    <pre className=\"max-h-96 overflow-auto whitespace-pre-wrap break-words rounded-lg bg-muted/70 p-4 font-mono text-xs leading-relaxed\">\n      {JSON.stringify(value, null, 2) ?? String(value)}\n    </pre>\n  );\n}\nfunction Content({ value }: { value: unknown }) {\n  if (!value || typeof value !== \"object\") return <Json value={value} />;\n  const block = value as Record<string, unknown>;\n  if (block.type === \"text\" && typeof block.text === \"string\")\n    return (\n      <p className=\"whitespace-pre-wrap break-words text-sm leading-relaxed\">\n        {block.text}\n      </p>\n    );\n  if (block.type === \"resource_link\" && safeUrl(block.uri))\n    return (\n      <a\n        className=\"text-sm underline underline-offset-4\"\n        href={safeUrl(block.uri)}\n        target=\"_blank\"\n        rel=\"noopener noreferrer\"\n      >\n        {String(block.name ?? block.uri)}\n      </a>\n    );\n  if (\n    block.type === \"resource\" &&\n    block.resource &&\n    typeof block.resource === \"object\"\n  ) {\n    const resource = block.resource as Record<string, unknown>;\n    return typeof resource.text === \"string\" ? (\n      <pre className=\"max-h-80 overflow-auto whitespace-pre-wrap text-xs\">\n        {resource.text}\n      </pre>\n    ) : (\n      <Json value={resource} />\n    );\n  }\n  if (\n    typeof block.data === \"string\" &&\n    block.data.length <= 8_000_000 &&\n    typeof block.mimeType === \"string\"\n  ) {\n    const src = `data:${block.mimeType};base64,${block.data}`;\n    // Only inert raster formats are embedded; remote URLs and SVG are never executed.\n    if (\n      block.type === \"image\" &&\n      /^image\\/(png|jpeg|webp|gif)$/.test(block.mimeType)\n    )\n      return (\n        <picture>\n          <img\n            src={src}\n            alt=\"Tool result\"\n            className=\"max-h-80 max-w-full rounded-md object-contain\"\n          />\n        </picture>\n      );\n    if (\n      block.type === \"audio\" &&\n      /^audio\\/(mpeg|mp3|wav|ogg|webm)$/.test(block.mimeType)\n    )\n      return <audio controls src={src} aria-label=\"Tool audio result\" />;\n  }\n  return <Json value={value} />;\n}\nexport function ResultView({\n  result,\n  className,\n}: {\n  result: unknown;\n  className?: string;\n}) {\n  const [raw, setRaw] = useState(false);\n  const object =\n    result && typeof result === \"object\"\n      ? (result as Record<string, unknown>)\n      : undefined;\n  const content = Array.isArray(object?.content)\n    ? object.content\n    : Array.isArray(object?.contents)\n      ? object.contents\n      : null;\n  return (\n    <div className={cn(\"space-y-3\", className)}>\n      <div className=\"flex items-center justify-between\">\n        <span className=\"text-xs font-medium text-muted-foreground\">\n          Result\n        </span>\n        <Button\n          variant=\"ghost\"\n          size=\"xs\"\n          onClick={() => setRaw(!raw)}\n          aria-pressed={raw}\n        >\n          {raw ? \"Preview\" : \"Raw JSON\"}\n        </Button>\n      </div>\n      {raw ? (\n        <Json value={result} />\n      ) : (\n        <>\n          {content?.map((block, index) => (\n            <Content key={index} value={block} />\n          ))}\n          {object && \"structuredContent\" in object ? (\n            <Json value={object.structuredContent} />\n          ) : (\n            !content && <Json value={result} />\n          )}\n        </>\n      )}\n    </div>\n  );\n}\n"
     }
-  ]
+  ],
+  "meta": {
+    "source": "fabrials",
+    "tier": "fabrials",
+    "license": "MIT",
+    "category": "MCP"
+  }
 }

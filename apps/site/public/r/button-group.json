@@ -1,0 +1,28 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "button-group",
+  "type": "registry:ui",
+  "title": "Button group",
+  "description": "shadcn's button-group, backed by @fabrials/ui. Related actions that belong to one choice.",
+  "author": "Fabrials <admin@grokinsider.net>",
+  "dependencies": [
+    "@fabrials/ui@^0.7.0"
+  ],
+  "registryDependencies": [
+    "https://ui.fabrials.com/r/styles.json"
+  ],
+  "files": [
+    {
+      "path": "registry/shims/button-group.tsx",
+      "type": "registry:ui",
+      "content": "// Fabrials UI shim for shadcn's button-group: https://ui.fabrials.com/docs/shims\n// The names match shadcn; the control is @fabrials/ui's. Import from\n// \"@fabrials/ui\" directly in new code.\nexport { ButtonGroup, ButtonGroupSeparator, ButtonGroupText, buttonGroupVariants } from \"@fabrials/ui\";\n"
+    }
+  ],
+  "meta": {
+    "source": "shim",
+    "tier": "fabrials",
+    "license": "MIT",
+    "category": "Shims",
+    "shadcn": "button-group"
+  }
+}

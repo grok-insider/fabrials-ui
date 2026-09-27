@@ -1,0 +1,28 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "carousel",
+  "type": "registry:ui",
+  "title": "Carousel",
+  "description": "shadcn's carousel, backed by @fabrials/ui. A sideways list of peer items, such as citations.",
+  "author": "Fabrials <admin@grokinsider.net>",
+  "dependencies": [
+    "@fabrials/ui@^0.7.0"
+  ],
+  "registryDependencies": [
+    "https://ui.fabrials.com/r/styles.json"
+  ],
+  "files": [
+    {
+      "path": "registry/shims/carousel.tsx",
+      "type": "registry:ui",
+      "content": "// Fabrials UI shim for shadcn's carousel: https://ui.fabrials.com/docs/shims\n// The names match shadcn; the control is @fabrials/ui's. Import from\n// \"@fabrials/ui\" directly in new code.\nexport { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, useCarousel } from \"@fabrials/ui\";\n"
+    }
+  ],
+  "meta": {
+    "source": "shim",
+    "tier": "fabrials",
+    "license": "MIT",
+    "category": "Shims",
+    "shadcn": "carousel"
+  }
+}

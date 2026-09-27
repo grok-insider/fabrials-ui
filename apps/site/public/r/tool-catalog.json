@@ -11,7 +11,10 @@
     "ajv@^8.20.0",
     "lucide-react@^1.41.0"
   ],
-  "registryDependencies": [],
+  "registryDependencies": [
+    "https://ui.fabrials.com/r/styles.json",
+    "utils"
+  ],
   "files": [
     {
       "path": "registry/mcp/types.ts",
@@ -37,5 +40,11 @@
       "target": "components/webmcp/tool-catalog.tsx",
       "content": "\"use client\";\nimport { useState } from \"react\";\nimport { Search, ArrowUpRight, Braces } from \"lucide-react\";\nimport { Badge, Button, Input } from \"@fabrials/ui\";\nimport { ArgumentsForm } from \"@/components/webmcp/arguments-form\";\nimport type { ToolDefinition } from \"@/lib/mcp/types\";\nimport { cn } from \"@/lib/utils\";\nexport function ToolCatalog({\n  tools,\n  selected,\n  onSelect,\n  className,\n}: {\n  tools: ToolDefinition[];\n  selected?: string;\n  onSelect: (tool: ToolDefinition) => void;\n  className?: string;\n}) {\n  const [query, setQuery] = useState(\"\");\n  const shown = tools.filter((t) =>\n    `${t.name} ${t.description ?? \"\"}`\n      .toLowerCase()\n      .includes(query.toLowerCase()),\n  );\n  return (\n    <div className={cn(\"space-y-4\", className)}>\n      <div className=\"relative\">\n        <Search className=\"pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground\" />\n        <Input\n          aria-label=\"Search tools\"\n          placeholder=\"Search tools…\"\n          value={query}\n          onChange={(e) => setQuery(e.target.value)}\n          className=\"pl-9\"\n        />\n      </div>\n      <div className=\"grid gap-2\">\n        {shown.map((tool) => (\n          <button\n            type=\"button\"\n            key={tool.name}\n            aria-pressed={selected === tool.name}\n            onClick={() => onSelect(tool)}\n            className={cn(\n              \"group flex w-full items-start gap-3 rounded-lg border p-4 text-left transition-colors hover:bg-muted/60 focus-visible:outline-2 focus-visible:outline-ring\",\n              selected === tool.name &&\n                \"border-[var(--brand)] bg-[var(--brand-soft)]\",\n            )}\n          >\n            <Braces className=\"mt-0.5 size-4 shrink-0 text-muted-foreground\" />\n            <span className=\"min-w-0 flex-1\">\n              <span className=\"block text-sm font-medium\">\n                {tool.title ?? tool.name}\n              </span>\n              <span className=\"mt-1 block text-xs leading-relaxed text-muted-foreground\">\n                {tool.description}\n              </span>\n              <span className=\"mt-2 block font-mono text-[10px] text-muted-foreground\">\n                {tool.name}\n              </span>\n            </span>\n            <ArrowUpRight className=\"size-3.5 text-muted-foreground\" />\n          </button>\n        ))}\n      </div>\n      {!shown.length && (\n        <p\n          role=\"status\"\n          className=\"py-6 text-center text-sm text-muted-foreground\"\n        >\n          No matching tools.\n        </p>\n      )}\n    </div>\n  );\n}\nexport function ToolDetail({\n  tool,\n  onRun,\n  disabled,\n}: {\n  tool: ToolDefinition;\n  onRun: (args: Record<string, unknown>) => unknown | Promise<unknown>;\n  disabled?: boolean;\n}) {\n  const [showSchema, setShowSchema] = useState(false);\n  return (\n    <section className=\"space-y-5\">\n      <header className=\"space-y-2\">\n        <div className=\"flex flex-wrap items-center gap-2\">\n          <h3 className=\"font-medium\">{tool.title ?? tool.name}</h3>\n          {tool.annotations?.readOnlyHint && (\n            <Badge variant=\"soft\">Read-only hint</Badge>\n          )}\n        </div>\n        <p className=\"text-sm text-muted-foreground\">{tool.description}</p>\n      </header>\n      <ArgumentsForm\n        key={tool.name}\n        schema={tool.inputSchema}\n        onSubmit={onRun}\n        disabled={disabled}\n      />\n      <Button\n        variant=\"ghost\"\n        size=\"sm\"\n        onClick={() => setShowSchema(!showSchema)}\n        aria-expanded={showSchema}\n      >\n        {showSchema ? \"Hide\" : \"View\"} input schema\n      </Button>\n      {showSchema && (\n        <pre className=\"max-h-64 overflow-auto rounded-md bg-muted p-4 text-xs\">\n          {JSON.stringify(tool.inputSchema, null, 2)}\n        </pre>\n      )}\n    </section>\n  );\n}\n"
     }
-  ]
+  ],
+  "meta": {
+    "source": "fabrials",
+    "tier": "fabrials",
+    "license": "MIT",
+    "category": "MCP"
+  }
 }
