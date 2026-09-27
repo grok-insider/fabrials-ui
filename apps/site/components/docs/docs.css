@@ -855,3 +855,11 @@ h3.docs-heading {
 .docs-step p a:hover {
   text-decoration-color: currentColor;
 }
+/* Types wrap at spaces, never inside a word. */
+.docs .docs-props .docs-type {
+  overflow-wrap: normal;
+  word-break: normal;
+}
+.docs .docs-props td:nth-child(2) {
+  min-width: 8rem;
+}

@@ -1,7 +1,13 @@
 "use client";
 // Preview written by Fabrials for Kibo UI's kanban (Kibo publishes no demo). Synthetic tasks.
 import { useState } from "react";
-import { KanbanBoard, KanbanCard, KanbanCards, KanbanHeader, KanbanProvider } from "@/components/external/kibo/kanban";
+import {
+  KanbanBoard,
+  KanbanCard,
+  KanbanCards,
+  KanbanHeader,
+  KanbanProvider,
+} from "@/components/external/kibo/kanban";
 
 const columns = [
   { id: "backlog", name: "Backlog" },
@@ -20,19 +26,33 @@ const initial = [
 export default function KiboKanbanDemo() {
   const [data, setData] = useState(initial);
   return (
-    <KanbanProvider columns={columns} data={data} onDataChange={setData} className="min-h-72 w-full">
-      {(column) => (
-        <KanbanBoard id={column.id} key={column.id}>
-          <KanbanHeader>{column.name}</KanbanHeader>
-          <KanbanCards id={column.id}>
-            {(task: (typeof initial)[number]) => (
-              <KanbanCard column={column.id} id={task.id} key={task.id} name={task.name}>
-                <p className="text-sm">{task.name}</p>
-              </KanbanCard>
-            )}
-          </KanbanCards>
-        </KanbanBoard>
-      )}
-    </KanbanProvider>
+    // A fixed id keeps dnd-kit's accessibility ids equal on server and client.
+    <div className="w-full overflow-x-auto">
+      <KanbanProvider
+        id="kibo-kanban-demo"
+        columns={columns}
+        data={data}
+        onDataChange={setData}
+        className="min-h-72 min-w-[36rem]"
+      >
+        {(column) => (
+          <KanbanBoard id={column.id} key={column.id}>
+            <KanbanHeader>{column.name}</KanbanHeader>
+            <KanbanCards id={column.id}>
+              {(task: (typeof initial)[number]) => (
+                <KanbanCard
+                  column={column.id}
+                  id={task.id}
+                  key={task.id}
+                  name={task.name}
+                >
+                  <p className="text-sm">{task.name}</p>
+                </KanbanCard>
+              )}
+            </KanbanCards>
+          </KanbanBoard>
+        )}
+      </KanbanProvider>
+    </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import { moreDemos } from "@/components/ui-demos-more";
 import { BookOpen, Code2, Globe, Lightbulb, MoreHorizontal, Paperclip, Pencil, RotateCcw, Search, Terminal } from "lucide-react";
 import {
   ActivityDisclosure,
@@ -1172,7 +1173,7 @@ function VoiceDemo() {
 }
 
 export function UiDemo({ slug }: { slug: string }) {
-  const Demo = demos[slug];
+  const Demo = demos[slug] ?? moreDemos[slug];
   if (!Demo) return <p className="text-sm">This preview is not available.</p>;
   return <Demo />;
 }

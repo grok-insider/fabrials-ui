@@ -1,4 +1,5 @@
 export type UiGroup =
+  | "Brand"
   | "Controls"
   | "Overlays"
   | "Collections"
@@ -7,7 +8,8 @@ export type UiGroup =
   | "Metrics"
   | "Patterns"
   | "Effects"
-  | "AI chat";
+  | "AI chat"
+  | "AI providers";
 
 export type UiPackage = "@fabrials/ui" | "@fabrials/ai-ui";
 
@@ -24,6 +26,10 @@ export interface UiCatalogItem {
 }
 
 export const uiGroups: { name: UiGroup; description: string }[] = [
+  {
+    name: "Brand",
+    description: "The dithered Highstorm light and the product marks. Landings, sign-in and product marks use them.",
+  },
   {
     name: "Controls",
     description: "Buttons, fields and choices used across Fabrials products.",
@@ -59,6 +65,10 @@ export const uiGroups: { name: UiGroup; description: string }[] = [
   {
     name: "AI chat",
     description: "Presentational chat pieces from @fabrials/ai-ui. The host supplies the data.",
+  },
+  {
+    name: "AI providers",
+    description: "Provider marks and account presentation from @fabrials/ai-ui.",
   },
 ];
 
@@ -96,7 +106,8 @@ function aiUi(
   props: UiCatalogItem["props"],
   note: string,
 ): UiCatalogItem {
-  return ui(slug, title, "AI chat", description, exports, props, note, "@fabrials/ai-ui");
+  const group = slug === "provider-icon" ? "AI providers" : "AI chat";
+  return ui(slug, title, group, description, exports, props, note, "@fabrials/ai-ui");
 }
 
 export const uiCatalog: UiCatalogItem[] = [
@@ -845,6 +856,343 @@ export const uiCatalog: UiCatalogItem[] = [
       ["status", "VoiceInputStatus", "idle, requesting, recording, transcribing or error. The stateless view uses it for custom recorders."],
     ],
     "Presentational. The microphone is only requested after a press. The host supplies transcription; nothing is sent by the component.",
+  ),
+
+  // ---------------------------------------------------------------- 0.5–0.7 additions
+  ui(
+    "dither-scene",
+    "Dither scene",
+    "Brand",
+    "The Highstorm storm front behind a landing hero or a sign-in page.",
+    ["DitherScene"],
+    [
+      ["variant", "hero | full", "hero enters from the right of the box; full covers it, for sign-in."],
+      ["reveal", "number", "Milliseconds for the one-time roll-in on first paint; 0 turns it off. Skipped under reduced motion."],
+      ["seed", "number", "Another storm with the same look."],
+      ["cell", "number", "CSS pixels per dither dot (2 to 4)."],
+    ],
+    "Absolute: give the parent position: relative and keep text on the calm side or on a solid surface. The ramp fades into --fui-dither-bg, else --background. Painted once; no loop.",
+  ),
+  ui(
+    "dither-band",
+    "Dither band",
+    "Brand",
+    "A thin storm band that signs a section or page heading.",
+    ["DitherBand"],
+    [
+      ["seed", "number", "Another band with the same look."],
+      ["--fui-band-height", "CSS length", "Height, 4.5rem by default."],
+    ],
+    "At most one per view. On a card, set --fui-dither-bg: var(--card) so the band fades into it.",
+  ),
+  ui(
+    "dither-gem",
+    "Dither gem",
+    "Brand",
+    "A cut gem filled with dithered light: the product mark in navigation, lists and empty states.",
+    ["DitherGem"],
+    [
+      ["gem", "GemName", "The product's gem: stormlight, heliodor, sapphire, ruby, emerald, zircon, smokestone or amethyst."],
+      ["size", "number", "Box size in CSS pixels: 16, 20, 28 or 40 in interfaces, larger beside a hero."],
+      ["reveal", "number", "Large marks only: fills with light once on first paint."],
+    ],
+    "Decorative (aria-hidden). Always pair it with the product name.",
+  ),
+  ui(
+    "dither-canvas",
+    "Dither canvas",
+    "Brand",
+    "The engine under the brand pieces: any brightness field, dithered onto a colour ramp.",
+    ["DitherCanvas"],
+    [
+      ["field", "(theme, size, progress) => (u, v) => 0…1", "Brightness at each point; built again on resize and theme change."],
+      ["ramp", "string[] | { light, dark }", "Colours. \"background\" as the first stop is the surface behind the canvas."],
+      ["order", "brightness | ramp", "ramp keeps the order: 0 is the first colour, 1 the last."],
+      ["reveal / stars / paintKey", "number / DitherStars / key", "One-time reveal, crisp stars in dark mode, repaint on new data."],
+    ],
+    "Pure helpers live in @fabrials/ui/dither (paintRampField, STORM_RAMP, gemRamp, stormField, gemField). Products may add their own fields on the same engine.",
+  ),
+  ui(
+    "product-lockup",
+    "Product lockup",
+    "Brand",
+    "A product's name with its gem, for headers and sign-in.",
+    ["ProductLockup", "FabrialsGem"],
+    [
+      ["product", "string", "The product name, set in Plex Sans Condensed."],
+      ["gem", "GemName", "The product's gem."],
+      ["tagline", "string", "Optional second line."],
+      ["size", "sm | md | lg", "Scale."],
+    ],
+    "The gem signs the mark and nothing else; it is never a status or a button colour.",
+  ),
+  ui(
+    "radio-group",
+    "Radio group",
+    "Controls",
+    "One choice from a short list that stays visible.",
+    ["RadioGroup", "RadioGroupItem", "Radio"],
+    [
+      ["defaultValue / value", "string", "The selected option."],
+      ["onValueChange", "(value) => void", "Called when the choice changes."],
+      ["aria-label", "string", "Names the group when there is no visible legend."],
+    ],
+    "Arrow keys move between options. RadioGroupItem is shadcn's name for Radio.",
+  ),
+  ui(
+    "toggle-group",
+    "Toggle group",
+    "Controls",
+    "A segmented choice for ranges and views.",
+    ["ToggleGroup", "ToggleGroupItem"],
+    [
+      ["value", "string[]", "Selected items."],
+      ["onValueChange", "(value: string[]) => void", "Keep at least one selected for a single choice."],
+      ["size", "default | sm", "Height."],
+    ],
+    "Use it for a view or range next to what it changes; use RadioGroup inside forms.",
+  ),
+  ui(
+    "theme-switcher",
+    "Theme switcher",
+    "Controls",
+    "System, light or dark, as a compact segmented control.",
+    ["ThemeSwitcher"],
+    [
+      ["value", "system | light | dark", "The stored preference."],
+      ["onValueChange", "(value) => void", "The host applies and stores it."],
+      ["showLabels", "boolean", "Words next to the icons."],
+    ],
+    "The host owns storage and the class on the root element; the switcher only presents the choice.",
+  ),
+  ui(
+    "multi-select",
+    "Multi-select",
+    "Controls",
+    "Several values from a list, summarised in the trigger.",
+    ["MultiSelect"],
+    [
+      ["id / label", "string", "Connects the visible label."],
+      ["options", "{ value, label }[]", "The choices."],
+      ["value / onValueChange", "string[] / (value) => void", "Controlled selection."],
+      ["placeholder", "string", "Shown when nothing is selected, \"Any\" by default."],
+    ],
+    "Use it for filters. For a single value, use Select.",
+  ),
+  ui(
+    "native-select",
+    "Native select",
+    "Controls",
+    "The browser's own select, styled, for long lists and forms that must work without JavaScript.",
+    ["NativeSelect", "NativeSelectOption", "NativeSelectOptGroup", "NativeCheckbox"],
+    [
+      ["name / defaultValue", "string", "Submitted with the form."],
+      ["children", "NativeSelectOption | NativeSelectOptGroup", "Options, optionally grouped."],
+    ],
+    "Keeps the platform picker on phones. NativeCheckbox is the matching native checkbox.",
+  ),
+  ui(
+    "accordion",
+    "Accordion",
+    "Collections",
+    "Questions and details that open in place.",
+    ["Accordion", "AccordionItem", "AccordionTrigger", "AccordionContent"],
+    [
+      ["multiple", "boolean", "Let several items stay open."],
+      ["defaultValue", "string[]", "Items open at first."],
+    ],
+    "Keep the answer short; long content belongs on its own page.",
+  ),
+  ui(
+    "breadcrumb",
+    "Breadcrumb",
+    "Navigation",
+    "Where the page sits, with a way back up.",
+    ["Breadcrumb", "BreadcrumbList", "BreadcrumbItem", "BreadcrumbLink", "BreadcrumbPage", "BreadcrumbSeparator", "BreadcrumbEllipsis"],
+    [["BreadcrumbLink render", "ReactElement", "Pass the host's link element."]],
+    "The current page is text, not a link, and carries aria-current.",
+  ),
+  ui(
+    "pagination",
+    "Pagination",
+    "Navigation",
+    "Pages of a long collection.",
+    ["Pagination", "PaginationContent", "PaginationItem", "PaginationLink", "PaginationPrevious", "PaginationNext", "PaginationEllipsis"],
+    [["isActive", "boolean", "Marks the current page."]],
+    "Prefer a cursor or \"Load more\" when page numbers mean nothing to the reader.",
+  ),
+  ui(
+    "nav-tabs",
+    "Nav tabs",
+    "Navigation",
+    "Links styled as tabs, for the sections of one record.",
+    ["NavTabs", "NavTab"],
+    [
+      ["label", "string", "Names the navigation."],
+      ["current", "boolean", "The section on screen (aria-current=page)."],
+      ["count", "number | string", "Optional count after the label."],
+      ["render", "ReactElement", "The host's link element."],
+    ],
+    "Each tab is a URL. Use Tabs when the panels live on the same page.",
+  ),
+  ui(
+    "description-list",
+    "Description list",
+    "Collections",
+    "Terms and values, such as a record's properties.",
+    ["DescriptionList", "DescriptionItem", "DescriptionTerm", "DescriptionDetails"],
+    [["layout", "grid | stacked", "Side by side or stacked."]],
+    "A configured value is not a verified one: say which it is.",
+  ),
+  ui(
+    "avatar",
+    "Avatar",
+    "Collections",
+    "A person or account, with initials when there is no image.",
+    ["Avatar", "AvatarImage", "AvatarFallback"],
+    [["size", "sm | md | lg", "Scale."]],
+    "Decorative next to a name; give it alt text when it stands alone.",
+  ),
+  ui(
+    "stat",
+    "Stat",
+    "Metrics",
+    "One number with its change and a short trend.",
+    ["Stat", "StatGroup"],
+    [
+      ["label / value / unit", "string", "What, how much, in what."],
+      ["delta / trend", "string / up | down | flat", "The change, with an icon, not only a colour."],
+      ["deltaTone", "positive | negative | neutral", "Whether up is good for this number."],
+      ["sparkline / hint", "number[] / string", "Recent values and the comparison period."],
+    ],
+    "Tabular figures. A stale value says so in the hint.",
+  ),
+  ui(
+    "sparkline",
+    "Sparkline",
+    "Metrics",
+    "A small line of recent values.",
+    ["Sparkline"],
+    [
+      ["data", "number[]", "Values in order."],
+      ["label", "string", "Accessible description of the trend."],
+    ],
+    "Shape only; put the number next to it.",
+  ),
+  ui(
+    "meter",
+    "Meter",
+    "Metrics",
+    "How much of a quota or budget is used.",
+    ["Meter"],
+    [
+      ["value / min / max", "number", "The measurement."],
+      ["label / hint", "ReactNode", "What it measures and when it resets."],
+      ["warnAt / dangerAt", "number", "Percent thresholds for the warning and danger inks."],
+    ],
+    "Use Progress for a task that finishes; Meter for a level that stays.",
+  ),
+  ui(
+    "status-dot",
+    "Status dot",
+    "Metrics",
+    "A state as a dot and a word.",
+    ["StatusDot"],
+    [
+      ["tone", "neutral | info | success | warning | danger", "The state's ink."],
+      ["label", "ReactNode", "The word; required, even when hidden."],
+      ["pulse", "boolean", "Only for something live right now; stops under reduced motion."],
+    ],
+    "Colour never stands alone: the label is always there for assistive technology.",
+  ),
+  ui(
+    "activity-strip",
+    "Activity strip",
+    "Metrics",
+    "A row of intensity cells, like posts per day or per hour.",
+    ["ActivityStrip"],
+    [
+      ["cells", "{ label, value, tone? }[]", "One cell per period."],
+      ["caption", "string", "Required: it names the table screen readers get."],
+      ["startLabel / endLabel", "string", "The ends of the range."],
+      ["size", "default | lg", "Cell height."],
+    ],
+    "Five levels of Stormlight, or a status tone per cell.",
+  ),
+  ui(
+    "timeline",
+    "Timeline",
+    "Metrics",
+    "An event feed with a marker, title, time and detail.",
+    ["Timeline", "TimelineItem"],
+    [
+      ["tone / icon", "Tone / ReactNode", "The marker."],
+      ["title / time", "ReactNode", "What happened and when."],
+      ["fresh", "boolean", "Highlights a live item once when it arrives."],
+    ],
+    "Newest first. Nothing loops.",
+  ),
+  ui(
+    "relative-time",
+    "Relative time",
+    "Metrics",
+    "\"3 minutes ago\" in any locale, with the full date on hover.",
+    ["RelativeTime", "formatRelativeTime"],
+    [
+      ["date", "Date | string | number", "The moment."],
+      ["locale", "string", "Language of the phrase."],
+    ],
+    "Refreshes while the page is visible; renders a <time> element with the exact date.",
+  ),
+  ui(
+    "snippet",
+    "Snippet",
+    "Composition",
+    "A command or short code with a copy button.",
+    ["Snippet", "CopyButton"],
+    [
+      ["prompt", "string", "Shown before each line and left out of the copy, \"$\" by default."],
+      ["label", "string", "Names the snippet."],
+      ["copyValue", "string", "What to copy when it differs from what is shown."],
+    ],
+    "Long commands wrap with a hanging indent instead of scrolling.",
+  ),
+  ui(
+    "site-header",
+    "Site header",
+    "Patterns",
+    "The top bar of a public site: mark, navigation, actions and a phone menu.",
+    ["SiteHeader"],
+    [
+      ["brand / navigation / actions", "ReactNode", "The slots."],
+      ["mobileMenu", "ReactNode", "What replaces the navigation on phones."],
+      ["sticky", "boolean", "Stays at the top while scrolling."],
+    ],
+    "Navigation that will grow groups its items in a menu (see fabrials.com's Products).",
+  ),
+  ui(
+    "auth-layout",
+    "Auth layout",
+    "Patterns",
+    "The sign-in page: brand, a card for the form, and an aside for the storm.",
+    ["AuthLayout"],
+    [
+      ["brand / title / description", "ReactNode", "What the person signs in to."],
+      ["aside", "ReactNode", "Shown beside the card on wide screens; put a DitherScene variant=\"full\" in it."],
+      ["footer", "ReactNode", "What the session can and cannot do."],
+    ],
+    "The aside is a positioning context whose surface the dither fades into.",
+  ),
+  aiUi(
+    "provider-icon",
+    "Provider icon",
+    "The mark of an AI provider or coding agent.",
+    ["ProviderIcon", "providerBrand"],
+    [
+      ["provider", "string", "openai, anthropic, xai, cursor, github, nous and more; aliases such as codex, claude and grok resolve."],
+      ["size", "number", "CSS pixels, 24 by default."],
+    ],
+    "Third-party marks keep their own colours and shapes. Unknown providers fall back to a neutral tile.",
   ),
 ];
 
