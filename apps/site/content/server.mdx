@@ -1,0 +1,47 @@
+The connector is an optional Node adapter for applications whose MCP endpoints do not permit browser CORS or whose credentials must remain on the server.
+
+## Install
+
+```bash
+bunx shadcn@latest add https://ui.fabrials.com/r/server-connector.json
+```
+
+## Wire it to your host
+
+```ts
+import { createConnector } from "@/lib/mcp-server/connector";
+
+const connector = createConnector({
+  destinations: {
+    workspace: { endpoint: "https://mcp.example.com/mcp" },
+  },
+  allowedOrigins: ["https://app.example.com"],
+  authenticate: async (request) => {
+    // Verify your application's session here.
+    return getAuthenticatedUser(request);
+  },
+  credentials: async (userId, destination) => {
+    return getCredentialFromYourStore(userId, destination);
+  },
+});
+
+// Next.js Node route: /api/mcp/workspace
+export const runtime = "nodejs";
+export const POST = (request: Request) => connector(request, "workspace");
+export const GET = POST;
+export const DELETE = POST;
+```
+
+`getAuthenticatedUser` and `getCredentialFromYourStore` above are host integration points, not bundled authentication. Return null to reject an unauthenticated request. The credential callback returns an optional `accessToken`.
+
+## Network behavior
+
+Destinations are configured by the operator. Requests cannot supply an arbitrary upstream URL. The connector validates public HTTPS destinations, pins the resolved address for the connection, rejects redirects, and does not forward caller cookies or arbitrary authorization headers.
+
+It accepts same-application origins from the configured list, bounds POST bodies to 1 MiB and requests to two minutes, and streams results. It partitions legacy sessions by user and destination. Restarting this reference adapter drops those sessions; reconnect rather than replaying an interrupted tool operation.
+
+## Hosting
+
+Keep credentials in your host's secret store. This library does not provision a credential database. In Fabrials deployments, secrets live in Coolify; any future persisted files belong in the house S3 storage.
+
+The public documentation site connects directly to its own demo server. It does not expose an arbitrary upstream proxy. The installed connector runs in infrastructure you control.

@@ -1,0 +1,27 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "action-button",
+  "type": "registry:component",
+  "title": "Action button",
+  "description": "A single action with pending, error and duplicate-click handling.",
+  "author": "Fabrials <admin@grokinsider.net>",
+  "dependencies": [
+    "@fabrials/ui@0.5.0",
+    "lucide-react@^1.41.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/mcp/types.ts",
+      "type": "registry:lib",
+      "target": "lib/mcp/types.ts",
+      "content": "export type JsonSchema =\n  | boolean\n  | {\n      [key: string]: unknown;\n      type?: string | string[];\n      properties?: Record<string, JsonSchema>;\n      required?: string[];\n      enum?: unknown[];\n      description?: string;\n      title?: string;\n      items?: JsonSchema;\n    };\nexport interface ToolDefinition {\n  name: string;\n  title?: string;\n  description?: string;\n  inputSchema: JsonSchema;\n  annotations?: {\n    readOnlyHint?: boolean;\n    destructiveHint?: boolean;\n    untrustedContentHint?: boolean;\n    consequentialHint?: boolean;\n    [key: string]: unknown;\n  };\n}\nexport interface Execution {\n  id: string;\n  name: string;\n  source: \"human\" | \"agent\" | \"simulator\";\n  status: \"running\" | \"success\" | \"error\" | \"cancelled\";\n  startedAt: number;\n  completedAt?: number;\n  args: Record<string, unknown>;\n  result?: unknown;\n  error?: string;\n  progress?: { progress: number; total?: number; message?: string };\n}\nexport type Support = \"checking\" | \"native\" | \"legacy\" | \"unsupported\";\nexport interface ToolContext {\n  signal: AbortSignal;\n  source: Execution[\"source\"];\n}\nexport interface WebTool extends ToolDefinition {\n  execute: (\n    args: Record<string, unknown>,\n    context: ToolContext,\n  ) => unknown | Promise<unknown>;\n}\nexport function errorMessage(error: unknown) {\n  return error instanceof Error ? error.message : \"The operation failed.\";\n}\n"
+    },
+    {
+      "path": "registry/components/action-button.tsx",
+      "type": "registry:component",
+      "target": "components/webmcp/action-button.tsx",
+      "content": "\"use client\";\nimport { useRef, useState, type ReactNode } from \"react\";\nimport { Loader2 } from \"lucide-react\";\nimport { Button } from \"@fabrials/ui\";\nimport { errorMessage } from \"@/lib/mcp/types\";\nexport function ActionButton({\n  action,\n  children,\n  disabled = false,\n}: {\n  action: () => unknown | Promise<unknown>;\n  children: ReactNode;\n  disabled?: boolean;\n}) {\n  const busy = useRef(false);\n  const [pending, setPending] = useState(false);\n  const [error, setError] = useState(\"\");\n  return (\n    <div className=\"space-y-2\">\n      <Button\n        disabled={disabled || pending}\n        aria-busy={pending}\n        onClick={async () => {\n          if (busy.current) return;\n          busy.current = true;\n          setPending(true);\n          setError(\"\");\n          try {\n            await action();\n          } catch (e) {\n            setError(errorMessage(e));\n          } finally {\n            setPending(false);\n            busy.current = false;\n          }\n        }}\n      >\n        {pending && (\n          <Loader2 className=\"size-4 animate-spin motion-reduce:animate-none\" />\n        )}\n        {children}\n      </Button>\n      {error && (\n        <p role=\"alert\" className=\"text-sm text-destructive\">\n          {error}\n        </p>\n      )}\n    </div>\n  );\n}\n"
+    }
+  ]
+}

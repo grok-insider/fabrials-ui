@@ -1,0 +1,24 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "webmcp-form",
+  "type": "registry:component",
+  "title": "Agent-ready form",
+  "description": "Semantic forms that people and browser agents can fill together.",
+  "author": "Fabrials <admin@grokinsider.net>",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/mcp/types.ts",
+      "type": "registry:lib",
+      "target": "lib/mcp/types.ts",
+      "content": "export type JsonSchema =\n  | boolean\n  | {\n      [key: string]: unknown;\n      type?: string | string[];\n      properties?: Record<string, JsonSchema>;\n      required?: string[];\n      enum?: unknown[];\n      description?: string;\n      title?: string;\n      items?: JsonSchema;\n    };\nexport interface ToolDefinition {\n  name: string;\n  title?: string;\n  description?: string;\n  inputSchema: JsonSchema;\n  annotations?: {\n    readOnlyHint?: boolean;\n    destructiveHint?: boolean;\n    untrustedContentHint?: boolean;\n    consequentialHint?: boolean;\n    [key: string]: unknown;\n  };\n}\nexport interface Execution {\n  id: string;\n  name: string;\n  source: \"human\" | \"agent\" | \"simulator\";\n  status: \"running\" | \"success\" | \"error\" | \"cancelled\";\n  startedAt: number;\n  completedAt?: number;\n  args: Record<string, unknown>;\n  result?: unknown;\n  error?: string;\n  progress?: { progress: number; total?: number; message?: string };\n}\nexport type Support = \"checking\" | \"native\" | \"legacy\" | \"unsupported\";\nexport interface ToolContext {\n  signal: AbortSignal;\n  source: Execution[\"source\"];\n}\nexport interface WebTool extends ToolDefinition {\n  execute: (\n    args: Record<string, unknown>,\n    context: ToolContext,\n  ) => unknown | Promise<unknown>;\n}\nexport function errorMessage(error: unknown) {\n  return error instanceof Error ? error.message : \"The operation failed.\";\n}\n"
+    },
+    {
+      "path": "registry/webmcp/form.tsx",
+      "type": "registry:lib",
+      "target": "lib/webmcp/form.tsx",
+      "content": "\"use client\";\nimport { useRef, useState, type ComponentProps, type FormEvent } from \"react\";\nimport { errorMessage } from \"@/lib/mcp/types\";\ntype AgentSubmit = SubmitEvent & {\n  agentInvoked?: boolean;\n  respondWith?: (value: Promise<unknown>) => void;\n};\nexport function WebMCPForm({\n  toolName,\n  toolDescription,\n  autoSubmit = false,\n  onExecute,\n  children,\n  ...props\n}: Omit<ComponentProps<\"form\">, \"onSubmit\"> & {\n  toolName: string;\n  toolDescription: string;\n  autoSubmit?: boolean;\n  onExecute: (\n    data: FormData,\n    context: { agentInvoked: boolean },\n  ) => Promise<unknown>;\n}) {\n  const [error, setError] = useState(\"\");\n  const [pending, setPending] = useState(false);\n  const busy = useRef(false);\n  function submit(event: FormEvent<HTMLFormElement>) {\n    event.preventDefault();\n    const native = event.nativeEvent as AgentSubmit;\n    if (busy.current) {\n      if (native.agentInvoked)\n        native.respondWith?.(\n          Promise.resolve({ error: \"A submission is already running.\" }),\n        );\n      return;\n    }\n    busy.current = true;\n    setPending(true);\n    setError(\"\");\n    const data = new FormData(event.currentTarget, native.submitter);\n    const response = Promise.resolve()\n      .then(() =>\n        onExecute(data, { agentInvoked: native.agentInvoked === true }),\n      )\n      .catch((e) => {\n        setError(errorMessage(e));\n        return { error: errorMessage(e) };\n      })\n      .finally(() => {\n        busy.current = false;\n        setPending(false);\n      });\n    if (native.agentInvoked) native.respondWith?.(response);\n  }\n  return (\n    <form\n      {...props}\n      {...{\n        toolname: toolName,\n        tooldescription: toolDescription,\n        ...(autoSubmit ? { toolautosubmit: \"\" } : {}),\n      }}\n      onSubmit={submit}\n      aria-busy={pending}\n    >\n      {children}\n      {error && (\n        <p role=\"alert\" className=\"text-sm text-destructive\">\n          {error}\n        </p>\n      )}\n    </form>\n  );\n}\nexport function toolField(description: string) {\n  return { toolparamdescription: description };\n}\n"
+    }
+  ]
+}

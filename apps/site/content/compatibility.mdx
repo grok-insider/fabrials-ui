@@ -1,0 +1,25 @@
+The protocol target is **MCP 2026-07-28**, using the official TypeScript SDK v2. Compatibility with MCP 2025-11-25 is tested separately.
+
+## Version negotiation
+
+`protocol: 'auto'` probes `server/discover` and selects the current era when supported. `protocol: 'current'` pins 2026-07-28 and fails if it is unavailable. `protocol: 'legacy'` explicitly uses the older initialization handshake.
+
+The current era carries protocol version and capabilities on each request. It uses `subscriptions/listen` for change streams and `input_required` for additional input. The SDK manages these wire details and aggregates paginated capability lists.
+
+A failed network request is not evidence that an endpoint uses an older protocol. Interrupted tool calls are not retried automatically by this UI. A cancelled request does not prove that remote work was rolled back.
+
+## Supported capabilities
+
+- Tools, JSON Schema arguments, progress and cancellation.
+- Resources, resource templates, prompts and catalog change subscriptions.
+- Form and URL elicitation through the SDK's shared handler model.
+- Browser Streamable HTTP with anonymous, bearer or OAuth authentication.
+- Optional authenticated Node connector with operator-controlled destinations.
+
+Tasks, Skills and MCP Apps are separate extensions. This release does not advertise them, launch stdio processes, or render remote MCP Apps iframes. Sampling, Roots and the legacy HTTP+SSE transport are not added to new applications.
+
+## WebMCP compatibility
+
+WebMCP is a browser proposal with a separate release lifecycle. The adapter distinguishes the current document API from the older navigator API. The simulator is always labeled and does not count as evidence of native browser support.
+
+Source of truth: [MCP versioning](https://modelcontextprotocol.io/docs/2026-07-28/learn/versioning), [MCP changes](https://modelcontextprotocol.io/specification/2026-07-28/changelog), and [WebMCP implementation status](https://github.com/webmachinelearning/webmcp/blob/main/implementation-status.md).

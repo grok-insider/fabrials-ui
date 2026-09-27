@@ -1,0 +1,22 @@
+Fabrials UI is an open-source collection of React components for interfaces shared by people and agents. Install the source with the shadcn CLI, adapt it, and keep ownership of every line.
+
+## Two protocols, one interface
+
+**WebMCP** exposes functionality inside a browser page. A person and an agent use the same application state and business logic. The human interface remains fully usable without browser support.
+
+**MCP** connects a client to a server that advertises tools, resources and prompts. The components here let you connect, inspect those capabilities, and run tools with visible results.
+
+These integrations have separate providers. Visual components accept props and callbacks, so you can also use them with your own state management or transport.
+
+## Choose your starting point
+
+- [Agent-ready form](/docs/webmcp-form): expose a semantic HTML form.
+- [WebMCP provider](/docs/webmcp-provider): expose structured application actions.
+- [MCP dashboard](/docs/mcp-dashboard): install a complete remote tool console.
+- [Working examples](/playground): try filtering, reservation review and a real MCP server.
+
+## The foundation
+
+React 19, TypeScript, Tailwind CSS 4, shadcn Base UI / Nova, and the official MCP TypeScript SDK v2. The documentation uses IBM Plex Sans; installed components inherit your application's font and color tokens.
+
+The registry is MIT licensed. There is no Fabrials runtime service required by the installed components.

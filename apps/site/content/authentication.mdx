@@ -1,0 +1,33 @@
+The browser adapter supports anonymous endpoints, bearer tokens and OAuth. Use Streamable HTTP and let the official SDK negotiate the protocol and authentication requirements.
+
+## Direct connections
+
+A remote server must allow your origin, required MCP request headers and authorization headers through CORS. Network and CORS errors remain visible; the library does not route them through an unknown proxy.
+
+Bearer tokens are held in memory and cleared from the input when connecting. They are never written to localStorage, included in a URL, or sent through Fabrials infrastructure by the direct adapter.
+
+## OAuth / PKCE
+
+Install `mcp-client` or `connection-panel` and use `BrowserOAuthProvider`. Supply your own callback and metadata routes. The defaults are `/oauth/callback` and `/oauth/client-metadata.json`.
+
+```tsx
+const provider = new BrowserOAuthProvider(endpoint, {
+  callbackPath: "/oauth/callback",
+  metadataPath: "/oauth/client-metadata.json",
+});
+await connection.connect({ endpoint, oauth: provider });
+```
+
+The metadata document must list your absolute callback URL, `authorization_code` and `refresh_token` grants, `code` response type and `none` token endpoint authentication. Its `client_id` is its own HTTPS URL. You may pass a pre-registered public `clientId` for servers that require one.
+
+## Handle the callback
+
+Render the callback under `MCPProvider`. Read `BrowserOAuthProvider.readPending()`, reconstruct the provider with `{ resume: true }`, and call `validateCallback(new URLSearchParams(location.search))`. Then call `connect({ endpoint, oauth: provider }, callbackParams)` and remove query parameters from browser history. Keep the provider mounted while its connection is in use.
+
+The SDK exchanges the authorization code, checks the returned issuer against recorded discovery, and handles refresh. The provider stores tokens in memory, keyed by issuer. Transient state, PKCE verifier, discovery and public client registration survive a redirect in sessionStorage for up to ten minutes. Call `provider.complete()` in a finally block after the callback to remove transient storage.
+
+The site's [callback implementation](https://github.com/grok-insider/fabrials-webmcp/blob/master/app/oauth/callback/page.tsx) is a complete example. It keeps the resulting console in the callback page so memory-only tokens survive.
+
+## Server-held credentials
+
+For confidential clients or server-held refresh tokens, use your application's OAuth flow and credential store. Inject its access token into the optional connector through `credentials(userId, destination)`. The connector does not take client secrets from the browser.

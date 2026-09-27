@@ -1,0 +1,73 @@
+WebMCP augments an existing interface with named, structured actions. Start with a useful operation such as filtering a catalog, rather than exposing every low-level click.
+
+## Enable experimental WebMCP
+
+<WebMCPSetup />
+
+Use HTTPS or localhost. If the UI says **Native WebMCP unavailable**, this page could not detect the browser API. Check the flag, relaunch Chrome and reload the app. Enabling the flag does not connect an AI agent by itself; Chrome’s tool inspector can discover and invoke your registered tools.
+
+## Install the React integration
+
+```bash
+bunx shadcn@latest add https://ui.fabrials.com/r/webmcp-provider.json
+```
+
+Complete the [application setup](/docs/installation) first if your app does not yet use shadcn Base UI.
+
+## Register an application action
+
+```tsx
+"use client";
+import { useState } from "react";
+import { WebMCPProvider, useWebMCPTool } from "@/lib/webmcp/provider";
+
+function Search() {
+  const [query, setQuery] = useState("");
+  useWebMCPTool({
+    name: "set_search",
+    description: "Filter the visible catalog by a search term.",
+    inputSchema: {
+      type: "object",
+      properties: { query: { type: "string" } },
+      required: ["query"],
+    },
+    execute: ({ query }) => {
+      setQuery(String(query));
+      return { query };
+    },
+  });
+  return (
+    <input
+      aria-label="Search"
+      value={query}
+      onChange={(event) => setQuery(event.target.value)}
+    />
+  );
+}
+
+export default function Page() {
+  return (
+    <WebMCPProvider>
+      <Search />
+    </WebMCPProvider>
+  );
+}
+```
+
+Registrations are removed on unmount or definition changes. Callbacks use current committed React state. Duplicate tool names fail explicitly. The provider caps in-memory activity at 100 entries.
+
+For a common activity history, route human controls through `useWebMCP().run(name, args)`. The examples do this for both search and row selection.
+
+## Declarative forms
+
+`WebMCPForm` adds `toolname` and `tooldescription` to a native form. `toolField(description)` supplies `toolparamdescription` to a named control. Keep native labels, required fields and browser validation.
+
+The default is manual review: `autoSubmit` is false. When the browser provides `SubmitEvent.respondWith`, the handler returns its structured result to the agent. Ordinary form submission works through the same handler.
+
+Do not register a second imperative tool with the same name as a declarative form. Do not claim browser support based only on the presence of HTML attributes.
+
+## Browser compatibility
+
+The adapter detects `document.modelContext` first and the older `navigator.modelContext` registration API separately. Browser support is experimental and must be verified in the actual browser build. The simulator calls the shared handler locally; it does not emulate native browser registration.
+
+See the [WebMCP proposal](https://github.com/webmachinelearning/webmcp) and [Chrome's WebMCP guide](https://developer.chrome.com/docs/ai/webmcp) for origin trials and local testing flags.

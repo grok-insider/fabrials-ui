@@ -1,0 +1,29 @@
+## A single guided tour
+
+The [landing tour](/#try-it) follows a complete task through requirements, evidence, selection and review. It uses the original narration and music, with synchronized subtitles and a comparison and floating MCP activity panel.
+
+Press **Play tour** to begin. Pause, mute, restart, scrub the timeline to explore at your own pace. The tour does not scroll the page or switch into a manual mode. You can follow every stage without connecting an agent.
+
+## Experiment in the playground
+
+Open [Playground](/playground) for hands-on flows. These use the same registry components and shared state as their WebMCP tools:
+
+- [Shopping](/playground#comparison): compare machines and review a selection.
+- [Project explorer](/playground#explorer): filter and select records.
+- [Reservation](/playground#reservation): choose dates and validate a booking flow.
+- [MCP workspace](/playground#console): connect to a remote server and inspect its tools.
+- [Travel planner](/playground#travel): find a quiet stay within a budget.
+- [Support inbox](/playground#support): filter tickets and review a resolution.
+- [Workspace setup](/playground#onboarding): prepare and complete a validated setup.
+
+Choose one of the seven scenarios from the sidebar, or the selector on mobile. Switching scenarios starts fresh; browser Back and direct links preserve scenario navigation. Each scenario also has a reset button. The local tool runner lets you select an available tool, edit its arguments and inspect the result and execution history. It calls the same handler as native WebMCP, without needing a connected agent. Conditional tools appear as the application state changes.
+
+The landing panel illustrates tool calls synchronized with the narration; the playground executes them against live state.
+
+Fictional examples do not place orders, create accounts or make reservations. Their ordinary controls work without WebMCP.
+
+## Media and implementation
+
+The video player has been removed from the landing. The original film, narration, music and subtitle assets are preserved. The landing uses a separate 52.47-second soundtrack with a short fade after the human decision, before the film’s promotional outro. The complete film soundtrack remains available for posts. Both are served with byte ranges from S3.
+
+`video:render` produces the film, extracts `demo-audio.m4a` and prepares `landing-audio.m4a`. `video:landing-audio` regenerates the landing cut independently; `PUBLISH_ASSET=landing-audio.m4a` publishes only that cut. Changing the interface does not require regenerating the voice.

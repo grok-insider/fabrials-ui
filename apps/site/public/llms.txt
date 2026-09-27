@@ -1,0 +1,56 @@
+# Fabrials WebMCP UI
+
+React 19 / Tailwind 4 / shadcn Base UI registry. MIT.
+MCP target: 2026-07-28. WebMCP is a browser proposal, distinct from remote MCP.
+
+Browse the [component catalog](https://ui.fabrials.com/components) or explore [complete examples](https://ui.fabrials.com/playground).
+
+## Components
+- [Comparison](https://ui.fabrials.com/docs/comparison): Show choices side by side and highlight the evidence behind a recommendation.
+  Install: bunx shadcn@latest add https://ui.fabrials.com/r/comparison.json
+- [WebMCP provider](https://ui.fabrials.com/docs/webmcp-provider): Give your interface a shared home for tools, state and agent activity.
+  Install: bunx shadcn@latest add https://ui.fabrials.com/r/webmcp-provider.json
+- [Agent-ready form](https://ui.fabrials.com/docs/webmcp-form): Semantic forms that people and browser agents can fill together.
+  Install: bunx shadcn@latest add https://ui.fabrials.com/r/webmcp-form.json
+- [Browser support](https://ui.fabrials.com/docs/support-badge): Show native support, legacy compatibility or manual mode.
+  Install: bunx shadcn@latest add https://ui.fabrials.com/r/support-badge.json
+- [Action button](https://ui.fabrials.com/docs/action-button): A single action with pending, error and duplicate-click handling.
+  Install: bunx shadcn@latest add https://ui.fabrials.com/r/action-button.json
+- [Arguments form](https://ui.fabrials.com/docs/arguments-form): Turn a tool schema into a usable form, with a JSON escape hatch.
+  Install: bunx shadcn@latest add https://ui.fabrials.com/r/arguments-form.json
+- [Data explorer](https://ui.fabrials.com/docs/data-explorer): Search, filter, sort and select records with one shared state.
+  Install: bunx shadcn@latest add https://ui.fabrials.com/r/data-explorer.json
+- [Date range](https://ui.fabrials.com/docs/date-range): Native date fields and an accessible calendar, working in tandem.
+  Install: bunx shadcn@latest add https://ui.fabrials.com/r/date-range.json
+- [Multi-step flow](https://ui.fabrials.com/docs/wizard): Guide a shared human-agent workflow through review and completion.
+  Install: bunx shadcn@latest add https://ui.fabrials.com/r/wizard.json
+- [Confirmation](https://ui.fabrials.com/docs/confirmation-dialog): Give an action a clear review point before it runs.
+  Install: bunx shadcn@latest add https://ui.fabrials.com/r/confirmation-dialog.json
+- [MCP client](https://ui.fabrials.com/docs/mcp-client): Connect to the current protocol, with isolated legacy compatibility.
+  Install: bunx shadcn@latest add https://ui.fabrials.com/r/mcp-client.json
+- [Connection panel](https://ui.fabrials.com/docs/connection-panel): An endpoint, an auth method, and a clear connection state.
+  Install: bunx shadcn@latest add https://ui.fabrials.com/r/connection-panel.json
+- [Tool catalog](https://ui.fabrials.com/docs/tool-catalog): Make tool discovery readable, searchable and keyboard accessible.
+  Install: bunx shadcn@latest add https://ui.fabrials.com/r/tool-catalog.json
+- [Tool detail](https://ui.fabrials.com/docs/tool-detail): A tool description, its arguments, and the action in one place.
+  Install: bunx shadcn@latest add https://ui.fabrials.com/r/tool-detail.json
+- [Result viewer](https://ui.fabrials.com/docs/result-view): Readable text, structured content and media, with raw data one click away.
+  Install: bunx shadcn@latest add https://ui.fabrials.com/r/result-view.json
+- [Execution history](https://ui.fabrials.com/docs/execution-log): Follow progress, inspect results, and cancel outstanding requests.
+  Install: bunx shadcn@latest add https://ui.fabrials.com/r/execution-log.json
+- [Elicitation](https://ui.fabrials.com/docs/elicitation-dialog): Answer the server when a tool needs another piece of information.
+  Install: bunx shadcn@latest add https://ui.fabrials.com/r/elicitation-dialog.json
+- [Resources & prompts](https://ui.fabrials.com/docs/resource-explorer): Read resources, resolve templates, and fill reusable prompts.
+  Install: bunx shadcn@latest add https://ui.fabrials.com/r/resource-explorer.json
+- [MCP dashboard](https://ui.fabrials.com/docs/mcp-dashboard): A complete working console, composed from the registry.
+  Install: bunx shadcn@latest add https://ui.fabrials.com/r/mcp-dashboard.json
+- [Server connector](https://ui.fabrials.com/docs/server-connector): An optional Node bridge for private credentials and endpoints without CORS.
+  Install: bunx shadcn@latest add https://ui.fabrials.com/r/server-connector.json
+
+## Guides
+- https://ui.fabrials.com/docs/installation
+- https://ui.fabrials.com/docs/webmcp
+- https://ui.fabrials.com/docs/interactive-demo
+- https://ui.fabrials.com/docs/authentication
+- https://ui.fabrials.com/docs/server
+- https://ui.fabrials.com/docs/compatibility

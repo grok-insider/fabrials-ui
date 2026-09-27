@@ -1,0 +1,60 @@
+Start with a React 19 application configured for Tailwind 4 and shadcn **Base UI**. This registry uses Base UI's composition API.
+
+## Set up shadcn
+
+For a new app, run `bunx shadcn@latest create` and select Base UI. For an existing React or Next.js app, run `bunx shadcn@latest init` and configure your CSS and import aliases. Use the Nova style for the same defaults as this site.
+
+## Enable native WebMCP in Chrome
+
+<WebMCPSetup />
+
+## Add browser tools to your interface
+
+```bash
+bunx shadcn@latest add https://ui.fabrials.com/r/webmcp-provider.json
+```
+
+Wrap your interactive view in `WebMCPProvider`, then register an application action with `useWebMCPTool`. Follow the complete [WebMCP example](/docs/webmcp#register-an-application-action) or try a [working playground scenario](/playground).
+
+## Connect to a remote MCP server
+
+```bash
+bunx shadcn@latest add https://ui.fabrials.com/r/mcp-dashboard.json
+```
+
+This copies the dashboard, its component dependencies and its React integration. shadcn installs the underlying UI primitives and npm dependencies. Components live in `components/webmcp`; integration helpers live in `lib/mcp` and `lib/webmcp`.
+
+```tsx
+"use client";
+import { MCPDashboard } from "@/components/webmcp/mcp-dashboard";
+
+export default function Console() {
+  return <MCPDashboard defaultEndpoint="https://your-server.example/mcp" />;
+}
+```
+
+Your endpoint must accept the browser origin through CORS. The demo endpoint on this site is same-origin; it is not a general-purpose hosted MCP service.
+
+## Add a named registry
+
+Add this entry to the `registries` object in your `components.json`:
+
+```json
+{
+  "registries": {
+    "@fabrials": "https://ui.fabrials.com/r/{name}.json"
+  }
+}
+```
+
+Then use `bunx shadcn@latest add @fabrials/webmcp-provider`.
+
+## Next.js and Vite
+
+In Next.js, render interactive components under a client boundary. Helpers do not access `window`, `document` or storage during server rendering. The optional connector must remain in a Node server route.
+
+In Vite, render the provider in your root React tree. Configure `@/*` in TypeScript and the Vite resolver, and ensure Tailwind scans the copied component files. Browser-only components do not need Next.js.
+
+## Updates
+
+The source belongs to you. Review registry updates before overwriting customized files. Multiple entries share helpers; keep related helpers and their consumers in sync. Keep the notices for shadcn, Base UI and other dependencies when redistributing.
