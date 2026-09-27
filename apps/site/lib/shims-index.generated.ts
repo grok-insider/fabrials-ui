@@ -188,6 +188,14 @@ export const shimIndex: { name: string; exports: string[] }[] = [
     ]
   },
   {
+    "name": "native-select",
+    "exports": [
+      "NativeSelect",
+      "NativeSelectOptGroup",
+      "NativeSelectOption"
+    ]
+  },
+  {
     "name": "navigation-menu",
     "exports": [
       "NavigationMenu",

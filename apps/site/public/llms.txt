@@ -70,6 +70,7 @@ Namespace: add "registries": { "@fabrials": "https://ui.fabrials.com/r/{name}.js
 - input-group: npx shadcn@latest add https://ui.fabrials.com/r/input-group.json
 - kbd: npx shadcn@latest add https://ui.fabrials.com/r/kbd.json
 - label: npx shadcn@latest add https://ui.fabrials.com/r/label.json
+- native-select: npx shadcn@latest add https://ui.fabrials.com/r/native-select.json
 - navigation-menu: npx shadcn@latest add https://ui.fabrials.com/r/navigation-menu.json
 - pagination: npx shadcn@latest add https://ui.fabrials.com/r/pagination.json
 - popover: npx shadcn@latest add https://ui.fabrials.com/r/popover.json

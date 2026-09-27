@@ -44,8 +44,9 @@ missing: `DialogPortal`, `DialogOverlay`, `SheetFooter`,
 `AlertDialogPortal`, `AlertDialogOverlay`, `AlertDialogMedia`,
 `DropdownMenuPortal`, `DropdownMenuSub`, `DropdownMenuSubTrigger`,
 `DropdownMenuSubContent`, `SelectLabel`, `SelectSeparator`,
-`SelectScrollUpButton`, `SelectScrollDownButton`, `RadioGroupItem` (the same
-component as `Radio`), `KbdGroup`, and the `icon-lg` button size. Nothing
+`SelectScrollUpButton`, `SelectScrollDownButton`, `NativeSelectOption`,
+`NativeSelectOptGroup`, `RadioGroupItem` (the same component as `Radio`),
+`KbdGroup`, and the `icon-lg` button size. Nothing
 existing changes.
 
 ## New in `@fabrials/ai-ui`

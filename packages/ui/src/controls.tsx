@@ -71,6 +71,15 @@ export function NativeSelect({
   );
 }
 
+/** shadcn's names for the native select's options. */
+export function NativeSelectOption(props: ComponentProps<"option">) {
+  return <option {...props} />;
+}
+
+export function NativeSelectOptGroup(props: ComponentProps<"optgroup">) {
+  return <optgroup {...props} />;
+}
+
 export function NativeCheckbox({
   className,
   ...props

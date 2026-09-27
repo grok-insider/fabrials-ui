@@ -21,6 +21,9 @@ import {
   Kbd,
   KbdGroup,
   Label,
+  NativeSelect,
+  NativeSelectOptGroup,
+  NativeSelectOption,
   PageHeader,
   RadioGroup,
   RadioGroupItem,
@@ -49,6 +52,8 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+const models = { grok: "Grok 5", "grok-mini": "Grok 5 mini", opus: "Claude Opus 5.5" };
+
 // Parts added in 0.7 so shadcn's primitives map onto Fabrials controls one to one (see the shims).
 function Parts() {
   return (
@@ -75,8 +80,8 @@ function Parts() {
       <section aria-labelledby="parts-choices">
         <SectionHeader title={<span id="parts-choices">Grouped choices</span>} />
         <div className="catalogue-row">
-          <Select defaultValue="grok">
-            <SelectTrigger aria-label="Model" className="w-56">
+          <Select defaultValue="grok" items={models}>
+            <SelectTrigger aria-label="Model" style={{ width: "16rem" }}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -92,6 +97,13 @@ function Parts() {
               </SelectGroup>
             </SelectContent>
           </Select>
+          <NativeSelect aria-label="Region" defaultValue="eu" style={{ width: "12rem" }}>
+            <NativeSelectOptGroup label="Europe">
+              <NativeSelectOption value="eu">Frankfurt</NativeSelectOption>
+              <NativeSelectOption value="hel">Helsinki</NativeSelectOption>
+            </NativeSelectOptGroup>
+            <NativeSelectOption value="us">Ashburn</NativeSelectOption>
+          </NativeSelect>
           <RadioGroup defaultValue="week" aria-label="Period" className="catalogue-row">
             <Label>
               <RadioGroupItem value="week" /> This week
