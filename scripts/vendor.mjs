@@ -31,6 +31,7 @@ const targets = {
   admin: resolve(workspace, "admin/vendor"),
   "fabrials-webmcp": resolve(workspace, "libs/fabrials-webmcp/vendor"),
   ditox: resolve(workspace, "ditox/gui/vendor"),
+  "x-tracker": resolve(workspace, "x-tracker/vendor"),
 };
 const genericOnly = new Set([
   "open-email",
