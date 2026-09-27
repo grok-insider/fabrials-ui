@@ -1,0 +1,8 @@
+# Integrity manifests list sha256 hashes keyed by file name; names such as
+# "api-key-form.js" or "tokens.css" make the generic rule read them as keys.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "sha256 integrity manifests of vendored copies"
+paths = ['''(^|/)fabrials-manifest\.json$''']

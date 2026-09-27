@@ -29,6 +29,7 @@ bun install --frozen-lockfile
 bun run check                  # packages and site: types, lint, tests, builds
 bun run test:visual:container  # Playwright and axe in the pinned container
 docker build -f Dockerfile.site .
+nix run nixpkgs#gitleaks -- git --config .gitleaks.toml .   # before making history public
 ```
 
 Bun 1.4.2 manages dependencies with the frozen `bun.lock`; Node 22 builds and serves Next.js. The site deploys through Coolify from `Dockerfile.site` with the repository root as the build context; secrets live only in Coolify.
