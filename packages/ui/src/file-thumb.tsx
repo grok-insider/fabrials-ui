@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type CSSProperties, type ReactNode } from "react";
+import { useCallback, useState, type CSSProperties, type ReactNode } from "react";
 import { FileText } from "lucide-react";
 import { classes } from "./shared";
 
@@ -30,6 +30,14 @@ export function FileThumb({
   className,
 }: FileThumbProps) {
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  // A server-rendered image can fail before hydration attaches onError; the
+  // ref callback catches that case (finished loading with no pixels).
+  const checkLoaded = useCallback(
+    (img: HTMLImageElement | null) => {
+      if (img && src && img.complete && img.naturalWidth === 0) setFailedSrc(src);
+    },
+    [src],
+  );
   const style = { "--fui-file-thumb-size": `${size}px` } as CSSProperties;
   const isImage = !mime || mime.startsWith("image/");
 
@@ -45,6 +53,7 @@ export function FileThumb({
         className={classes("fui-file-thumb", "fui-file-thumb-image", className)}
         style={style}
         onError={() => setFailedSrc(src)}
+        ref={checkLoaded}
       />
     );
   }

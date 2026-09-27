@@ -37,3 +37,5 @@ The package index barrels (`@fabrials/ui`, `@fabrials/ai-ui`) no longer carry
 Next.js keep every export in the page bundle, so importing one button shipped
 the charts too (about 800 KB on Radiant's sign-in page). Nothing to change in
 hosts; bundles just get smaller.
+- `FileThumb` falls back to its file-type tile when a server-rendered image
+  had already failed before hydration (its `onError` never fired).
