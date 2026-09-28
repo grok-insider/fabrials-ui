@@ -22,7 +22,7 @@ Resolve this skill directory's real path (`readlink -f`, it is usually a symlink
 | Upgrading or adopting 0.7 | `docs/migration-0.7.md` |
 | Registry, shims, other libraries, the license gate | `docs/registry.md` |
 
-Some older stories predate the 0.7 layout rules (`stories/catalogue.css` centres its page column; `patterns.stories.tsx` › PublicSite shows a card grid and an arrow on a button). Take component usage from them, not page layout.
+The Patterns stories (`stories/patterns.stories.tsx`: PublicSite, Settings, Console, SignIn) follow the 0.7 layout rules and are safe references for page composition.
 
 Precedence: the user's explicit instruction, then the product's own `AGENTS.md` and `DESIGN.md`, then the design-system `DESIGN.md`, then this skill. When this skill and `DESIGN.md` disagree, `DESIGN.md` wins; say so in your report. Code wins over prose for values: read the token or the component instead of guessing.
 

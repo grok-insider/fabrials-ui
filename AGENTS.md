@@ -33,7 +33,7 @@ The Fabrials design system and ui.fabrials.com. Independent git repository; `mas
 - Crisp and quiet: radii 3/4/5/6/8 px, badges are 3 px tags (no pill clutter), sentence case with no uppercase eyebrows, no `→` appended to buttons or links, no gradients or glow.
 - Motion answers a person: at most one `reveal` per page, continuous motion only for loading, all of it off under reduced motion.
 - Design both themes and every state: first-load skeletons, empty with a next action, error with a fix, stale said as stale, long content, 390 px.
-- Examples: `stories/highstorm.stories.tsx` (landing, sign-in), `apps/site/app/page.tsx`, the docs frame in `apps/site/components/docs/`, `stories/patterns.stories.tsx` › Console, `stories/generic-patterns.stories.tsx`, and the component demos in `apps/site/components/ui-demos*.tsx`. `stories/catalogue.css` and the PublicSite story predate the 0.7 layout rules: take component usage from them, not page layout.
+- Examples: `stories/highstorm.stories.tsx` (landing, sign-in), `apps/site/app/page.tsx`, the docs frame in `apps/site/components/docs/`, `stories/patterns.stories.tsx` (PublicSite, Settings, Console), `stories/generic-patterns.stories.tsx`, and the component demos in `apps/site/components/ui-demos*.tsx`.
 - Verify with `bun run check` and `bun run test:visual:container` (light and dark at 390, 768 and 1440 px, with axe), then look at 2560 x 1315 in an isolated headless browser. Never emulate a viewport in the owner's desktop browser window.
 
 ## Checks
