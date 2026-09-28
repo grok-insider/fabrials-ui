@@ -26,7 +26,7 @@ Render the callback under `MCPProvider`. Read `BrowserOAuthProvider.readPending(
 
 The SDK exchanges the authorization code, checks the returned issuer against recorded discovery, and handles refresh. The provider stores tokens in memory, keyed by issuer. Transient state, PKCE verifier, discovery and public client registration survive a redirect in sessionStorage for up to ten minutes. Call `provider.complete()` in a finally block after the callback to remove transient storage.
 
-The site's [callback implementation](https://github.com/grok-insider/fabrials-webmcp/blob/master/app/oauth/callback/page.tsx) is a complete example. It keeps the resulting console in the callback page so memory-only tokens survive.
+The site's [callback implementation](https://github.com/grok-insider/fabrials-ui/blob/master/apps/site/app/oauth/callback/page.tsx) is a complete example. It keeps the resulting console in the callback page so memory-only tokens survive.
 
 ## Server-held credentials
 

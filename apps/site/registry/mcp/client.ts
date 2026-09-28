@@ -35,7 +35,7 @@ export function createMCPClient(
   )
     throw new Error("Remote connections require HTTPS.");
   const client = new Client(
-    { name: "fabrials-webmcp", version: "0.1.0" },
+    { name: "fabrials-ui", version: "0.7.0" },
     {
       ...handlers,
       capabilities: { elicitation: { form: {}, url: {} } },
