@@ -42,6 +42,7 @@ The Fabrials design system and ui.fabrials.com. Independent git repository; `mas
 bun install --frozen-lockfile
 bun run check                  # packages and site: types, lint, tests, builds
 bun run test:visual:container  # Playwright and axe in the pinned container
+bun run test:loading:container # skeleton suite: every docs preview in Loading, three engines (~25 min)
 docker build -f Dockerfile.site .
 nix run nixpkgs#gitleaks -- git --config .gitleaks.toml .   # before making history public
 ```

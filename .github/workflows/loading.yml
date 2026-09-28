@@ -1,0 +1,41 @@
+name: Skeleton suite
+# Loading paints real components as their skeleton; this suite proves no box
+# moves, every line has a bar and no colour leaks, for every docs preview, in
+# Chromium, Firefox and WebKit (tests/loading). It takes about 25 minutes, so it
+# runs when the packages, the site or the suite change, weekly, and on demand.
+on:
+  pull_request:
+    branches: [master]
+    paths: ["packages/ui/**", "apps/site/**", "tests/loading/**", "playwright.loading.config.ts", "scripts/loading.mjs"]
+  push:
+    branches: [master]
+    paths: ["packages/ui/**", "apps/site/**", "tests/loading/**", "playwright.loading.config.ts", "scripts/loading.mjs"]
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: fabrials-ui-loading-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  loading:
+    runs-on: [self-hosted, linux, fabrials]
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      - run: bun install --frozen-lockfile
+      - run: bun run test:loading:container
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: skeleton-suite-failures
+          path: |
+            playwright-report/loading/
+            test-results/
