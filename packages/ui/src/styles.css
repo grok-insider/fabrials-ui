@@ -3626,7 +3626,7 @@
      nothing may alter a box — so the view does not move when loading ends.
      !important beats host utilities and inline colours; it never touches layout.
      Text: a bar per line, as long as the text (a thick strike-through).
-     Media: blocks. Colour: none (grayscale), so no tone or gem leaks through.
+     Media: blocks. Colour: none (luminosity blend), so no tone or gem leaks through.
      Coloured controls: neutral solid shapes. Borders and surfaces: structure. */
   .fui-loading,
   .fui-loading-content {
@@ -3650,8 +3650,11 @@
     color: transparent !important;
     -webkit-text-fill-color: transparent !important;
   }
+  /* Colour goes by blending each top-level part's luminosity onto the neutral
+     surface behind it. Not a filter: filter makes an element the containing
+     block of its fixed and absolute descendants, and they would move. */
   [data-fui-loading] > .fui-loading-content > * {
-    filter: grayscale(1);
+    mix-blend-mode: luminosity;
   }
   [data-fui-loading] > .fui-loading-content :is(svg, img, video, picture, [role="img"]) {
     background-color: var(--fui-skeleton) !important;
@@ -3667,7 +3670,8 @@
   [data-fui-loading] > .fui-loading-content canvas {
     visibility: hidden !important;
   }
-  /* Controls that carry their own fill become one solid, neutral shape. */
+  /* Controls that carry their own fill become one solid, neutral shape, and
+     nothing inside them paints: no bars, dots, thumbs, icons or inner fills. */
   [data-fui-loading] > .fui-loading-content :is(
       .fui-button,
       .fui-badge,
@@ -3688,33 +3692,8 @@
     border-color: transparent !important;
     box-shadow: none !important;
     outline-color: transparent !important;
-  }
-  [data-fui-loading] > .fui-loading-content :is(
-      .fui-button,
-      .fui-badge,
-      .fui-filter-chip,
-      .fui-combobox-chip,
-      .fui-toggle,
-      .fui-kbd,
-      .fui-nav-tab-count,
-      .fui-sidebar-menu-badge,
-      [data-skeleton="fill"]
-    ),
-  [data-fui-loading] > .fui-loading-content :is(
-      .fui-button,
-      .fui-badge,
-      .fui-filter-chip,
-      .fui-combobox-chip,
-      .fui-toggle,
-      .fui-kbd,
-      .fui-nav-tab-count,
-      .fui-sidebar-menu-badge,
-      [data-skeleton="fill"]
-    )
-    * {
     text-decoration-color: transparent !important;
   }
-  /* Inside a filled shape nothing else paints: no dots, icons or inner fills. */
   [data-fui-loading] > .fui-loading-content :is(
       .fui-button,
       .fui-badge,
@@ -3723,12 +3702,19 @@
       .fui-toggle,
       .fui-avatar,
       .fui-kbd,
+      .fui-status-dot,
+      .fui-switch,
+      .fui-checkbox,
+      .fui-radio,
+      .fui-nav-tab-count,
+      .fui-sidebar-menu-badge,
       [data-skeleton="fill"]
     )
     * {
     background-color: transparent !important;
     border-color: transparent !important;
     box-shadow: none !important;
+    text-decoration-color: transparent !important;
   }
   /* Fields keep their frame and show a short bar where the value would be. */
   [data-fui-loading] > .fui-loading-content :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="hidden"]), textarea, select) {
