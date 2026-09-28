@@ -21,6 +21,10 @@ check a host's screens after updating; nothing in its code has to change.
   DESIGN.md › Layout): no centred page columns.
 - **Snippet** wraps long commands with a hanging indent instead of showing a
   horizontal scrollbar.
+- **Badge** is a tag, not a pill: 3 px corners, a quieter tint with a hairline
+  in its tone, tabular figures and a square status dot. Multi-select chips,
+  sidebar and tab counts and the AI search-step badge get 3 px corners;
+  FilterChip gets 4 px. Props are unchanged.
 
 ## New in `@fabrials/ui`
 

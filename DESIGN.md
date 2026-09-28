@@ -67,7 +67,7 @@ Numbers use tabular figures. Headings wrap with `text-wrap: balance`. Copy is se
 
 - Spacing follows a 4 px grid (`--fui-space-*`).
 - Controls are 40 px (`--fui-control-height`); small 32, extra small 28, large 44. `data-density="compact"` tightens controls to 32 px and collection rows, as a composition choice, not a stored preference. Narrow screens and coarse pointers keep 44 px targets.
-- Corners are crisp: 3 px for keys and badges, 4 px for small parts, 5 px for controls, 6 px for containers, 8 px for overlays (`--fui-radius-xs` to `--fui-radius-xl`). Pills are only for a passive label that must stand out.
+- Corners are crisp: 3 px for keys and badges, 4 px for small parts, 5 px for controls, 6 px for containers, 8 px for overlays (`--fui-radius-xs` to `--fui-radius-xl`). Badges, counts and chips are tags with those 3 to 4 px corners, and a badge's status dot is square, like one pixel of the dither. Pills are only for a passive label that must stand out.
 - Separate with space and hairlines before borders; shadows belong to overlays. Do not box every label and control.
 - Tables scroll inside their labelled region; the page never scrolls sideways.
 

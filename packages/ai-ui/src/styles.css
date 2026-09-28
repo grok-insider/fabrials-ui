@@ -1175,7 +1175,7 @@
     margin-top: 0.5rem;
     place-items: center;
     border: 1px solid var(--border);
-    border-radius: var(--fui-radius-full);
+    border-radius: var(--fui-radius-xs);
     background: var(--card);
     color: var(--muted-foreground);
   }
