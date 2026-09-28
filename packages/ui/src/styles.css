@@ -3625,7 +3625,7 @@
   /* Loading paints what it wraps as a skeleton. Only paint changes here —
      nothing may alter a box — so the view does not move when loading ends.
      !important beats host utilities and inline colours; it never touches layout.
-     Text: a bar per line, as long as the text (a thick strike-through).
+     Text: a bar per line, as long as the text (a thick underline raised onto it).
      Media: blocks. Colour: none (luminosity blend), so no tone or gem leaks through.
      Coloured controls: neutral solid shapes. Borders and surfaces: structure. */
   .fui-loading,
@@ -3637,11 +3637,17 @@
     -webkit-text-fill-color: transparent !important;
     caret-color: transparent !important;
     text-shadow: none !important;
-    text-decoration-line: line-through !important;
+    /* An underline raised 0.74em, from just above cap height to the baseline:
+       a line-through inside an anonymous box (text directly in a flex or grid
+       container or a button) is drawn 1px thin by WebKit, which honours the
+       underline's thickness everywhere, and all engines place it alike. */
+    text-decoration-line: underline !important;
     text-decoration-style: solid !important;
     text-decoration-color: var(--fui-skeleton) !important;
     text-decoration-thickness: 0.8em !important;
     text-decoration-skip-ink: none !important;
+    text-underline-position: auto !important;
+    text-underline-offset: -0.74em !important;
     background-image: none !important;
     scrollbar-color: transparent transparent !important;
     cursor: progress;
@@ -3692,7 +3698,12 @@
     border-color: transparent !important;
     box-shadow: none !important;
     outline-color: transparent !important;
-    text-decoration-color: transparent !important;
+    /* A shape laid out as a block (a flex item) still receives the bars of
+       the boxes around it: decorations propagate and cannot be removed. Its
+       own band, wider and in its own colour, is painted over them. */
+    text-decoration-color: var(--fui-skeleton-surface) !important;
+    text-decoration-thickness: 1.15em !important;
+    text-underline-offset: -0.95em !important;
   }
   [data-fui-loading] > .fui-loading-content :is(
       .fui-button,
@@ -3733,6 +3744,8 @@
     color: revert-layer !important;
     -webkit-text-fill-color: revert-layer !important;
     text-decoration-line: revert-layer !important;
+    text-decoration-thickness: revert-layer !important;
+    text-underline-offset: revert-layer !important;
     background-image: revert-layer !important;
   }
   [data-fui-loading] > .fui-loading-content [data-skeleton="hide"] {
@@ -3742,6 +3755,9 @@
     background-color: var(--fui-skeleton-surface) !important;
     border-color: transparent !important;
     box-shadow: none !important;
+    text-decoration-color: var(--fui-skeleton-surface) !important;
+    text-decoration-thickness: 1.15em !important;
+    text-underline-offset: -0.95em !important;
   }
   [data-fui-loading] > .fui-loading-content [data-skeleton="block"] * {
     visibility: hidden !important;
