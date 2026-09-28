@@ -3656,6 +3656,15 @@
     color: transparent !important;
     -webkit-text-fill-color: transparent !important;
   }
+  /* The skeleton comes and goes at once. Hosts that transition every property
+     (a reduced-motion rule setting transition-duration on *) would otherwise
+     start a transition for each changed property of each element, hundreds
+     of milliseconds of work on a large view. Loading keeps
+     data-fui-loading-settle for a frame after it ends, so turning off is
+     instant too. */
+  :is([data-fui-loading], [data-fui-loading-settle]) > .fui-loading-content :is(*, *::before, *::after) {
+    transition-property: none !important;
+  }
   /* Colour goes by blending each top-level part's luminosity onto the neutral
      surface behind it. Not a filter: filter makes an element the containing
      block of its fixed and absolute descendants, and they would move. */

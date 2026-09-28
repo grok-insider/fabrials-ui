@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, type ComponentProps, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ComponentProps, type ReactNode } from "react";
 import { classes } from "./shared";
 
 const LoadingContext = createContext(false);
@@ -31,10 +31,26 @@ export type LoadingProps = Omit<ComponentProps<"div">, "children"> & {
  * says what is loading. Works on the server; motion follows reduced motion.
  */
 export function Loading({ when, label = "Loading", className, children, ...props }: LoadingProps) {
+  // For a frame after the skeleton ends, transitions stay off (see styles.css),
+  // so the content returns at once instead of transitioning every property.
+  const [previous, setPrevious] = useState(when);
+  const [settling, setSettling] = useState(false);
+  if (previous !== when) {
+    setPrevious(when);
+    setSettling(!when);
+  }
+  useEffect(() => {
+    if (!settling) return;
+    let frame = requestAnimationFrame(() => {
+      frame = requestAnimationFrame(() => setSettling(false));
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [settling]);
   return (
     <div
       data-slot="loading"
       data-fui-loading={when ? "" : undefined}
+      data-fui-loading-settle={settling ? "" : undefined}
       aria-busy={when || undefined}
       className={classes("fui-loading", className)}
       {...props}
