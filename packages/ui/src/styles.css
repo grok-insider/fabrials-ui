@@ -712,9 +712,6 @@
     content: "−";
     color: var(--fui-danger-ink);
   }
-  .fui-code-line[data-diff="removed"] > * {
-    opacity: 0.72;
-  }
   .fui-code-word {
     padding: 0 2px;
     border: 1px solid color-mix(in oklab, var(--foreground) 35%, transparent);

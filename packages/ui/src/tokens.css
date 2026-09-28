@@ -152,12 +152,12 @@
   --fui-shadow-overlay: var(--fui-shadow-md);
 
   /* Syntax: muted gem inks, never Stormlight (that stays the interaction colour). */
-  --fui-syntax-keyword: oklch(0.5 0.17 305);
-  --fui-syntax-string: oklch(0.5 0.12 150);
-  --fui-syntax-number: oklch(0.55 0.14 55);
-  --fui-syntax-function: oklch(0.5 0.14 250);
-  --fui-syntax-type: oklch(0.5 0.1 200);
-  --fui-syntax-tag: oklch(0.52 0.16 22);
+  --fui-syntax-keyword: oklch(0.46 0.17 305);
+  --fui-syntax-string: oklch(0.45 0.11 150);
+  --fui-syntax-number: oklch(0.49 0.13 55);
+  --fui-syntax-function: oklch(0.46 0.14 250);
+  --fui-syntax-type: oklch(0.45 0.09 200);
+  --fui-syntax-tag: oklch(0.47 0.16 22);
   --fui-syntax-variable: var(--foreground);
   --fui-syntax-comment: var(--muted-foreground);
   --fui-syntax-punctuation: color-mix(in oklab, var(--foreground) 70%, var(--muted-foreground));
