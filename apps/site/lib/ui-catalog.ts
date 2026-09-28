@@ -123,7 +123,7 @@ export const uiCatalog: UiCatalogItem[] = [
     "The action control. One primary action per task, with quiet alternatives.",
     ["Button"],
     [
-      ["variant", "default | outline | secondary | ghost | destructive | link", "Visual weight of the action."],
+      ["variant", "default | accent | outline | secondary | ghost | destructive | link", "Visual weight of the action. default is ink, the primary; accent (Stormlight) only when one action must stand out."],
       ["disabled", "boolean", "Unavailable actions stay visible and unnamed as the next step."],
       ["type", "button | submit | reset", "Use submit inside a form."],
     ],

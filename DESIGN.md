@@ -56,19 +56,19 @@ The IBM Plex superfamily, served locally by `fonts.css` in Latin, Latin Extended
 
 | Role | Face | Use |
 | --- | --- | --- |
-| Display | Plex Sans Condensed 600 (`--fui-font-display`) | Hero headlines (40 to 80 px, line height 0.98), page titles (24 px), marketing section titles (28 px), the wordmark |
+| Display | Plex Sans Condensed 600 (`--fui-font-display`) | Hero headlines (40 to 80 px, line height 0.98), page titles (24 px in apps; 36 px, 44 px from 1800 px, for documentation articles), marketing section titles (28 px), the wordmark |
 | Interface | Plex Sans | Body and controls 14 px, metadata 12 px, subsections 16 px |
 | Code | Plex Mono | Code, commands, keys and identifiers. Not for labels |
 | Editorial | Plex Serif | Quotations only |
 
-Numbers use tabular figures. Headings wrap with `text-wrap: balance`. Copy is sentence case; no tracked uppercase eyebrows, no single word in a headline set in another colour, no arrows appended to link text. Do not lower the contrast of essential text to make hierarchy.
+Numbers use tabular figures. Headings wrap with `text-wrap: balance`. Copy is sentence case; no tracked uppercase eyebrows, no single word in a headline set in another colour, no arrows appended to link or button text. Arrows that show a direction (a pager's Previous and Next, a disclosure) are fine. Do not lower the contrast of essential text to make hierarchy.
 
 ## Space, density and shape
 
 - Spacing follows a 4 px grid (`--fui-space-*`).
 - Controls are 40 px (`--fui-control-height`); small 32, extra small 28, large 44. `data-density="compact"` tightens controls to 32 px and collection rows, as a composition choice, not a stored preference. Narrow screens and coarse pointers keep 44 px targets.
-- Corners are crisp: 3 px for keys and badges, 4 px for small parts, 5 px for controls, 6 px for containers, 8 px for overlays (`--fui-radius-xs` to `--fui-radius-xl`). Badges, counts and chips are tags with those 3 to 4 px corners, and a badge's status dot is square, like one pixel of the dither. Pills are only for a passive label that must stand out.
-- Separate with space and hairlines before borders; shadows belong to overlays. Do not box every label and control.
+- Corners are crisp: 3 px for keys and badges, 4 px for small parts and tooltips, 5 px for controls, 6 px for containers, menus, popovers and the command palette, 8 px for dialogs, sheets, toasts and the sign-in card (`--fui-radius-xs` to `--fui-radius-xl`). Tailwind's `rounded-2xl` and larger are not part of the system. Badges, counts and chips are tags with those 3 to 4 px corners, and a badge's status dot is square, like one pixel of the dither; `StatusDot` stays a round light. Pills are only for a passive label that must stand out.
+- Separate with space and hairlines before borders; shadows belong to overlays, and a card carries at most the small shadow. Do not box every label and control.
 - Tables scroll inside their labelled region; the page never scrolls sideways.
 
 ## Dithering is the brand
@@ -92,7 +92,7 @@ Three pieces use it, and every product uses them in these places:
 
 Motion answers what a person did: opening, expanding, confirming. Durations are 100, 150 and 240 ms (`--fui-duration-fast`, `--fui-duration`, `--fui-duration-slow`) with a quick-out ease, and all drop to 0 under reduced motion.
 
-- Continuous motion is reserved for genuine loading indicators.
+- Continuous motion is reserved for genuine loading indicators, and for a `StatusDot` with `pulse` while something is live or in progress.
 - A page may have one orchestrated moment: `DitherScene` and a large `DitherGem` accept `reveal`, so the storm rolls in or the gem fills with light once on first paint. Never again, and not under reduced motion.
 - A `TimelineItem` marked `fresh` highlights once when a live item arrives.
 - `MoonPhase` and `Starfield` are the sign-in exception inherited from Radiant; they stop under reduced motion.
@@ -113,7 +113,7 @@ A loading view is the finished view painted as its own skeleton. Wrap the real c
 
 - **Product screens** use `WorkspaceShell` with navigation and header slots when they need a shell; hosts own routing, active state, authentication, theme storage and native window chrome. Mail keeps its resizable panes; desktop keeps native window behaviour.
 - **Page patterns** come first: `PageHeader`, `SectionHeader`, `CollectionToolbar`, `Table`, `BulkActions`, `StatePanel`. Bulk actions appear once selection begins. Filters live next to their collection; primary actions next to their task.
-- **Nothing is centred on the page.** Headers span the window; content anchors to the same left gutter (`--fui-page-padding`), with a maximum width for reading but no `margin-inline: auto`. On a wide screen the free space stays on the right. Centring is for small things inside a component (an empty state, a toast on a phone), never for a page column.
+- **Nothing is centred on the page.** Headers span the window; content anchors to the same left gutter (`--fui-page-padding`), with a maximum width for reading but no `margin-inline: auto`. On a wide screen the free space stays on the right. Centring is for small things inside a component (an empty state, a toast on a phone), never for a page column. Two frames are the exceptions: documentation uses three columns (a sidebar panel reaching the left edge, the article, the page index) whose outer columns share the extra width, and a sign-in `AuthLayout` without an aside centres its card; with the storm aside the card anchors left.
 - **Landings** are left-aligned and asymmetric: the headline and one command or action on the left, the storm on the right. Lists of products or features are indexes (rows with a mark, a name, one line and a link), not grids of identical cards. Numbered markers only for real sequences. Marketing compositions stay in the host and may use tokens and controls; they never become a `WorkspaceShell`.
 - **Navigation** that will grow groups its items: fabrials.com's Products menu groups tools by how people use them (install, hosted, developers, open data), each with its gem.
 
