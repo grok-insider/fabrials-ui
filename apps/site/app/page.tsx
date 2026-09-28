@@ -1,22 +1,16 @@
 import Link from "next/link";
 import {
   DitherScene,
-  SectionHeader,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
 } from "@fabrials/ui";
 import { buttonVariants } from "@fabrials/ui/button-variants";
 import { CodeBlock } from "@/components/code-block";
-import { LandingDemo } from "@/components/landing-demo";
-import { LandingTour } from "@/components/landing-tour";
+import { HomeDemo } from "@/components/demo/home-demo";
 import { catalog } from "@/lib/catalog";
 import { externalIndex } from "@/lib/external-index.generated";
 import { shimIndex } from "@/lib/shims-index.generated";
@@ -102,40 +96,39 @@ export default function Home() {
         </ul>
       </section>
 
-      <section id="try-it" className="scroll-mt-24 border-t py-14">
-        <SectionHeader
-          title="Watch an agent use the interface you use."
-          description="Every step is a real WebMCP tool call against this page's state. Run the built-in agent, take over at any moment, or connect your browser's own agent. You make the final decision."
-          actions={
-            <Link href="/docs/comparison" className={buttonVariants({ variant: "outline", size: "sm" })}>
-              Build this interaction
-            </Link>
-          }
-        />
-        <Tabs defaultValue="live">
-          <TabsList aria-label="Demo format">
-            <TabsTrigger value="live">Live demo</TabsTrigger>
-            <TabsTrigger value="tour">Narrated tour, 53 s</TabsTrigger>
-          </TabsList>
-          <TabsContent value="live" keepMounted>
-            <LandingDemo />
-          </TabsContent>
-          <TabsContent value="tour">
-            <LandingTour />
-          </TabsContent>
-        </Tabs>
+      <section id="try-it" className="scroll-mt-24 border-t py-14" aria-labelledby="try-title">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h2 id="try-title" className="font-display text-[1.75rem] leading-tight font-semibold">
+              Watch an agent use the interface you use.
+            </h2>
+            <p className="mt-2 max-w-[64ch] text-muted-foreground">
+              Follow the narrated tour, or switch to Try it yourself: the store registers real WebMCP tools for your
+              browser&apos;s agent, and you can call them yourself. You make the final decision.
+            </p>
+          </div>
+          <Link href="/docs/comparison" className={buttonVariants({ variant: "outline", size: "sm" })}>
+            Build this interaction
+          </Link>
+        </div>
+        <HomeDemo />
       </section>
 
       <section className="border-t py-14" aria-labelledby="libraries-title">
-        <SectionHeader
-          title={<span id="libraries-title">Components from other libraries</span>}
-          description="Published unchanged with their license at the top of every file. Each page says where the component departs from the Fabrials principles."
-          actions={
-            <Link href="/libraries" className={buttonVariants({ variant: "outline", size: "sm" })}>
-              How a library gets in
-            </Link>
-          }
-        />
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h2 id="libraries-title" className="font-display text-[1.75rem] leading-tight font-semibold">
+              Components from other libraries
+            </h2>
+            <p className="mt-2 max-w-[64ch] text-muted-foreground">
+              Published unchanged with their license in every file. Each page says where the component departs from the
+              Fabrials principles.
+            </p>
+          </div>
+          <Link href="/libraries" className={buttonVariants({ variant: "outline", size: "sm" })}>
+            How a library gets in
+          </Link>
+        </div>
         <Table aria-label="Libraries">
           <TableHeader>
             <TableRow>

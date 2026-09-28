@@ -69,11 +69,11 @@ export function TourAgentPanel({ time }: { time: number }) {
   return (
     <aside
       aria-label="MCP tour activity"
-      className="self-start rounded-xl border bg-background shadow-xl shadow-black/5 xl:sticky xl:top-40"
+      className="demo-side"
     >
-      <div className="flex items-center justify-between gap-2 border-b p-4">
+      <div className="demo-side-head">
         <div className="flex items-center gap-2">
-          <Braces className="size-4" />
+          <Braces aria-hidden className="size-4 text-muted-foreground" />
           <h4 className="text-sm font-medium">Inside the agent</h4>
         </div>
         <Button
@@ -89,16 +89,16 @@ export function TourAgentPanel({ time }: { time: number }) {
           {collapsed ? <ChevronDown /> : <ChevronUp />}
         </Button>
       </div>
-      <div className="px-4 py-3 text-xs text-muted-foreground">
-        Illustrated tool calls · synced to the tour
-      </div>
+      <p className="px-4 pt-3 text-xs text-muted-foreground">
+        Illustrated tool calls, synced to the narration.
+      </p>
       <div
         id="tour-agent-content"
         hidden={collapsed}
-        className="space-y-5 px-4 pb-5"
+        className="space-y-5 px-4 pt-3 pb-5"
       >
         <div
-          className="rounded-xl bg-muted p-4 text-sm leading-6"
+          className="rounded-md border bg-background p-3 text-sm leading-6"
           aria-label="Your request"
         >
           <span className="sr-only">{landingPrompt}</span>
@@ -123,9 +123,9 @@ export function TourAgentPanel({ time }: { time: number }) {
         {current ? (
           <div
             key={current.name}
-            className="tour-enter overflow-hidden rounded-xl border"
+            className="tour-enter overflow-hidden rounded-md border bg-background"
           >
-            <div className="space-y-3 p-4">
+            <div className="space-y-2 p-3">
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 {reviewing || current.source === "Human" ? (
                   <UserRound className="size-3.5" />
@@ -134,13 +134,13 @@ export function TourAgentPanel({ time }: { time: number }) {
                 )}
                 {reviewing ? "Your turn" : `${current.source} action`}
               </div>
-              <h5 className="text-base font-medium">{current.title}</h5>
+              <h5 className="font-display text-lg leading-tight font-semibold">{current.title}</h5>
               {reviewing ? (
                 <>
                   <p className="text-sm leading-6 text-muted-foreground">
                     Check the selection before you decide.
                   </p>
-                  <dl className="space-y-2 rounded-lg bg-muted/50 p-3 text-sm">
+                  <dl className="space-y-2 border-y py-2 text-sm">
                     <div className="flex justify-between gap-2">
                       <dt>Studio Dual</dt>
                       <dd>€1,290</dd>
@@ -159,11 +159,11 @@ export function TourAgentPanel({ time }: { time: number }) {
               )}
             </div>
             {current.args !== null && (
-              <details className="border-t bg-muted/20 px-4 py-3">
+              <details className="border-t px-3 py-2">
                 <summary className="cursor-pointer text-xs text-muted-foreground">
                   Tool details
                 </summary>
-                <p className="mt-3 break-all font-mono text-xs">
+                <p className="mt-2 break-all font-mono text-xs">
                   {current.name}
                 </p>
                 {Object.keys(current.args).length > 0 ? (
@@ -199,7 +199,7 @@ export function TourAgentPanel({ time }: { time: number }) {
             <ol className="mt-3 space-y-3">
               {completed.slice(0, -1).map((a) => (
                 <li key={a.name} className="text-xs leading-5">
-                  <span className="text-muted-foreground">{a.source} · </span>
+                  <span className="text-muted-foreground">{a.source}: </span>
                   {a.result}
                 </li>
               ))}
@@ -228,7 +228,7 @@ export function TourAgentPanel({ time }: { time: number }) {
         {time >= tourCues.outro && (
           <a
             href="/playground#comparison"
-            className="flex items-center justify-between rounded-lg bg-foreground p-3 text-sm text-background"
+            className="flex items-center justify-between rounded-md border p-3 text-sm hover:bg-accent"
           >
             Try it in the playground
             <ArrowRight className="size-4" />

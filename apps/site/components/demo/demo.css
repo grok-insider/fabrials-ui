@@ -1,0 +1,303 @@
+/* Home demo: one panel. A title row with the mode, then the store and a side
+   column split by a hairline; the narrated tour adds a transport row. */
+.demo {
+  overflow: clip;
+  border: 1px solid var(--border);
+  border-radius: var(--fui-radius-lg);
+  background: var(--card);
+  --fui-dither-bg: var(--card);
+}
+.demo-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--fui-space-2) var(--fui-space-4);
+  min-height: 3rem;
+  padding: var(--fui-space-2) var(--fui-space-4);
+  border-bottom: 1px solid var(--border);
+}
+.demo-bar-note {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: var(--fui-text-sm);
+}
+.demo-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 22rem;
+  min-width: 0;
+}
+.demo-stage {
+  display: grid;
+  align-content: start;
+  gap: var(--fui-space-5);
+  min-width: 0;
+  padding: var(--fui-space-5);
+}
+.demo-side {
+  display: grid;
+  align-content: start;
+  min-width: 0;
+  border-left: 1px solid var(--border);
+  background: var(--background);
+}
+.demo-side-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fui-space-2);
+  min-height: 2.75rem;
+  padding: var(--fui-space-1) var(--fui-space-2) var(--fui-space-1) var(--fui-space-4);
+  border-bottom: 1px solid var(--border);
+}
+.demo-side-head > div {
+  display: flex;
+  align-items: center;
+  gap: var(--fui-space-2);
+}
+.demo-side-body {
+  display: grid;
+  align-content: start;
+  gap: var(--fui-space-5);
+  padding: var(--fui-space-4);
+}
+
+/* Narrated: chapter heading, requirements, transport. */
+.demo-chapter {
+  display: grid;
+  gap: var(--fui-space-1);
+}
+.demo-chapter p {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: var(--fui-text-sm);
+}
+.demo-chapter h3 {
+  margin: 0;
+  font: var(--fui-weight-semibold) clamp(1.75rem, 2.4vw, 2.5rem) / 1 var(--fui-font-display);
+  text-wrap: balance;
+}
+.demo-needs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--fui-space-6);
+  margin: 0;
+  padding-block: var(--fui-space-2);
+  border-block: 1px solid var(--border);
+}
+.demo-needs div {
+  display: flex;
+  align-items: baseline;
+  gap: var(--fui-space-2);
+}
+.demo-needs dt {
+  color: var(--muted-foreground);
+  font-size: var(--fui-text-sm);
+}
+.demo-needs dd {
+  margin: 0;
+  font-weight: var(--fui-weight-medium);
+  font-variant-numeric: tabular-nums;
+}
+.demo-choice {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--fui-space-1-5);
+  height: 1.75rem;
+  padding-inline: var(--fui-space-2-5);
+  border: 1px solid var(--border);
+  border-radius: var(--fui-radius-md);
+  color: var(--muted-foreground);
+  font-size: var(--fui-text-xs);
+}
+.demo-choice[data-selected] {
+  border-color: var(--foreground);
+  background: var(--foreground);
+  color: var(--background);
+}
+.demo-reason {
+  display: grid;
+  gap: 2px;
+}
+.demo-reason small {
+  color: var(--muted-foreground);
+  font-size: var(--fui-text-xs);
+}
+.demo-reason small[data-good] {
+  color: var(--fui-success-ink);
+}
+.demo-transport {
+  display: grid;
+  gap: var(--fui-space-3);
+  padding: var(--fui-space-3) var(--fui-space-4) var(--fui-space-4);
+  border-top: 1px solid var(--border);
+}
+.demo-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--fui-space-2);
+}
+.demo-chapters {
+  display: flex;
+  flex: 1 1 24rem;
+  gap: 3px;
+  min-width: 0;
+  margin: 0 var(--fui-space-2);
+  padding: 0;
+  list-style: none;
+}
+.demo-chapters li {
+  flex-basis: 0;
+  min-width: 0;
+}
+.demo-chapters button {
+  position: relative;
+  display: grid;
+  width: 100%;
+  padding: 0.875rem 0 0;
+  border: 0;
+  background: none;
+  color: var(--muted-foreground);
+  text-align: left;
+  cursor: pointer;
+}
+.demo-chapters button::before,
+.demo-chapter-fill {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  border-radius: 1px;
+  background: color-mix(in oklab, var(--foreground) 14%, transparent);
+}
+.demo-chapter-fill {
+  background: var(--brand-ink);
+  transform-origin: left;
+}
+.demo-chapter-label {
+  overflow: hidden;
+  font-size: var(--fui-text-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.demo-chapters button[aria-current] {
+  color: var(--foreground);
+}
+.demo-chapters button:hover {
+  color: var(--foreground);
+}
+.demo-time {
+  min-width: 4.5rem;
+  color: var(--muted-foreground);
+  font-size: var(--fui-text-xs);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.demo-caption {
+  min-height: 2rem;
+  margin: 0;
+  max-width: 60ch;
+  font-size: var(--fui-text-lg);
+  line-height: 1.5;
+}
+.demo-error {
+  margin: 0;
+  color: var(--fui-danger-ink);
+  font-size: var(--fui-text-sm);
+}
+
+/* Free: requirements, selection and the agent console. */
+.demo-requirements {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--fui-space-3);
+}
+.demo-selection {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fui-space-3);
+  padding-top: var(--fui-space-4);
+  border-top: 1px solid var(--border);
+}
+.demo-prompt {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--fui-space-2);
+  padding: var(--fui-space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--fui-radius-md);
+  background: var(--card);
+}
+.demo-prompt p {
+  flex: 1;
+  margin: 0;
+  font-size: var(--fui-text-sm);
+  line-height: 1.5;
+}
+.demo-steps {
+  display: grid;
+  gap: var(--fui-space-2);
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--muted-foreground);
+  font-size: var(--fui-text-sm);
+  line-height: 1.5;
+}
+.demo-steps a {
+  color: var(--brand-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.demo-call {
+  padding-block: var(--fui-space-3);
+  border-block: 1px solid var(--border);
+}
+.demo-call summary {
+  font-size: var(--fui-text-sm);
+  font-weight: var(--fui-weight-medium);
+  cursor: pointer;
+}
+
+@media (max-width: 1100px) {
+  .demo-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .demo-side {
+    border-top: 1px solid var(--border);
+    border-left: 0;
+  }
+}
+@media (max-width: 639px) {
+  .demo-stage {
+    padding: var(--fui-space-4);
+  }
+  .demo-chapter-label {
+    display: none;
+  }
+  .demo-chapters {
+    order: 5;
+    flex-basis: 100%;
+    margin: var(--fui-space-1) 0 0;
+  }
+}
+
+/* The tool call the narration reaches: it arrives once, then stays still. */
+@keyframes demo-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+.tour-enter {
+  animation: demo-enter var(--fui-duration-slow) var(--fui-ease);
+}
+@media (prefers-reduced-motion: reduce) {
+  .tour-enter {
+    animation: none;
+  }
+}

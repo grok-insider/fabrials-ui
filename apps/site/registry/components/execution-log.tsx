@@ -3,14 +3,28 @@ import { Check, Circle, Loader2, X } from "lucide-react";
 import { Badge, Button, Progress } from "@fabrials/ui";
 import { ResultView } from "@/registry/components/result-view";
 import type { Execution } from "@/registry/mcp/types";
+const statusLabels: Record<string, string> = {
+  running: "Running",
+  success: "Done",
+  error: "Failed",
+  cancelled: "Cancelled",
+};
+const defaultSourceLabels: Record<Execution["source"], string> = {
+  human: "You",
+  agent: "Agent",
+  simulator: "Simulator",
+};
 export function ExecutionLog({
   executions,
   onCancel,
   onClear,
+  sourceLabels = defaultSourceLabels,
 }: {
   executions: Execution[];
   onCancel?: (id: string) => void;
   onClear?: () => void;
+  /** Who made each call, in the reader's words. */
+  sourceLabels?: Partial<Record<Execution["source"], string>>;
 }) {
   return (
     <section className="space-y-3" aria-label="Execution history">
@@ -28,7 +42,7 @@ export function ExecutionLog({
         )}
       </header>
       {!executions.length && (
-        <div className="flex min-h-28 flex-col items-center justify-center gap-2 rounded-lg border border-dashed text-muted-foreground">
+        <div className="flex min-h-28 flex-col items-center justify-center gap-2 rounded-md border border-dashed text-muted-foreground">
           <Circle className="size-4" />
           <p className="text-xs">Run a tool to see its activity here.</p>
         </div>
@@ -36,7 +50,7 @@ export function ExecutionLog({
       {executions.map((e) => (
         <details
           key={e.id}
-          className="rounded-lg border p-3"
+          className="rounded-md border p-3"
           open={e.status === "running" || undefined}
         >
           <summary className="flex cursor-pointer list-none flex-wrap items-center gap-2 text-xs">
@@ -48,9 +62,9 @@ export function ExecutionLog({
               <X className="size-3.5 text-destructive" />
             )}
             <span className="flex-1 font-mono">{e.name}</span>
-            <Badge variant="soft">{e.source}</Badge>
+            <Badge variant="outline">{sourceLabels[e.source] ?? defaultSourceLabels[e.source]}</Badge>
             <span role="status" className="text-muted-foreground">
-              {e.status}
+              {statusLabels[e.status] ?? e.status}
             </span>
           </summary>
           <div className="mt-4 space-y-3">

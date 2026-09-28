@@ -68,5 +68,5 @@ it("executes editable playground arguments against the visible travel state", as
   await u.selectOptions(runner.getByLabelText(/^id/), "garden");
   await u.click(runner.getByRole("button", { name: "Execute tool" }));
   expect(screen.getByText(/Garden Loft is on your shortlist/)).toBeTruthy();
-  expect(runner.getAllByText("success")).toHaveLength(2);
+  expect(runner.getAllByText("Done")).toHaveLength(2);
 });

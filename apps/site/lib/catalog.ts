@@ -312,6 +312,7 @@ export const catalog: CatalogItem[] = [
       ["executions", "Execution[]", "Newest-first execution records."],
       ["onCancel", "(id) => void", "Cancel the associated request."],
       ["onClear", "() => void", "Clear completed history."],
+      ["sourceLabels", "{ human?, agent?, simulator? }", "Who made each call, in the reader's words. Defaults: You, Agent, Simulator."],
     ],
     "History is in memory and capped at 100 in the providers. Cancellation does not imply rollback. Failed mutations are never automatically replayed.",
   ),

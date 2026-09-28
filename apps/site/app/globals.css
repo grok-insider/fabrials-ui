@@ -137,56 +137,6 @@ html {
   scroll-padding-top: 100px;
 }
 
-.tour-theatre .comparison-table {
-  border-radius: var(--fui-radius-lg);
-}
-.tour-theatre .comparison-table th,
-.tour-theatre .comparison-table td {
-  padding: 1rem;
-}
-.tour-theatre .comparison-table th {
-  padding-top: 1rem;
-  padding-bottom: 1rem;
-}
-@keyframes tour-enter {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-.tour-enter {
-  animation: tour-enter 0.5s ease-out;
-}
-@media (max-width: 639px) {
-  .tour-theatre .comparison-mobile {
-    display: none;
-  }
-  .tour-theatre .comparison-table {
-    display: block;
-  }
-  .tour-theatre .comparison-table table {
-    min-width: 0;
-    font-size: 12px;
-  }
-  .tour-theatre .comparison-table th,
-  .tour-theatre .comparison-table td {
-    padding: 10px 8px;
-  }
-  .tour-theatre .comparison-table svg {
-    height: 56px;
-  }
-  .tour-theatre .comparison-table .text-lg {
-    font-size: 14px;
-  }
-  .tour-theatre .comparison-table .mt-4 {
-    margin-top: 8px;
-  }
-}
-
 .tour-type-caret {
   border-left: 2px solid currentColor;
   margin-left: 1px;
