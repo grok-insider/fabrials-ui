@@ -14,7 +14,7 @@ test.skip(({ browserName }) => browserName !== "chromium", "One engine is enough
 const inline = (page: Page, selector: string, css: Record<string, string>) =>
   page.evaluate(
     ([selector, css]) => {
-      for (const el of document.querySelectorAll<HTMLElement>(`.docs-preview-stage .fui-loading-content ${selector}`))
+      for (const el of document.querySelectorAll<HTMLElement>(`.docs-preview-stage > .fui-loading > .fui-loading-content ${selector}`))
         for (const [property, value] of Object.entries(css)) el.style.setProperty(property, value, "important");
     },
     [selector, css] as const,

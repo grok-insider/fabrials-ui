@@ -48,7 +48,7 @@ export async function openPreview(page: Page, slug: string, { theme = "light" as
   // A page that documents a server piece has no preview by design.
   test.skip((await page.locator("#preview").count()) === 0, "This page has no preview");
   await setTheme(page, theme);
-  await expect(page.locator(".docs-preview-stage .fui-loading")).toHaveCount(1);
+  await expect(page.locator(".docs-preview-stage > .fui-loading")).toHaveCount(1);
   await expect(toggle(page)).toBeVisible();
   await page.evaluate(() => document.fonts.ready.then(() => undefined));
   await toggle(page).scrollIntoViewIfNeeded();
@@ -62,7 +62,7 @@ export async function setLoading(page: Page, on: boolean) {
   const control = toggle(page);
   if ((await control.getAttribute("aria-checked")) !== String(on)) await control.click();
   await expect(control).toHaveAttribute("aria-checked", String(on));
-  const root = page.locator(".docs-preview-stage .fui-loading");
+  const root = page.locator(".docs-preview-stage > .fui-loading");
   if (on) await expect(root).toHaveAttribute("data-fui-loading", "");
   else await expect(root).not.toHaveAttribute("data-fui-loading");
   // Real frames (not requestAnimationFrame, which a frozen clock holds back):

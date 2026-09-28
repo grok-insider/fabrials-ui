@@ -66,7 +66,7 @@ for (const motion of ["no-preference", "reduce"] as const)
         });
       });
 
-      const root = page.locator(".docs-preview-stage .fui-loading");
+      const root = page.locator(".docs-preview-stage > .fui-loading");
       const toggles: { style: number; layout: number }[] = [];
       for (let i = 0; i < 3; i += 1)
         for (const on of [true, false])

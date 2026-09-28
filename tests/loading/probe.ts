@@ -61,7 +61,7 @@ export function installProbe() {
     return found;
   };
   const content = () => {
-    const found = stage().querySelector<HTMLElement>(".fui-loading-content");
+    const found = stage().querySelector<HTMLElement>(":scope > .fui-loading > .fui-loading-content");
     if (!found) throw new Error("No Loading content inside the preview stage");
     return found;
   };

@@ -25,7 +25,7 @@ async function audit(page: import("@playwright/test").Page) {
 for (const slug of componentSlugs())
   test(`skeleton accessibility ${slug}`, async ({ page }) => {
     await openPreview(page, slug);
-    const root = page.locator(".docs-preview-stage .fui-loading");
+    const root = page.locator(".docs-preview-stage > .fui-loading");
     const status = root.locator(':scope > [role="status"]');
     await expect(status).toHaveText("");
 
@@ -42,7 +42,7 @@ for (const slug of componentSlugs())
       await page.keyboard.press("Tab");
       const focus = await page.evaluate(() => {
         const active = document.activeElement;
-        const content = document.querySelector(".docs-preview-stage .fui-loading-content");
+        const content = document.querySelector(".docs-preview-stage > .fui-loading > .fui-loading-content");
         return { inside: !!active && !!content?.contains(active), name: active ? `${active.tagName.toLowerCase()} ${active.textContent?.trim().slice(0, 30) ?? ""}` : "none" };
       });
       expect.soft(focus.inside, `Tab ${i + 1} from the switch focused ${focus.name} inside the loading content`).toBe(false);
