@@ -15,8 +15,10 @@ export default defineConfig({
   testDir: "./tests/loading",
   outputDir: "./test-results/loading",
   globalSetup: "./tests/loading/global-setup.ts",
-  timeout: 120_000,
-  expect: { timeout: 10_000 },
+  // Shared CI runners are several times slower; a preview with thousands of
+  // elements (Magic UI's dot pattern) takes ~30 s per variations test locally.
+  timeout: process.env.CI ? 360_000 : 120_000,
+  expect: { timeout: process.env.CI ? 30_000 : 10_000 },
   fullyParallel: true,
   workers: Number(process.env.LOADING_WORKERS ?? 6),
   // Shared CI runners are slow and busy; one retry absorbs timing noise there.
