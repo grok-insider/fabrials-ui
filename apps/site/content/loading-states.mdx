@@ -3,7 +3,7 @@ A loading view in Fabrials is the finished view, painted as its own skeleton. Wr
 ```tsx title="app/accounts/accounts-panel.tsx"
 "use client";
 import { Loading, placeholderList, placeholderText } from "@fabrials/ui";
-import { AccountsTable } from "./accounts-table";
+import { AccountsTable, type Account } from "./accounts-table";
 
 const placeholders = placeholderList(5, (i) => ({
   id: `placeholder-${i}`,
