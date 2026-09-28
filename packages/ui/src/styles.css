@@ -3627,12 +3627,17 @@
      !important beats host utilities and inline colours; it never touches layout.
      Text: a bar per line, as long as the text (a thick underline raised onto it).
      Media: blocks. Colour: none (luminosity blend), so no tone or gem leaks through.
-     Coloured controls: neutral solid shapes. Borders and surfaces: structure. */
+     Coloured controls: neutral solid shapes. Borders and surfaces: structure.
+     A part marked data-skeleton="keep" is left out of every rule below, and
+     so are the boxes that contain it: their colour is what the kept part
+     inherits, and their bars would reach into it (decorations propagate). */
   .fui-loading,
   .fui-loading-content {
     display: contents;
   }
-  [data-fui-loading] > .fui-loading-content * {
+  [data-fui-loading]
+    > .fui-loading-content
+    :not(:where([data-skeleton="keep"], [data-skeleton="keep"] *, :has([data-skeleton="keep"]))) {
     color: transparent !important;
     -webkit-text-fill-color: transparent !important;
     caret-color: transparent !important;
@@ -3652,7 +3657,7 @@
     scrollbar-color: transparent transparent !important;
     cursor: progress;
   }
-  [data-fui-loading] > .fui-loading-content *::placeholder {
+  [data-fui-loading] > .fui-loading-content :not(:where([data-skeleton="keep"], [data-skeleton="keep"] *))::placeholder {
     color: transparent !important;
     -webkit-text-fill-color: transparent !important;
   }
@@ -3671,23 +3676,27 @@
   [data-fui-loading] > .fui-loading-content > * {
     mix-blend-mode: luminosity;
   }
-  [data-fui-loading] > .fui-loading-content :is(svg, img, video, picture, [role="img"]) {
+  [data-fui-loading]
+    > .fui-loading-content
+    :is(svg, img, video, picture, [role="img"]):not(:where([data-skeleton="keep"], [data-skeleton="keep"] *)) {
     background-color: var(--fui-skeleton) !important;
     border-radius: var(--fui-radius-xs);
     box-shadow: none !important;
   }
-  [data-fui-loading] > .fui-loading-content svg * {
+  [data-fui-loading] > .fui-loading-content svg:not(:where([data-skeleton="keep"], [data-skeleton="keep"] *)) * {
     visibility: hidden !important;
   }
-  [data-fui-loading] > .fui-loading-content :is(img, video) {
+  [data-fui-loading] > .fui-loading-content :is(img, video):not(:where([data-skeleton="keep"], [data-skeleton="keep"] *)) {
     object-position: -300vw 0 !important;
   }
-  [data-fui-loading] > .fui-loading-content canvas {
+  [data-fui-loading] > .fui-loading-content canvas:not(:where([data-skeleton="keep"], [data-skeleton="keep"] *)) {
     visibility: hidden !important;
   }
   /* Controls that carry their own fill become one solid, neutral shape, and
      nothing inside them paints: no bars, dots, thumbs, icons or inner fills. */
-  [data-fui-loading] > .fui-loading-content :is(
+  [data-fui-loading]
+    > .fui-loading-content
+    :is(
       .fui-button,
       .fui-badge,
       .fui-filter-chip,
@@ -3702,7 +3711,7 @@
       .fui-nav-tab-count,
       .fui-sidebar-menu-badge,
       [data-skeleton="fill"]
-    ) {
+    ):not(:where([data-skeleton="keep"], [data-skeleton="keep"] *)) {
     background-color: var(--fui-skeleton-surface) !important;
     border-color: transparent !important;
     box-shadow: none !important;
@@ -3714,7 +3723,9 @@
     text-decoration-thickness: 1.15em !important;
     text-underline-offset: -0.95em !important;
   }
-  [data-fui-loading] > .fui-loading-content :is(
+  [data-fui-loading]
+    > .fui-loading-content
+    :is(
       .fui-button,
       .fui-badge,
       .fui-filter-chip,
@@ -3729,7 +3740,7 @@
       .fui-nav-tab-count,
       .fui-sidebar-menu-badge,
       [data-skeleton="fill"]
-    )
+    ):not(:where([data-skeleton="keep"], [data-skeleton="keep"] *))
     * {
     background-color: transparent !important;
     border-color: transparent !important;
@@ -3737,26 +3748,21 @@
     text-decoration-color: transparent !important;
   }
   /* Fields keep their frame and show a short bar where the value would be. */
-  [data-fui-loading] > .fui-loading-content :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="hidden"]), textarea, select) {
+  [data-fui-loading]
+    > .fui-loading-content
+    :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="hidden"]), textarea, select):not(
+      :where([data-skeleton="keep"], [data-skeleton="keep"] *)
+    ) {
     background-image: linear-gradient(var(--fui-skeleton), var(--fui-skeleton)) !important;
     background-repeat: no-repeat !important;
     background-size: min(9rem, 45%) 0.8em !important;
     background-position: 0.75rem center !important;
     text-decoration-color: transparent !important;
   }
-  [data-fui-loading] > .fui-loading-content textarea {
+  [data-fui-loading] > .fui-loading-content textarea:not(:where([data-skeleton="keep"], [data-skeleton="keep"] *)) {
     background-position: 0.75rem 0.7rem !important;
   }
-  /* Hosts opt parts out: keep = paint as usual, hide = leave the space empty, block = one bone. */
-  [data-fui-loading] > .fui-loading-content [data-skeleton="keep"],
-  [data-fui-loading] > .fui-loading-content [data-skeleton="keep"] * {
-    color: revert-layer !important;
-    -webkit-text-fill-color: revert-layer !important;
-    text-decoration-line: revert-layer !important;
-    text-decoration-thickness: revert-layer !important;
-    text-underline-offset: revert-layer !important;
-    background-image: revert-layer !important;
-  }
+  /* Hosts tune a part: keep = paint as usual (left out above), hide = leave the space empty, block = one bone. */
   [data-fui-loading] > .fui-loading-content [data-skeleton="hide"] {
     visibility: hidden !important;
   }
