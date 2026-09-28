@@ -150,6 +150,19 @@
   --fui-shadow-lg:
     0 4px 8px oklch(0.2 0.015 255 / 6%), 0 24px 48px -12px oklch(0.2 0.015 255 / 24%);
   --fui-shadow-overlay: var(--fui-shadow-md);
+
+  /* Syntax: muted gem inks, never Stormlight (that stays the interaction colour). */
+  --fui-syntax-keyword: oklch(0.5 0.17 305);
+  --fui-syntax-string: oklch(0.5 0.12 150);
+  --fui-syntax-number: oklch(0.55 0.14 55);
+  --fui-syntax-function: oklch(0.5 0.14 250);
+  --fui-syntax-type: oklch(0.5 0.1 200);
+  --fui-syntax-tag: oklch(0.52 0.16 22);
+  --fui-syntax-variable: var(--foreground);
+  --fui-syntax-comment: var(--muted-foreground);
+  --fui-syntax-punctuation: color-mix(in oklab, var(--foreground) 70%, var(--muted-foreground));
+  --fui-syntax-deleted: var(--fui-danger-ink);
+  --fui-syntax-inserted: var(--fui-success-ink);
 }
 
 .dark,
@@ -224,6 +237,13 @@
   --fui-shadow-lg:
     0 4px 8px oklch(0 0 0 / 35%), 0 28px 56px -12px oklch(0 0 0 / 60%);
   --fui-shadow-overlay: var(--fui-shadow-md);
+
+  --fui-syntax-keyword: oklch(0.78 0.12 305);
+  --fui-syntax-string: oklch(0.8 0.12 150);
+  --fui-syntax-number: oklch(0.8 0.12 60);
+  --fui-syntax-function: oklch(0.8 0.1 245);
+  --fui-syntax-type: oklch(0.8 0.08 200);
+  --fui-syntax-tag: oklch(0.76 0.13 22);
 }
 
 [data-gem="stormlight"] {

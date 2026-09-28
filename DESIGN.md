@@ -118,6 +118,7 @@ The catalogue lives in Storybook (`bun run storybook`, port 6041) and at ui.fabr
 - **Overlays:** Dialog, AlertDialog, Sheet, DropdownMenu (with submenus), Tooltip, Popover, HoverCard, Command, ConfirmDialog. They render from `fui-` styles without Tailwind.
 - **Collections:** Table, Tabs, NavTabs, Badge, Progress, Skeleton, Card, Accordion, Breadcrumb, Pagination, DescriptionList, Kbd and KbdGroup.
 - **Data:** Stat, StatGroup, Sparkline, Meter, StatusDot, NumberTicker, SeriesChart, ActivityStrip, Timeline, RelativeTime.
+- **Docs pieces:** CodePanel, CodeTabs, PackageInstall, Files/Folder/File and RepoInfo. Syntax uses the muted `--fui-syntax-*` inks, never Stormlight.
 - **Brand and chrome:** DitherScene, DitherBand, DitherGem, DitherCanvas, ProductLockup, FabrialsGem, Avatar, Snippet, CopyButton, SiteHeader, AuthLayout, MoonPhase, Starfield.
 - **Patterns:** WorkspaceShell, Sidebar, PageHeader, SectionHeader, CollectionToolbar, BulkActions, StatePanel, SettingsSection, FilterChip, FileThumb, SuggestionCard, TruncatedText, ShimmerText.
 - **`@fabrials/ai-ui`:** provider, quota, history and migration presentation, and the chat pieces (ChatMessage, ChatComposer, CodeBlock with `.fui-markdown`, citations, activity, attachments, VoiceInputButton).

@@ -33,6 +33,7 @@ const stories: Record<string, string> = {
   highstorm: "fabrials-highstorm--landing",
   "highstorm-sign-in": "fabrials-highstorm--sign-in",
   "shadcn-parts": "fabrials-shadcn-parts--gallery",
+  "docs-pieces": "fabrials-docs-pieces--gallery",
 };
 
 for (const theme of ["light", "dark"]) {

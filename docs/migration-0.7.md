@@ -52,6 +52,20 @@ missing: `DialogPortal`, `DialogOverlay`, `SheetFooter`,
 `KbdGroup`, and the `icon-lg` button size. Nothing
 existing changes.
 
+### Docs pieces
+
+- `CodePanel`: a code sample with its file name and icon, a copy button,
+  line numbers, highlighted lines, boxed words and diff marks. It highlights
+  TypeScript/JSX, JSON, shell, CSS and HTML itself (`highlightCode`, pure);
+  pass Shiki output as children to use Shiki instead. Syntax colours are the
+  new `--fui-syntax-*` tokens.
+- `CodeTabs`: several versions of one sample in one frame.
+- `PackageInstall`: one command in npm, pnpm, yarn and bun; the choice is
+  shared by every instance on the page and can be remembered.
+- `Files`, `Folder`, `File`: a file tree whose folders open and close.
+- `RepoInfo`: a repository as a compact link with stars and forks; the host
+  fetches the numbers.
+
 ## New in `@fabrials/ai-ui`
 
 Nothing; the version moves with `@fabrials/ui`.

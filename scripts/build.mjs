@@ -48,7 +48,7 @@ for (const name of ["ui", "ai-ui"]) {
           // Every component module is its own client boundary. The index barrels
           // stay directive-free: a "use client" barrel makes bundlers keep every
           // export (charts included) wherever one component is imported.
-          banner: chunk => /(?:button-variants|shared|moon-math|dither|index)\.[jt]sx?$/.test(chunk.facadeModuleId ?? "") ? "" : '"use client";',
+          banner: chunk => /(?:button-variants|shared|moon-math|dither|dither-presets|syntax|index)\.[jt]sx?$/.test(chunk.facadeModuleId ?? "") ? "" : '"use client";',
         },
       },
     },
