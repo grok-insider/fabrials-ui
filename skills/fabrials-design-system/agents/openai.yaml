@@ -1,6 +1,6 @@
 interface:
   display_name: "Fabrials Design System"
-  short_description: "Shared Fabrials components, tokens and UI patterns"
-  default_prompt: "Use $fabrials-design-system to develop this Fabrials interface with the shared components and design rules."
+  short_description: "Highstorm style, layouts and components for Fabrials UI"
+  default_prompt: "Use $fabrials-design-system to build or review this interface in the Fabrials Highstorm style, with its layout recipes, components and QA checklist."
 policy:
   allow_implicit_invocation: true
