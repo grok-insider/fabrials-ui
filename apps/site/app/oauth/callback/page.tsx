@@ -41,7 +41,7 @@ function Callback() {
     })();
   }, [mcp]);
   return (
-    <main id="main-content" className="mx-auto w-full max-w-4xl px-6 py-14">
+    <main id="main-content" className="w-full max-w-4xl px-(--fui-page-padding) py-14">
       <PageHeader
         title="Your MCP connection"
         description="Authorization returns to this console. Tokens remain in this tab until you disconnect or leave."

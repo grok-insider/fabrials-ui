@@ -50,8 +50,8 @@ const kinds = [
 
 export default function Home() {
   return (
-    <main id="main-content" className="w-full px-5 sm:px-8 lg:px-12 2xl:px-16">
-      <section className="home-hero relative -mx-5 px-5 pt-16 pb-24 sm:-mx-8 sm:px-8 lg:-mx-12 lg:px-12 lg:pt-24 2xl:-mx-16 2xl:px-16" aria-labelledby="home-title">
+    <main id="main-content" className="w-full px-(--fui-page-padding)">
+      <section className="home-hero relative -mx-(--fui-page-padding) px-(--fui-page-padding) pt-16 pb-24 lg:pt-24" aria-labelledby="home-title">
         <DitherScene className="home-storm" />
         <div className="relative z-10 max-w-[38rem]">
           <h1

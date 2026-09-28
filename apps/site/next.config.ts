@@ -10,6 +10,7 @@ const config: NextConfig = {
   async redirects() {
     return [
       { source: "/examples", destination: "/playground", permanent: true },
+      { source: "/docs", destination: "/docs/introduction", permanent: false },
     ];
   },
   poweredByHeader: false,

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { useSearchContext } from "fumadocs-ui/contexts/search";
-import { ArrowLeft, ArrowRight, ChevronDown, PanelLeft, Search, TextAlignStart } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUp, ChevronDown, PanelLeft, Search, TextAlignStart } from "lucide-react";
 import {
   Button,
   Collapsible,
@@ -162,12 +162,13 @@ export function DocsShell({
           </article>
         </main>
         <aside className="docs-toc" aria-label="On this page">
-          {items.length > 0 && (
+          {items.length > 1 && (
             <>
-              <p className="docs-toc-title">
-                <TextAlignStart aria-hidden="true" size={16} /> On this page
-              </p>
+              <p className="docs-toc-title">On this page</p>
               <DocsTocList items={items} active={active} />
+              <a href="#main-content" className="docs-toc-top">
+                <ArrowUp aria-hidden="true" size={12} /> Back to top
+              </a>
             </>
           )}
         </aside>

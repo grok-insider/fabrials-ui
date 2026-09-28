@@ -121,7 +121,7 @@ export function SiteFrame({ children }: { children: ReactNode }) {
 export function SiteFooter() {
   return (
     <footer className="border-t">
-      <div className="flex w-full flex-wrap items-center justify-between gap-4 px-6 py-8 text-xs text-muted-foreground lg:px-10">
+      <div className="flex w-full flex-wrap items-center justify-between gap-4 px-(--fui-page-padding) py-8 text-xs text-muted-foreground">
         <p>
           Made at{" "}
           <a

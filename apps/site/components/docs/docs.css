@@ -1,6 +1,5 @@
 .docs {
   --docs-top: 68px;
-  --docs-max: 96rem;
   color: var(--foreground);
   font-family: var(--fui-font-sans);
   font-size: var(--fui-text-sm);
@@ -11,13 +10,14 @@
 }
 
 /* Grid */
+/* Anchored left on the header's gutter: sidebar, a reading column, then the page index.
+   On a wide screen the free space stays on the right; nothing is centred. */
 .docs-body {
   display: grid;
-  grid-template-columns: 16rem minmax(0, 1fr) 14.5rem;
-  gap: var(--fui-space-8);
-  max-width: var(--docs-max);
-  margin-inline: auto;
-  padding-inline: var(--fui-space-6);
+  grid-template-columns: 16rem minmax(0, 58rem) 13.5rem;
+  justify-content: start;
+  gap: 0 var(--fui-space-10);
+  padding-inline: var(--fui-page-padding);
 }
 .docs-sidebar,
 .docs-toc {
@@ -34,7 +34,8 @@
   display: grid;
   align-content: start;
   gap: var(--fui-space-5);
-  padding-right: var(--fui-space-2);
+  padding-right: var(--fui-space-5);
+  border-right: 1px solid var(--border);
 }
 .docs-mobile-bar {
   display: none;
@@ -70,7 +71,7 @@
   padding-inline: var(--fui-space-2);
   color: var(--muted-foreground);
   font-family: var(--fui-font-sans);
-  font-size: var(--fui-text-sm);
+  font-size: var(--fui-text-xs);
   letter-spacing: 0;
 }
 .docs-nav-heading {
@@ -84,10 +85,9 @@
   border-radius: var(--fui-radius-sm);
   background: none;
   color: var(--foreground);
-  font-family: var(--fui-font-mono);
-  font-size: var(--fui-text-xs);
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  font-family: var(--fui-font-sans);
+  font-size: 0.8125rem;
+  font-weight: var(--fui-weight-medium);
 }
 .docs-nav-heading:hover {
   background: var(--accent);
@@ -126,15 +126,15 @@
   color: var(--foreground);
   font-weight: 500;
 }
+/* The current page is marked on the rail in Stormlight, like the page index. */
 .docs-nav li a[aria-current="page"]::before {
   content: "";
   position: absolute;
-  left: calc(-1 * var(--fui-space-2) - 4px);
-  top: 50%;
-  width: 7px;
-  height: 7px;
-  background: var(--foreground);
-  transform: translateY(-50%) rotate(45deg);
+  left: calc(-1 * var(--fui-space-2) - 1.5px);
+  top: 0.25rem;
+  bottom: 0.25rem;
+  width: 2px;
+  background: var(--brand-ink);
 }
 
 /* Article */
@@ -145,17 +145,15 @@
 }
 .docs-article {
   min-width: 0;
-  padding: var(--fui-space-8) 2.5rem;
-  border: 1px solid var(--border);
-  border-radius: var(--fui-radius-lg);
-  background: var(--card);
+  padding-top: var(--fui-space-4);
 }
 .docs-article .fui-page-header {
   margin-bottom: var(--fui-space-6);
 }
 .docs-article .fui-page-heading h1 {
-  font-size: 1.75rem;
-  font-weight: 500;
+  font-size: 2.25rem;
+  font-weight: var(--fui-weight-semibold);
+  line-height: 1.05;
 }
 .docs-article .fui-page-heading .fui-description {
   font-size: var(--fui-text-md);
@@ -529,67 +527,59 @@ h3.docs-heading {
   font-weight: 500;
 }
 
-/* On this page */
+/* On this page: a hairline rail; the section on screen gets the Stormlight mark. */
+.docs-toc {
+  padding-top: var(--fui-space-8);
+}
 .docs-toc-title {
-  display: flex;
-  align-items: center;
-  gap: var(--fui-space-2);
-  margin: 0 0 var(--fui-space-3);
-  color: var(--muted-foreground);
+  margin: 0 0 var(--fui-space-2);
+  color: var(--foreground);
+  font-size: var(--fui-text-xs);
+  font-weight: var(--fui-weight-medium);
 }
-.docs-toc-track {
-  position: relative;
-}
-.docs-toc-svg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  overflow: visible;
-}
-.docs-toc-line,
-.docs-toc-line-active {
-  fill: none;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-}
-.docs-toc-line {
-  stroke: color-mix(in srgb, var(--foreground) 16%, transparent);
-  stroke-width: 1.5;
-}
-.docs-toc-line-active {
-  stroke: var(--foreground);
-  stroke-width: 2;
-}
-.docs-toc-svg rect {
-  transition:
-    y var(--fui-duration) ease-out,
-    height var(--fui-duration) ease-out;
-}
-.docs-toc-track ol {
+.docs-toc-list {
   display: grid;
   margin: 0;
   padding: 0;
+  border-left: 1px solid var(--border);
   list-style: none;
 }
-.docs-toc-track a {
+.docs-toc-list a {
   display: block;
-  padding: 0.3rem 0 0.3rem 1.25rem;
+  margin-left: -1px;
+  padding: 0.3125rem 0 0.3125rem var(--fui-space-3);
+  border-left: 2px solid transparent;
   color: var(--muted-foreground);
   font-size: 0.8125rem;
-  line-height: 1.4;
+  line-height: 1.35;
   text-decoration: none;
-  transition: color var(--fui-duration);
+  transition:
+    color var(--fui-duration-fast),
+    border-color var(--fui-duration-fast);
 }
-.docs-toc-track a[data-depth="3"],
-.docs-toc-track a[data-depth="4"] {
-  padding-left: 2rem;
+.docs-toc-list a[data-depth="3"],
+.docs-toc-list a[data-depth="4"] {
+  padding-left: var(--fui-space-6);
+  font-size: var(--fui-text-xs);
 }
-.docs-toc-track a:hover,
-.docs-toc-track a[aria-current] {
+.docs-toc-list a:hover {
   color: var(--foreground);
 }
-.docs-toc-track a[aria-current] {
-  font-weight: 500;
+.docs-toc-list a[aria-current] {
+  border-left-color: var(--brand-ink);
+  color: var(--foreground);
+}
+.docs-toc-top {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--fui-space-1-5);
+  margin-top: var(--fui-space-4);
+  color: var(--muted-foreground);
+  font-size: var(--fui-text-xs);
+  text-decoration: none;
+}
+.docs-toc-top:hover {
+  color: var(--foreground);
 }
 .docs-toc-inline {
   display: none;

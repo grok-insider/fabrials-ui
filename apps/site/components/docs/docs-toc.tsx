@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 export interface DocsTocItem {
   title: ReactNode;
@@ -35,73 +35,17 @@ export function useActiveHeading(items: DocsTocItem[]) {
   return active;
 }
 
-interface Track {
-  path: string;
-  height: number;
-  top: number;
-  bottom: number;
-}
-
+/** The page index: a hairline rail with the section on screen marked in Stormlight. */
 export function DocsTocList({ items, active }: { items: DocsTocItem[]; active?: string }) {
-  const listRef = useRef<HTMLOListElement>(null);
-  const [track, setTrack] = useState<Track>();
-  const clipId = `docs-toc-${useId().replace(/[^a-zA-Z0-9-]/g, "")}`;
-
-  useLayoutEffect(() => {
-    const list = listRef.current;
-    if (!list) return;
-    const measure = () => {
-      let path = "";
-      let top = 0;
-      let bottom = 0;
-      list.querySelectorAll<HTMLAnchorElement>("a[data-depth]").forEach((link, index) => {
-        const x = Number(link.dataset.depth) > 2 ? 11 : 1;
-        const start = link.offsetTop + 4;
-        const end = link.offsetTop + link.offsetHeight - 4;
-        path += `${index === 0 ? "M" : " L"}${x} ${start} L${x} ${end}`;
-        if (link.getAttribute("href") === active) {
-          top = link.offsetTop;
-          bottom = link.offsetTop + link.offsetHeight;
-        }
-      });
-      setTrack({ path, height: list.offsetHeight, top, bottom });
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(list);
-    return () => observer.disconnect();
-  }, [items, active]);
-
   return (
-    <div className="docs-toc-track">
-      {track && (
-        <svg
-          aria-hidden="true"
-          className="docs-toc-svg"
-          width="14"
-          height={track.height}
-          viewBox={`0 0 14 ${track.height}`}
-        >
-          <path d={track.path} className="docs-toc-line" />
-          <clipPath id={clipId}>
-            <rect x="0" y={track.top} width="14" height={track.bottom - track.top} />
-          </clipPath>
-          <path d={track.path} className="docs-toc-line-active" clipPath={`url(#${clipId})`} />
-        </svg>
-      )}
-      <ol ref={listRef}>
-        {items.map((item) => (
-          <li key={item.url}>
-            <a
-              href={item.url}
-              data-depth={item.depth}
-              aria-current={item.url === active ? "location" : undefined}
-            >
-              {item.title}
-            </a>
-          </li>
-        ))}
-      </ol>
-    </div>
+    <ol className="docs-toc-list">
+      {items.map((item) => (
+        <li key={item.url}>
+          <a href={item.url} data-depth={item.depth} aria-current={item.url === active ? "location" : undefined}>
+            {item.title}
+          </a>
+        </li>
+      ))}
+    </ol>
   );
 }

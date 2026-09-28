@@ -13,7 +13,7 @@ import { Card, CardContent, PageHeader, SectionHeader } from "@fabrials/ui";
 export const metadata = { title: "Playground" };
 export default function Playground() {
   return (
-    <main id="main-content" className="w-full px-6 py-12 lg:px-12 2xl:px-16">
+    <main id="main-content" className="w-full px-(--fui-page-padding) py-12">
       <PageHeader
         title="Playground"
         description="Choose a scenario. Edit tool arguments and execute them against the live interface, then try a manual correction. Inspect every result and reset to experiment again."

@@ -16,6 +16,9 @@ check a host's screens after updating; nothing in its code has to change.
   (latin, latin-ext, cyrillic-ext, vietnamese) as `--fui-font-display`, and in
   the Tailwind bridge as `font-display`. `PageHeader` titles, `AuthLayout`
   titles and the `ProductLockup` wordmark use it.
+- **SiteHeader** spans the window instead of a centred 80rem column; its
+  content anchors to the left gutter. Pages follow the same rule (see
+  DESIGN.md › Layout): no centred page columns.
 - **Snippet** wraps long commands with a hanging indent instead of showing a
   horizontal scrollbar.
 

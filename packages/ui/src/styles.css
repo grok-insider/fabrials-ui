@@ -1934,13 +1934,12 @@
     position: sticky;
     top: 0;
   }
+  /* 0.7: the header spans the window and anchors left, like the page under it. */
   .fui-site-header-inner {
     display: flex;
     align-items: center;
     gap: var(--fui-space-6);
-    max-width: var(--fui-content);
     min-height: var(--fui-header-height);
-    margin-inline: auto;
     padding: var(--fui-space-2) var(--fui-page-padding);
   }
   .fui-site-brand {
