@@ -11,8 +11,9 @@ concurrency:
   cancel-in-progress: true
 jobs:
   check:
-    # GitHub-hosted runners are blocked by billing; puck-2 runs the house's ephemeral runners.
-    runs-on: [self-hosted, linux, fabrials]
+    # A public repository runs on GitHub-hosted runners (free, isolated). Never the
+    # house's self-hosted runners: a fork's pull request would run code on puck-2.
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -37,7 +38,7 @@ jobs:
             playwright-report/
             test-results/
   image:
-    runs-on: [self-hosted, linux, fabrials]
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4

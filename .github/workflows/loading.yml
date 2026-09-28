@@ -20,7 +20,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   loading:
-    runs-on: [self-hosted, linux, fabrials]
+    runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4

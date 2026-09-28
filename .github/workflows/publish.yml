@@ -9,7 +9,7 @@ permissions:
   id-token: write
 jobs:
   publish:
-    runs-on: [self-hosted, linux, fabrials]
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
