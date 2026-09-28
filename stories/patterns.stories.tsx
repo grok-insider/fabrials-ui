@@ -2,7 +2,6 @@ import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import {
   Activity,
-  ArrowUpRight,
   Blocks,
   CircleGauge,
   History,
@@ -32,7 +31,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
   Checkbox,
@@ -48,6 +46,7 @@ import {
   ProductLockup,
   SectionHeader,
   SeriesChart,
+  SettingsSection,
   Sidebar,
   SidebarContent,
   SidebarFooter,
@@ -319,25 +318,24 @@ function PublicSiteDemo() {
           <div className="fui-actions">
             <Button size="lg">Install Spanreed</Button>
             <Button size="lg" variant="outline">
-              Read the docs <ArrowUpRight aria-hidden />
+              Read the docs
             </Button>
           </div>
         </section>
         <section id="site-products" aria-labelledby="site-products-title" className="catalogue-stack">
           <SectionHeader title={<span id="site-products-title">Products</span>} />
-          <div className="catalogue-grid">
+          {/* Products are an index: rows with the mark, one line and a link, not a grid of cards. */}
+          <ul className="catalogue-index">
             {productCards.map((item) => (
-              <Card key={item.product} interactive>
-                <div className="catalogue-stack">
-                  <ProductLockup product={item.product} gem={item.gem} />
-                  <p className="fui-description">{item.text}</p>
-                  <a className="fui-link catalogue-card-link" href="#site-products">
-                    Open {item.product}
-                  </a>
-                </div>
-              </Card>
+              <li key={item.product}>
+                <ProductLockup product={item.product} gem={item.gem} />
+                <p className="fui-description">{item.text}</p>
+                <a className="fui-link" href="#site-products">
+                  Go to {item.product}
+                </a>
+              </li>
             ))}
-          </div>
+          </ul>
         </section>
         <section id="site-install" aria-labelledby="site-install-title" className="catalogue-stack catalogue-panel">
           <SectionHeader title={<span id="site-install-title">Install</span>} description="The canonical bootstrap is on fabrials.com, not the release page." />
@@ -389,58 +387,42 @@ function SettingsDemo() {
   const [theme, setTheme] = useState<ThemePreference>("dark");
   const [notify, setNotify] = useState(true);
   return (
-    <main className="catalogue catalogue-narrow">
+    <main className="catalogue catalogue-settings">
       <PageHeader title="Workspace settings" description="Appearance, notifications and how this machine connects to Fabrials." />
+      {/* One page of sections split by hairlines, not a column of cards. */}
       <div className="catalogue-stack">
-        <Card>
-          <CardHeader>
-            <CardTitle>Appearance</CardTitle>
-            <CardDescription>Follow the system or choose a theme for Spanreed.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ThemeSwitcher value={theme} onValueChange={setTheme} showLabels />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Notifications</CardTitle>
-            <CardDescription>Desktop notices when a quota resets or an account needs attention.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="catalogue-setting">
-              <Label htmlFor="settings-reset">Quota resets</Label>
-              <Switch id="settings-reset" checked={notify} onCheckedChange={setNotify} />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Sharing</CardTitle>
-            <CardDescription>Each option is independent. A Fabrials sign-in is also required.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="catalogue-stack">
-              <Label className="fui-choice">
-                <Checkbox /> Publish aggregate usage metrics
-              </Label>
-              <Label className="fui-choice">
-                <Checkbox defaultChecked /> Synchronize private usage history
-              </Label>
-            </div>
-          </CardContent>
-          <CardFooter>
-            <Button size="sm">Save sharing</Button>
+        <SettingsSection title="Appearance" description="Follow the system or choose a theme for Spanreed.">
+          <ThemeSwitcher value={theme} onValueChange={setTheme} showLabels />
+        </SettingsSection>
+        <SettingsSection title="Notifications" description="Desktop notices when a quota resets or an account needs attention.">
+          <div className="catalogue-setting">
+            <Label htmlFor="settings-reset">Quota resets</Label>
+            <Switch id="settings-reset" checked={notify} onCheckedChange={setNotify} />
+          </div>
+        </SettingsSection>
+        <SettingsSection
+          title="Sharing"
+          description="Each option is independent. A Fabrials sign-in is also required."
+          status={
             <Badge tone="success" dot>
               Saved
             </Badge>
-          </CardFooter>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Remove this machine</CardTitle>
-            <CardDescription>Local history stays on disk; the link to Fabrials is revoked.</CardDescription>
-          </CardHeader>
-          <CardFooter>
+          }
+        >
+          <div className="catalogue-stack">
+            <Label className="fui-choice">
+              <Checkbox /> Publish aggregate usage metrics
+            </Label>
+            <Label className="fui-choice">
+              <Checkbox defaultChecked /> Synchronize private usage history
+            </Label>
+            <div>
+              <Button size="sm">Save sharing</Button>
+            </div>
+          </div>
+        </SettingsSection>
+        <SettingsSection title="Remove this machine" description="Local history stays on disk; the link to Fabrials is revoked.">
+          <div>
             <AlertDialog>
               <AlertDialogTrigger render={<Button variant="destructive" size="sm" />}>Unlink machine</AlertDialogTrigger>
               <AlertDialogContent>
@@ -454,8 +436,8 @@ function SettingsDemo() {
                 </DialogFooter>
               </AlertDialogContent>
             </AlertDialog>
-          </CardFooter>
-        </Card>
+          </div>
+        </SettingsSection>
       </div>
     </main>
   );

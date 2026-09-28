@@ -14,7 +14,6 @@ select {
   max-width: 76rem;
   min-width: 0;
   padding: 2rem;
-  margin-inline: auto;
   overflow-x: clip;
 }
 .catalogue-toast-stage {
@@ -122,6 +121,35 @@ select {
 }
 .catalogue-narrow {
   max-width: 44rem;
+}
+.catalogue-settings {
+  max-width: 60rem;
+}
+/* A product index: one row per product, split by hairlines. */
+.catalogue-index {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  border-block: 1px solid var(--border);
+  list-style: none;
+}
+.catalogue-index > li {
+  display: grid;
+  grid-template-columns: minmax(10rem, 14rem) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--fui-space-2) var(--fui-space-6);
+  padding-block: var(--fui-space-4);
+}
+.catalogue-index > li + li {
+  border-top: 1px solid var(--border);
+}
+.catalogue-index .fui-description {
+  margin: 0;
+}
+@media (max-width: 767px) {
+  .catalogue-index > li {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 .catalogue-swatches {
   display: grid;
@@ -243,7 +271,6 @@ select {
   box-sizing: border-box;
   width: 100%;
   max-width: var(--fui-content);
-  margin-inline: auto;
   padding: var(--fui-page-padding);
 }
 .catalogue-search-button {
@@ -283,7 +310,6 @@ select {
 }
 .catalogue-site-main {
   max-width: var(--fui-content);
-  margin-inline: auto;
   padding: 0 var(--fui-page-padding) 4rem;
 }
 .catalogue-hero {
@@ -319,7 +345,6 @@ select {
   justify-content: space-between;
   gap: 1rem;
   max-width: var(--fui-content);
-  margin-inline: auto;
   padding: 1.5rem var(--fui-page-padding);
   border-top: 1px solid var(--border);
 }
