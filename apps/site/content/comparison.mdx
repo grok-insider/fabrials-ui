@@ -9,7 +9,7 @@ import { Comparison } from "@/components/webmcp/comparison";
   caption="Plan features"
   columns={[
     { id: "personal", title: "Personal" },
-    { id: "team", title: "Team" },
+    { id: "team", title: "Team", recommended: true },
   ]}
   rows={[
     {
@@ -24,6 +24,6 @@ import { Comparison } from "@/components/webmcp/comparison";
 
 ## Composing a complete flow
 
-Comparison renders the evidence. Your application owns selection, recommendation rules and any side effects. It does not register tools or change application state by itself.
+Comparison renders the evidence. Your application owns selection, recommendation rules and any side effects; mark the column your rules point to with `recommended`, so people see which option the highlighted rows support. It does not register tools or change application state by itself.
 
 The [shopping example](/playground#comparison) combines Comparison with WebMCP tools, a compatible accessory, shared cart state and human review. For a different use case, see the [project explorer](/playground#explorer) or [reservation flow](/playground#reservation).

@@ -6,6 +6,8 @@ export interface ComparisonColumn {
   subtitle?: string;
   visual?: ReactNode;
   action?: ReactNode;
+  /** Marks the option the evidence points to; its column gets a Stormlight edge and a "Best fit" label. */
+  recommended?: boolean;
 }
 export interface ComparisonRow {
   id: string;
@@ -13,7 +15,9 @@ export interface ComparisonRow {
   values: Record<string, ReactNode>;
   highlighted?: boolean;
 }
-/** Controlled presentation: application tools decide which evidence to highlight. */
+const RECOMMENDED = "shadow-[inset_1px_0_0_var(--brand),inset_-1px_0_0_var(--brand)]";
+
+/** Controlled presentation: application tools decide which evidence and option to highlight. */
 export function Comparison({
   columns,
   rows,
@@ -29,7 +33,7 @@ export function Comparison({
     <div className="comparison-view">
       {note && (
         <div
-          className="mb-5 rounded-xl border border-[color-mix(in_oklab,var(--brand)_28%,transparent)] bg-[var(--brand-soft)] px-5 py-4 text-sm leading-6 text-foreground"
+          className="mb-5 rounded-[var(--fui-radius-lg)] border border-[color-mix(in_oklab,var(--brand)_28%,transparent)] bg-[var(--brand-soft)] px-5 py-4 text-sm leading-6 text-foreground"
           role="status"
         >
           {note}
@@ -39,13 +43,15 @@ export function Comparison({
         {columns.map((column) => (
           <article
             key={column.id}
-            className="overflow-hidden rounded-xl border bg-card"
+            data-recommended={column.recommended || undefined}
+            className={`overflow-hidden rounded-[var(--fui-radius-lg)] border bg-card ${column.recommended ? "border-[var(--brand)]" : ""}`}
           >
             <div className="flex items-center gap-4 p-4">
               {column.visual && (
                 <div className="w-28 shrink-0">{column.visual}</div>
               )}
               <div>
+                {column.recommended && <p className="text-xs font-medium text-[var(--brand-ink)]">Best fit</p>}
                 <h4 className="text-lg font-medium">{column.title}</h4>
                 <p className="text-sm text-muted-foreground">
                   {column.subtitle}
@@ -81,8 +87,14 @@ export function Comparison({
                 <th
                   key={c.id}
                   scope="col"
-                  className="px-5 py-6 align-top font-normal"
+                  data-recommended={c.recommended || undefined}
+                  className={`px-5 py-6 align-top font-normal ${c.recommended ? "shadow-[inset_1px_0_0_var(--brand),inset_-1px_0_0_var(--brand),inset_0_2px_0_var(--brand)]" : ""}`}
                 >
+                  {c.recommended ? (
+                    <p className="mb-2 text-xs font-medium text-[var(--brand-ink)]">Best fit</p>
+                  ) : (
+                    <p aria-hidden className="mb-2 text-xs">&nbsp;</p>
+                  )}
                   {c.visual}
                   <div className="mt-4 text-lg font-medium tracking-tight">
                     {c.title}
@@ -106,7 +118,7 @@ export function Comparison({
                   )}
                 </th>
                 {columns.map((c) => (
-                  <td key={c.id} className="px-5 py-4">
+                  <td key={c.id} className={`px-5 py-4 ${c.recommended ? RECOMMENDED : ""}`}>
                     {row.values[c.id] ?? "—"}
                   </td>
                 ))}
@@ -120,7 +132,10 @@ export function Comparison({
                   Your choice
                 </td>
                 {columns.map((c) => (
-                  <td key={c.id} className="px-5 py-5">
+                  <td
+                    key={c.id}
+                    className={`px-5 py-5 ${c.recommended ? "shadow-[inset_1px_0_0_var(--brand),inset_-1px_0_0_var(--brand),inset_0_-2px_0_var(--brand)]" : ""}`}
+                  >
                     {c.action}
                   </td>
                 ))}

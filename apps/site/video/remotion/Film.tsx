@@ -21,6 +21,9 @@ import {
   reviewPath,
 } from "./motion";
 import { coffeeProducts } from "../../lib/coffee-demo";
+
+// The recorded film compares the two machines its narration names.
+const filmProducts = coffeeProducts.filter((p) => p.id === "studio" || p.id === "atelier");
 import timing from "./timing.json";
 import { narration } from "./script";
 import captions from "./captions.json";
@@ -388,7 +391,7 @@ function Shop({ step }: { step: number }) {
           <div style={{ width: 1210, padding: "22px 28px" }}>
             <Comparison
               caption="Find your fit"
-              columns={coffeeProducts.map((p) => ({
+              columns={filmProducts.map((p) => ({
                 id: p.id,
                 title: p.name,
                 subtitle: `€${p.price.toLocaleString("en")}`,

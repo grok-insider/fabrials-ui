@@ -114,13 +114,35 @@
   background: var(--foreground);
   color: var(--background);
 }
+.demo-requirements-fixed {
+  align-self: center;
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: var(--fui-text-sm);
+}
 .demo-reason {
   display: grid;
   gap: 2px;
 }
 .demo-reason small {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
   color: var(--muted-foreground);
   font-size: var(--fui-text-xs);
+}
+.demo-reason small svg {
+  flex: none;
+  width: 0.8rem;
+  height: 0.8rem;
+}
+/* Machines share one scale; the column keeps them at the same size on the page. */
+.demo-machine {
+  display: block;
+  width: 100%;
+  max-width: 11rem;
+  margin-inline: auto;
+  color: var(--foreground);
 }
 .demo-reason small[data-good] {
   color: var(--fui-success-ink);

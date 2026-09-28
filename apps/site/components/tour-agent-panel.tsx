@@ -22,7 +22,7 @@ const actions = [
     name: "compare_coffee_machines",
     title: "Compare your requirements",
     args: { maxWidth: 32, fitting: "58 mm" },
-    result: "Studio Dual fits both requirements.",
+    result: "5 machines checked. Only Studio Dual meets all three requirements.",
     source: "Agent",
   },
   {

@@ -14,14 +14,14 @@ import {
   ToggleGroup,
   ToggleGroupItem,
 } from "@fabrials/ui";
-import { CoffeeMachine } from "@/components/coffee-machine";
 import { CoffeeComparison, CoffeeReviewDialog, useCoffeeStore, type CoffeeStore } from "@/components/coffee-demo";
 import { TourAgentPanel } from "@/components/tour-agent-panel";
 import { ArgumentsForm } from "@/registry/components/arguments-form";
 import { Comparison } from "@/registry/components/comparison";
 import { ExecutionLog } from "@/registry/components/execution-log";
 import { useWebMCP, WebMCPProvider } from "@/registry/webmcp/provider";
-import { coffeeProducts } from "@/lib/coffee-demo";
+import { coffeeColumns, coffeeRows } from "@/components/demo/coffee-rows";
+import { coffeeFittings, coffeeProducts } from "@/lib/coffee-demo";
 import { tourSnapshot } from "@/lib/coffee-tour";
 import { landingTourDuration as tourDuration } from "@/lib/landing-tour";
 import captions from "@/video/remotion/captions.json";
@@ -29,6 +29,9 @@ import timing from "@/video/remotion/timing.json";
 import "./demo.css";
 
 type Mode = "tour" | "free";
+
+/** What the narrated shopper asks for; the tour compares against it. */
+const TOUR_NEEDS = { width: 32, fitting: "58 mm" };
 
 const money = new Intl.NumberFormat("en", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
 
@@ -72,8 +75,8 @@ export function HomeDemo() {
 
 const chapterTitles = [
   { title: "A better morning", detail: "One task, one shared interface." },
-  { title: "Set the requirements", detail: "32 cm of space, 58 mm accessories." },
-  { title: "Compare the evidence", detail: "A recommendation with its reasons." },
+  { title: "Set the requirements", detail: "32 cm of counter, 58 mm accessories, two flat whites." },
+  { title: "Compare the evidence", detail: `${coffeeProducts.length} machines, one meets all three.` },
   { title: "Build a selection", detail: "One machine and a compatible filter." },
   { title: "Review the choice", detail: "A correction, then your decision." },
 ];
@@ -188,51 +191,33 @@ function NarratedTour() {
               <dt>Accessories</dt>
               <dd>58 mm</dd>
             </div>
+            <div>
+              <dt>Drinks</dt>
+              <dd>Two flat whites</dd>
+            </div>
           </dl>
           <Comparison
             caption="Find your fit"
-            columns={coffeeProducts.map((product) => ({
-              id: product.id,
-              title: product.name,
-              subtitle: money.format(product.price),
-              visual: <CoffeeMachine color={product.color} className="mx-auto h-24 w-full max-w-40" />,
-              action: (
-                <span className="demo-choice" data-selected={state.id === product.id || undefined}>
-                  {state.id === product.id ? (
-                    <>
-                      <Check aria-hidden className="size-3.5" /> Selected
-                    </>
-                  ) : (
-                    "Available"
-                  )}
-                </span>
-              ),
-            }))}
-            rows={[
-              {
-                id: "space",
-                label: "Counter space",
-                highlighted: state.compared,
-                values: {
-                  studio: <Reason value="29 cm" note={state.compared ? "Fits your space" : undefined} good />,
-                  atelier: <Reason value="36 cm" note={state.compared ? "Too wide" : undefined} />,
-                },
-              },
-              {
-                id: "fitting",
-                label: "Accessory fit",
-                highlighted: state.compared,
-                values: {
-                  studio: <Reason value="58 mm" note={state.compared ? "Keeps your accessories" : undefined} good />,
-                  atelier: <Reason value="54 mm" note={state.compared ? "Different fitting" : undefined} />,
-                },
-              },
-              {
-                id: "milk",
-                label: "Two flat whites",
-                values: { studio: "Independent steam", atelier: "Independent steam" },
-              },
-            ]}
+            columns={coffeeColumns(state.compared ? TOUR_NEEDS : null, (product) => (
+              <span className="demo-choice" data-selected={state.id === product.id || undefined}>
+                {state.id === product.id ? (
+                  <>
+                    <Check aria-hidden className="size-3.5" /> Selected
+                  </>
+                ) : (
+                  "Available"
+                )}
+              </span>
+            ))}
+            rows={coffeeRows(state.compared ? TOUR_NEEDS : null)}
+            note={
+              state.compared ? (
+                <>
+                  <strong>Studio Dual fits your setup.</strong> Of {coffeeProducts.length} machines it is the only one
+                  that fits the counter, keeps the 58 mm accessories and steams milk while it brews.
+                </>
+              ) : undefined
+            }
           />
         </div>
         <TourAgentPanel time={time} />
@@ -312,15 +297,6 @@ function NarratedTour() {
   );
 }
 
-function Reason({ value, note, good = false }: { value: string; note?: string; good?: boolean }) {
-  return (
-    <span className="demo-reason">
-      {value}
-      {note && <small data-good={good || undefined}>{note}</small>}
-    </span>
-  );
-}
-
 // ---------------------------------------------------------------- free
 
 const prompt = "Find a machine for my 32 cm counter that works with my 58 mm accessories. Add a filter if it fits, then open the review.";
@@ -374,8 +350,9 @@ function Requirements({ store }: { store: CoffeeStore }) {
         <Field label="Your accessories">
           {(props) => (
             <NativeSelect {...props} value={store.fitting} onChange={(event) => store.setFitting(event.target.value)}>
-              <NativeSelectOption>58 mm</NativeSelectOption>
-              <NativeSelectOption>54 mm</NativeSelectOption>
+              {coffeeFittings.map((fit) => (
+                <NativeSelectOption key={fit}>{fit}</NativeSelectOption>
+              ))}
             </NativeSelect>
           )}
         </Field>
@@ -387,6 +364,7 @@ function Requirements({ store }: { store: CoffeeStore }) {
       >
         Compare
       </Button>
+      <p className="demo-requirements-fixed">For two flat whites: steam while the second shot brews.</p>
     </div>
   );
 }

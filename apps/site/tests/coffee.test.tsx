@@ -3,7 +3,7 @@ import { afterEach, expect, it } from "vitest";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { CoffeeDemo } from "@/components/coffee-demo";
-import { compareCoffee } from "@/lib/coffee-demo";
+import { coffeeMatch, coffeeProducts, compareCoffee } from "@/lib/coffee-demo";
 afterEach(cleanup);
 it("keeps comparison, cart, manual correction and human review in the same state", async () => {
   const user = userEvent.setup();
@@ -12,8 +12,11 @@ it("keeps comparison, cart, manual correction and human review in the same state
   expect(screen.getByRole("status").textContent).toContain(
     "Studio Dual fits your setup",
   );
-  expect(document.querySelectorAll("[data-highlighted]")).toHaveLength(2);
-  await user.click(screen.getAllByRole("button", { name: "Choose" })[0]);
+  // Counter, accessories and milk are highlighted; the count row says who meets all three.
+  expect(document.querySelectorAll("[data-highlighted]")).toHaveLength(3);
+  expect(screen.getAllByText("Meets all three").length).toBeGreaterThan(0);
+  const studio = coffeeProducts.findIndex((p) => p.id === "studio");
+  await user.click(screen.getAllByRole("button", { name: "Choose" })[studio]!);
   const cart = screen.getByRole("complementary");
   await user.click(
     within(cart).getByRole("button", { name: /Add compatible filter/ }),
@@ -31,11 +34,20 @@ it("keeps comparison, cart, manual correction and human review in the same state
   expect(document.querySelectorAll("[data-highlighted]")).toHaveLength(0);
   expect(screen.queryByText("Selection saved for this demo.")).toBeNull();
 });
-it("does not recommend a product when neither matches both requirements", () => {
-  expect(compareCoffee(28, "58 mm").some((p) => p.fits && p.compatible)).toBe(
-    false,
+it("recommends only a machine that meets all three requirements", () => {
+  expect(coffeeMatch(32, "58 mm")?.id).toBe("studio");
+  // Each other machine misses something different.
+  const misses = Object.fromEntries(
+    compareCoffee(32, "58 mm").map((p) => [p.id, [!p.fits && "width", !p.compatible && "fitting", !p.milk && "milk"].filter(Boolean)]),
   );
-  expect(
-    compareCoffee(40, "54 mm").find((p) => p.fits && p.compatible)?.id,
-  ).toBe("atelier");
+  expect(misses).toEqual({
+    lever: ["fitting", "milk"],
+    solo: ["milk"],
+    studio: [],
+    atelier: ["width", "fitting"],
+    twin: ["width"],
+  });
+  expect(coffeeMatch(28, "58 mm")).toBeUndefined();
+  expect(coffeeMatch(40, "54 mm")?.id).toBe("atelier");
+  expect(coffeeMatch(46, "58 mm")?.id).toBe("studio");
 });

@@ -24,8 +24,11 @@ import {
 } from "@/registry/webmcp/provider";
 import { Comparison } from "@/registry/components/comparison";
 import { ConfirmationDialog } from "@/registry/components/confirmation-dialog";
-import { CoffeeMachine } from "@/components/coffee-machine";
+import { coffeeColumns, coffeeRows } from "@/components/demo/coffee-rows";
 import {
+  coffeeFittings,
+  coffeeIds,
+  coffeeMatch,
   coffeeProducts,
   compareCoffee,
   coffeeTotal,
@@ -67,10 +70,7 @@ export function useCoffeeStore() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const results = compared
-    ? compareCoffee(compared.width, compared.fitting)
-    : [];
-  const match = results.find((p) => p.fits && p.compatible);
+  const match = compared ? coffeeMatch(compared.width, compared.fitting) : undefined;
   const total = coffeeTotal(cart.id, cart.filter);
   const active = coffeeProducts.find((p) => p.id === cart.id);
   async function run(
@@ -92,12 +92,12 @@ export function useCoffeeStore() {
     name: "compare_coffee_machines",
     title: "Compare coffee machines",
     description:
-      "Compare fictional demo machines against a counter width and existing accessory fitting. Highlights supporting evidence in the visible comparison; returns suitability and reasons. Does not change the cart.",
+      "Compare the five fictional demo machines against a counter width and existing accessory fitting, for two flat whites (which need independent steam). Highlights the evidence in the visible comparison; returns what each machine meets and why. Does not change the cart.",
     inputSchema: {
       type: "object",
       properties: {
         maxWidth: { type: "number", minimum: 20, maximum: 100 },
-        fitting: { type: "string", enum: ["58 mm", "54 mm"] },
+        fitting: { type: "string", enum: [...coffeeFittings] },
       },
       required: ["maxWidth", "fitting"],
       additionalProperties: false,
@@ -119,7 +119,7 @@ export function useCoffeeStore() {
     inputSchema: {
       type: "object",
       properties: {
-        productId: { type: "string", enum: ["studio", "atelier", ""] },
+        productId: { type: "string", enum: [...coffeeIds, ""] },
       },
       required: ["productId"],
       additionalProperties: false,
@@ -139,7 +139,7 @@ export function useCoffeeStore() {
       name: "set_coffee_filter",
       title: "Add a compatible filter",
       description:
-        "Add or remove the universal water filter in the demo cart. Requires a machine in the cart. Both fictional machines use this filter.",
+        "Add or remove the universal water filter in the demo cart. Requires a machine in the cart. Every fictional machine uses this filter.",
       inputSchema: {
         type: "object",
         properties: { included: { type: "boolean" } },
@@ -218,6 +218,8 @@ export function CoffeeComparison({
   action?: (product: (typeof coffeeProducts)[number]) => ReactNode;
 }) {
   const { compared, match, cart, busy, run } = store;
+  const results = compared ? compareCoffee(compared.width, compared.fitting) : [];
+  const close = results.filter((p) => p.met === 2).map((p) => p.name);
   return (
     <Comparison
       caption="Find your fit"
@@ -225,26 +227,20 @@ export function CoffeeComparison({
         compared ? (
           match ? (
             <>
-              <strong>{match.name} fits your setup.</strong>{" "}
-              {match.reasons.join(". ")}. Independent steam makes milk
-              preparation easier.
+              <strong>{match.name} fits your setup.</strong> It is the only one of {coffeeProducts.length} that meets all
+              three requirements: {match.reasons.join(", ")}.
             </>
           ) : (
-            "Neither machine meets both constraints. Adjust your requirements or compare the tradeoffs below."
+            <>
+              No machine meets all three requirements.
+              {close.length > 0 && ` ${close.join(" and ")} miss${close.length === 1 ? "es" : ""} one.`} Adjust your
+              requirements or compare the trade-offs below.
+            </>
           )
         ) : undefined
       }
-      columns={coffeeProducts.map((p) => ({
-        id: p.id,
-        title: p.name,
-        subtitle: money(p.price),
-        visual: (
-          <CoffeeMachine
-            color={p.color}
-            className="mx-auto h-32 w-full max-w-48"
-          />
-        ),
-        action: action?.(p) ?? (
+      columns={coffeeColumns(compared, (p) =>
+        action?.(p) ?? (
           <Button
             size="sm"
             variant={cart.id === p.id ? "secondary" : "outline"}
@@ -266,52 +262,8 @@ export function CoffeeComparison({
             )}
           </Button>
         ),
-      }))}
-      rows={[
-        {
-          id: "width",
-          label: "Counter space",
-          highlighted: Boolean(compared),
-          values: Object.fromEntries(
-            coffeeProducts.map((p) => [
-              p.id,
-              <span key={p.id}>
-                {p.width} cm
-                {compared && (
-                  <span className="mt-1 block text-xs">
-                    {p.width <= compared.width ? "Fits your space" : "Too wide"}
-                  </span>
-                )}
-              </span>,
-            ]),
-          ),
-        },
-        {
-          id: "fitting",
-          label: "Accessory fit",
-          highlighted: Boolean(compared),
-          values: Object.fromEntries(
-            coffeeProducts.map((p) => [
-              p.id,
-              <span key={p.id}>
-                {p.fitting}
-                {compared && (
-                  <span className="mt-1 block text-xs">
-                    {p.fitting === compared.fitting
-                      ? "Keep your accessories"
-                      : "Different fitting"}
-                  </span>
-                )}
-              </span>,
-            ]),
-          ),
-        },
-        {
-          id: "milk",
-          label: "Two flat whites",
-          values: Object.fromEntries(coffeeProducts.map((p) => [p.id, p.milk])),
-        },
-      ]}
+      )}
+      rows={coffeeRows(compared)}
     />
   );
 }
@@ -368,7 +320,7 @@ function CoffeeWorkbench() {
               </h3>
             </div>
             <span className="rounded-md border px-3 py-1 text-xs text-muted-foreground">
-              2 machines to compare
+              {coffeeProducts.length} machines to compare
             </span>
           </div>
           <div className="mb-6 flex flex-wrap items-end gap-3 rounded-xl bg-muted/60 p-4">
@@ -396,8 +348,9 @@ function CoffeeWorkbench() {
                 onChange={(e) => setFitting(e.target.value)}
                 className="w-auto"
               >
-                <option>58 mm</option>
-                <option>54 mm</option>
+                {coffeeFittings.map((fit) => (
+                  <option key={fit}>{fit}</option>
+                ))}
               </NativeSelect>
             </div>
             <Button

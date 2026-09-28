@@ -39,7 +39,7 @@ export const catalog: CatalogItem[] = [
       [
         "columns",
         "ComparisonColumn[]",
-        "Stable IDs, titles, visuals and optional actions.",
+        "Stable IDs, titles, visuals and optional actions. recommended: true marks the option the evidence points to (a Stormlight edge and a Best fit label).",
       ],
       [
         "rows",
