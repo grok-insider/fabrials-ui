@@ -263,11 +263,30 @@ import { AuthLayout, Button, DitherScene, Field, Input, ProductLockup } from "@f
 
 ## States
 
+### A first load with `Loading`
+
+```tsx
+import { Loading, placeholderList, placeholderText } from "@fabrials/ui";
+
+const placeholders = placeholderList(5, (i) => ({ id: `p${i}`, name: placeholderText(16, i), plan: placeholderText(6, i + 2) }));
+
+<Loading when={!accounts} label="Loading accounts">
+  <AccountsTable rows={accounts ?? placeholders} />
+</Loading>
+```
+
+- Render the same components the finished view uses; `Loading` turns text into a bar per line, media into blocks, coloured controls into neutral shapes, keeps borders and surfaces, removes colour, and changes only paint, so nothing moves when data arrives.
+- Placeholder lengths and row counts close to the real data (`placeholderText(length, seed)`, `placeholderList(count, make)`).
+- `label` names what loads for assistive technology; the content is inert while loading, so keep the refresh button outside.
+- `data-skeleton="keep|hide|block|fill"` tunes one part; `useLoading()` lets a component skip work it cannot show.
+- As a Suspense fallback or in a Next.js `loading.tsx`: the same `<Loading when>` with placeholders; it renders on the server.
+- Full guide: https://ui.fabrials.com/docs/loading-states (`apps/site/content/loading-states.mdx`).
+
 Every collection and panel has these states. Put them where the content would be, at the content's size.
 
 | State | Use | Notes |
 | --- | --- | --- |
-| First load | Skeletons shaped like the content (`Skeleton`, or the loading skeleton component when the installed version exports one); `SidebarMenuSkeleton` in a sidebar | Not a centred spinner on an empty page |
+| First load | The real components with placeholder data inside `<Loading when label>` (0.7): it paints them as their own skeleton with no layout shift. Older versions: `Skeleton` blocks; `SidebarMenuSkeleton` in a sidebar | Not a centred spinner on an empty page, not hand-drawn grey boxes |
 | Refresh | Keep the last value and show when it was read (`RelativeTime`) | A stale value says so: `StatePanel state="stale"` or a hint |
 | Long wait with unknown duration | `Spinner` or `Button loading` with text that says what is happening | `Progress` only when the fraction is real |
 | Empty | `StatePanel state="empty"` with the next action | Title says what is missing, description what to do |

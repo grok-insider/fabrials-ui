@@ -25,7 +25,8 @@ import { ChatMessage, ChatComposer } from "@fabrials/ai-ui";         // needs @f
 | A section inside a page | `SectionHeader` | Another heading style |
 | Search, filters and actions for a list | `CollectionToolbar` | Filters in a far-away sidebar |
 | Records | `Table` (+ `BulkActions` once rows are selected) | A grid of cards |
-| Loading, empty, error, stale, offline | `StatePanel`, `Skeleton` | A bare spinner in the middle of the page |
+| A first load | `Loading` around the real components with placeholder data | Hand-drawn grey boxes, a bare spinner in the middle of the page |
+| Empty, error, stale, offline | `StatePanel` | A bare spinner in the middle of the page |
 | A status | `Badge` (tag) or `StatusDot` (dot and word) | A coloured pill, colour without text |
 | A number and its change | `Stat` in a `StatGroup` | A big number in a card with a gradient |
 | A quota or budget | `Meter` | `Progress` (that is for a task that finishes) |
@@ -93,7 +94,8 @@ Triggers take `render` to become a Fabrials button: `<DialogTrigger render={<But
 | `DescriptionList` (`DescriptionItem`, `DescriptionTerm`, `DescriptionDetails`) | A record's properties |
 | `Accordion`, `Collapsible` | Short answers in place; reasoning, sources or long detail behind a named trigger |
 | `ScrollArea` | A region that scrolls without moving the page |
-| `Skeleton`, `Progress`, `Separator` | First-load placeholder; a known fraction; a decorative break |
+| `Loading`, `placeholderText`, `placeholderList`, `useLoading` | Paints the real components it wraps as their skeleton while `when` is true; placeholder copy and records; a hook for "inside a loading view" |
+| `Skeleton`, `Progress`, `Separator` | A block only where no component exists yet; a known fraction; a decorative break |
 | `Avatar` (`AvatarImage`, `AvatarFallback`) | A person or account |
 | `FileThumb`, `fileTypeLabel` | File previews and type tiles |
 | `TruncatedText` | One line that shows its full text in a tooltip only when cut |

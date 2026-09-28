@@ -52,7 +52,7 @@ The full list with checks: [references/style-rules.md](references/style-rules.md
 3. **Pick components before writing markup.** Patterns first (`PageHeader`, `SectionHeader`, `CollectionToolbar`, `Table`, `BulkActions`, `StatePanel`, `SettingsSection`), then controls. See [references/components.md](references/components.md). Do not rebuild a control the package has; do not add a universal component with many flags.
 4. **Compose with tokens.** Spacing on the 4 px grid (`--fui-space-*`), radii from `--fui-radius-*`, colours from roles. In Tailwind hosts use the bridge (`bg-card`, `text-muted-foreground`, `text-brand-ink`, `font-display`, `rounded-md`, `px-(--fui-page-padding)`).
 5. **Write the copy.** Sentence case, names people recognise, an action keeps its name through the flow ("Revoke key", then "Key revoked"). English unless the product decides otherwise.
-6. **Cover the states.** Loading (skeletons shaped like the content for a first load; a refresh keeps the last value), empty, error, stale, offline, long content, narrow screen.
+6. **Cover the states.** Loading (a first load is the real view inside `<Loading when label>` with placeholder data; a refresh keeps the last value), empty, error, stale, offline, long content, narrow screen.
 7. **Verify** with [references/checklist.md](references/checklist.md). Report what you did not test.
 
 ## Where code belongs
