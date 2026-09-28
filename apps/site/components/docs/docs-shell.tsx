@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useSearchContext } from "fumadocs-ui/contexts/search";
 import { ArrowLeft, ArrowRight, ArrowUp, BookOpen, Bot, Check, ChevronDown, ChevronsUpDown, Library, PanelLeft, Search, TextAlignStart } from "lucide-react";
 import {
@@ -134,6 +134,71 @@ function useRepoStats(repository: string) {
   return stats;
 }
 
+/**
+ * The part of the docs that stays put between pages: the phone bar, the
+ * sidebar with the library switcher, and the phone navigation sheet. Pages
+ * render DocsShell inside it.
+ */
+export function DocsFrame({ children }: { children: ReactNode }) {
+  const path = usePathname();
+  const [navOpen, setNavOpen] = useState(false);
+  const root = rootFor(path);
+  const repo = useRepoStats(root.repository);
+  const sidebar = useRef<HTMLElement>(null);
+  useEffect(() => setNavOpen(false), [path]);
+  // Keep the current page's link in view inside the sidebar, without moving the page itself.
+  useEffect(() => {
+    const box = sidebar.current;
+    const link = box?.querySelector<HTMLElement>('a[aria-current="page"]');
+    if (!box || !link) return;
+    const top = link.offsetTop - box.offsetTop;
+    if (top < box.scrollTop || top + link.offsetHeight > box.scrollTop + box.clientHeight)
+      box.scrollTop = Math.max(0, top - box.clientHeight / 3);
+  }, [path]);
+
+  const repoInfo = (
+    <RepoInfo
+      owner={root.repository.split("/")[0]!}
+      repo={root.repository.split("/")[1]!}
+      stars={repo.stars}
+      forks={repo.forks}
+      className="docs-sidebar-repo"
+    />
+  );
+
+  return (
+    <div className="docs">
+      <div className="docs-mobile-bar">
+        <Button type="button" variant="ghost" size="sm" aria-label="Browse docs" onClick={() => setNavOpen(true)}>
+          <PanelLeft aria-hidden="true" /> Browse docs
+        </Button>
+        <SearchTrigger compact />
+      </div>
+      <div className="docs-body">
+        <div className="docs-sidebar-column">
+          <aside ref={sidebar} className="docs-sidebar" aria-label="Documentation sidebar">
+            <SearchTrigger />
+            <RootToggle current={root} />
+            <DocsNav path={path} root={root} />
+            {repoInfo}
+          </aside>
+        </div>
+        {children}
+      </div>
+      <Dialog open={navOpen} onOpenChange={setNavOpen}>
+        <DialogContent placement="start" className="docs-sheet" closeLabel="Close navigation">
+          <DialogTitle className="docs-sheet-title">Documentation</DialogTitle>
+          <DialogDescription className="fui-sr-only">Browse every documentation page.</DialogDescription>
+          <RootToggle current={root} />
+          <DocsNav path={path} root={root} />
+          {repoInfo}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+/** One documentation page: its article, pager and page index, inside the persistent DocsFrame. */
 export function DocsShell({
   header,
   toc = [],
@@ -144,112 +209,65 @@ export function DocsShell({
   children: ReactNode;
 }) {
   const path = usePathname();
-  const [navOpen, setNavOpen] = useState(false);
   const items = toc.filter((item) => item.depth >= 2 && item.depth <= 3);
   const active = useActiveHeadings(items);
   const activeTitle = items.find((item) => item.url === active[0])?.title;
-  const root = rootFor(path);
-  const repo = useRepoStats(root.repository);
   const { previous, next } = docsNeighbours(path);
-  useEffect(() => setNavOpen(false), [path]);
 
   return (
-    <div className="docs">
-      <div className="docs-mobile-bar">
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          aria-label="Browse docs"
-          onClick={() => setNavOpen(true)}
-        >
-          <PanelLeft aria-hidden="true" /> Browse docs
-        </Button>
-        <SearchTrigger compact />
-      </div>
-      <div className="docs-body">
-        <div className="docs-sidebar-column">
-          <aside className="docs-sidebar" aria-label="Documentation sidebar">
-            <SearchTrigger />
-            <RootToggle current={root} />
-            <DocsNav path={path} root={root} />
-            <RepoInfo
-              owner={root.repository.split("/")[0]!}
-              repo={root.repository.split("/")[1]!}
-              stars={repo.stars}
-              forks={repo.forks}
-              className="docs-sidebar-repo"
-            />
-          </aside>
-        </div>
-        <main id="main-content" className="docs-main" tabIndex={-1}>
-          <article className="docs-article">
-            {header}
-            {items.length > 1 && (
-              <Collapsible className="docs-toc-inline">
-                <CollapsibleTrigger className="docs-toc-inline-trigger">
-                  <TextAlignStart aria-hidden="true" size={16} />
-                  <span>On this page</span>
-                  {activeTitle && <span className="docs-toc-inline-current">{activeTitle}</span>}
-                  <ChevronDown aria-hidden="true" size={16} className="docs-toc-inline-chevron" />
-                </CollapsibleTrigger>
-                <CollapsibleContent className="docs-toc-inline-panel">
-                  <DocsTocList items={items} active={active} />
-                </CollapsibleContent>
-              </Collapsible>
-            )}
-            <div className="docs-content">{children}</div>
-            {(previous || next) && (
-              <nav className="docs-pager" aria-label="Previous and next page">
-                {previous ? (
-                  <Link href={previous.href}>
-                    <span className="docs-pager-label">
-                      <ArrowLeft aria-hidden="true" size={14} /> Previous
-                    </span>
-                    <span className="docs-pager-title">{previous.title}</span>
-                  </Link>
-                ) : (
-                  <span />
-                )}
-                {next && (
-                  <Link href={next.href} data-direction="next">
-                    <span className="docs-pager-label">
-                      Next <ArrowRight aria-hidden="true" size={14} />
-                    </span>
-                    <span className="docs-pager-title">{next.title}</span>
-                  </Link>
-                )}
-              </nav>
-            )}
-          </article>
-        </main>
-        <aside className="docs-toc" aria-label="On this page">
+    <>
+      <main id="main-content" className="docs-main" tabIndex={-1}>
+        <article className="docs-article">
+          {header}
           {items.length > 1 && (
-            <>
-              <p className="docs-toc-title">On this page</p>
-              <DocsTocList items={items} active={active} />
-              <a href="#main-content" className="docs-toc-top">
-                <ArrowUp aria-hidden="true" size={12} /> Back to top
-              </a>
-            </>
+            <Collapsible className="docs-toc-inline">
+              <CollapsibleTrigger className="docs-toc-inline-trigger">
+                <TextAlignStart aria-hidden="true" size={16} />
+                <span>On this page</span>
+                {activeTitle && <span className="docs-toc-inline-current">{activeTitle}</span>}
+                <ChevronDown aria-hidden="true" size={16} className="docs-toc-inline-chevron" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="docs-toc-inline-panel">
+                <DocsTocList items={items} active={active} />
+              </CollapsibleContent>
+            </Collapsible>
           )}
-        </aside>
-      </div>
-      <Dialog open={navOpen} onOpenChange={setNavOpen}>
-        <DialogContent placement="start" className="docs-sheet" closeLabel="Close navigation">
-          <DialogTitle className="docs-sheet-title">Documentation</DialogTitle>
-          <DialogDescription className="fui-sr-only">Browse every documentation page.</DialogDescription>
-          <RootToggle current={root} />
-          <DocsNav path={path} root={root} />
-          <RepoInfo
-            owner={root.repository.split("/")[0]!}
-            repo={root.repository.split("/")[1]!}
-            stars={repo.stars}
-            forks={repo.forks}
-            className="docs-sidebar-repo"
-          />
-        </DialogContent>
-      </Dialog>
-    </div>
+          <div className="docs-content">{children}</div>
+          {(previous || next) && (
+            <nav className="docs-pager" aria-label="Previous and next page">
+              {previous ? (
+                <Link href={previous.href}>
+                  <span className="docs-pager-label">
+                    <ArrowLeft aria-hidden="true" size={14} /> Previous
+                  </span>
+                  <span className="docs-pager-title">{previous.title}</span>
+                </Link>
+              ) : (
+                <span />
+              )}
+              {next && (
+                <Link href={next.href} data-direction="next">
+                  <span className="docs-pager-label">
+                    Next <ArrowRight aria-hidden="true" size={14} />
+                  </span>
+                  <span className="docs-pager-title">{next.title}</span>
+                </Link>
+              )}
+            </nav>
+          )}
+        </article>
+      </main>
+      <aside className="docs-toc" aria-label="On this page">
+        {items.length > 1 && (
+          <>
+            <p className="docs-toc-title">On this page</p>
+            <DocsTocList items={items} active={active} />
+            <a href="#main-content" className="docs-toc-top">
+              <ArrowUp aria-hidden="true" size={12} /> Back to top
+            </a>
+          </>
+        )}
+      </aside>
+    </>
   );
 }
