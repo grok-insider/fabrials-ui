@@ -17,6 +17,24 @@ const ICONS: Record<string, typeof FileCode2> = {
   css: Palette,
 };
 
+/** Copy with a spoken result: "Copied", or how to copy by hand when the clipboard refuses. */
+function useCopyStatus() {
+  const [status, setStatus] = useState("");
+  return {
+    status,
+    onCopy: () => setStatus("Copied to clipboard"),
+    onCopyError: () => setStatus("Couldn't copy. Select the code and copy it."),
+  };
+}
+
+function CopyStatus({ status }: { status: string }) {
+  return (
+    <span role="status" className={status.startsWith("Couldn't") ? "fui-code-panel-status" : "fui-sr-only"}>
+      {status}
+    </span>
+  );
+}
+
 function languageIcon(language?: string) {
   const Icon = ICONS[(language ?? "").toLowerCase()] ?? (language ? FileCode2 : FileText);
   return <Icon aria-hidden size={14} />;
@@ -72,13 +90,16 @@ function CodeLines({
   highlightWords,
 }: Pick<CodePanelProps, "code" | "language" | "highlightLines" | "addedLines" | "removedLines" | "highlightWords">) {
   const lines = highlightCode(code.replace(/\n$/, ""), language);
+  const diff = Boolean(addedLines?.length || removedLines?.length);
   return (
-    <code>
+    <code data-diff-gutter={diff || undefined}>
       {lines.map((tokens, index) => {
         const n = index + 1;
         const mark = addedLines?.includes(n) ? "added" : removedLines?.includes(n) ? "removed" : undefined;
+        // Changed lines are <ins> and <del>, so assistive technology hears the change, not just a colour.
+        const Line = mark === "added" ? "ins" : mark === "removed" ? "del" : "span";
         return (
-          <span
+          <Line
             key={index}
             className="fui-code-line"
             data-highlighted={highlightLines?.includes(n) || undefined}
@@ -87,9 +108,10 @@ function CodeLines({
             {tokens.length ? (
               tokens.map((token, t) => <Words key={t} text={token.text} words={highlightWords} type={token.type} />)
             ) : (
-              "​"
+              // A plain space keeps an empty line's height; a zero-width space would paste into code as an invalid character.
+              " "
             )}
-          </span>
+          </Line>
         );
       })}
     </code>
@@ -118,6 +140,7 @@ export function CodePanel({
   ...props
 }: CodePanelProps) {
   const copy = copyValue ?? (removedLines?.length ? code.split("\n").filter((_, i) => !removedLines.includes(i + 1)).join("\n") : code);
+  const copied = useCopyStatus();
   return (
     <figure
       data-slot="code-panel"
@@ -132,7 +155,7 @@ export function CodePanel({
             {icon ?? languageIcon(language)}
             <span>{title ?? language ?? "Code"}</span>
           </span>
-          <CopyButton value={copy} label="Copy code" />
+          <CopyButton value={copy} label="Copy code" onCopy={copied.onCopy} onCopyError={copied.onCopyError} />
         </figcaption>
       )}
       <pre className="fui-code-panel-body" tabIndex={0}>
@@ -147,7 +170,10 @@ export function CodePanel({
           />
         )}
       </pre>
-      {bare ? <CopyButton value={copy} label="Copy code" className="fui-code-panel-float" /> : null}
+      {bare ? (
+        <CopyButton value={copy} label="Copy code" className="fui-code-panel-float" onCopy={copied.onCopy} onCopyError={copied.onCopyError} />
+      ) : null}
+      <CopyStatus status={copied.status} />
     </figure>
   );
 }
@@ -171,6 +197,7 @@ export function CodeTabs({
   className?: string;
 }) {
   const [internal, setInternal] = useState(defaultValue ?? items[0]?.value);
+  const copied = useCopyStatus();
   const current = value ?? internal;
   const active = items.find((item) => item.value === current) ?? items[0];
   return (
@@ -191,7 +218,9 @@ export function CodeTabs({
             </BaseTabs.Tab>
           ))}
         </BaseTabs.List>
-        {active && <CopyButton value={active.copyValue ?? active.code} label="Copy code" />}
+        {active && (
+          <CopyButton value={active.copyValue ?? active.code} label="Copy code" onCopy={copied.onCopy} onCopyError={copied.onCopyError} />
+        )}
       </div>
       {items.map(({ value: tab, label: _label, code, language, lineNumbers, highlightLines, addedLines, removedLines, highlightWords, children }) => (
         <BaseTabs.Panel key={tab} value={tab} className="fui-code-tabs-panel" data-line-numbers={lineNumbers || undefined}>
@@ -209,6 +238,7 @@ export function CodeTabs({
           </pre>
         </BaseTabs.Panel>
       ))}
+      <CopyStatus status={copied.status} />
     </BaseTabs.Root>
   );
 }

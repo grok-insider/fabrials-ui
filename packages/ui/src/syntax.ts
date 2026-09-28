@@ -53,7 +53,8 @@ const jsonRules: Rule[] = [
 ];
 
 const shellRules: Rule[] = [
-  [/#[^\n]*/y, "comment"],
+  // A comment starts a line or follows a space; a # inside a word or URL is not one.
+  [/(?<![^\s])#[^\n]*/y, "comment"],
   [/"(?:[^"\\\n]|\\.)*"|'[^'\n]*'/y, "string"],
   [/(^|(?<=[\n|;&]\s*))(?:npx|pnpm|yarn|bunx|bun|npm|node|git|curl|docker|cd|export|sudo|cargo|nix)\b/y, "function"],
   [/(?<=\s)--?[\w-]+/y, "attribute"],

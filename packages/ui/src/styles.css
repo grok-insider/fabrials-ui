@@ -639,11 +639,13 @@
   .fui-code-panel-body {
     margin: 0;
     padding: var(--fui-space-3) 0;
-    overflow-x: auto;
+    overflow: auto;
     font-family: var(--fui-font-mono);
     font-size: 0.8125rem;
     line-height: 1.7;
     tab-size: 2;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
   }
   .fui-code-panel-body code {
     display: grid;
@@ -671,15 +673,47 @@
     border-left-color: var(--muted-foreground);
     background: color-mix(in oklab, var(--foreground) 7%, transparent);
   }
+  /* Diffs: a tinted line with a + or − in its own gutter; no strike-through over the indent. */
+  .fui-code-line[data-diff] {
+    text-decoration: none;
+  }
+  [data-diff-gutter] .fui-code-line {
+    position: relative;
+    padding-left: calc(var(--fui-space-4) + 2ch);
+  }
+  [data-diff-gutter] .fui-code-line[data-diff]::after {
+    position: absolute;
+    top: 0;
+    left: var(--fui-space-4);
+    user-select: none;
+  }
+  [data-line-numbers] [data-diff-gutter] .fui-code-line {
+    padding-left: var(--fui-space-4);
+  }
+  [data-line-numbers] [data-diff-gutter] .fui-code-line::before {
+    margin-right: calc(var(--fui-space-2) + 2ch);
+  }
+  [data-line-numbers] [data-diff-gutter] .fui-code-line[data-diff]::after {
+    left: calc(var(--fui-space-4) + 1.75rem + var(--fui-space-2));
+  }
   .fui-code-line[data-diff="added"] {
     border-left-color: var(--fui-success-ink);
     background: color-mix(in oklab, var(--fui-success-ink) 12%, transparent);
   }
+  .fui-code-line[data-diff="added"]::after {
+    content: "+";
+    color: var(--fui-success-ink);
+  }
   .fui-code-line[data-diff="removed"] {
     border-left-color: var(--fui-danger-ink);
     background: color-mix(in oklab, var(--fui-danger-ink) 12%, transparent);
-    text-decoration: line-through;
-    text-decoration-color: color-mix(in oklab, var(--fui-danger-ink) 50%, transparent);
+  }
+  .fui-code-line[data-diff="removed"]::after {
+    content: "−";
+    color: var(--fui-danger-ink);
+  }
+  .fui-code-line[data-diff="removed"] > * {
+    opacity: 0.72;
   }
   .fui-code-word {
     padding: 0 2px;
@@ -690,6 +724,13 @@
   }
   .fui-code-panel[data-bare] .fui-code-panel-body {
     padding-right: 2.75rem;
+  }
+  .fui-code-panel-status {
+    display: block;
+    padding: var(--fui-space-1-5) var(--fui-space-3);
+    border-top: 1px solid var(--border);
+    color: var(--fui-danger-ink);
+    font-size: var(--fui-text-xs);
   }
   .fui-code-panel-float {
     position: absolute;

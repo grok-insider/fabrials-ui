@@ -19,6 +19,7 @@ test("the highlighter classifies TypeScript, JSX, JSON and shell", () => {
   assert.deepEqual(kinds('<Button size="sm">Go</Button>', "tsx").slice(0, 3), ["type:Button", "attribute:size", 'string:"sm"']);
   assert.deepEqual(kinds('{ "style": "base-nova", "rsc": true }', "json"), ['property:"style"', 'string:"base-nova"', 'property:"rsc"', "keyword:true"]);
   assert.deepEqual(kinds("npx shadcn@latest add --yes @fabrials/button", "bash").slice(0, 2), ["function:npx", "attribute:--yes"]);
+  assert.deepEqual(kinds("curl https://x.dev/#top # fetch", "bash"), ["function:curl", "comment:# fetch"]);
 });
 
 test("tokens that cross lines are split per line, and unknown languages stay plain", () => {
