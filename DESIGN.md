@@ -98,6 +98,17 @@ Motion answers what a person did: opening, expanding, confirming. Durations are 
 - `MoonPhase` and `Starfield` are the sign-in exception inherited from Radiant; they stop under reduced motion.
 - No enter animations on navigation people repeat all day.
 
+## Loading states
+
+A loading view is the finished view painted as its own skeleton. Wrap the real components in `Loading` and render them with placeholder data (`placeholderText`, `placeholderList`) while the data loads; turn it off when the data arrives.
+
+- Text becomes a bar per line, as long as the text; icons, images and charts become blocks; coloured controls become neutral solid shapes; borders, tables and cards stay as structure; colour is removed entirely, so a loading view never shows a state it does not have yet.
+- Only paint changes and the wrappers are `display: contents`, so nothing moves when loading ends, at any width and with any content. Keep placeholder lengths and row counts close to the real data.
+- The content is inert while loading and a status message names what loads (`label`). Keep the control that starts a refresh outside `Loading`.
+- The pulse is the one continuous motion and stops under reduced motion.
+- Tune a part with `data-skeleton`: `keep` (paint as usual), `hide`, `block`, `fill`.
+- Use a Spinner or a button's `loading` for an action in progress, Progress when the amount is known, and the standalone Skeleton block only where no component exists yet.
+
 ## Layout and composition
 
 - **Product screens** use `WorkspaceShell` with navigation and header slots when they need a shell; hosts own routing, active state, authentication, theme storage and native window chrome. Mail keeps its resizable panes; desktop keeps native window behaviour.
@@ -121,9 +132,10 @@ The catalogue lives in Storybook (`bun run storybook`, port 6041) and at ui.fabr
 - **Docs pieces:** CodePanel, CodeTabs, PackageInstall, Files/Folder/File and RepoInfo. Syntax uses the muted `--fui-syntax-*` inks, never Stormlight.
 - **Brand and chrome:** DitherScene, DitherBand, DitherGem, DitherCanvas, ProductLockup, FabrialsGem, Avatar, Snippet, CopyButton, SiteHeader, AuthLayout, MoonPhase, Starfield.
 - **Patterns:** WorkspaceShell, Sidebar, PageHeader, SectionHeader, CollectionToolbar, BulkActions, StatePanel, SettingsSection, FilterChip, FileThumb, SuggestionCard, TruncatedText, ShimmerText.
+- **Loading:** `Loading` with `placeholderText`, `placeholderList` and `useLoading` (see Loading states).
 - **`@fabrials/ai-ui`:** provider, quota, history and migration presentation, and the chat pieces (ChatMessage, ChatComposer, CodeBlock with `.fui-markdown`, citations, activity, attachments, VoiceInputButton).
 
-Every pattern covers its normal, loading, empty, error and long-content cases. Use named exports; interactive modules carry `"use client"`, tokens and styles need no React. Controls keep Base UI or native semantics; form validation belongs to the host, and `Field` connects label, hint and error.
+Every pattern covers its normal, loading, empty, error and long-content cases; the loading case is the pattern inside `Loading`. Use named exports; interactive modules carry `"use client"`, tokens and styles need no React. Controls keep Base UI or native semantics; form validation belongs to the host, and `Field` connects label, hint and error.
 
 ## Accessibility
 

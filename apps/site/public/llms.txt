@@ -117,6 +117,7 @@ Namespace: add "registries": { "@fabrials": "https://ui.fabrials.com/r/{name}.js
 - https://ui.fabrials.com/docs/installation
 - https://ui.fabrials.com/docs/design
 - https://ui.fabrials.com/docs/shims
+- https://ui.fabrials.com/docs/loading-states
 - https://ui.fabrials.com/docs/webmcp
 - https://ui.fabrials.com/docs/interactive-demo
 - https://ui.fabrials.com/docs/authentication

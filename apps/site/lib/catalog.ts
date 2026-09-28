@@ -398,6 +398,7 @@ export const guides = [
   { slug: "installation", title: "Installation" },
   { slug: "design", title: "Design principles" },
   { slug: "shims", title: "Shims" },
+  { slug: "loading-states", title: "Loading states" },
   { slug: "webmcp", title: "WebMCP integration" },
   { slug: "interactive-demo", title: "Interactive demo" },
   { slug: "authentication", title: "OAuth & connections" },

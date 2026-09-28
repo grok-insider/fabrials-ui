@@ -1,0 +1,93 @@
+A loading view in Fabrials is the finished view, painted as its own skeleton. Wrap the components in `Loading`, render them with placeholder data while the real data is on its way, and turn it off when the data arrives. Nothing is measured or captured ahead of time, so the skeleton has the exact layout of the finished view at every width, in both themes, with any content.
+
+```tsx title="app/accounts/accounts-panel.tsx"
+"use client";
+import { Loading, placeholderList, placeholderText } from "@fabrials/ui";
+import { AccountsTable } from "./accounts-table";
+
+const placeholders = placeholderList(5, (i) => ({
+  id: `placeholder-${i}`,
+  name: placeholderText(14, i),
+  plan: placeholderText(6, i + 2),
+  status: "active" as const,
+}));
+
+export function AccountsPanel({ accounts }: { accounts?: Account[] }) {
+  return (
+    <Loading when={!accounts} label="Loading accounts">
+      <AccountsTable rows={accounts ?? placeholders} />
+    </Loading>
+  );
+}
+```
+
+Install it with the package, or through the registry once the app has the Fabrials style:
+
+```bash
+npx shadcn@latest add https://ui.fabrials.com/r/init.json
+```
+
+## What it does
+
+- **Text** becomes a bar per line, as long as the text itself: placeholder copy of the right length wraps like the real copy will.
+- **Icons, images and charts** become blocks of the same size. Canvases are hidden.
+- **Coloured controls** (buttons, badges, chips, toggles, avatars, switches) become neutral solid shapes. Fields keep their frame and show a short bar.
+- **Structure stays**: borders, tables, cards and dividers paint as usual, so the view is recognisable.
+- **No colour**: tones and gems are removed, so a loading view never signals a state it does not have yet.
+- **Nothing moves**: only paint changes. The wrappers use `display: contents`, so `Loading` does not add a box to your layout either.
+
+While loading, the content is `inert`: it cannot be focused or clicked, and assistive technology hears the `label` instead of the placeholder copy. The pulse runs only when the person allows motion.
+
+## Placeholder data
+
+`placeholderText(length, seed)` returns invisible copy of about `length` characters that breaks into words like interface copy. Use lengths close to the real data: a name of 14 characters, a plan of 6, a two-line description of 90. `placeholderList(count, make)` builds that many placeholder records.
+
+Choose the number of rows the view usually shows. When the real data has a different number of rows, the view grows or shrinks once, when it arrives, as with any skeleton.
+
+## Tuning a part
+
+Mark an element with `data-skeleton` when the defaults are not right for it:
+
+| Value | Effect |
+| --- | --- |
+| `keep` | Paint it as usual (a heading that is already known, a static label) |
+| `hide` | Keep its space, paint nothing |
+| `block` | Paint it as one neutral block |
+| `fill` | Paint it as a solid neutral shape, like a button |
+
+`useLoading()` returns `true` inside a loading `Loading`, for components that should skip work they cannot show, such as starting a chart animation.
+
+## With Suspense and Next.js
+
+`Loading` renders the same on the server and in the browser, so it works as a Suspense fallback and in a route's `loading.tsx`:
+
+```tsx title="app/accounts/page.tsx"
+import { Suspense } from "react";
+import { Loading } from "@fabrials/ui";
+import { AccountsTable, placeholders } from "./accounts-table";
+import { Accounts } from "./accounts";
+
+export default function Page() {
+  return (
+    <Suspense
+      fallback={
+        <Loading when label="Loading accounts">
+          <AccountsTable rows={placeholders} />
+        </Loading>
+      }
+    >
+      <Accounts />
+    </Suspense>
+  );
+}
+```
+
+## When to use something else
+
+- A **spinner** or a button's `loading` state for an action the person just started, such as saving.
+- **Progress** when you know how far along the work is.
+- The standalone **Skeleton** block only for a region with no component to paint yet.
+
+Keep the control that starts a refresh outside `Loading`: the content is inert while loading, so focus inside it is lost.
+
+Every component page has a **Loading state** switch beside its preview to show what it looks like.

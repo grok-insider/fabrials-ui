@@ -1191,6 +1191,21 @@ export const uiCatalog: UiCatalogItem[] = [
     "The aside is a positioning context whose surface the dither fades into.",
   ),
   ui(
+    "loading",
+    "Loading",
+    "Composition",
+    "Paints real components as their own skeleton while data loads, with no layout shift.",
+    ["Loading", "placeholderText", "placeholderList", "useLoading"],
+    [
+      ["when", "boolean", "Shows the skeleton. The children stay mounted, so nothing moves when it turns off."],
+      ["label", "string", "What assistive technology hears while it loads, e.g. Loading accounts."],
+      ["placeholderText(length, seed?)", "string", "Invisible placeholder copy that wraps like real words."],
+      ["placeholderList(count, make)", "T[]", "Placeholder records for lists and tables."],
+      ["data-skeleton", "keep | hide | block | fill", "On any element inside: paint as usual, leave empty, one block, or a solid shape."],
+    ],
+    "Only paint changes (display: contents wrappers), so any width or content matches the finished view. Content is inert while loading and a status message names what loads; the pulse follows reduced motion. See the loading states guide.",
+  ),
+  ui(
     "code-panel",
     "Code panel",
     "Documentation",

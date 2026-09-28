@@ -14,6 +14,7 @@ import {
   AuthLayout,
   Avatar,
   AvatarFallback,
+  Badge,
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
@@ -35,6 +36,7 @@ import {
   Files,
   Folder,
   Label,
+  Loading,
   Meter,
   MultiSelect,
   NativeSelect,
@@ -50,6 +52,8 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
+  placeholderList,
+  placeholderText,
   ProductLockup,
   RadioGroup,
   RadioGroupItem,
@@ -210,7 +214,64 @@ function RepoInfoDemo() {
   );
 }
 
+const ACCOUNTS = [
+  { id: "north", name: "North workspace", plan: "Team", status: "Current", tone: "success" as const, initials: "NW" },
+  { id: "relay", name: "Relay staging", plan: "Personal", status: "Stale", tone: "warning" as const, initials: "RS" },
+  { id: "archive", name: "Archive", plan: "Team", status: "Paused", tone: "neutral" as const, initials: "AR" },
+];
+const ACCOUNT_PLACEHOLDERS = placeholderList(3, (i) => ({
+  id: `placeholder-${i}`,
+  name: placeholderText(15, i),
+  plan: placeholderText(6, i + 3),
+  status: placeholderText(7, i + 5),
+  tone: "neutral" as const,
+  initials: "",
+}));
+
+function LoadingDemo() {
+  const [loading, setLoading] = useState(false);
+  const rows = loading ? ACCOUNT_PLACEHOLDERS : ACCOUNTS;
+  return (
+    <div className="grid w-full max-w-lg gap-3">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm font-medium">Accounts</p>
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={loading}
+          onClick={() => {
+            setLoading(true);
+            window.setTimeout(() => setLoading(false), 1800);
+          }}
+        >
+          {loading ? "Refreshing" : "Refresh accounts"}
+        </Button>
+      </div>
+      <Loading when={loading} label="Loading accounts">
+        <ul className="grid divide-y rounded-lg border bg-card">
+          {rows.map((account) => (
+            <li key={account.id} className="flex items-center gap-3 px-3 py-2.5">
+              <Avatar className="size-8">
+                <AvatarFallback>{account.initials}</AvatarFallback>
+              </Avatar>
+              <span className="grid min-w-0 flex-1">
+                <span className="truncate text-sm font-medium">{account.name}</span>
+                <span className="text-xs text-muted-foreground">{account.plan}</span>
+              </span>
+              <Badge dot tone={account.tone}>
+                {account.status}
+              </Badge>
+            </li>
+          ))}
+        </ul>
+      </Loading>
+      <p className="text-xs text-muted-foreground">Synthetic data. Refresh shows the same list as its skeleton for two seconds.</p>
+    </div>
+  );
+}
+
 export const moreDemos: Record<string, () => ReactNode> = {
+  loading: () => <LoadingDemo />,
   "code-panel": () => (
     <div className="grid w-full gap-4">
       <CodePanel

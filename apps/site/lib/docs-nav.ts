@@ -19,6 +19,7 @@ const guideDescriptions: Record<string, string> = {
   installation: "Set an app up, then add components by name.",
   design: "Palette, type, density, dithering and motion.",
   shims: "shadcn primitives backed by Fabrials controls.",
+  "loading-states": "Skeletons from the real components, with no layout shift.",
   webmcp: "Expose page actions to browser agents with WebMCP.",
   "interactive-demo": "Try tools on a live page and a real MCP server.",
   authentication: "Connect remote MCP servers with OAuth.",

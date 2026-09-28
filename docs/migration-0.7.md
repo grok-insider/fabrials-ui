@@ -43,6 +43,20 @@ check a host's screens after updating; nothing in its code has to change.
   `GEM_HEX`, `stormField`, `stormBandField`, `gemField`, `fbm`,
   `valueNoise`, `DITHER_BACKGROUND`.
 
+### Loading
+
+- `Loading` (`when`, `label`) paints the real components it wraps as their
+  own skeleton while data loads: text bars per line, blocks for media,
+  neutral shapes for coloured controls, structure kept, colour removed.
+  Only paint changes (its wrappers are `display: contents`), so nothing
+  moves when loading ends. Content is inert while loading; a status message
+  names what loads; the pulse follows reduced motion; server rendering works.
+- `placeholderText(length, seed?)` and `placeholderList(count, make)` build
+  invisible placeholder data; `useLoading()` tells a component it is inside a
+  loading view; `data-skeleton="keep|hide|block|fill"` tunes a part.
+- Tokens `--fui-skeleton` (bars, media) and `--fui-skeleton-surface` (filled
+  shapes). The standalone `Skeleton` block now uses `--fui-skeleton-surface`.
+
 ### shadcn's names
 
 So shadcn primitives map onto Fabrials controls one to one (and third-party
