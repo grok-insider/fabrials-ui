@@ -375,6 +375,20 @@ h3.docs-heading {
 .docs-preview > * {
   min-width: 0;
 }
+.docs-preview-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fui-space-2) var(--fui-space-4);
+}
+.docs-loading-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--fui-space-2);
+  color: var(--muted-foreground);
+  font-size: var(--fui-text-sm);
+}
 .docs .fui-tabs-list.docs-segmented {
   justify-self: start;
   gap: 2px;
@@ -426,7 +440,8 @@ h3.docs-heading {
       0 0 / 16px 16px,
     var(--background);
 }
-.docs-preview-stage > .fui-preview {
+/* The preview may sit inside Loading's display: contents wrappers. */
+.docs-preview-stage :where(.fui-preview) {
   width: 100%;
 }
 

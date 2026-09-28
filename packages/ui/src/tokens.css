@@ -163,6 +163,10 @@
   --fui-syntax-punctuation: color-mix(in oklab, var(--foreground) 70%, var(--muted-foreground));
   --fui-syntax-deleted: var(--fui-danger-ink);
   --fui-syntax-inserted: var(--fui-success-ink);
+
+  /* Skeleton bones: solid (no alpha), so overlapping bars never darken each other. */
+  --fui-skeleton: color-mix(in oklab, var(--foreground) 15%, var(--card));
+  --fui-skeleton-surface: color-mix(in oklab, var(--foreground) 9%, var(--card));
 }
 
 .dark,
@@ -244,6 +248,9 @@
   --fui-syntax-function: oklch(0.8 0.1 245);
   --fui-syntax-type: oklch(0.8 0.08 200);
   --fui-syntax-tag: oklch(0.76 0.13 22);
+
+  --fui-skeleton: color-mix(in oklab, var(--foreground) 14%, var(--card));
+  --fui-skeleton-surface: color-mix(in oklab, var(--foreground) 8%, var(--card));
 }
 
 [data-gem="stormlight"] {

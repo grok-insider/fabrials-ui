@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { Code2, Eye } from "lucide-react";
 import {
   CodePanel,
   CodeTabs,
+  Loading,
   StatePanel,
   Tabs,
   TabsContent,
@@ -11,6 +13,7 @@ import {
   TabsTrigger,
 } from "@fabrials/ui";
 import { externalPreviews } from "@/components/external/previews";
+import { LoadingToggle } from "@/components/loading-toggle";
 
 /** Preview of a component from another library, next to the exact source people install. */
 export function ExternalPreview({
@@ -24,25 +27,29 @@ export function ExternalPreview({
   credit: string;
 }) {
   const Preview = externalPreviews[slug];
+  const [loading, setLoading] = useState(false);
+  const [tab, setTab] = useState(Preview ? "preview" : "code");
   return (
     <>
-      <Tabs
-        defaultValue={Preview ? "preview" : "code"}
-        className="docs-preview"
-      >
-        <TabsList className="docs-segmented" aria-label="Example view">
-          <TabsTrigger value="preview">
-            <Eye aria-hidden="true" /> Preview
-          </TabsTrigger>
-          <TabsTrigger value="code">
-            <Code2 aria-hidden="true" /> Source code
-          </TabsTrigger>
-        </TabsList>
+      <Tabs value={tab} onValueChange={(next) => setTab(next as string)} className="docs-preview">
+        <div className="docs-preview-bar">
+          <TabsList className="docs-segmented" aria-label="Example view">
+            <TabsTrigger value="preview">
+              <Eye aria-hidden="true" /> Preview
+            </TabsTrigger>
+            <TabsTrigger value="code">
+              <Code2 aria-hidden="true" /> Source code
+            </TabsTrigger>
+          </TabsList>
+          {tab === "preview" && Preview && <LoadingToggle checked={loading} onCheckedChange={setLoading} />}
+        </div>
         <TabsContent value="preview" className="docs-preview-stage">
           {Preview ? (
-            <div className="fui-preview docs-external-stage">
-              <Preview />
-            </div>
+            <Loading when={loading} label="Loading the example">
+              <div className="fui-preview docs-external-stage">
+                <Preview />
+              </div>
+            </Loading>
           ) : (
             <StatePanel
               state="empty"

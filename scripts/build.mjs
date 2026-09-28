@@ -1,10 +1,13 @@
 import { build } from "vite";
-import { cp, mkdir, readdir, copyFile, readFile } from "node:fs/promises";
+import { cp, mkdir, readdir, copyFile, readFile, rename, rm } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+// Each package builds into dist.next and then replaces dist in one rename, so a
+// running dev server (Next, Storybook) never reads a half-written package.
+const staging = "dist.next";
 
 for (const name of ["ui", "ai-ui"]) {
   const directory = resolve(root, "packages", name);
@@ -25,7 +28,7 @@ for (const name of ["ui", "ai-ui"]) {
     build: {
       target: "es2022",
       minify: false,
-      outDir: "dist",
+      outDir: staging,
       emptyOutDir: true,
       lib: {
         // Subpath exports that the index does not re-export are entries of their own,
@@ -60,6 +63,8 @@ for (const name of ["ui", "ai-ui"]) {
       resolve(root, "node_modules/typescript/bin/tsc"),
       "-p",
       resolve(directory, "tsconfig.build.json"),
+      "--outDir",
+      resolve(directory, staging),
     ],
     { stdio: "inherit", cwd: root },
   );
@@ -67,20 +72,24 @@ for (const name of ["ui", "ai-ui"]) {
     if (file.endsWith(".css"))
       await copyFile(
         resolve(directory, "src", file),
-        resolve(directory, "dist", file),
+        resolve(directory, staging, file),
       );
   }
   if (name === "ui") {
-    await mkdir(resolve(directory, "dist/fonts"), { recursive: true });
-    await cp(resolve(directory, "fonts"), resolve(directory, "dist/fonts"), {
+    await mkdir(resolve(directory, staging, "fonts"), { recursive: true });
+    await cp(resolve(directory, "fonts"), resolve(directory, staging, "fonts"), {
       recursive: true,
     });
   } else {
     await copyFile(
       resolve(directory, "src/contracts.ts"),
-      resolve(directory, "dist/contracts.source.ts"),
+      resolve(directory, staging, "contracts.source.ts"),
     );
   }
+  await rm(resolve(directory, "dist.old"), { recursive: true, force: true });
+  await rename(resolve(directory, "dist"), resolve(directory, "dist.old")).catch(() => {});
+  await rename(resolve(directory, staging), resolve(directory, "dist"));
+  await rm(resolve(directory, "dist.old"), { recursive: true, force: true });
   const manifest = JSON.parse(
     await readFile(resolve(directory, "package.json"), "utf8"),
   );

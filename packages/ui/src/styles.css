@@ -1289,7 +1289,7 @@
     display: block;
     min-height: 1rem;
     border-radius: var(--fui-radius-sm);
-    background: var(--muted);
+    background: var(--fui-skeleton-surface);
   }
   .fui-progress {
     --fui-progress-fill: var(--chart-1);
@@ -3534,9 +3534,9 @@
     .fui-skeleton {
       background: linear-gradient(
           90deg,
-          var(--muted) 0%,
-          color-mix(in oklab, var(--muted) 55%, var(--card)) 50%,
-          var(--muted) 100%
+          var(--fui-skeleton-surface) 0%,
+          color-mix(in oklab, var(--fui-skeleton-surface) 45%, var(--card)) 50%,
+          var(--fui-skeleton-surface) 100%
         )
         0 0 / 200% 100%;
       animation: fui-shimmer 1.6s linear infinite;
@@ -3618,6 +3618,156 @@
     }
     .fui-site-mobile-menu {
       display: flex;
+    }
+  }
+
+  /* ---------------------------------------------------------------- loading */
+  /* Loading paints what it wraps as a skeleton. Only paint changes here —
+     nothing may alter a box — so the view does not move when loading ends.
+     !important beats host utilities and inline colours; it never touches layout.
+     Text: a bar per line, as long as the text (a thick strike-through).
+     Media: blocks. Colour: none (grayscale), so no tone or gem leaks through.
+     Coloured controls: neutral solid shapes. Borders and surfaces: structure. */
+  .fui-loading,
+  .fui-loading-content {
+    display: contents;
+  }
+  [data-fui-loading] > .fui-loading-content * {
+    color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
+    caret-color: transparent !important;
+    text-shadow: none !important;
+    text-decoration-line: line-through !important;
+    text-decoration-style: solid !important;
+    text-decoration-color: var(--fui-skeleton) !important;
+    text-decoration-thickness: 0.8em !important;
+    text-decoration-skip-ink: none !important;
+    background-image: none !important;
+    scrollbar-color: transparent transparent !important;
+    cursor: progress;
+  }
+  [data-fui-loading] > .fui-loading-content *::placeholder {
+    color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
+  }
+  [data-fui-loading] > .fui-loading-content > * {
+    filter: grayscale(1);
+  }
+  [data-fui-loading] > .fui-loading-content :is(svg, img, video, picture, [role="img"]) {
+    background-color: var(--fui-skeleton) !important;
+    border-radius: var(--fui-radius-xs);
+    box-shadow: none !important;
+  }
+  [data-fui-loading] > .fui-loading-content svg * {
+    visibility: hidden !important;
+  }
+  [data-fui-loading] > .fui-loading-content :is(img, video) {
+    object-position: -300vw 0 !important;
+  }
+  [data-fui-loading] > .fui-loading-content canvas {
+    visibility: hidden !important;
+  }
+  /* Controls that carry their own fill become one solid, neutral shape. */
+  [data-fui-loading] > .fui-loading-content :is(
+      .fui-button,
+      .fui-badge,
+      .fui-filter-chip,
+      .fui-combobox-chip,
+      .fui-toggle,
+      .fui-avatar,
+      .fui-kbd,
+      .fui-status-dot,
+      .fui-switch,
+      .fui-checkbox,
+      .fui-radio,
+      .fui-nav-tab-count,
+      .fui-sidebar-menu-badge,
+      [data-skeleton="fill"]
+    ) {
+    background-color: var(--fui-skeleton-surface) !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    outline-color: transparent !important;
+  }
+  [data-fui-loading] > .fui-loading-content :is(
+      .fui-button,
+      .fui-badge,
+      .fui-filter-chip,
+      .fui-combobox-chip,
+      .fui-toggle,
+      .fui-kbd,
+      .fui-nav-tab-count,
+      .fui-sidebar-menu-badge,
+      [data-skeleton="fill"]
+    ),
+  [data-fui-loading] > .fui-loading-content :is(
+      .fui-button,
+      .fui-badge,
+      .fui-filter-chip,
+      .fui-combobox-chip,
+      .fui-toggle,
+      .fui-kbd,
+      .fui-nav-tab-count,
+      .fui-sidebar-menu-badge,
+      [data-skeleton="fill"]
+    )
+    * {
+    text-decoration-color: transparent !important;
+  }
+  /* Inside a filled shape nothing else paints: no dots, icons or inner fills. */
+  [data-fui-loading] > .fui-loading-content :is(
+      .fui-button,
+      .fui-badge,
+      .fui-filter-chip,
+      .fui-combobox-chip,
+      .fui-toggle,
+      .fui-avatar,
+      .fui-kbd,
+      [data-skeleton="fill"]
+    )
+    * {
+    background-color: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+  /* Fields keep their frame and show a short bar where the value would be. */
+  [data-fui-loading] > .fui-loading-content :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="hidden"]), textarea, select) {
+    background-image: linear-gradient(var(--fui-skeleton), var(--fui-skeleton)) !important;
+    background-repeat: no-repeat !important;
+    background-size: min(9rem, 45%) 0.8em !important;
+    background-position: 0.75rem center !important;
+    text-decoration-color: transparent !important;
+  }
+  [data-fui-loading] > .fui-loading-content textarea {
+    background-position: 0.75rem 0.7rem !important;
+  }
+  /* Hosts opt parts out: keep = paint as usual, hide = leave the space empty, block = one bone. */
+  [data-fui-loading] > .fui-loading-content [data-skeleton="keep"],
+  [data-fui-loading] > .fui-loading-content [data-skeleton="keep"] * {
+    color: revert-layer !important;
+    -webkit-text-fill-color: revert-layer !important;
+    text-decoration-line: revert-layer !important;
+    background-image: revert-layer !important;
+  }
+  [data-fui-loading] > .fui-loading-content [data-skeleton="hide"] {
+    visibility: hidden !important;
+  }
+  [data-fui-loading] > .fui-loading-content [data-skeleton="block"] {
+    background-color: var(--fui-skeleton-surface) !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+  [data-fui-loading] > .fui-loading-content [data-skeleton="block"] * {
+    visibility: hidden !important;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    [data-fui-loading] > .fui-loading-content > * {
+      animation: fui-loading-pulse 1.8s ease-in-out infinite;
+    }
+  }
+  @keyframes fui-loading-pulse {
+    50% {
+      opacity: 0.6;
     }
   }
 }

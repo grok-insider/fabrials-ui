@@ -1,5 +1,7 @@
 node_modules/
 packages/*/dist/
+packages/*/dist.next/
+packages/*/dist.old/
 storybook-static/
 test-results/
 playwright-report/

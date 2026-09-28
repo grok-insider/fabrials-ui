@@ -50,3 +50,4 @@ export * from "./activity-strip";
 export * from "./timeline";
 export * from "./relative-time";
 export * from "./nav-tabs";
+export * from "./loading";
