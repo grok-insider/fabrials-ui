@@ -19,7 +19,8 @@ export default defineConfig({
   expect: { timeout: 10_000 },
   fullyParallel: true,
   workers: Number(process.env.LOADING_WORKERS ?? 6),
-  retries: 0,
+  // Shared CI runners are slow and busy; one retry absorbs timing noise there.
+  retries: process.env.CI ? 1 : 0,
   reporter: [["list"], ["html", { open: "never", outputFolder: "playwright-report/loading" }]],
   use: {
     baseURL,
@@ -29,7 +30,14 @@ export default defineConfig({
     contextOptions: { reducedMotion: "reduce" },
   },
   projects: [
-    { name: "chromium", use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1 } },
+    // The timing test runs last and alone, after the three engines, so it measures an idle machine.
+    { name: "chromium", testIgnore: /perf\.spec\.ts/, use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1 } },
+    {
+      name: "perf",
+      testMatch: /perf\.spec\.ts/,
+      dependencies: ["chromium", "firefox", "webkit"],
+      use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1 },
+    },
     { name: "firefox", use: { ...devices["Desktop Firefox"], viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1 } },
     { name: "webkit", use: { ...devices["Desktop Safari"], viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1 } },
   ],

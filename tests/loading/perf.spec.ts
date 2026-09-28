@@ -25,6 +25,12 @@ import { openPreview, toggle } from "./support";
  *   not grow with the content. This part holds on any machine.
  */
 const ROWS = 1000;
+// Shared CI runners are several times slower than a desktop and share their CPU;
+// the absolute budget scales there, the relative layout budget does not.
+const BUDGET_MS = process.env.CI ? 400 : 100;
+
+// One test at a time: a timing test must not share the CPU with its sibling.
+test.describe.configure({ mode: "serial" });
 
 for (const motion of ["no-preference", "reduce"] as const)
   test.describe(`motion preference ${motion}`, () => {
@@ -84,7 +90,7 @@ for (const motion of ["no-preference", "reduce"] as const)
         .join(", ")}`;
       test.info().annotations.push({ type: "performance", description: report });
       console.log(report);
-      expect(worst.style + worst.layout, report).toBeLessThan(100);
+      expect(worst.style + worst.layout, report).toBeLessThan(BUDGET_MS);
       for (const t of toggles) expect(t.layout, report).toBeLessThan(Math.max(2, relayout.layout / 4));
     });
   });

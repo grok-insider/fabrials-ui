@@ -51,7 +51,16 @@ export async function openPreview(page: Page, slug: string, { theme = "light" as
   await expect(page.locator(".docs-preview-stage > .fui-loading")).toHaveCount(1);
   await expect(toggle(page)).toBeVisible();
   await page.evaluate(() => document.fonts.ready.then(() => undefined));
-  await toggle(page).scrollIntoViewIfNeeded();
+  // Hydration can replace the switch under a slow runner; try again when it does.
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      await toggle(page).scrollIntoViewIfNeeded();
+      break;
+    } catch (error) {
+      if (!String(error).includes("not attached") || attempt === 4) throw error;
+      await page.waitForTimeout(200);
+    }
+  }
   await settle(page);
   return errors;
 }
@@ -90,9 +99,17 @@ export async function settle(page: Page) {
 
 /** Stops the page's timers and animation frames (needs `clock` in openPreview). */
 export async function freeze(page: Page) {
-  // Fake time keeps flowing until paused, so aim a little ahead of "now".
-  const now = await page.evaluate(() => Date.now());
-  await page.clock.pauseAt(now + 250);
+  // Fake time keeps flowing until paused, so aim ahead of "now". On a slow runner
+  // "now" can pass before the pause lands; read it again and retry.
+  for (let attempt = 0; ; attempt += 1) {
+    const now = await page.evaluate(() => Date.now());
+    try {
+      await page.clock.pauseAt(now + 1000);
+      return;
+    } catch (error) {
+      if (!String(error).includes("fast-forward to the past") || attempt === 4) throw error;
+    }
+  }
 }
 
 export const thaw = (page: Page) => page.clock.resume();

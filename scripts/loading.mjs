@@ -80,9 +80,9 @@ try {
       "LOADING_EXTERNAL=1",
       "--env",
       `LOADING_PORT=${port}`,
-      // LOADING_WORKERS, LOADING_DEBUG and the like reach the suite unchanged.
+      // LOADING_WORKERS, LOADING_DEBUG and the like, and CI, reach the suite unchanged.
       ...Object.keys(process.env)
-        .filter((key) => key.startsWith("LOADING_") && !["LOADING_EXTERNAL", "LOADING_PORT"].includes(key))
+        .filter((key) => (key.startsWith("LOADING_") && !["LOADING_EXTERNAL", "LOADING_PORT"].includes(key)) || key === "CI")
         .flatMap((key) => ["--env", `${key}=${process.env[key]}`]),
       image,
       "node",
