@@ -321,9 +321,11 @@ export const uiCatalog: UiCatalogItem[] = [
     "A short status that always has a text label.",
     ["Badge"],
     [
-      ["tone", "neutral | success | warning | danger", "Color is paired with the word."],
+      ["tone", "neutral | info | success | warning | danger", "Color is paired with the word."],
+      ["variant", "soft | outline | solid", "soft for status, outline for facts such as a license or version, solid for a count that must stand out."],
+      ["dot", "boolean", "A square marker before the text, like one pixel of the dither."],
     ],
-    "Color is not the only signal. The text says what the status is.",
+    "A small tag with 3 px corners, never a pill. Color is not the only signal: the text says what the status is.",
   ),
   ui(
     "card",
@@ -915,7 +917,7 @@ export const uiCatalog: UiCatalogItem[] = [
       ["order", "brightness | ramp", "ramp keeps the order: 0 is the first colour, 1 the last."],
       ["reveal / stars / paintKey", "number / DitherStars / key", "One-time reveal, crisp stars in dark mode, repaint on new data."],
     ],
-    "Pure helpers live in @fabrials/ui/dither (paintRampField, STORM_RAMP, gemRamp, stormField, gemField). Products may add their own fields on the same engine.",
+    "A backdrop: it fills its positioned parent and sits behind the content, so the parent needs position: relative and isolation: isolate (Tailwind relative isolate). Pure helpers live in @fabrials/ui/dither (paintRampField, STORM_RAMP, gemRamp, stormField, gemField). Products may add their own fields on the same engine.",
   ),
   ui(
     "product-lockup",

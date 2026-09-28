@@ -404,11 +404,15 @@ h3.docs-heading {
 .docs .fui-tab-panel.docs-preview-code {
   padding-top: 0;
 }
+/* A wide preview scrolls inside the stage; "safe" keeps its start reachable. */
 .docs .fui-tab-panel.docs-preview-stage {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: safe center;
   min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
   min-height: 15rem;
   padding: var(--fui-space-8) var(--fui-space-6);
   border: 1px solid var(--border);

@@ -2,7 +2,22 @@
 
 import { useState, type ReactNode } from "react";
 import { moreDemos } from "@/components/ui-demos-more";
-import { BookOpen, Code2, Globe, Lightbulb, MoreHorizontal, Paperclip, Pencil, RotateCcw, Search, Terminal } from "lucide-react";
+import {
+  BookOpen,
+  ChevronDown,
+  Code2,
+  Globe,
+  KeyRound,
+  LayoutGrid,
+  Lightbulb,
+  MoreHorizontal,
+  Paperclip,
+  Pencil,
+  RotateCcw,
+  Search,
+  Terminal,
+  Users,
+} from "lucide-react";
 import {
   ActivityDisclosure,
   AttachmentChip,
@@ -115,7 +130,9 @@ import {
   SettingsSection,
   SheetContent,
   SheetTitle,
+  SidebarGroupLabel,
   SidebarMenu,
+  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
@@ -158,8 +175,14 @@ const series = [
   { month: "Aug", requests: 540, cost: 21 },
 ];
 
-function Frame({ children }: { children: ReactNode }) {
-  return <div className="fui-preview grid gap-4">{children}</div>;
+/**
+ * The preview box. Stacked by default; `inline` lays controls out in a row at
+ * their own width, so a lone trigger or group is not stretched across the stage.
+ */
+const grouped = new Intl.NumberFormat("en");
+
+function Frame({ children, inline = false }: { children: ReactNode; inline?: boolean }) {
+  return <div className={inline ? "fui-preview flex flex-wrap items-center gap-3" : "fui-preview grid grid-cols-[minmax(0,1fr)] gap-4"}>{children}</div>;
 }
 
 const demos: Record<string, () => ReactNode> = {
@@ -223,7 +246,7 @@ const demos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   dialog: () => (
-    <Frame>
+    <Frame inline>
       <Dialog>
         <DialogTrigger render={<Button />}>Add account</DialogTrigger>
         <DialogContent>
@@ -241,7 +264,7 @@ const demos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   "alert-dialog": () => (
-    <Frame>
+    <Frame inline>
       <AlertDialog>
         <AlertDialogTrigger render={<Button variant="destructive" />}>Remove account</AlertDialogTrigger>
         <AlertDialogContent>
@@ -258,7 +281,7 @@ const demos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   sheet: () => (
-    <Frame>
+    <Frame inline>
       <Dialog>
         <DialogTrigger render={<Button variant="outline" />}>Open filters</DialogTrigger>
         <SheetContent>
@@ -274,7 +297,7 @@ const demos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   "dropdown-menu": () => (
-    <Frame>
+    <Frame inline>
       <DropdownMenu>
         <DropdownMenuTrigger render={<Button variant="outline" />}>Account actions</DropdownMenuTrigger>
         <DropdownMenuContent>
@@ -285,7 +308,7 @@ const demos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   tooltip: () => (
-    <Frame>
+    <Frame inline>
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger render={<Button variant="outline" aria-label="Refresh records" />}>Refresh</TooltipTrigger>
@@ -295,7 +318,7 @@ const demos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   "hover-card": () => (
-    <Frame>
+    <Frame inline>
       <HoverCard>
         <HoverCardTrigger render={<Button variant="outline" />}>North workspace</HoverCardTrigger>
         <HoverCardContent className="w-64 text-sm">
@@ -305,7 +328,7 @@ const demos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   popover: () => (
-    <Frame>
+    <Frame inline>
       <Popover>
         <PopoverTrigger render={<Button variant="outline" />}>Pick a range</PopoverTrigger>
         <PopoverContent className="text-sm">Last 7 days, last 30 days.</PopoverContent>
@@ -354,6 +377,19 @@ const demos: Record<string, () => ReactNode> = {
         <Badge tone="success">Current</Badge>
         <Badge tone="warning">Stale</Badge>
         <Badge tone="danger">Failed</Badge>
+        <Badge tone="info">Preview</Badge>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <Badge dot tone="success">Synced</Badge>
+        <Badge dot tone="warning">3 h old</Badge>
+        <Badge dot tone="danger">Expired</Badge>
+        <Badge dot>Paused</Badge>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <Badge variant="outline">MIT</Badge>
+        <Badge variant="outline">v0.7.0</Badge>
+        <Badge variant="solid" tone="info">New</Badge>
+        <Badge variant="solid">12</Badge>
       </div>
     </Frame>
   ),
@@ -422,10 +458,16 @@ const demos: Record<string, () => ReactNode> = {
   ),
   collapsible: () => (
     <Frame>
-      <Collapsible className="max-w-md">
-        <CollapsibleTrigger className="text-sm font-medium">Reasoning</CollapsibleTrigger>
-        <CollapsibleContent className="pt-2 text-sm text-muted-foreground">
-          Checked three synthetic sources. Nothing was sent.
+      <Collapsible className="group/collapsible max-w-md rounded-lg border bg-card">
+        <CollapsibleTrigger className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-sm font-medium">
+          Sources checked
+          <ChevronDown
+            aria-hidden="true"
+            className="size-4 text-muted-foreground transition-transform group-data-[open]/collapsible:rotate-180 motion-reduce:transition-none"
+          />
+        </CollapsibleTrigger>
+        <CollapsibleContent className="border-t px-3 py-2 text-sm text-muted-foreground">
+          Three synthetic sources, read 4 minutes ago. Nothing was sent.
         </CollapsibleContent>
       </Collapsible>
     </Frame>
@@ -460,18 +502,34 @@ const demos: Record<string, () => ReactNode> = {
   ),
   sidebar: () => (
     <Frame>
-      <SidebarProvider className="w-full max-w-xs rounded-lg border bg-sidebar p-2 text-sidebar-foreground">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton isActive>Overview</SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton>Accounts</SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton>Keys</SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+      {/* A small app frame: the sidebar beside its page, at a fixed height instead of the full window. */}
+      <SidebarProvider className="min-h-0 h-64 overflow-hidden rounded-lg border">
+        <nav aria-label="Workspace" className="flex w-52 shrink-0 flex-col gap-1 border-r bg-sidebar p-2 text-sidebar-foreground">
+          <SidebarGroupLabel>North workspace</SidebarGroupLabel>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton isActive>
+                <LayoutGrid aria-hidden="true" /> Overview
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton>
+                <Users aria-hidden="true" /> Accounts
+              </SidebarMenuButton>
+              <SidebarMenuBadge>2</SidebarMenuBadge>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton>
+                <KeyRound aria-hidden="true" /> Keys
+              </SidebarMenuButton>
+              <SidebarMenuBadge>3</SidebarMenuBadge>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </nav>
+        <div className="grid flex-1 content-start gap-1 bg-background p-5">
+          <p className="font-medium">Overview</p>
+          <p className="text-sm text-muted-foreground">Two accounts, last sync 4 minutes ago. Synthetic data.</p>
+        </div>
       </SidebarProvider>
     </Frame>
   ),
@@ -542,7 +600,7 @@ const demos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   toaster: () => (
-    <Frame>
+    <Frame inline>
       <Button
         variant="outline"
         onClick={() => toast("Account saved", { description: "Synthetic notice. Nothing was stored." })}
@@ -555,7 +613,7 @@ const demos: Record<string, () => ReactNode> = {
   "number-ticker": () => (
     <Frame>
       <p className="text-3xl font-medium tabular-nums">
-        <NumberTicker value={12840} startOnView={false} />
+        <NumberTicker value={12840} startOnView={false} format={(n) => grouped.format(Math.round(n))} />
       </p>
       <p className="text-sm text-muted-foreground">Requests this week</p>
     </Frame>

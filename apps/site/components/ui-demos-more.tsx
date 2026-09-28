@@ -71,8 +71,12 @@ import {
 } from "@fabrials/ui";
 import { fbm } from "@fabrials/ui/dither";
 
-function Frame({ children }: { children: ReactNode }) {
-  return <div className="fui-preview grid gap-4">{children}</div>;
+/**
+ * The preview box. Stacked by default; `inline` lays controls out in a row at
+ * their own width, so a lone trigger or group is not stretched across the stage.
+ */
+function Frame({ children, inline = false }: { children: ReactNode; inline?: boolean }) {
+  return <div className={inline ? "fui-preview flex flex-wrap items-center gap-3" : "fui-preview grid grid-cols-[minmax(0,1fr)] gap-4"}>{children}</div>;
 }
 
 const GEMS: [GemName, string][] = [
@@ -303,7 +307,7 @@ export const moreDemos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   "dither-canvas": () => (
-    <div className="relative h-56 w-full overflow-hidden rounded-(--fui-radius-lg) border bg-background">
+    <div className="relative isolate h-56 w-full overflow-hidden rounded-(--fui-radius-lg) border bg-background">
       <DitherCanvas
         ramp={TELEMETRY_RAMP}
         order="ramp"
@@ -344,7 +348,7 @@ export const moreDemos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   "toggle-group": () => (
-    <Frame>
+    <Frame inline>
       <ToggleGroupDemo />
     </Frame>
   ),
