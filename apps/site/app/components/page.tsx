@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { PageHeader } from "@fabrials/ui";
 import { buttonVariants } from "@fabrials/ui/button-variants";
 import { DocsShell } from "@/components/docs/docs-shell";
@@ -29,7 +28,7 @@ export default function Components() {
                 Installation guide
               </Link>
               <Link className={buttonVariants({ variant: "ghost", size: "sm" })} href="/playground">
-                See them in use <ArrowRight aria-hidden="true" />
+                See them in use
               </Link>
             </>
           }

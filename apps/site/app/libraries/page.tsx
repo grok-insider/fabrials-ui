@@ -6,6 +6,7 @@ import {
   DescriptionList,
   DescriptionTerm,
   PageHeader,
+  RepoInfo,
   Table,
   TableBody,
   TableCell,
@@ -16,14 +17,16 @@ import {
 import { DocsShell } from "@/components/docs/docs-shell";
 import { loadExternal } from "@/lib/external";
 import { ALLOWED_LICENSES } from "@/lib/license";
+import { repoStats } from "@/lib/github";
 
 export const metadata = {
   title: "Libraries",
   description: "Components from other open-source libraries, and the rules they pass to be published here.",
 };
 
-export default function Libraries() {
+export default async function Libraries() {
   const libraries = loadExternal();
+  const stats = await Promise.all(libraries.map(({ snapshot }) => repoStats(snapshot.repository)));
   const toc = [
     { title: "How a library gets in", url: "#policy", depth: 2 },
     { title: "Tiers", url: "#tiers", depth: 2 },
@@ -99,7 +102,7 @@ export default function Libraries() {
         </p>
       </section>
 
-      {libraries.map(({ snapshot, items }) => (
+      {libraries.map(({ snapshot, items }, index) => (
         <section key={snapshot.name} className="docs-section" aria-labelledby={snapshot.name}>
           <h2 id={snapshot.name} className="docs-heading">
             <a href={`#${snapshot.name}`} className="docs-heading-anchor">
@@ -107,6 +110,13 @@ export default function Libraries() {
             </a>
           </h2>
           <p>{snapshot.description}</p>
+          <RepoInfo
+            owner={snapshot.repository.split("/")[0]!}
+            repo={snapshot.repository.split("/")[1]!}
+            stars={stats[index]!.stars}
+            forks={stats[index]!.forks}
+            className="docs-repo"
+          />
           <DescriptionList>
             <DescriptionItem>
               <DescriptionTerm>License</DescriptionTerm>

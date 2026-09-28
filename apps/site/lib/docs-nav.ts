@@ -93,7 +93,7 @@ export type DocsRoot = {
   id: string;
   title: string;
   description: string;
-  kind: "guides" | "fabrials" | "agents" | "library";
+  kind: "guides" | "fabrials" | "agents" | "libraries" | "library";
   href: string;
   /** The GitHub repository the sidebar links to (owner/name). */
   repository: string;
@@ -130,6 +130,15 @@ export const docsRoots: DocsRoot[] = [
     repository: FABRIALS_REPOSITORY,
     groups: docsNav.filter((group) => group.section === "Agents"),
   },
+  {
+    id: "libraries",
+    title: "All libraries",
+    description: `${externalIndex.length} libraries, ${externalIndex.reduce((n, library) => n + library.items.length, 0)} components`,
+    kind: "libraries",
+    href: "/libraries",
+    repository: FABRIALS_REPOSITORY,
+    groups: docsNav.filter((group) => group.section === "Libraries"),
+  },
   ...externalIndex.map((library) => ({
     id: library.name,
     title: library.title,
@@ -144,10 +153,12 @@ export const docsRoots: DocsRoot[] = [
 /** Repositories the site shows stars for: its own and every aggregated library's. */
 export const knownRepositories = new Set(docsRoots.map((root) => root.repository));
 
-/** The root a page belongs to; /libraries opens the first library, anything unknown the guides. */
+/** The root a page belongs to; /libraries opens the overview of every library, anything unknown the guides. */
 export function rootFor(path: string): DocsRoot {
-  if (path === "/libraries") return docsRoots.find((root) => root.kind === "library") ?? docsRoots[0]!;
-  return docsRoots.find((root) => root.groups.some((group) => group.pages.some((page) => page.href === path))) ?? docsRoots[0]!;
+  if (path === "/libraries") return docsRoots.find((root) => root.kind === "libraries")!;
+  // A component page belongs to its own library, not to the overview that lists every library.
+  const specific = docsRoots.filter((root) => root.kind !== "libraries");
+  return specific.find((root) => root.groups.some((group) => group.pages.some((page) => page.href === path))) ?? docsRoots[0]!;
 }
 
 export function docsNeighbours(href: string) {

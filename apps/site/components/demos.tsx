@@ -3,11 +3,11 @@ import { ToolPlayground } from "@/components/tool-playground";
 import { ComparisonDemo } from "@/components/comparison-demo";
 import { useState } from "react";
 import {
-  ArrowRight,
   Braces,
   RotateCcw,
   Check,
   LoaderCircle,
+  Play,
 } from "lucide-react";
 import {
   Alert,
@@ -221,7 +221,7 @@ function Explorer({ compact = false }: { compact?: boolean }) {
             {last?.status === "running" ? (
               <LoaderCircle className="size-3.5 animate-spin" />
             ) : (
-              <ArrowRight className="size-3.5" />
+              <Play className="size-3.5" />
             )}
             {last?.status === "running" ? "Running…" : "Run simulated tool"}
           </Button>

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { useSearchContext } from "fumadocs-ui/contexts/search";
-import { ArrowLeft, ArrowRight, ArrowUp, BookOpen, Bot, Check, ChevronDown, ChevronsUpDown, PanelLeft, Search, TextAlignStart } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUp, BookOpen, Bot, Check, ChevronDown, ChevronsUpDown, Library, PanelLeft, Search, TextAlignStart } from "lucide-react";
 import {
   Button,
   Collapsible,
@@ -28,7 +28,7 @@ import "./docs.css";
 
 function RootMark({ root }: { root: DocsRoot }) {
   if (root.kind === "fabrials") return <DitherGem gem="zircon" size={18} />;
-  const Icon = root.kind === "guides" ? BookOpen : root.kind === "agents" ? Bot : null;
+  const Icon = root.kind === "guides" ? BookOpen : root.kind === "agents" ? Bot : root.kind === "libraries" ? Library : null;
   return (
     <span className="docs-root-mark" aria-hidden="true">
       {Icon ? <Icon size={14} /> : root.title.replace(/[^A-Z]/g, "").slice(0, 2) || root.title.slice(0, 2)}

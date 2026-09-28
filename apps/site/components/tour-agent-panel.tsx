@@ -5,7 +5,6 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
-  ArrowRight,
   UserRound,
 } from "lucide-react";
 import { Button } from "@fabrials/ui";
@@ -231,7 +230,6 @@ export function TourAgentPanel({ time }: { time: number }) {
             className="flex items-center justify-between rounded-md border p-3 text-sm hover:bg-accent"
           >
             Try it in the playground
-            <ArrowRight className="size-4" />
           </a>
         )}
       </div>
