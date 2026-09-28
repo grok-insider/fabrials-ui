@@ -55,7 +55,7 @@ IBM Plex, served locally by `fonts.css`.
 
 | Face | Token [Tailwind] | Use |
 | --- | --- | --- |
-| Plex Sans Condensed 600 | `--fui-font-display` [`font-display`] | Hero headlines 40 to 80 px (line height 0.98, tracking -0.015em), page titles 24 px, marketing section titles 28 px, index row names 22 px, the wordmark |
+| Plex Sans Condensed 600 | `--fui-font-display` [`font-display`] | Hero headlines 40 to 80 px (line height 0.98, tracking -0.015em), page titles 24 px (documentation articles 36 px, 44 px from 1800 px), marketing section titles 28 px, index row names 22 px, the wordmark |
 | Plex Sans | `--fui-font-sans` [`font-sans`] | Body and controls 14 px, metadata 12 px, subsections 16 px semibold |
 | Plex Mono | `--fui-font-mono` [`font-mono`] | Code, commands, keys, identifiers. Not labels |
 | Plex Serif | `--fui-font-serif` [`font-serif`] | Quotations only |
@@ -99,7 +99,7 @@ Scale tokens: `--fui-text-xs` 12, `sm` 14, `md` 16, `lg` 18, `xl` 20, `title` 24
 - Durations `--fui-duration-fast` 100 ms, `--fui-duration` 150 ms, `--fui-duration-slow` 240 ms; ease `--fui-ease`. All become 0 under `prefers-reduced-motion: reduce`.
 - Motion answers what a person did: opening, expanding, confirming. No enter animations on navigation people repeat all day; no scroll-triggered reveals.
 - One orchestrated moment per page at most: `DitherScene` `reveal` (on by default) or a large `DitherGem` `reveal`. Painted once; never again on that page.
-- Continuous motion only for real loading: `Spinner`, `Skeleton` shimmer, `ShimmerText`, `Button loading`. `StatusDot pulse` only while something is live or in progress. `MoonPhase` and `Starfield` only on sign-in and landing.
+- Continuous motion only for real loading: `Spinner`, the `Loading` pulse, `Skeleton` shimmer, `ShimmerText`, `Button loading`. `StatusDot pulse` only while something is live or in progress. `MoonPhase` and `Starfield` only on sign-in and landing.
 - Custom keyframes sit inside `@media (prefers-reduced-motion: no-preference)` or stop under `reduce`.
 
 ## Dithering

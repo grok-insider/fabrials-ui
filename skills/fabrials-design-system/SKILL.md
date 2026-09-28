@@ -26,7 +26,7 @@ The Patterns stories (`stories/patterns.stories.tsx`: PublicSite, Settings, Cons
 
 Precedence: the user's explicit instruction, then the product's own `AGENTS.md` and `DESIGN.md`, then the design-system `DESIGN.md`, then this skill. When this skill and `DESIGN.md` disagree, `DESIGN.md` wins; say so in your report. Code wins over prose for values: read the token or the component instead of guessing.
 
-Without the repository (an outside app), read https://ui.fabrials.com/docs/design (the same `DESIGN.md`), https://ui.fabrials.com/llms.txt and https://ui.fabrials.com/r/registry.json.
+Without a local checkout (an outside app), the repository is public at https://github.com/grok-insider/fabrials-ui (same paths as above); also read https://ui.fabrials.com/docs/design (the same `DESIGN.md`), https://ui.fabrials.com/llms.txt and https://ui.fabrials.com/r/registry.json. Registry entries install `@fabrials/ui` from npm.
 
 ## Highstorm in operational rules
 
