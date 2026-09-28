@@ -15,5 +15,5 @@
       "@fabrials/ai-ui": ["./packages/ai-ui/src/index.tsx"]
     }
   },
-  "include": ["packages/*/src", "stories", ".storybook", "tests/visual", "playwright.config.ts"]
+  "include": ["packages/*/src", "stories", ".storybook", "tests/visual", "tests/loading", "playwright.config.ts", "playwright.loading.config.ts"]
 }

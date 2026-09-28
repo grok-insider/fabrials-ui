@@ -18,6 +18,8 @@
     "build:storybook": "storybook build --disable-telemetry",
     "test:visual": "playwright test",
     "test:visual:container": "node scripts/visual.mjs",
+    "test:loading": "playwright test --config playwright.loading.config.ts",
+    "test:loading:container": "node scripts/loading.mjs",
     "vendor": "node scripts/vendor.mjs",
     "check:site": "bun run --cwd apps/site check && bun run --cwd apps/site test",
     "dev:site": "bun run --cwd apps/site dev",
