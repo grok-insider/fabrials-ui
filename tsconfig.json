@@ -12,6 +12,9 @@
     "types": ["node", "react", "react-dom"],
     "paths": {
       "@fabrials/ui": ["./packages/ui/src/index.ts"],
+      "@fabrials/ui/button-variants": ["./packages/ui/src/button-variants.ts"],
+      "@fabrials/ui/dither": ["./packages/ui/src/dither.ts"],
+      "@fabrials/ui/moon": ["./packages/ui/src/moon-math.ts"],
       "@fabrials/ai-ui": ["./packages/ai-ui/src/index.tsx"]
     }
   },
