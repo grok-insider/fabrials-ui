@@ -2,7 +2,7 @@
 
 // Previews for the controls added to the catalogue in 0.7: brand, data, navigation and chrome.
 // Synthetic data only.
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { AtSign, Eye, Trash2, UserPlus } from "lucide-react";
 import { ProviderIcon } from "@fabrials/ai-ui";
 import {
@@ -25,10 +25,15 @@ import {
   DescriptionItem,
   DescriptionList,
   DescriptionTerm,
+  CodePanel,
+  CodeTabs,
   DitherBand,
   DitherCanvas,
   DitherGem,
   DitherScene,
+  File,
+  Files,
+  Folder,
   Label,
   Meter,
   MultiSelect,
@@ -37,6 +42,7 @@ import {
   NativeSelectOption,
   NavTab,
   NavTabs,
+  PackageInstall,
   Pagination,
   PaginationContent,
   PaginationEllipsis,
@@ -48,6 +54,7 @@ import {
   RadioGroup,
   RadioGroupItem,
   RelativeTime,
+  RepoInfo,
   SiteHeader,
   Snippet,
   Sparkline,
@@ -134,7 +141,131 @@ function ThemeSwitcherDemo() {
   );
 }
 
+const LAYOUT_BEFORE = `import "./globals.css";
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
+}`;
+
+const LAYOUT_AFTER = `import "./globals.css";
+import { ThemeProvider } from "@fabrials/ui";
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
+    </html>
+  );
+}`;
+
+// The layout diff as one sample: removed lines from before, added lines from after.
+const LAYOUT_DIFF = `import "./globals.css";
+import { ThemeProvider } from "@fabrials/ui";
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <body>{children}</body>
+      <body>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
+    </html>
+  );
+}`;
+
+/** Live counts through the site's cached GitHub route; nulls until they arrive, and if GitHub fails. */
+function useRepoCounts(repository: string) {
+  const [counts, setCounts] = useState<{ stars: number | null; forks: number | null }>({ stars: null, forks: null });
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch(`/api/github?repo=${repository}`, { signal: controller.signal })
+      .then((response) => response.json())
+      .then((data: { stars?: number | null; forks?: number | null }) => setCounts({ stars: data.stars ?? null, forks: data.forks ?? null }))
+      .catch(() => {});
+    return () => controller.abort();
+  }, [repository]);
+  return counts;
+}
+
+function RepoInfoDemo() {
+  const magic = useRepoCounts("magicuidesign/magicui");
+  const kibo = useRepoCounts("haydenbleasel/kibo");
+  return (
+    <div className="grid w-full max-w-md gap-3">
+      <RepoInfo owner="magicuidesign" repo="magicui" stars={magic.stars} forks={magic.forks} description="Magic UI, community tier" />
+      <RepoInfo owner="haydenbleasel" repo="kibo" stars={kibo.stars} forks={kibo.forks} />
+      <RepoInfo owner="grok-insider" repo="fabrials-ui" description="Counts not given: the link stays, the numbers are left out" />
+    </div>
+  );
+}
+
 export const moreDemos: Record<string, () => ReactNode> = {
+  "code-panel": () => (
+    <div className="grid w-full gap-4">
+      <CodePanel
+        title="app/layout.tsx"
+        language="tsx"
+        code={LAYOUT_DIFF}
+        lineNumbers
+        addedLines={[2, 7, 9, 10, 11]}
+        removedLines={[6, 8]}
+        highlightWords={["ThemeProvider"]}
+      />
+      <CodePanel bare language="bash" code="bunx --bun shadcn@latest add @fabrials/code-panel" />
+    </div>
+  ),
+  "code-tabs": () => (
+    <CodeTabs
+      className="w-full"
+      label="Layout versions"
+      items={[
+        { value: "after", label: "With theme", code: LAYOUT_AFTER, language: "tsx", highlightLines: [2, 7, 8, 9] },
+        { value: "before", label: "Before", code: LAYOUT_BEFORE, language: "tsx" },
+        {
+          value: "json",
+          label: "components.json",
+          code: `{\n  "style": "base-nova",\n  "registries": {\n    "@fabrials": "https://ui.fabrials.com/r/{name}.json"\n  }\n}`,
+          language: "json",
+        },
+      ]}
+    />
+  ),
+  "package-install": () => (
+    <div className="grid w-full gap-4">
+      <PackageInstall command="shadcn@latest add @fabrials/button @fabrials/files" persistKey={null} />
+      <PackageInstall command="@fabrials/ui" kind="install" persistKey={null} />
+      <p className="text-sm text-muted-foreground">Choose pnpm in one and the other follows.</p>
+    </div>
+  ),
+  files: () => (
+    <Files className="w-full max-w-md">
+      <Folder name="app" defaultOpen>
+        <File name="layout.tsx" highlighted note="edited" />
+        <File name="page.tsx" />
+        <File name="globals.css" note="Fabrials styles" />
+      </Folder>
+      <Folder name="components" defaultOpen>
+        <Folder name="ui" defaultOpen note="shims">
+          <File name="button.tsx" />
+          <File name="dialog.tsx" />
+        </Folder>
+        <Folder name="kibo-ui">
+          <Folder name="kanban">
+            <File name="index.tsx" note="MIT" />
+          </Folder>
+        </Folder>
+      </Folder>
+      <File name="components.json" />
+    </Files>
+  ),
+  "repo-info": () => <RepoInfoDemo />,
   "dither-scene": () => (
     <div className="relative min-h-72 w-full overflow-hidden rounded-(--fui-radius-lg) border bg-background p-8">
       <DitherScene />

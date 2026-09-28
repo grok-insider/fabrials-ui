@@ -8,7 +8,7 @@ npx shadcn@latest add @fabrials/server-connector
 
 ## Wire it to your host
 
-```ts
+```ts title="app/api/mcp/workspace/route.ts"
 import { createConnector } from "@/lib/mcp-server/connector";
 
 const connector = createConnector({
@@ -25,7 +25,6 @@ const connector = createConnector({
   },
 });
 
-// Next.js Node route: /api/mcp/workspace
 export const runtime = "nodejs";
 export const POST = (request: Request) => connector(request, "workspace");
 export const GET = POST;

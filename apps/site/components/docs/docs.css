@@ -1,5 +1,8 @@
 .docs {
-  --docs-top: 68px;
+  --docs-top: 57px;
+  --docs-sidebar: 17.5rem;
+  --docs-content: 56rem;
+  --docs-toc: 16rem;
   color: var(--foreground);
   font-family: var(--fui-font-sans);
   font-size: var(--fui-text-sm);
@@ -10,14 +13,19 @@
 }
 
 /* Grid */
-/* Anchored left on the header's gutter: sidebar, a reading column, then the page index.
-   On a wide screen the free space stays on the right; nothing is centred. */
+/* Three columns: the sidebar panel (its background runs to the window's left
+   edge, the navigation sits against the content), the reading column, and the
+   page index. Wide screens grow the outer columns and the type, not the lines. */
 .docs-body {
   display: grid;
-  grid-template-columns: 16rem minmax(0, 58rem) 13.5rem;
-  justify-content: start;
-  gap: 0 var(--fui-space-10);
-  padding-inline: var(--fui-page-padding);
+  grid-template-columns: minmax(var(--docs-sidebar), 1fr) minmax(0, var(--docs-content)) minmax(var(--docs-toc), 1fr);
+}
+.docs-sidebar-column {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
+  border-right: 1px solid var(--border);
+  background: var(--sidebar);
 }
 .docs-sidebar,
 .docs-toc {
@@ -27,15 +35,92 @@
   max-height: calc(100dvh - var(--docs-top));
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding-block: var(--fui-space-6);
   scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
 }
 .docs-sidebar {
   display: grid;
   align-content: start;
-  gap: var(--fui-space-5);
-  padding-right: var(--fui-space-5);
-  border-right: 1px solid var(--border);
+  gap: var(--fui-space-4);
+  width: var(--docs-sidebar);
+  padding: var(--fui-space-5) var(--fui-space-4) var(--fui-space-6);
+}
+.docs-sidebar-repo {
+  display: grid;
+  margin-top: var(--fui-space-2);
+}
+.docs-toc {
+  width: var(--docs-toc);
+  padding: var(--fui-space-10) var(--fui-space-6) var(--fui-space-6);
+}
+
+/* Library switcher */
+.docs-root-trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--fui-space-2-5);
+  width: 100%;
+  padding: var(--fui-space-1-5) var(--fui-space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--fui-radius-md);
+  background: var(--card);
+  color: var(--foreground);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.docs-root-trigger:hover,
+.docs-root-trigger[data-popup-open] {
+  background: var(--accent);
+}
+.docs-root-mark {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--fui-radius-sm);
+  background: var(--background);
+  color: var(--muted-foreground);
+  font: var(--fui-weight-semibold) 0.6875rem/1 var(--fui-font-display);
+}
+.docs-root-trigger .fui-dither-gem,
+.docs-root-item .fui-dither-gem {
+  margin: 0 5px;
+}
+.docs-root-text {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  line-height: 1.25;
+}
+.docs-root-title {
+  font-size: var(--fui-text-sm);
+  font-weight: var(--fui-weight-medium);
+}
+.docs-root-description {
+  overflow: hidden;
+  color: var(--muted-foreground);
+  font-size: var(--fui-text-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.docs-root-chevron,
+.docs-root-check {
+  flex: none;
+  color: var(--muted-foreground);
+}
+.docs-root-check {
+  color: var(--brand-ink);
+}
+.fui-menu.docs-root-menu {
+  width: var(--anchor-width, 16rem);
+  min-width: 15rem;
+}
+.fui-menu-item.docs-root-item {
+  gap: var(--fui-space-2-5);
+  padding-block: var(--fui-space-1-5);
 }
 .docs-mobile-bar {
   display: none;
@@ -140,7 +225,7 @@
 /* Article */
 .docs-main {
   min-width: 0;
-  padding-block: var(--fui-space-6) var(--fui-space-8);
+  padding: var(--fui-space-10) var(--fui-space-12) var(--fui-space-16);
   outline: none;
 }
 .docs-article {
@@ -176,8 +261,8 @@
 }
 .docs-section p {
   margin: 0;
-  max-width: 72ch;
-  color: var(--muted-foreground);
+  max-width: 80ch;
+  color: color-mix(in oklab, var(--foreground) 82%, var(--muted-foreground));
   line-height: 1.7;
 }
 .docs-heading {
@@ -221,13 +306,13 @@ h3.docs-heading {
   grid-template-columns: minmax(0, 1fr);
   gap: var(--fui-space-4);
   min-width: 0;
-  color: var(--muted-foreground);
+  color: color-mix(in oklab, var(--foreground) 82%, var(--muted-foreground));
   font-size: 0.9375rem;
   line-height: 1.75;
 }
 .docs-prose > * {
   margin: 0;
-  max-width: 72ch;
+  max-width: 80ch;
 }
 .docs-prose > :is(.docs-code, .fui-table-scroll, figure, div) {
   max-width: none;
@@ -254,15 +339,16 @@ h3.docs-heading {
 .docs-prose a:not(.docs-heading-anchor, .fui-button):hover {
   text-decoration-color: var(--foreground);
 }
-.docs-prose :is(ul, ol) {
+/* Prose lists only; component lists (file trees, steps) keep their own styles. */
+.docs-prose :is(ul, ol):not(.fui-files *, .docs-steps) {
   display: grid;
   gap: var(--fui-space-2);
   padding-left: var(--fui-space-5);
 }
-.docs-prose ul {
+.docs-prose ul:not(.fui-files *) {
   list-style: disc;
 }
-.docs-prose ol {
+.docs-prose ol:not(.docs-steps) {
   list-style: decimal;
 }
 .docs-prose li::marker {
@@ -391,8 +477,56 @@ h3.docs-heading {
   font-size: var(--fui-text-xs);
   font-weight: 600;
 }
+/* The steps hang on a thread, like the page index. */
+.docs-step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: calc(0.875rem - 0.5px);
+  top: 2.25rem;
+  bottom: calc(-1 * var(--fui-space-6) + 0.5rem);
+  width: 1px;
+  background: var(--border);
+}
 .docs-step > p {
   padding-top: 0.2rem;
+}
+.docs-step > .fui-code-panel,
+.docs-step > .fui-files {
+  min-width: 0;
+}
+
+/* Long sources scroll inside the panel instead of stretching the page. */
+.docs-preview-code .fui-code-panel-body,
+.docs-preview-code .fui-code-tabs-panel .fui-code-panel-body {
+  max-height: 32rem;
+}
+
+.webmcp-setup {
+  display: grid;
+  gap: var(--fui-space-4);
+  padding: var(--fui-space-5);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--brand-ink, var(--primary));
+  border-radius: var(--fui-radius-md);
+  background: var(--card);
+}
+.webmcp-setup-lead {
+  margin: 0;
+  color: var(--foreground);
+  font-weight: 600;
+}
+.webmcp-setup-note {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: var(--fui-text-sm);
+}
+.webmcp-setup-note a {
+  color: var(--foreground);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.docs .fui-repo-info.docs-repo {
+  max-width: 28rem;
 }
 .docs .docs-props th:first-child,
 .docs .docs-props td:first-child {
@@ -527,47 +661,72 @@ h3.docs-heading {
   font-weight: 500;
 }
 
-/* On this page: a hairline rail; the section on screen gets the Stormlight mark. */
-.docs-toc {
-  padding-top: var(--fui-space-8);
-}
+/* On this page: a thread that steps in for subsections; the sections on
+   screen are drawn in Stormlight and end in a dot. */
 .docs-toc-title {
-  margin: 0 0 var(--fui-space-2);
-  color: var(--foreground);
-  font-size: var(--fui-text-xs);
-  font-weight: var(--fui-weight-medium);
+  display: flex;
+  align-items: center;
+  gap: var(--fui-space-2);
+  margin: 0 0 var(--fui-space-3);
+  color: var(--muted-foreground);
+  font-size: var(--fui-text-sm);
+}
+.docs-toc-thread {
+  position: relative;
+}
+.docs-toc-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
+}
+.docs-toc-line,
+.docs-toc-line-active {
+  fill: none;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.docs-toc-line {
+  stroke: var(--border);
+  stroke-width: 1.5;
+}
+.docs-toc-line-active {
+  stroke: var(--brand-ink);
+  stroke-width: 1.5;
+}
+.docs-toc-dot {
+  fill: var(--brand-ink);
+  transition: cy var(--fui-duration) var(--fui-ease), cx var(--fui-duration) var(--fui-ease);
+}
+.docs-toc-svg rect {
+  transition:
+    y var(--fui-duration) var(--fui-ease),
+    height var(--fui-duration) var(--fui-ease);
 }
 .docs-toc-list {
   display: grid;
   margin: 0;
   padding: 0;
-  border-left: 1px solid var(--border);
   list-style: none;
 }
 .docs-toc-list a {
   display: block;
-  margin-left: -1px;
-  padding: 0.3125rem 0 0.3125rem var(--fui-space-3);
-  border-left: 2px solid transparent;
+  padding: 0.3125rem 0 0.3125rem 1.25rem;
   color: var(--muted-foreground);
-  font-size: 0.8125rem;
-  line-height: 1.35;
+  font-size: var(--fui-text-sm);
+  line-height: 1.4;
   text-decoration: none;
-  transition:
-    color var(--fui-duration-fast),
-    border-color var(--fui-duration-fast);
+  transition: color var(--fui-duration-fast);
 }
 .docs-toc-list a[data-depth="3"],
 .docs-toc-list a[data-depth="4"] {
-  padding-left: var(--fui-space-6);
-  font-size: var(--fui-text-xs);
+  padding-left: 1.875rem;
 }
 .docs-toc-list a:hover {
   color: var(--foreground);
 }
 .docs-toc-list a[aria-current] {
-  border-left-color: var(--brand-ink);
-  color: var(--foreground);
+  color: var(--brand-ink);
 }
 .docs-toc-top {
   display: inline-flex;
@@ -580,6 +739,12 @@ h3.docs-heading {
 }
 .docs-toc-top:hover {
   color: var(--foreground);
+}
+@media (prefers-reduced-motion: reduce) {
+  .docs-toc-dot,
+  .docs-toc-svg rect {
+    transition: none;
+  }
 }
 .docs-toc-inline {
   display: none;
@@ -727,13 +892,42 @@ h3.docs-heading {
   font-size: var(--fui-text-md);
   font-weight: 600;
 }
+.docs-sheet .docs-root-trigger {
+  margin-bottom: var(--fui-space-5);
+}
+.docs-sheet .docs-sidebar-repo {
+  margin-top: var(--fui-space-5);
+}
 .docs-sheet .docs-nav li a {
   min-height: 2.75rem;
 }
 
+/* Large screens: more room and a reading size to match. */
+@media (min-width: 1800px) {
+  .docs {
+    --docs-sidebar: 18.5rem;
+    --docs-content: 60rem;
+    --docs-toc: 17rem;
+  }
+  .docs-prose,
+  .docs-section p {
+    font-size: 1rem;
+  }
+  .docs-article .fui-page-heading h1 {
+    font-size: 2.75rem;
+  }
+  .docs-article .fui-page-heading .fui-description {
+    font-size: var(--fui-text-lg);
+  }
+  .docs-nav li a,
+  .docs-nav-heading {
+    font-size: var(--fui-text-sm);
+  }
+}
+
 @media (max-width: 1279px) {
   .docs-body {
-    grid-template-columns: 15rem minmax(0, 1fr);
+    grid-template-columns: var(--docs-sidebar) minmax(0, 1fr);
   }
   .docs-toc {
     display: none;
@@ -745,11 +939,11 @@ h3.docs-heading {
 
 @media (max-width: 1023px) {
   .docs {
-    --docs-top: 116px;
+    --docs-top: 105px;
   }
   .docs-mobile-bar {
     position: sticky;
-    top: 68px;
+    top: 57px;
     z-index: 30;
     display: flex;
     align-items: center;
@@ -759,24 +953,20 @@ h3.docs-heading {
     border-bottom: 1px solid var(--border);
     background: var(--background);
   }
-  .docs-sidebar {
+  .docs-sidebar-column {
     display: none;
   }
   .docs-body {
     grid-template-columns: minmax(0, 1fr);
-    padding-inline: var(--fui-space-4);
+  }
+  .docs-main {
+    padding: var(--fui-space-6) var(--fui-space-5) var(--fui-space-10);
   }
 }
 
 @media (max-width: 639px) {
-  .docs-body {
-    padding-inline: var(--fui-space-3);
-  }
   .docs-main {
-    padding-block: var(--fui-space-3) var(--fui-space-6);
-  }
-  .docs-article {
-    padding: var(--fui-space-6) var(--fui-space-4);
+    padding: var(--fui-space-4) var(--fui-space-4) var(--fui-space-8);
   }
   .docs-article .fui-page-heading h1 {
     font-size: var(--fui-text-title);

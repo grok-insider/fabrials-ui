@@ -1,33 +1,17 @@
-export async function GET() {
-  try {
-    const response = await fetch(
-      "https://api.github.com/repos/grok-insider/fabrials-ui",
-      {
-        headers: { Accept: "application/vnd.github+json" },
-        next: { revalidate: 3600 },
-        signal: AbortSignal.timeout(5000),
+import { repoStats } from "@/lib/github";
+import { knownRepositories } from "@/lib/docs-nav";
+
+/** Stars for Fabrials UI, or for an aggregated library with ?repo=owner/name. Unknown repositories are refused. */
+export async function GET(request?: Request) {
+  const repo = request ? new URL(request.url).searchParams.get("repo") ?? "grok-insider/fabrials-ui" : "grok-insider/fabrials-ui";
+  if (!knownRepositories.has(repo)) return Response.json({ stars: null, forks: null }, { status: 404 });
+  const { stars, forks } = await repoStats(repo);
+  return Response.json(
+    { stars, forks },
+    {
+      headers: {
+        "Cache-Control": stars === null ? "no-store" : "public, s-maxage=3600, stale-while-revalidate=86400",
       },
-    );
-    if (!response.ok) throw new Error("GitHub unavailable");
-    const data = await response.json();
-    if (
-      !Number.isSafeInteger(data.stargazers_count) ||
-      data.stargazers_count < 0
-    )
-      throw new Error("Invalid count");
-    return Response.json(
-      { stars: data.stargazers_count },
-      {
-        headers: {
-          "Cache-Control":
-            "public, s-maxage=3600, stale-while-revalidate=86400",
-        },
-      },
-    );
-  } catch {
-    return Response.json(
-      { stars: null },
-      { headers: { "Cache-Control": "no-store" } },
-    );
-  }
+    },
+  );
 }

@@ -7,6 +7,7 @@ export type UiGroup =
   | "Composition"
   | "Metrics"
   | "Patterns"
+  | "Documentation"
   | "Effects"
   | "AI chat"
   | "AI providers";
@@ -57,6 +58,10 @@ export const uiGroups: { name: UiGroup; description: string }[] = [
   {
     name: "Patterns",
     description: "Page structure shared by operational screens.",
+  },
+  {
+    name: "Documentation",
+    description: "Code samples, install commands, file trees and repository links for docs and READMEs.",
   },
   {
     name: "Effects",
@@ -1182,6 +1187,77 @@ export const uiCatalog: UiCatalogItem[] = [
       ["footer", "ReactNode", "What the session can and cannot do."],
     ],
     "The aside is a positioning context whose surface the dither fades into.",
+  ),
+  ui(
+    "code-panel",
+    "Code panel",
+    "Documentation",
+    "A code sample with its file name, a copy button, line numbers, highlighted lines, boxed words and diff marks.",
+    ["CodePanel", "highlightCode"],
+    [
+      ["code", "string", "The source. Copy puts exactly this on the clipboard (without removed lines)."],
+      ["language", "string", "ts, tsx, js, json, bash, css or html are highlighted; anything else is plain text."],
+      ["title", "ReactNode", "Usually the file path; the icon follows the language."],
+      ["lineNumbers / highlightLines", "boolean / number[]", "Numbers in the gutter; 1-based lines drawn with a Stormlight edge."],
+      ["addedLines / removedLines", "number[]", "Diff marks; removed lines are left out of Copy."],
+      ["highlightWords", "string[]", "Boxes each occurrence, to point at a name."],
+      ["children", "ReactNode", "Pre-highlighted lines (from Shiki, for instance) instead of the built-in highlighter."],
+      ["bare", "boolean", "No bar; the copy button floats. For one-line snippets."],
+    ],
+    "The highlighter is pure and server-safe. Copy results are announced; when the clipboard refuses, the panel says how to copy by hand.",
+  ),
+  ui(
+    "code-tabs",
+    "Code tabs",
+    "Documentation",
+    "Several versions of one sample in one frame: languages, frameworks or files.",
+    ["CodeTabs"],
+    [
+      ["items", "CodeTab[]", "value, label and every CodePanel option except title."],
+      ["defaultValue / value / onValueChange", "string", "Uncontrolled or controlled."],
+      ["label", "string", "Accessible name of the tab list."],
+    ],
+    "Tabs follow the Tabs keyboard model. Copy takes the open tab.",
+  ),
+  ui(
+    "package-install",
+    "Package install",
+    "Documentation",
+    "A command in npm, pnpm, yarn and bun. Choosing one switches every command on the page.",
+    ["PackageInstall", "packageCommand"],
+    [
+      ["command", "string", "Without the runner: shadcn@latest add @fabrials/button."],
+      ["kind", "run | install", "run uses npx, pnpm dlx, yarn dlx and bunx; install uses npm install, pnpm add, yarn add and bun add."],
+      ["persistKey", "string | null", "Remembers the choice in this browser under that key; null forgets it."],
+    ],
+    "The saved choice is read after hydration, so the server and the first render agree on npm.",
+  ),
+  ui(
+    "files",
+    "Files",
+    "Documentation",
+    "A file tree: what a command creates or what a package contains. Folders open and close.",
+    ["Files", "Folder", "File"],
+    [
+      ["Folder name / defaultOpen", "string / boolean", "Folders start closed unless defaultOpen."],
+      ["File name / icon", "string / ReactNode", "The icon defaults to a plain file."],
+      ["note", "ReactNode", "A short remark on the right: new, generated, a license."],
+      ["highlighted", "boolean", "Marks the file the text is about."],
+    ],
+    "Folders are buttons with aria-expanded; indentation comes from the depth, not from nesting margins.",
+  ),
+  ui(
+    "repo-info",
+    "Repository link",
+    "Documentation",
+    "A GitHub repository as a compact link with its stars and forks.",
+    ["RepoInfo"],
+    [
+      ["owner / repo", "string", "The repository; the link goes to github.com unless href is set."],
+      ["stars / forks", "number | null", "Fetched and cached by the host. Unknown counts are left out, never shown as zero."],
+      ["description", "ReactNode", "A line under the name."],
+    ],
+    "Presentational: it never calls GitHub itself, so pages stay fast and rate limits stay the host's concern.",
   ),
   aiUi(
     "provider-icon",

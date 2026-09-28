@@ -26,7 +26,7 @@ npx shadcn@latest add https://ui.fabrials.com/r/styles.json
 
 `init` adds the Fabrials registry for you. If you only added `styles`, add it to `components.json` yourself, so you can add components by name:
 
-```json
+```json title="components.json"
 {
   "registries": {
     "@fabrials": "https://ui.fabrials.com/r/{name}.json"
@@ -43,6 +43,40 @@ npx shadcn@latest add @fabrials/mcp-dashboard @fabrials/kibo-kanban @fabrials/bu
 The address works too: `https://ui.fabrials.com/r/<name>.json`.
 
 ## What gets installed
+
+For example, after `init` and `add @fabrials/button @fabrials/mcp-dashboard @fabrials/magicui-terminal`, a Next.js app has these new files:
+
+<Files>
+  <File name="components.json" note="style and @fabrials registry" />
+  <Folder name="app" defaultOpen>
+    <File name="globals.css" note="imports the Fabrials styles" />
+  </Folder>
+  <Folder name="components" defaultOpen>
+    <Folder name="ui" defaultOpen>
+      <File name="button.tsx" note="shim" />
+      <File name="terminal.tsx" note="Magic UI, MIT notice on top" />
+    </Folder>
+    <Folder name="webmcp" note="8 files">
+      <File name="arguments-form.tsx" />
+      <File name="connection-panel.tsx" />
+      <File name="elicitation-dialog.tsx" />
+      <File name="execution-log.tsx" />
+      <File name="mcp-dashboard.tsx" />
+      <File name="resource-explorer.tsx" />
+      <File name="result-view.tsx" />
+      <File name="tool-catalog.tsx" />
+    </Folder>
+  </Folder>
+  <Folder name="lib" defaultOpen>
+    <Folder name="mcp" note="5 files">
+      <File name="client.ts" />
+      <File name="oauth.ts" />
+      <File name="provider.tsx" />
+      <File name="schema.ts" />
+      <File name="types.ts" />
+    </Folder>
+  </Folder>
+</Files>
 
 | You add | You get |
 | --- | --- |
@@ -70,7 +104,7 @@ Wrap your interactive view in `WebMCPProvider`, then register an application act
 npx shadcn@latest add @fabrials/mcp-dashboard
 ```
 
-```tsx
+```tsx title="app/console/page.tsx"
 "use client";
 import { MCPDashboard } from "@/components/webmcp/mcp-dashboard";
 

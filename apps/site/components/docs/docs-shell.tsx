@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { useSearchContext } from "fumadocs-ui/contexts/search";
-import { ArrowLeft, ArrowRight, ArrowUp, ChevronDown, PanelLeft, Search, TextAlignStart } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUp, BookOpen, Bot, Check, ChevronDown, ChevronsUpDown, PanelLeft, Search, TextAlignStart } from "lucide-react";
 import {
   Button,
   Collapsible,
@@ -14,45 +14,77 @@ import {
   DialogContent,
   DialogDescription,
   DialogTitle,
+  DitherGem,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   Kbd,
+  RepoInfo,
 } from "@fabrials/ui";
-import { docsNav, docsNeighbours } from "@/lib/docs-nav";
-import { DocsTocList, useActiveHeading, type DocsTocItem } from "@/components/docs/docs-toc";
+import { docsNeighbours, docsRoots, rootFor, type DocsRoot } from "@/lib/docs-nav";
+import { DocsTocList, useActiveHeadings, type DocsTocItem } from "@/components/docs/docs-toc";
 import "./docs.css";
 
-const sections = ["Guides", "Components", "Agents", "Libraries"] as const;
-
-function DocsNav({ path }: { path: string }) {
+function RootMark({ root }: { root: DocsRoot }) {
+  if (root.kind === "fabrials") return <DitherGem gem="zircon" size={18} />;
+  const Icon = root.kind === "guides" ? BookOpen : root.kind === "agents" ? Bot : null;
   return (
-    <nav aria-label="Documentation" className="docs-nav">
-      {sections.map((section) => (
-        <div key={section} className="docs-nav-section">
-          <p className="docs-nav-section-label">{section}</p>
-          {docsNav
-            .filter((group) => group.section === section)
-            .map((group) => (
-              <Collapsible key={group.name} defaultOpen className="docs-nav-group">
-                <CollapsibleTrigger className="docs-nav-heading">
-                  {group.name}
-                  <ChevronDown aria-hidden="true" size={14} />
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <ul>
-                    {group.pages.map((page) => (
-                      <li key={page.href}>
-                        <Link
-                          href={page.href}
-                          aria-current={page.href === path ? "page" : undefined}
-                        >
-                          {page.title}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </CollapsibleContent>
-              </Collapsible>
-            ))}
-        </div>
+    <span className="docs-root-mark" aria-hidden="true">
+      {Icon ? <Icon size={14} /> : root.title.replace(/[^A-Z]/g, "").slice(0, 2) || root.title.slice(0, 2)}
+    </span>
+  );
+}
+
+/** Switches the sidebar between the guides, Fabrials' components, the agent blocks and each library. */
+function RootToggle({ current }: { current: DocsRoot }) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger className="docs-root-trigger" aria-label={`Documentation: ${current.title}. Switch library`}>
+        <RootMark root={current} />
+        <span className="docs-root-text">
+          <span className="docs-root-title">{current.title}</span>
+          <span className="docs-root-description">{current.description}</span>
+        </span>
+        <ChevronsUpDown aria-hidden="true" size={14} className="docs-root-chevron" />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="docs-root-menu">
+        {docsRoots.map((root) => (
+          <DropdownMenuItem key={root.id} render={<Link href={root.href} />} className="docs-root-item">
+            <RootMark root={root} />
+            <span className="docs-root-text">
+              <span className="docs-root-title">{root.title}</span>
+              <span className="docs-root-description">{root.description}</span>
+            </span>
+            {root.id === current.id && <Check aria-hidden="true" size={14} className="docs-root-check" />}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+function DocsNav({ path, root }: { path: string; root: DocsRoot }) {
+  return (
+    <nav aria-label={`${root.title} documentation`} className="docs-nav">
+      {root.groups.map((group) => (
+        <Collapsible key={group.name} defaultOpen className="docs-nav-group">
+          <CollapsibleTrigger className="docs-nav-heading">
+            {group.name}
+            <ChevronDown aria-hidden="true" size={14} />
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <ul>
+              {group.pages.map((page) => (
+                <li key={page.href}>
+                  <Link href={page.href} aria-current={page.href === path ? "page" : undefined}>
+                    {page.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </CollapsibleContent>
+        </Collapsible>
       ))}
     </nav>
   );
@@ -84,6 +116,24 @@ function SearchTrigger({ compact = false }: { compact?: boolean }) {
   );
 }
 
+/** The repository's stars, from the site's cached GitHub route; unknown until it answers. */
+function useRepoStats(repository: string) {
+  const [stats, setStats] = useState<{ stars: number | null; forks: number | null }>({ stars: null, forks: null });
+  useEffect(() => {
+    const controller = new AbortController();
+    setStats({ stars: null, forks: null });
+    fetch(`/api/github?repo=${encodeURIComponent(repository)}`, { signal: controller.signal })
+      .then((response) => response.json())
+      .then((data: { stars?: unknown; forks?: unknown }) => {
+        const count = (value: unknown) => (typeof value === "number" && Number.isSafeInteger(value) ? value : null);
+        setStats({ stars: count(data.stars), forks: count(data.forks) });
+      })
+      .catch(() => {});
+    return () => controller.abort();
+  }, [repository]);
+  return stats;
+}
+
 export function DocsShell({
   header,
   toc = [],
@@ -96,8 +146,10 @@ export function DocsShell({
   const path = usePathname();
   const [navOpen, setNavOpen] = useState(false);
   const items = toc.filter((item) => item.depth >= 2 && item.depth <= 3);
-  const active = useActiveHeading(items);
-  const activeTitle = items.find((item) => item.url === active)?.title;
+  const active = useActiveHeadings(items);
+  const activeTitle = items.find((item) => item.url === active[0])?.title;
+  const root = rootFor(path);
+  const repo = useRepoStats(root.repository);
   const { previous, next } = docsNeighbours(path);
   useEffect(() => setNavOpen(false), [path]);
 
@@ -116,10 +168,20 @@ export function DocsShell({
         <SearchTrigger compact />
       </div>
       <div className="docs-body">
-        <aside className="docs-sidebar" aria-label="Documentation sidebar">
-          <SearchTrigger />
-          <DocsNav path={path} />
-        </aside>
+        <div className="docs-sidebar-column">
+          <aside className="docs-sidebar" aria-label="Documentation sidebar">
+            <SearchTrigger />
+            <RootToggle current={root} />
+            <DocsNav path={path} root={root} />
+            <RepoInfo
+              owner={root.repository.split("/")[0]!}
+              repo={root.repository.split("/")[1]!}
+              stars={repo.stars}
+              forks={repo.forks}
+              className="docs-sidebar-repo"
+            />
+          </aside>
+        </div>
         <main id="main-content" className="docs-main" tabIndex={-1}>
           <article className="docs-article">
             {header}
@@ -177,7 +239,15 @@ export function DocsShell({
         <DialogContent placement="start" className="docs-sheet" closeLabel="Close navigation">
           <DialogTitle className="docs-sheet-title">Documentation</DialogTitle>
           <DialogDescription className="fui-sr-only">Browse every documentation page.</DialogDescription>
-          <DocsNav path={path} />
+          <RootToggle current={root} />
+          <DocsNav path={path} root={root} />
+          <RepoInfo
+            owner={root.repository.split("/")[0]!}
+            repo={root.repository.split("/")[1]!}
+            stars={repo.stars}
+            forks={repo.forks}
+            className="docs-sidebar-repo"
+          />
         </DialogContent>
       </Dialog>
     </div>

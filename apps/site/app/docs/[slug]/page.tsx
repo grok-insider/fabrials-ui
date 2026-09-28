@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
+import { remarkCodeTitle } from "@/lib/remark-code-title";
 import { getTableOfContents } from "fumadocs-core/content/toc";
 import { Info, Lightbulb } from "lucide-react";
 import {
@@ -16,7 +17,11 @@ import {
   DescriptionItem,
   DescriptionList,
   DescriptionTerm,
+  File,
+  Files,
+  Folder,
   PageHeader,
+  RepoInfo,
   Table,
   TableBody,
   TableCell,
@@ -31,6 +36,8 @@ import { docsPages } from "@/lib/docs-nav";
 import { DocsShell } from "@/components/docs/docs-shell";
 import { ComponentPreview } from "@/components/component-preview";
 import { CodeBlock } from "@/components/code-block";
+import { InstalledFiles } from "@/components/installed-files";
+import { repoStats } from "@/lib/github";
 import { ExternalPreview } from "@/components/external-preview";
 import { loadExternal, type ExternalItem } from "@/lib/external";
 import { shimIndex } from "@/lib/shims-index.generated";
@@ -142,6 +149,9 @@ function ShimTable() {
 
 const mdxComponents = {
   WebMCPSetup,
+  Files,
+  Folder,
+  File,
   ShimTable,
   h2: ({ id, children }: ComponentProps<"h2">) => (
     <Heading level={2} id={id}>
@@ -168,13 +178,18 @@ const mdxComponents = {
   ),
   pre: ({ children }: ComponentProps<"pre">) => {
     if (
-      isValidElement<{ children: string; className?: string }>(children) &&
+      isValidElement<{ children: string; className?: string; "data-title"?: string }>(children) &&
       typeof children.props.children === "string"
     ) {
+      const language = children.props.className?.replace("language-", "");
+      const code = children.props.children.trimEnd();
       return (
         <CodeBlock
-          code={children.props.children.trimEnd()}
-          label={children.props.className?.replace("language-", "").toUpperCase() || "Code"}
+          code={code}
+          language={language}
+          variant={language && /^(bash|sh|shell)$/.test(language) ? "command" : "code"}
+          label={children.props["data-title"] ?? language?.toUpperCase() ?? "Code"}
+          title={children.props["data-title"]}
         />
       );
     }
@@ -332,13 +347,21 @@ export default async function Docs({
         <div className="docs-prose">
           <MDXRemote
             source={mdx}
-            options={{ mdxOptions: { remarkPlugins: [remarkGfm], rehypePlugins: [rehypeSlug], format: designDoc ? "md" : "mdx" } }}
+            options={{ mdxOptions: { remarkPlugins: [remarkGfm, remarkCodeTitle], rehypePlugins: [rehypeSlug], format: designDoc ? "md" : "mdx" } }}
             components={mdxComponents}
           />
         </div>
       )}
     </DocsShell>
   );
+}
+
+/** Where shadcn writes a registry file in a default Next.js app: its target, or the folder for its type. */
+function installedPath(file: { path: string; target?: string | null; type: string }) {
+  if (file.target) return file.target;
+  const name = file.path.split("/").pop()!;
+  const folder = { "registry:lib": "lib", "registry:hook": "hooks", "registry:ui": "components/ui" }[file.type] ?? "components";
+  return `${folder}/${name}`;
 }
 
 const CHECK_TITLES: Record<string, string> = {
@@ -350,14 +373,19 @@ const CHECK_TITLES: Record<string, string> = {
   "overrides-theme": "Theme tokens",
 };
 
-function ExternalDocs({ entry }: { entry: ExternalItem }) {
+async function ExternalDocs({ entry }: { entry: ExternalItem }) {
   const { library, item, raw, slug } = entry;
   const parent = external.find((x) => x.snapshot.name === library.name)!;
   const published = publishExternalItem(raw, item, library, parent.licenseText, {
     origin: "https://ui.fabrials.com",
     shims: shimNames,
   });
-  const code = published.files.map((file) => file.content).join("\n\n");
+  const files = published.files.map((file) => ({ path: installedPath(file), code: file.content }));
+  const shims = published.registryDependencies
+    .filter((dep) => dep.startsWith("https://ui.fabrials.com/r/"))
+    .map((dep) => ({ path: `components/ui/${dep.slice("https://ui.fabrials.com/r/".length, -".json".length)}.tsx`, note: "Fabrials shim" }));
+  const [owner, repo] = library.repository.split("/") as [string, string];
+  const stats = await repoStats(library.repository);
   const upstreamUrl = library.registry.replace("{name}", item.name);
   const toc = [
     { title: "Preview", url: "#preview", depth: 2 },
@@ -387,7 +415,7 @@ function ExternalDocs({ entry }: { entry: ExternalItem }) {
       <section id="preview" aria-label="Component preview" className="docs-section docs-section-first">
         <ExternalPreview
           slug={slug}
-          code={code}
+          files={files}
           credit={
             item.demo
               ? `Demo from ${library.title}, shown with the Fabrials theme.`
@@ -407,9 +435,10 @@ function ExternalDocs({ entry }: { entry: ExternalItem }) {
           <li className="docs-step">
             <p>
               shadcn copies the source into your app and installs what it needs.
-              {published.registryDependencies.some((dep) => dep.startsWith("https://ui.fabrials.com")) &&
+              {shims.length > 0 &&
                 " Its shadcn primitives come from Fabrials shims, so buttons and panels match the rest of the app."}
             </p>
+            <InstalledFiles files={[...files.map((file) => ({ path: file.path, note: "new" })), ...shims]} />
             {published.dependencies.length > 0 && (
               <ul className="docs-deps" aria-label="npm dependencies">
                 {item.dependencies.map((dep) => (
@@ -430,6 +459,7 @@ function ExternalDocs({ entry }: { entry: ExternalItem }) {
           file. The copy was taken on {library.fetchedAt} and passed the{" "}
           <Link href="/libraries#policy">license gate</Link>.
         </p>
+        <RepoInfo owner={owner} repo={repo} stars={stats.stars} forks={stats.forks} description={library.title} className="docs-repo" />
         <DescriptionList>
           <DescriptionItem>
             <DescriptionTerm>Library</DescriptionTerm>

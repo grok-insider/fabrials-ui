@@ -84,12 +84,79 @@ export const docsPages = docsNav.flatMap((group) =>
   group.pages.map((page) => ({ ...page, group: group.name, section: group.section })),
 );
 
+/**
+ * The documentation roots the sidebar switches between, like separate
+ * libraries: the guides, Fabrials' own components, the agent blocks and one
+ * root per aggregated library. The sidebar shows one root at a time.
+ */
+export type DocsRoot = {
+  id: string;
+  title: string;
+  description: string;
+  kind: "guides" | "fabrials" | "agents" | "library";
+  href: string;
+  /** The GitHub repository the sidebar links to (owner/name). */
+  repository: string;
+  groups: DocsNavGroup[];
+};
+
+const FABRIALS_REPOSITORY = "grok-insider/fabrials-ui";
+
+export const docsRoots: DocsRoot[] = [
+  {
+    id: "guides",
+    title: "Guides",
+    description: "Set up, principles and WebMCP",
+    kind: "guides",
+    href: "/docs/introduction",
+    repository: FABRIALS_REPOSITORY,
+    groups: docsNav.filter((group) => group.section === "Guides"),
+  },
+  {
+    id: "fabrials",
+    title: "Fabrials UI",
+    description: "Controls, patterns and the brand",
+    kind: "fabrials",
+    href: "/components",
+    repository: FABRIALS_REPOSITORY,
+    groups: docsNav.filter((group) => group.section === "Components"),
+  },
+  {
+    id: "agents",
+    title: "WebMCP & MCP",
+    description: "Blocks people and agents share",
+    kind: "agents",
+    href: "/docs/webmcp-provider",
+    repository: FABRIALS_REPOSITORY,
+    groups: docsNav.filter((group) => group.section === "Agents"),
+  },
+  ...externalIndex.map((library) => ({
+    id: library.name,
+    title: library.title,
+    description: `${library.items.length} components, ${library.license}, ${library.tier}`,
+    kind: "library" as const,
+    href: `/docs/${[...library.items].sort((a, b) => a.title.localeCompare(b.title))[0]!.slug}`,
+    repository: library.repository,
+    groups: docsNav.filter((group) => group.section === "Libraries" && (group.name === library.title || group.name === "Overview")),
+  })),
+];
+
+/** Repositories the site shows stars for: its own and every aggregated library's. */
+export const knownRepositories = new Set(docsRoots.map((root) => root.repository));
+
+/** The root a page belongs to; /libraries opens the first library, anything unknown the guides. */
+export function rootFor(path: string): DocsRoot {
+  if (path === "/libraries") return docsRoots.find((root) => root.kind === "library") ?? docsRoots[0]!;
+  return docsRoots.find((root) => root.groups.some((group) => group.pages.some((page) => page.href === path))) ?? docsRoots[0]!;
+}
+
 export function docsNeighbours(href: string) {
-  const index = docsPages.findIndex((page) => page.href === href);
+  const pages = rootFor(href).groups.flatMap((group) => group.pages);
+  const index = pages.findIndex((page) => page.href === href);
   return {
-    current: docsPages[index],
-    previous: index > 0 ? docsPages[index - 1] : undefined,
-    next: index >= 0 ? docsPages[index + 1] : undefined,
+    current: pages[index],
+    previous: index > 0 ? pages[index - 1] : undefined,
+    next: index >= 0 ? pages[index + 1] : undefined,
   };
 }
 

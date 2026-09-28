@@ -14,10 +14,9 @@ afterEach(() => {
 it("copies the original command and announces success", async () => {
   const user = userEvent.setup();
   const write = vi.spyOn(navigator.clipboard, "writeText").mockResolvedValue();
-  const command =
-    "bunx shadcn@latest add https://ui.fabrials.com/r/webmcp-provider.json";
+  const command = "bun install --frozen-lockfile";
   render(<CodeBlock code={command} variant="command" />);
-  await user.click(screen.getByRole("button", { name: "Copy Terminal" }));
+  await user.click(screen.getByRole("button", { name: "Copy code" }));
   expect(write).toHaveBeenCalledWith(command);
   expect(screen.getByRole("status").textContent).toBe("Copied to clipboard");
 });
@@ -28,11 +27,19 @@ it("shows clipboard failures and permits retry", async () => {
     .mockRejectedValueOnce(new Error())
     .mockResolvedValue();
   render(<CodeBlock code="bun install" variant="command" />);
-  await user.click(screen.getByRole("button", { name: "Copy Terminal" }));
+  await user.click(screen.getByRole("button", { name: "Copy code" }));
   expect(screen.getByRole("status").textContent).toContain("Select");
-  await user.click(screen.getByRole("button", { name: "Copy Terminal" }));
+  await user.click(screen.getByRole("button", { name: "Copy code" }));
   expect(write).toHaveBeenCalledTimes(2);
   expect(screen.getByRole("status").textContent).toContain("Copied");
+});
+it("turns an npx command into package manager tabs", async () => {
+  const user = userEvent.setup();
+  const write = vi.spyOn(navigator.clipboard, "writeText").mockResolvedValue();
+  render(<CodeBlock code="npx shadcn@latest add @fabrials/button" variant="command" />);
+  await user.click(screen.getByRole("tab", { name: "pnpm" }));
+  await user.click(screen.getByRole("button", { name: "Copy code" }));
+  expect(write).toHaveBeenCalledWith("pnpm dlx shadcn@latest add @fabrials/button");
 });
 it("preserves zero stars and falls back without a fabricated count", async () => {
   vi.stubGlobal(
@@ -40,10 +47,12 @@ it("preserves zero stars and falls back without a fabricated count", async () =>
     vi.fn().mockResolvedValue(Response.json({ stargazers_count: 0 })),
   );
   const response = await GET();
-  expect(await response.json()).toEqual({ stars: 0 });
+  expect(await response.json()).toEqual({ stars: 0, forks: null });
   expect(response.headers.get("cache-control")).toContain("3600");
   vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error()));
-  expect(await (await GET()).json()).toEqual({ stars: null });
+  expect(await (await GET()).json()).toEqual({ stars: null, forks: null });
+  const unknown = await GET(new Request("https://ui.fabrials.com/api/github?repo=someone/else"));
+  expect(unknown.status).toBe(404);
 });
 it("renders an accessible GitHub link with the real zero count", async () => {
   vi.stubGlobal(
