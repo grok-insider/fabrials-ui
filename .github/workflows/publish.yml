@@ -1,6 +1,7 @@
 name: Publish packages
-# Runs only for a version tag pushed on purpose (v0.7.0 and so on). It needs the
-# NPM_TOKEN secret and the @fabrials organisation on npm; see docs/registry.md.
+# Runs only for a version tag pushed on purpose (v0.7.1 and so on). Publishing uses
+# npm trusted publishing (OIDC): each package on npmjs.com trusts this repository's
+# publish.yml, so no npm token is stored anywhere. Provenance comes with it.
 on:
   push:
     tags: ["v*"]
@@ -20,6 +21,8 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.4.2
+      # Trusted publishing needs npm 11.5.1 or later; Node 22 ships npm 10.
+      - run: npm install -g npm@11
       - run: bun install --frozen-lockfile
       - run: bun run check
       - run: bun run stage:publish
@@ -27,9 +30,5 @@ jobs:
         run: test "${GITHUB_REF_NAME#v}" = "$(node -p "require('./packages/ui/package.json').version")"
       - run: npm publish --provenance --access public
         working-directory: packages/ui
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - run: npm publish --provenance --access public
         working-directory: packages/ai-ui
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
