@@ -6,7 +6,7 @@
   "description": "shadcn's checkbox, backed by @fabrials/ui. A binary choice that can sit in a form or a selection list.",
   "author": "Fabrials <admin@grokinsider.net>",
   "dependencies": [
-    "@fabrials/ui@^0.7.0"
+    "@fabrials/ui@^0.7.1"
   ],
   "registryDependencies": [
     "https://ui.fabrials.com/r/styles.json"

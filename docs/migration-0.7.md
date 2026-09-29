@@ -88,7 +88,15 @@ existing changes.
 
 Nothing; the version moves with `@fabrials/ui`.
 
-## Theme islands
+## Where to use the brand
+
+See DESIGN.md › "Dithering is the brand": landing hero and sign-in get a
+`DitherScene`, a public page may carry one `DitherBand`, and every product
+shows its `DitherGem` next to its name.
+
+## 0.7.1
+
+### Theme islands
 
 `.light` and `[data-theme="light"]` now scope the light palette next to `:root`
 (dark already had `.dark` and `[data-theme="dark"]`). A light island inside a
@@ -98,8 +106,11 @@ sets `data-gem` on the island's own root, because `[data-gem]` selectors match
 only the element that carries them. Additive: nothing changes for a page that
 sets the theme on `<html>` only.
 
-## Where to use the brand
+### Touch targets of segmented controls
 
-See DESIGN.md › "Dithering is the brand": landing hero and sign-in get a
-`DitherScene`, a public page may carry one `DitherBand`, and every product
-shows its `DitherGem` next to its name.
+`Toggle` (and so `ToggleGroup` and `ThemeSwitcher`) and the tabs of a segmented
+`TabsList` were 38 px tall on touch and narrow screens, because they sit inside a
+group with 3 px of padding. Their hit area is now extended by that padding to
+44 px with a pseudo-element, so nothing in the layout moves. Nothing to change in
+hosts; a host that worked around it (a min-height override on the toggles) can
+drop the override.

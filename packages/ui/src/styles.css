@@ -3590,6 +3590,23 @@
     .fui-sidebar-menu-button {
       height: auto;
     }
+    /* Segmented toggles and tabs are 6 px shorter than a control (they sit inside a 3 px padded group), so their hit area is
+       extended by that padding instead of growing the group: 44 px tall targets, nothing moves. An icon-only theme switcher is
+       square and also gains the 3 px each side (the 2 px gap between items means neighbours share a pixel or two). */
+    .fui-toggle,
+    .fui-tabs-list[data-variant="segmented"] .fui-tab {
+      position: relative;
+    }
+    .fui-toggle::before,
+    .fui-tabs-list[data-variant="segmented"] .fui-tab::before {
+      content: "";
+      position: absolute;
+      inset-block: -3px;
+      inset-inline: 0;
+    }
+    .fui-theme-switcher:not([data-labels]) .fui-toggle::before {
+      inset-inline: -3px;
+    }
     :is(.fui-button[data-size="icon"], .fui-button-size-icon),
     :is(.fui-button[data-size="icon-sm"], .fui-button-size-icon-sm),
     :is(.fui-button[data-size="icon-xs"], .fui-button-size-icon-xs),

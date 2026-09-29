@@ -37,3 +37,11 @@ test("server link styles have no client boundary and dark mode supports either h
   assert.match(css, /\.dark,\s*\[data-theme="dark"\]/);
   assert.match(css, /:root,\s*\.light,\s*\[data-theme="light"\]\s*\{/);
 });
+
+test("segmented toggles get a 44 px hit area on touch and narrow screens without growing their group", () => {
+  const styles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
+  const at = styles.indexOf(".fui-toggle::before");
+  assert.ok(at > 0, "the toggle extends its hit area with a pseudo-element");
+  assert.match(styles.slice(styles.lastIndexOf("@media", at), at), /^@media \(max-width: 767px\), \(pointer: coarse\)/);
+  assert.match(styles.slice(at, at + 200), /inset-block: -3px/);
+});
