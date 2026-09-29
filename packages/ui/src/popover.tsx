@@ -19,14 +19,18 @@ function PopoverContent({
   alignOffset = 0,
   side = "bottom",
   sideOffset = 6,
+  keepMounted,
   ...props
 }: Omit<PopoverPrimitive.Popup.Props, "className"> & { className?: string } &
   Pick<
     PopoverPrimitive.Positioner.Props,
     "align" | "alignOffset" | "side" | "sideOffset"
-  >) {
+  > & {
+    /** Keep the popover in the DOM, hidden, while it is closed: what was typed in it is still there when it opens again. */
+    keepMounted?: boolean;
+  }) {
   return (
-    <PopoverPrimitive.Portal>
+    <PopoverPrimitive.Portal keepMounted={keepMounted}>
       <PopoverPrimitive.Positioner
         align={align}
         alignOffset={alignOffset}

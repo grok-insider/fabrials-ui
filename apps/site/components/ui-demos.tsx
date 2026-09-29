@@ -84,6 +84,8 @@ import {
   CommandItem,
   CommandList,
   Dialog,
+  DialogActions,
+  DialogBody,
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -131,6 +133,7 @@ import {
   Separator,
   SeriesChart,
   SettingsSection,
+  Sheet,
   SheetContent,
   SheetTitle,
   SidebarGroupLabel,
@@ -265,6 +268,28 @@ const demos: Record<string, () => ReactNode> = {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <Dialog>
+        <DialogTrigger render={<Button variant="outline" />}>Save a copy</DialogTrigger>
+        <DialogContent size="wide" close="footer">
+          <DialogHeader>
+            <DialogTitle>Save a copy for offline reading</DialogTitle>
+            <DialogDescription>Fixed header and footer; the body is the only scroller.</DialogDescription>
+          </DialogHeader>
+          <DialogBody>
+            <form id="demo-copy" className="grid gap-3" onSubmit={(event) => event.preventDefault()}>
+              <Field label="Folders">{(props) => <Input {...props} name="folders" defaultValue="Inbox" />}</Field>
+              {Array.from({ length: 8 }, (_, index) => (
+                <p key={index} className="m-0 text-sm">Copies are encrypted with a key that only this browser holds.</p>
+              ))}
+            </form>
+          </DialogBody>
+          <DialogFooter>
+            <DialogActions>
+              <Button type="submit" form="demo-copy">Save a copy</Button>
+            </DialogActions>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Frame>
   ),
   "alert-dialog": () => (
@@ -298,6 +323,15 @@ const demos: Record<string, () => ReactNode> = {
           </Label>
         </SheetContent>
       </Dialog>
+      <Sheet modal={false}>
+        <DialogTrigger render={<Button variant="outline" />}>Open tools (non-modal)</DialogTrigger>
+        <SheetContent>
+          <DialogHeader>
+            <SheetTitle>Tools</SheetTitle>
+            <DialogDescription>No scrim and no focus trap: the page stays usable.</DialogDescription>
+          </DialogHeader>
+        </SheetContent>
+      </Sheet>
     </Frame>
   ),
   "dropdown-menu": () => (
@@ -699,6 +733,9 @@ const demos: Record<string, () => ReactNode> = {
   "bulk-actions": () => (
     <Frame>
       <BulkActions count={2}>
+        <Button variant="outline" size="sm">Archive</Button>
+      </BulkActions>
+      <BulkActions count={0} keepMounted>
         <Button variant="outline" size="sm">Archive</Button>
       </BulkActions>
     </Frame>

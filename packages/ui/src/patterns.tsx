@@ -110,17 +110,32 @@ export function BulkActions({
   children,
   label,
   regionLabel = "Selection actions",
+  keepMounted = false,
 }: {
   count: number;
   children: ReactNode;
   label?: ReactNode;
   regionLabel?: string;
+  /**
+   * Keep the region in the DOM at a count of 0: the actions are `hidden` (they stay mounted, so a controller or a focus
+   * handoff that relies on them keeps working) and the `role="status"` span is always there, visually hidden, so that
+   * the change from 0 to 1 is announced. Without it the component renders nothing at 0.
+   */
+  keepMounted?: boolean;
 }) {
-  if (count < 1) return null;
+  const empty = count < 1;
+  if (empty && !keepMounted) return null;
   return (
-    <div className="fui-bulk-actions" role="group" aria-label={regionLabel}>
+    <div
+      className="fui-bulk-actions"
+      role="group"
+      aria-label={regionLabel}
+      data-empty={empty || undefined}
+    >
       <span role="status">{label ?? `${count} selected`}</span>
-      <div className="fui-actions">{children}</div>
+      <div className="fui-actions" hidden={empty}>
+        {children}
+      </div>
     </div>
   );
 }
@@ -318,6 +333,8 @@ export function AuthLayout({
   children,
   footer,
   aside,
+  actions,
+  align = "auto",
   headingLevel = 1,
   className,
 }: {
@@ -329,6 +346,17 @@ export function AuthLayout({
   footer?: ReactNode;
   /** Optional editorial panel shown beside the card on wide screens. */
   aside?: ReactNode;
+  /**
+   * A corner control for the page (an appearance and language menu). It sits at the inline end of the top edge, above the aside,
+   * and comes AFTER the card in the DOM, so the first tab stop is the sign-in action, not the menu.
+   */
+  actions?: ReactNode;
+  /**
+   * Where the card sits in its column. `auto` (default) follows DESIGN.md: with an `aside` the card anchors to the inline start
+   * of its column, next to the storm (from 1024 px; below it the aside is gone and the card centres), without one it centres.
+   * `start` anchors it at every width, `center` centres it even beside an aside.
+   */
+  align?: "auto" | "start" | "center";
   headingLevel?: 1 | 2;
   className?: string;
 }) {
@@ -337,6 +365,7 @@ export function AuthLayout({
     <div
       data-slot="auth-layout"
       data-aside={aside ? "" : undefined}
+      data-align={align === "auto" ? undefined : align}
       className={classes("fui-auth", className)}
     >
       {aside ? <aside className="fui-auth-aside">{aside}</aside> : null}
@@ -351,6 +380,7 @@ export function AuthLayout({
         </section>
         {footer ? <p className="fui-auth-footer">{footer}</p> : null}
       </div>
+      {actions ? <div className="fui-auth-actions">{actions}</div> : null}
     </div>
   );
 }

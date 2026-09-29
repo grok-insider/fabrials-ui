@@ -1,6 +1,6 @@
 import { useRef, useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Archive, ContactRound, FileText, FolderOpen, Inbox, Layers, Plus, Search, Send, Settings, Star, Trash2, TriangleAlert, UserRound } from "lucide-react";
+import { Archive, ContactRound, FileText, FolderOpen, Inbox, Layers, Plus, Send, Settings, Star, Trash2, TriangleAlert, UserRound } from "lucide-react";
 import {
   AppHeader,
   AppHeaderAction,
@@ -15,6 +15,7 @@ import {
   AvatarFallback,
   Badge,
   Button,
+  CommandTrigger,
   IconButton,
   Item,
   ItemActions,
@@ -27,7 +28,6 @@ import {
   ItemSeparator,
   ItemTitle,
   ItemUnread,
-  Kbd,
   Loading,
   NativeCheckbox,
   NavSwitcher,
@@ -57,7 +57,6 @@ import {
   placeholderList,
   placeholderText,
 } from "@fabrials/ui";
-import "./structure.css";
 
 const meta = {
   title: "Fabrials/Structure",
@@ -297,13 +296,8 @@ function ItemsPage() {
 // ------------------------------------------------------------------ App header
 
 function Command() {
-  return (
-    <Button variant="outline" size="lg" className="structure-command" aria-label="Commands">
-      <Search aria-hidden />
-      <span className="structure-command-label">Commands</span>
-      <Kbd className="structure-command-keys">Ctrl K</Kbd>
-    </Button>
-  );
+  // The real launcher: it answers to the container named `command` (icon only under 12rem, then label and keys).
+  return <CommandTrigger label="Commands" keys={["mod", "K"]} />;
 }
 
 function Header({ name = "Open Email", logo, current = "mail", withCommand = true, withNav = true, ...props }: { name?: string; logo?: boolean; current?: "mail" | "contacts"; withCommand?: boolean; withNav?: boolean } & Partial<React.ComponentProps<typeof AppHeader>>) {

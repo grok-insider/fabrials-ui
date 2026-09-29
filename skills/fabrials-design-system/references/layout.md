@@ -250,6 +250,7 @@ import { AuthLayout, Button, DitherScene, Field, Input, ProductLockup } from "@f
   description="Use your mailbox password. Your administrator can reset it."
   footer="Your password is used only by this server."
   aside={<DitherScene variant="full" />}
+  actions={<PublicPreferences />}
 >
   <form className="grid gap-4">
     <Field label="Email address">{(props) => <Input {...props} type="email" autoComplete="username" />}</Field>
@@ -261,7 +262,7 @@ import { AuthLayout, Button, DitherScene, Field, Input, ProductLockup } from "@f
 
 - **Full storm** (house sign-in, `stories/highstorm.stories.tsx` › Sign in): a positioned page with `DitherScene variant="full"` behind it and a small solid card (`bg-card`, hairline, 8 px corners, about 22.5rem) anchored at the left gutter and vertically centred. Text never sits on the dither.
 - One primary action; say what the provider can read ("We read your X handle and avatar, nothing else").
-- `AuthLayout` centres its own card inside its column; that is the component's layout. Do not add more centring around it.
+- `AuthLayout` places its own card: beside an `aside` it anchors to the inline start of its column from 1024 px (`align="auto"`), without one it centres; `align="start"` or `"center"` override. Do not add more centring around it. The appearance and language menu goes in `actions` (a corner control that follows the card in the DOM), not in an absolutely positioned wrapper of your own.
 - `MoonPhase` and `Starfield` are allowed only on sign-in and landing surfaces and stop under reduced motion.
 
 ## States

@@ -253,12 +253,17 @@ export const uiCatalog: UiCatalogItem[] = [
     "Dialog",
     "Overlays",
     "A modal task with a title, an explanation and explicit actions.",
-    ["Dialog", "DialogTrigger", "DialogContent", "DialogTitle", "DialogDescription", "DialogClose"],
+    ["Dialog", "DialogTrigger", "DialogContent", "DialogHeader", "DialogTitle", "DialogDescription", "DialogBody", "DialogFooter", "DialogActions", "DialogClose"],
     [
       ["open", "boolean", "Controlled open state."],
-      ["onOpenChange", "(open) => void", "Fires on open and dismiss."],
+      ["onOpenChange", "(open) => void", "Fires on open and dismiss. Escape during an IME composition does not close the dialog."],
+      ["DialogContent size", "default | wide | settings | full-narrow", "default is 32rem, wide 46rem, settings 62 by 42rem (72 by 48 from 100rem). Wide, settings and full-narrow are the whole screen below 48rem."],
+      ["DialogContent close", "corner | footer", "corner is the X; footer draws no X and puts a Close button first in the DialogFooter (showCloseButton on DialogFooter is shadcn's name for it)."],
+      ["DialogContent padding / keepMounted", "none / boolean", "padding=none removes the padding; keepMounted keeps the dialog in the DOM, hidden, while it is closed."],
+      ["DialogBody scroll / padding", "boolean / none", "A DialogBody as a direct child of DialogContent gives a fixed header, a body that is the only scroller and a fixed footer. scroll=false lets the content scroll itself (a settings rail and panels)."],
+      ["DialogActions", "children", "Portals the actions into the footer from a stateful child (a form under the body), after Close. Nothing renders until the footer has mounted."],
     ],
-    "Focus moves into the dialog and returns to the trigger on Escape. The title names the task.",
+    "Focus moves into the dialog and returns to the trigger on Escape. The title names the task. Under 34rem the footer wraps: the secondary buttons share rows and the ink action, last as in the tab order, takes the full bottom row; every button is 44 px. Keep the header to the title and put the description first in the body: a phone in landscape or at a large text size then keeps room for the body. A body with no focusable content should be given tabIndex 0 and a name.",
   ),
   ui(
     "alert-dialog",
@@ -276,11 +281,13 @@ export const uiCatalog: UiCatalogItem[] = [
     "Sheet",
     "Overlays",
     "A side panel for filters and secondary tasks.",
-    ["Sheet", "SheetTrigger", "SheetContent", "SheetTitle", "SheetDescription"],
+    ["Sheet", "SheetTrigger", "SheetContent", "SheetHeader", "SheetTitle", "SheetDescription", "SheetBody"],
     [
-      ["side", "left | right", "Which edge the panel uses."],
+      ["SheetContent side", "left | right", "Which edge the panel uses."],
+      ["Sheet modal", "boolean | trap-focus", "true (default): scrim, focus trap, inert page. false: a drawer beside the page, with no scrim and no trap; an outside press does not close it, Escape and the close control do. Base UI reads modal on the root, so it is set on Sheet and SheetContent follows."],
+      ["SheetContent padding / keepMounted", "none / boolean", "padding=none for content that draws its own; keepMounted keeps it mounted while closed."],
     ],
-    "Sheet is the dialog primitive anchored to an edge. It still traps focus.",
+    "Sheet is the dialog primitive anchored to an edge; modal by default it traps focus. A non-modal sheet is for tools that stay open while people work in the page.",
   ),
   ui(
     "dropdown-menu",
@@ -290,6 +297,7 @@ export const uiCatalog: UiCatalogItem[] = [
     ["DropdownMenu", "DropdownMenuTrigger", "DropdownMenuContent", "DropdownMenuItem"],
     [
       ["variant", "default | destructive", "destructive marks a dangerous item."],
+      ["DropdownMenuContent keepMounted", "boolean", "Keep the menu in the DOM, hidden, while it is closed."],
     ],
     "Open it from a button that names the record. Do not hide the only primary action in the menu.",
   ),
@@ -316,6 +324,20 @@ export const uiCatalog: UiCatalogItem[] = [
     "The same content must be reachable from the keyboard, not only from hover.",
   ),
   ui(
+    "status-popover",
+    "Status popover",
+    "Overlays",
+    "A one-sentence status in a toolbar or header: an icon, or an icon and a word, that opens a popover with what to do about it.",
+    ["StatusPopover"],
+    [
+      ["title / description", "string", "The popup's name and the sentence. An icon trigger is named \"title: description\"; with a label, \"title: label\"."],
+      ["icon / label", "ReactNode / string", "The glyph should change with the state; label adds a visible word."],
+      ["attention", "boolean | warning | danger", "Tints the trigger with a status ink. true is danger. Never the only signal."],
+      ["compact / keepMounted", "boolean", "compact hides the label visually and keeps it in the name; keepMounted keeps the popover in the DOM while closed."],
+    ],
+    "It is a popover, not a modal and not a tooltip: Base UI names the popup by its title and Escape returns focus to the trigger. children is what a person can do about it, usually a button.",
+  ),
+  ui(
     "popover",
     "Popover",
     "Overlays",
@@ -323,6 +345,7 @@ export const uiCatalog: UiCatalogItem[] = [
     ["Popover", "PopoverTrigger", "PopoverContent"],
     [
       ["open", "boolean", "Controlled open state."],
+      ["PopoverContent keepMounted", "boolean", "Keep the popover in the DOM, hidden, while it is closed (also on DropdownMenuContent)."],
     ],
     "Use a dialog when the task has a title and a submit action. Use a popover for a short anchored choice.",
   ),
@@ -495,7 +518,22 @@ export const uiCatalog: UiCatalogItem[] = [
     [
       ["open", "boolean", "CommandDialog open state."],
     ],
-    "fabrials.com and the ai-relay console open this with Ctrl or Command K. Radiant uses Command to choose a model and does not add a second palette.",
+    "fabrials.com and the ai-relay console open this with Ctrl or Command K. Radiant uses Command to choose a model and does not add a second palette. The dialog has 6 px corners, the overlay shadow and one variable for its top and its maximum height; the selected row has the accent fill and the 2 px Stormlight bar. CommandDialog does not wrap its children: put a Command inside.",
+  ),
+  ui(
+    "command-trigger",
+    "Command launcher",
+    "Navigation",
+    "The launcher of a palette, and the rows of a palette that is not cmdk.",
+    ["CommandTrigger", "CommandOptionList", "CommandOption"],
+    [
+      ["CommandTrigger label / name / icon", "ReactNode / string", "The visible text; the accessible name when it must say more (it should contain the label); a decorative icon (a magnifier by default)."],
+      ["CommandTrigger keys / sequence / shortcut", "string[] / boolean / string | false", "Key caps, \"mod\" being the main modifier resolved after hydration (Ctrl on the server). aria-keyshortcuts is derived from them (Control+K Meta+K) and constant; false omits it. sequence shows \"G then K\" and derives none, because aria-keyshortcuts cannot express steps."],
+      ["CommandTrigger compact", "boolean", "Icon only at any width. Inside a container named command narrower than 12rem (the command slot of AppHeader) it is icon-only without the prop. The key hint hides on coarse pointers."],
+      ["CommandOption active / disabled", "boolean", "active is the virtual focus (aria-selected, data-active): accent fill and a 2 px Stormlight bar. disabled sets aria-disabled and mutes the label but stays selectable, so activating it can say why."],
+      ["CommandOption icon / label / detail / group / reason / keys", "ReactNode", "The slots. Below 32rem of list width the label takes its own line, then detail and group, then the reason."],
+    ],
+    "The launcher is a secondary button with the 3:1 control boundary, because it looks like the field it opens. The option list is a tabIndex -1 listbox: the input that drives it holds the focus and names the active row with aria-activedescendant. Set --fui-command-list-max (20rem by default) to none when a parent gives it a height.",
   ),
   ui(
     "kbd",
@@ -659,6 +697,7 @@ export const uiCatalog: UiCatalogItem[] = [
     [
       ["count", "number", "Selected rows. The bar is hidden at zero."],
       ["children", "ReactNode", "The actions."],
+      ["keepMounted", "boolean", "Keep the region at zero: the actions are hidden, the status stays (visually hidden) so the first selection is announced."],
     ],
     "Show the bar only after selection begins. The status names the count.",
   ),
@@ -1135,8 +1174,11 @@ export const uiCatalog: UiCatalogItem[] = [
     [
       ["multiple", "boolean", "Let several items stay open."],
       ["defaultValue", "string[]", "Items open at first."],
+      ["Accordion variant", "default | rows", "rows is a stack of independent tools: 44 px header rows (icon, title, tags, chevron), the open row marked like the current item, bodies that stay mounted while closed (keepMounted is on by default there)."],
+      ["AccordionTrigger headingLevel / headingRef", "2 | 3 | 4 / Ref", "The level of the heading around the trigger; a ref makes the heading focusable and hands focus to the trigger."],
+      ["AccordionTrigger icon / aside", "ReactNode", "aside (tags, counts) sits outside the trigger: it is not part of the name, describes the trigger, and does not make the row a bigger target. Non-interactive."],
     ],
-    "Keep the answer short; long content belongs on its own page.",
+    "Keep the answer short; long content belongs on its own page. Base UI's accordion has no arrow-key roving: each trigger is a tab stop. A row whose expansion lives in the URL is a link, not an accordion trigger.",
   ),
   ui(
     "breadcrumb",
@@ -1176,7 +1218,7 @@ export const uiCatalog: UiCatalogItem[] = [
     "Collections",
     "Terms and values, such as a record's properties.",
     ["DescriptionList", "DescriptionItem", "DescriptionTerm", "DescriptionDetails"],
-    [["layout", "grid | stacked", "Side by side or stacked."]],
+    [["layout", "grid | stacked | auto", "Side by side, stacked, or auto: it follows the list's own width, stacked under 30rem and a 8 to 11rem term column from it (the list becomes a size container, so it must fill its parent's width)."]],
     "A configured value is not a verified one: say which it is.",
   ),
   ui(
@@ -1394,6 +1436,8 @@ export const uiCatalog: UiCatalogItem[] = [
     ["AuthLayout"],
     [
       ["brand / title / description", "ReactNode", "What the person signs in to."],
+      ["actions", "ReactNode", "A corner control (appearance and language). At the inline end of the top edge, after the card in the DOM, so the first tab stop is the sign-in action."],
+      ["align", "auto | start | center", "auto follows DESIGN.md: with an aside the card anchors to the inline start of its column from 1024 px, without one it centres. start anchors it at every width."],
       ["aside", "ReactNode", "Shown beside the card on wide screens; put a DitherScene variant=\"full\" in it."],
       ["footer", "ReactNode", "What the session can and cannot do."],
     ],

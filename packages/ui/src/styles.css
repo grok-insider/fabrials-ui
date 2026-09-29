@@ -1465,7 +1465,7 @@
   .fui-dialog-close {
     position: absolute;
     top: var(--fui-space-3);
-    right: var(--fui-space-3);
+    inset-inline-end: var(--fui-space-3);
     color: var(--muted-foreground);
   }
   .fui-dialog-footer {
@@ -1475,6 +1475,174 @@
     flex-wrap: wrap;
     gap: var(--fui-space-2);
     margin-top: var(--fui-space-6);
+  }
+
+  /* -------------------------------------------- 0.8: dialog sizes and parts */
+  /* Kept mounted while closed (keepMounted): Base UI sets [hidden] on the popup, the scrim and the positioner, and a rule that
+     sets display would beat the user agent's. */
+  .fui-dialog[hidden],
+  .fui-backdrop[hidden],
+  .fui-positioner[hidden],
+  .fui-popover[hidden],
+  .fui-menu[hidden] {
+    display: none !important;
+  }
+  .fui-dialog[data-padding="none"] {
+    padding: 0;
+  }
+  .fui-dialog-footer-slot {
+    display: contents;
+  }
+
+  /* Sizes. A wide or settings dialog is the whole screen on a phone, the way a sheet is: a viewport query, because a dialog is
+     placed against the window, and rem, so a larger text size gives way earlier. */
+  .fui-dialog[data-size="wide"] {
+    width: min(46rem, calc(100vw - 2rem));
+    max-height: min(50rem, calc(100dvh - 3rem));
+  }
+  .fui-dialog[data-size="settings"] {
+    width: min(62rem, calc(100vw - 3rem));
+    height: min(42rem, calc(100dvh - 3rem));
+    max-height: none;
+    border-radius: var(--fui-radius-lg);
+  }
+  @media (min-width: 100rem) {
+    .fui-dialog[data-size="settings"] {
+      width: min(72rem, calc(100vw - 6rem));
+      height: min(48rem, calc(100dvh - 6rem));
+    }
+  }
+  @media (max-width: 47.99rem) {
+    .fui-dialog[data-placement="center"]:is(
+        [data-size="wide"],
+        [data-size="settings"],
+        [data-size="full-narrow"]
+      ) {
+      top: 0;
+      left: 0;
+      width: 100vw;
+      max-width: none;
+      height: 100dvh;
+      max-height: 100dvh;
+      border: 0;
+      border-radius: 0;
+      transform: none;
+    }
+    .fui-dialog[data-placement="center"]:is(
+        [data-size="wide"],
+        [data-size="settings"],
+        [data-size="full-narrow"]
+      ):is([data-starting-style], [data-ending-style]) {
+      transform: none;
+    }
+  }
+
+  /* A dialog with a DialogBody: fixed header, one scroller, fixed footer. Only a direct DialogBody switches it on, so every dialog
+     without one keeps the plain padded box. The dialog is a size container for its footer. */
+  .fui-dialog:has(> .fui-dialog-body) {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+    container: fui-dialog / inline-size;
+  }
+  .fui-dialog:has(> .fui-dialog-body) > .fui-dialog-header {
+    flex: none;
+    margin: 0;
+    padding-block: var(--fui-space-5) var(--fui-space-4);
+    padding-inline: var(--fui-space-5);
+    border-block-end: 1px solid var(--border);
+  }
+  /* The corner X sits in the header row: its title never runs under it. */
+  .fui-dialog[data-close="corner"]:has(> .fui-dialog-body) > .fui-dialog-header {
+    padding-inline-end: calc(var(--fui-control-height-lg) + var(--fui-space-4));
+  }
+  .fui-dialog:has(> .fui-dialog-body) .fui-dialog-title,
+  .fui-dialog:has(> .fui-dialog-body) .fui-dialog-header .fui-description {
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+  }
+  .fui-dialog-body {
+    flex: 1 1 auto;
+    min-block-size: 0;
+    padding: var(--fui-space-4) var(--fui-space-5);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  /* A body that scrolls and is a tab stop draws its ring inside: the dialog clips whatever is outside it. */
+  .fui-dialog-body:focus-visible {
+    outline-offset: -2px;
+  }
+  .fui-dialog-body[data-padding="none"] {
+    padding: 0;
+  }
+  .fui-dialog-body[data-scroll="false"] {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
+    overflow: hidden;
+  }
+  .fui-dialog:has(> .fui-dialog-body) > .fui-dialog-footer {
+    flex: none;
+    margin: 0;
+    padding: var(--fui-space-3) var(--fui-space-5);
+    border-block-start: 1px solid var(--border);
+    background: var(--popover);
+  }
+  .fui-dialog:has(> .fui-dialog-body) > .fui-dialog-footer > .fui-button,
+  .fui-dialog:has(> .fui-dialog-body) > .fui-dialog-footer > .fui-dialog-footer-slot > .fui-button {
+    min-block-size: var(--fui-control-height-lg);
+  }
+  /* A narrow dialog wraps its footer: the secondary buttons share rows and the ink action, last as in the tab order, takes the
+     full row at the bottom, under the thumb. */
+  @container fui-dialog (max-width: 34rem) {
+    .fui-dialog-footer {
+      justify-content: stretch;
+    }
+    .fui-dialog-footer > .fui-button,
+    .fui-dialog-footer-slot > .fui-button {
+      flex: 1 1 calc(50% - var(--fui-space-2));
+      min-inline-size: 0;
+    }
+    .fui-dialog-footer > .fui-button[data-variant="default"],
+    .fui-dialog-footer-slot > .fui-button[data-variant="default"] {
+      flex-basis: 100%;
+    }
+  }
+  /* A short window (a landscape phone): header and body scroll together and only the footer stays, so the text under the title
+     is never squeezed to a few lines. */
+  @media (max-height: 30rem) {
+    .fui-dialog:has(> .fui-dialog-body) {
+      display: block;
+      overflow-y: auto;
+    }
+    .fui-dialog:has(> .fui-dialog-body) > .fui-dialog-body {
+      overflow: visible;
+    }
+    .fui-dialog:has(> .fui-dialog-body) > .fui-dialog-footer {
+      position: sticky;
+      inset-block-end: 0;
+      z-index: 1;
+      padding-block: var(--fui-space-2);
+    }
+  }
+  /* A full-screen dialog keeps its bars clear of the notch and the home indicator. */
+  @media (max-width: 47.99rem) {
+    .fui-dialog[data-size]:has(> .fui-dialog-body) > .fui-dialog-header {
+      padding-block-start: max(var(--fui-space-5), env(safe-area-inset-top, 0px));
+      padding-inline-start: max(var(--fui-space-5), env(safe-area-inset-left, 0px));
+    }
+    /* With the X in the corner the header is a shorter row: the X sits at the top edge and the title beside it. */
+    .fui-dialog[data-size][data-close="corner"]:has(> .fui-dialog-body) > .fui-dialog-header {
+      padding-block-start: max(var(--fui-space-3), env(safe-area-inset-top, 0px));
+    }
+    .fui-dialog[data-size]:has(> .fui-dialog-body) > .fui-dialog-footer {
+      padding-block-end: max(var(--fui-space-3), env(safe-area-inset-bottom, 0px));
+    }
+    .fui-dialog[data-size][data-close="corner"] > .fui-dialog-close {
+      top: max(var(--fui-space-1), env(safe-area-inset-top, 0px));
+      inset-inline-end: max(var(--fui-space-2), env(safe-area-inset-right, 0px));
+    }
   }
 
   /* -------------------------------------------------------- badge, status */
@@ -2450,6 +2618,112 @@
     color: var(--muted-foreground);
   }
 
+  /* 0.8: a row with an aside (tags, counts) outside the trigger, and the variant "rows": a stack of independent tools. The
+     trigger's ::after stretches over the whole row (the way an Item's link does), so the aside and the chevron, which
+     ignore the pointer, sit on a target. The ring is drawn on that pseudo-element, inside the row. */
+  .fui-accordion-head {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-block-size: var(--fui-control-height-lg);
+  }
+  .fui-accordion-head > .fui-accordion-header {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+  }
+  .fui-accordion-head .fui-accordion-trigger {
+    min-block-size: var(--fui-control-height-lg);
+    padding-block: 0;
+  }
+  .fui-accordion-head .fui-accordion-trigger::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+  .fui-accordion-head .fui-accordion-trigger:focus-visible {
+    outline: 0;
+  }
+  .fui-accordion-head .fui-accordion-trigger:focus-visible::after {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: -2px;
+  }
+  .fui-accordion-icon {
+    display: inline-flex;
+    flex: none;
+    color: var(--muted-foreground);
+  }
+  .fui-accordion-icon svg {
+    width: 1rem;
+    height: 1rem;
+  }
+  .fui-accordion-title {
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+  }
+  .fui-accordion-aside {
+    display: inline-flex;
+    flex: none;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--fui-space-1);
+    pointer-events: none;
+  }
+  .fui-accordion-head > .fui-accordion-chevron {
+    margin-inline: var(--fui-space-2) var(--fui-accordion-pad, 0px);
+    pointer-events: none;
+  }
+  .fui-accordion-item[data-open] > .fui-accordion-head > .fui-accordion-chevron {
+    rotate: 180deg;
+  }
+
+  .fui-accordion[data-variant="rows"] {
+    --fui-accordion-pad: var(--fui-space-4);
+  }
+  .fui-accordion[data-variant="rows"] .fui-accordion-trigger {
+    justify-content: flex-start;
+    gap: var(--fui-space-3);
+    padding-inline: var(--fui-accordion-pad) var(--fui-space-2);
+  }
+  .fui-accordion[data-variant="rows"] .fui-accordion-trigger:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  /* The open row reads as the current one: accent fill and the 2 px Stormlight bar. */
+  .fui-accordion[data-variant="rows"] .fui-accordion-item[data-open] > .fui-accordion-head {
+    background: var(--accent);
+  }
+  .fui-accordion[data-variant="rows"] .fui-accordion-item[data-open] > .fui-accordion-head::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    inline-size: var(--fui-bar);
+    background: var(--brand-ink);
+    pointer-events: none;
+  }
+  @media (hover: hover) {
+    .fui-accordion[data-variant="rows"] .fui-accordion-item:not([data-open]) > .fui-accordion-head:hover {
+      background: var(--accent);
+    }
+  }
+  @media (forced-colors: active) {
+    .fui-accordion[data-variant="rows"] .fui-accordion-item[data-open] > .fui-accordion-head::before {
+      background: Highlight;
+    }
+  }
+  /* A body that stays mounted while closed does not animate a height it never leaves; it is a container its content lays out in. */
+  .fui-accordion[data-variant="rows"] .fui-accordion-panel {
+    height: auto;
+    transition: none;
+  }
+  .fui-accordion[data-variant="rows"] .fui-accordion-content {
+    container: fui-accordion-content / inline-size;
+    padding: var(--fui-space-4) var(--fui-accordion-pad) var(--fui-space-5);
+    color: var(--foreground);
+    overflow-wrap: anywhere;
+  }
+
   /* --------------------------------------------- 0.8: native disclosure */
   .fui-disclosure {
     min-inline-size: 0;
@@ -2910,6 +3184,48 @@
     grid-template-columns: minmax(0, 1fr);
     gap: var(--fui-space-0-5);
   }
+  /* 0.8: layout="auto" follows the list's own width. The list is the container and the items are what it lays out, so the term
+     column is a fixed 8 to 11rem (no subgrid: the container cannot size its own tracks). */
+  .fui-description-list[data-layout="auto"] {
+    display: block;
+    container: fui-description-list / inline-size;
+  }
+  .fui-description-list[data-layout="auto"] .fui-description-item {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--fui-space-0-5);
+  }
+  @container fui-description-list (min-width: 30rem) {
+    .fui-description-list[data-layout="auto"] .fui-description-item {
+      grid-template-columns: minmax(8rem, 11rem) minmax(0, 1fr);
+      column-gap: var(--fui-space-4);
+    }
+  }
+
+  /* ---------------------------------------------- 0.8: status popover trigger */
+  .fui-status-popover {
+    display: inline-flex;
+    flex: none;
+    color: var(--muted-foreground);
+  }
+  .fui-status-popover[data-attention="danger"] {
+    color: var(--fui-danger-ink);
+  }
+  .fui-status-popover[data-attention="warning"] {
+    color: var(--fui-warning-ink);
+  }
+  .fui-status-popover-trigger {
+    color: inherit;
+  }
+  .fui-status-popover-trigger[data-size="lg"] {
+    padding-inline: var(--fui-space-3);
+  }
+  .fui-status-popover[data-compact] .fui-status-popover-trigger[data-size="lg"] {
+    min-inline-size: var(--fui-control-height-lg);
+    padding-inline: 0;
+  }
+  .fui-popover.fui-status-popover-content {
+    width: min(20rem, calc(100vw - 2rem));
+  }
 
   /* --------------------------------------------------------- code snippets */
   .fui-snippet {
@@ -3059,6 +3375,22 @@
     border-radius: var(--fui-radius-md);
     background: color-mix(in oklab, var(--brand) 7%, var(--card));
     font-weight: var(--fui-weight-medium);
+  }
+  /* keepMounted at a count of 0: the region leaves the layout but not the accessibility tree, so its status can announce the first
+     selection. The actions are [hidden]. */
+  .fui-bulk-actions[data-empty] {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .fui-bulk-actions > .fui-actions[hidden] {
+    display: none;
   }
   .fui-state-panel {
     display: flex;
@@ -3473,9 +3805,17 @@
   }
 
   .fui-auth {
+    position: relative;
     display: grid;
     min-height: 100dvh;
     background: var(--background);
+  }
+  /* 0.8: the page's corner control, at the inline end of the top edge. It follows the card in the DOM. */
+  .fui-auth-actions {
+    position: absolute;
+    z-index: 2;
+    inset-block-start: max(var(--fui-space-2), env(safe-area-inset-top, 0px));
+    inset-inline-end: max(var(--fui-page-padding), env(safe-area-inset-right, 0px));
   }
   .fui-auth-aside {
     display: none;
@@ -3521,9 +3861,31 @@
     font-size: var(--fui-text-xs);
     text-align: center;
   }
+  /* 0.8: the card anchors to the inline start of its column (DESIGN.md: beside the storm, the card anchors next to it). Explicit
+     with align="start" at every width; the default does it only where an aside is drawn. */
+  .fui-auth[data-align="start"] .fui-auth-main {
+    justify-items: start;
+    padding-inline: var(--fui-page-padding);
+  }
+  .fui-auth[data-align="start"] .fui-auth-brand {
+    justify-content: flex-start;
+  }
+  .fui-auth[data-align="start"] .fui-auth-footer {
+    text-align: start;
+  }
   @media (min-width: 1024px) {
     .fui-auth[data-aside] {
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+    .fui-auth[data-aside]:not([data-align]) .fui-auth-main {
+      justify-items: start;
+      padding-inline: var(--fui-space-12);
+    }
+    .fui-auth[data-aside]:not([data-align]) .fui-auth-brand {
+      justify-content: flex-start;
+    }
+    .fui-auth[data-aside]:not([data-align]) .fui-auth-footer {
+      text-align: start;
     }
     .fui-auth[data-aside] .fui-auth-aside {
       display: flex;
@@ -4118,13 +4480,39 @@
     height: 1rem;
     color: var(--muted-foreground);
   }
-  .fui-command-item[data-selected="true"] {
+  /* The active row: cmdk's selection, or the virtual focus of a listbox that is not cmdk (data-active, aria-selected). The fill
+     and the 2 px Stormlight bar are the house mark of the current row (0.8; before it the fill alone). */
+  .fui-command-item:is([data-selected="true"], [data-active], [aria-selected="true"]) {
     background: var(--accent);
     color: var(--accent-foreground);
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+  }
+  .fui-command-item:is([data-selected="true"], [data-active], [aria-selected="true"])::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    inline-size: var(--fui-bar);
+    background: var(--brand-ink);
+    pointer-events: none;
+  }
+  @media (forced-colors: active) {
+    .fui-command-item:is([data-selected="true"], [data-active], [aria-selected="true"]) {
+      outline: 2px solid Highlight;
+    }
   }
   .fui-command-item[data-disabled="true"] {
     opacity: 0.5;
     pointer-events: none;
+  }
+  /* aria-disabled without data-disabled (a row that is not cmdk's, or one that must stay selectable so that activating it can
+     say why): muted, still a target. cmdk's own disabled item keeps the rule above. */
+  .fui-command-item[aria-disabled="true"]:not([data-disabled="true"]) {
+    cursor: not-allowed;
+  }
+  .fui-command-item[aria-disabled="true"]:not([data-disabled="true"]) .fui-command-option-label {
+    color: var(--muted-foreground);
   }
   .fui-command-check {
     margin-inline-start: auto;
@@ -4148,13 +4536,19 @@
     margin: var(--fui-space-1) calc(var(--fui-space-1) * -1);
     background: var(--border);
   }
+  /* One top for the placement and the height, so they cannot drift apart. The overlay shadow and the highlight are the house
+     recipe for a menu-sized overlay; the corners are a container's (6 px), not a dialog's. */
   .fui-dialog.fui-command-dialog {
+    --fui-command-top: min(14dvh, 9rem);
     width: min(36rem, calc(100vw - 2rem));
+    max-height: calc(100dvh - var(--fui-command-top) - 1.5rem);
     padding: 0;
     overflow: hidden;
+    border-radius: var(--fui-radius-lg);
+    box-shadow: var(--fui-shadow-overlay), var(--fui-highlight);
   }
   .fui-dialog.fui-command-dialog[data-placement="center"] {
-    top: 14vh;
+    top: var(--fui-command-top);
     transform: translateX(-50%);
   }
   .fui-dialog.fui-command-dialog[data-placement="center"]:is(
@@ -4165,6 +4559,150 @@
   }
   .fui-command-dialog .fui-command {
     border-radius: 0;
+  }
+
+  /* ---------------------------------- 0.8: the launcher and rows that are not cmdk's */
+  /* The launcher looks like the field it opens: a secondary button with the 3:1 control boundary. Two classes, because the
+     button sets --fui-button-border on [data-variant]. */
+  .fui-button.fui-command-trigger {
+    --command-target: var(--fui-control-height-lg);
+    --fui-button-border: var(--fui-control-border);
+    justify-content: flex-start;
+    gap: var(--fui-space-2);
+    inline-size: 100%;
+    min-inline-size: var(--command-target);
+    min-block-size: var(--command-target);
+    padding-inline: var(--fui-space-3);
+    color: var(--muted-foreground);
+    font-weight: var(--fui-weight-regular);
+  }
+  @media (hover: hover) {
+    .fui-button.fui-command-trigger:hover:not(:disabled) {
+      color: var(--foreground);
+    }
+  }
+  .fui-command-trigger-label {
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .fui-command-trigger-keys {
+    flex: none;
+    margin-inline-start: auto;
+  }
+  @media (pointer: coarse) {
+    .fui-command-trigger-keys {
+      display: none;
+    }
+  }
+  /* Icon only: forced with compact, or by the command slot of AppHeader (a container named "command") when it is under 12rem. */
+  .fui-button.fui-command-trigger[data-compact] {
+    justify-content: center;
+    padding-inline: 0;
+  }
+  .fui-command-trigger[data-compact] :is(.fui-command-trigger-label, .fui-command-trigger-keys) {
+    display: none;
+  }
+  @container command (max-width: 11.99rem) {
+    .fui-button.fui-command-trigger {
+      justify-content: center;
+      padding-inline: 0;
+    }
+    .fui-command-trigger-label,
+    .fui-command-trigger-keys {
+      display: none;
+    }
+  }
+
+  .fui-command-options {
+    --fui-command-list-max: 20rem;
+    container: fui-command-options / inline-size;
+    max-block-size: var(--fui-command-list-max);
+    margin: 0;
+    padding: var(--fui-space-1);
+    list-style: none;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scroll-padding-block: var(--fui-space-1);
+  }
+  .fui-command-options[hidden] {
+    display: none;
+  }
+  .fui-command-item.fui-command-option {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: var(--fui-space-3);
+    min-block-size: var(--fui-control-height-lg);
+    padding: var(--fui-space-1-5) var(--fui-space-3);
+    cursor: pointer;
+    user-select: auto;
+  }
+  .fui-command-option[data-icon] {
+    grid-template-columns: 1rem minmax(0, 1fr) var(--fui-command-keys-width, auto);
+  }
+  .fui-command-option-text {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: var(--fui-space-3);
+    align-items: baseline;
+    min-inline-size: 0;
+  }
+  .fui-command-option-main {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: var(--fui-space-2);
+    min-inline-size: 0;
+  }
+  .fui-command-option-label {
+    font-weight: var(--fui-weight-medium);
+  }
+  .fui-command-detail,
+  .fui-command-option-group,
+  .fui-command-reason {
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+  }
+  .fui-command-option-group {
+    white-space: nowrap;
+    text-align: end;
+  }
+  .fui-command-reason {
+    grid-column: 1 / -1;
+  }
+  .fui-command-option-keys {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--fui-space-1);
+    justify-self: end;
+  }
+  /* A narrow list: the label on its own line, then detail and group, then the reason. */
+  @container fui-command-options (max-width: 31.99rem) {
+    .fui-command-option-text {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      column-gap: var(--fui-space-3);
+    }
+    .fui-command-option-main {
+      display: contents;
+    }
+    .fui-command-option-label,
+    .fui-command-reason {
+      flex: 1 0 100%;
+    }
+    .fui-command-option-group {
+      white-space: normal;
+      text-align: start;
+    }
+    .fui-command-option[data-icon] {
+      grid-template-columns: 1rem minmax(0, 1fr) auto;
+    }
+  }
+  [data-density="compact"] .fui-command-option {
+    padding-block: var(--fui-space-1);
   }
 
   /* ------------------------------------------------------ navigation menu */

@@ -23,6 +23,7 @@ test("generic source only depends on presentation libraries and local modules", 
         const specifier = node.moduleSpecifier.text;
         const presentation = new Set([
           "react",
+          "react-dom", // a declared peer: DialogActions portals into the dialog footer
           "lucide-react",
           "class-variance-authority",
           "cmdk",

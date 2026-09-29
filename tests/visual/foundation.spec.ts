@@ -54,6 +54,22 @@ const stories: Record<string, string> = {
   "structure-navigation": "fabrials-structure--navigation",
   "structure-switcher-open": "fabrials-structure--switcher-open",
   "structure-sections": "fabrials-structure--sections",
+  "overlays-dialog-fixed": "fabrials-overlays--fixed-dialog",
+  "overlays-dialog-long-title": "fabrials-overlays--long-title",
+  "overlays-dialog-settings": "fabrials-overlays--settings-dialog",
+  "overlays-sheet-non-modal": "fabrials-overlays--non-modal-sheet",
+  "overlays-sheet-modal": "fabrials-overlays--modal-sheet",
+  "overlays-keep-mounted": "fabrials-overlays--keep-mounted",
+  "overlays-status-popovers": "fabrials-overlays--status-popovers",
+  "commands-launcher": "fabrials-commands--launcher",
+  "commands-options": "fabrials-commands--options",
+  "commands-palette": "fabrials-commands--palette-dialog",
+  "commands-tools": "fabrials-commands--tools",
+  "commands-bulk": "fabrials-commands--bulk",
+  "auth-aside": "fabrials-auth--aside-auto",
+  "auth-aside-centred": "fabrials-auth--aside-centred",
+  "auth-centred": "fabrials-auth--centred",
+  "auth-start": "fabrials-auth--start",
 };
 
 for (const theme of ["light", "dark"]) {
@@ -65,7 +81,8 @@ for (const theme of ["light", "dark"]) {
         await page.goto(
           `/iframe.html?id=${id}&viewMode=story&globals=theme:${theme}`,
         );
-        await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+        // By selector, not by role: behind an open modal dialog the page is inert and out of the accessibility tree.
+        await expect(page.locator("#storybook-root h1").first()).toBeVisible();
         await page.evaluate(() => document.fonts.ready);
         await expect(page.locator("html")).toHaveClass(
           theme === "dark" ? /dark/ : /^(?!.*dark).*$/,

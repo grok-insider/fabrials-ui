@@ -3,7 +3,7 @@
 // Previews for the controls added to the catalogue in 0.7: brand, data, navigation and chrome.
 // Synthetic data only.
 import { useEffect, useState, type ReactNode } from "react";
-import { Archive, AtSign, ContactRound, Ellipsis, Eye, FileText, Forward, Inbox, Layers, MailOpen, Plus, Reply, Search, Settings, Star, Trash2, UserPlus } from "lucide-react";
+import { Archive, AtSign, Bell, CircleAlert, ContactRound, Ellipsis, Eye, FileText, Forward, Inbox, Layers, MailOpen, Plus, Reply, Search, Settings, Star, Trash2, UserPlus } from "lucide-react";
 import { ProviderIcon } from "@fabrials/ai-ui";
 import {
   Accordion,
@@ -23,6 +23,9 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
   Button,
+  CommandOption,
+  CommandOptionList,
+  CommandTrigger,
   Disclosure,
   DisclosurePanel,
   DisclosureSummary,
@@ -37,6 +40,8 @@ import {
   FileSize,
   IconButton,
   Input,
+  Kbd,
+  StatusPopover,
   NativeCheckbox,
   NativeRadio,
   NativeRadioGroup,
@@ -725,6 +730,16 @@ export const moreDemos: Record<string, () => ReactNode> = {
           <AccordionContent>Daily totals per provider. No prompts, files or account names.</AccordionContent>
         </AccordionItem>
       </Accordion>
+      <Accordion variant="rows" multiple defaultValue={["reminders"]} className="max-w-xl overflow-hidden rounded-md border">
+        <AccordionItem value="reminders">
+          <AccordionTrigger headingLevel={3} icon={<Bell aria-hidden />} aside={<><Badge tone="warning" dot>Needs review</Badge><Badge>3</Badge></>}>Reminders</AccordionTrigger>
+          <AccordionContent><Input aria-label="Remind me about" defaultValue="Renewal quote" /></AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="labels">
+          <AccordionTrigger headingLevel={3} icon={<Layers aria-hidden />} aside={<Badge>12</Badge>}>Labels</AccordionTrigger>
+          <AccordionContent>Twelve labels.</AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </Frame>
   ),
   breadcrumb: () => (
@@ -790,7 +805,7 @@ export const moreDemos: Record<string, () => ReactNode> = {
   ),
   "description-list": () => (
     <Frame>
-      <DescriptionList className="max-w-xl">
+      <DescriptionList layout="auto" className="max-w-xl">
         <DescriptionItem>
           <DescriptionTerm>Relay ID</DescriptionTerm>
           <DescriptionDetails>
@@ -929,11 +944,34 @@ export const moreDemos: Record<string, () => ReactNode> = {
         description="One account for fabrials.com, ai.fabrials.com and the admin console."
         aside={<DitherScene variant="full" reveal={0} />}
         footer="We read your X handle and avatar, nothing else."
+        actions={<Button variant="ghost" size="sm">English</Button>}
         headingLevel={2}
       >
         <Button>Continue with X</Button>
       </AuthLayout>
     </div>
+  ),
+  "command-trigger": () => (
+    <Frame>
+      <div className="grid max-w-sm gap-3">
+        <CommandTrigger label="Search or run a command" keys={["mod", "K"]} />
+        <div style={{ width: "3rem" }}>
+          <CommandTrigger label="Search or run a command" keys={["mod", "K"]} compact />
+        </div>
+      </div>
+      <CommandOptionList aria-label="Commands" className="max-w-sm rounded-md border" style={{ "--fui-command-list-max": "none" } as React.CSSProperties}>
+        <CommandOption label="Go to Inbox" detail="12 unread" group="Navigation" active icon={<Inbox aria-hidden />} keys={<Kbd>G</Kbd>} />
+        <CommandOption label="Move to Archive" group="Folders" disabled reason="Select a message first." icon={<Archive aria-hidden />} />
+      </CommandOptionList>
+    </Frame>
+  ),
+  "status-popover": () => (
+    <Frame inline>
+      <StatusPopover title="Permissions" description="Some actions are unavailable on this account." icon={<CircleAlert aria-hidden />} attention="warning" label="Limited">
+        <Button variant="secondary" size="sm">Refresh</Button>
+      </StatusPopover>
+      <StatusPopover title="Sync" description="Everything is up to date." icon={<Inbox aria-hidden />} />
+    </Frame>
   ),
   "provider-icon": () => (
     <Frame>

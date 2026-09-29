@@ -217,7 +217,14 @@ export function DescriptionList({
   className,
   layout = "grid",
   ...props
-}: ComponentProps<"dl"> & { layout?: "grid" | "stacked" }) {
+}: ComponentProps<"dl"> & {
+  /**
+   * `grid` aligns every term in one column, `stacked` puts each term above its details. `auto` follows the list's own
+   * width: stacked under 30rem, and from 30rem the term in a column of 8 to 11rem beside its details (a drawer, a sheet
+   * and a wide panel use the same markup). It makes the list a size container, so it must fill its parent's width.
+   */
+  layout?: "grid" | "stacked" | "auto";
+}) {
   return (
     <dl
       data-layout={layout}

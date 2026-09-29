@@ -258,6 +258,91 @@ root. **Visual change:** the underline indicator is anchored to the active tab's
 onto two rows underlines the right one; a single row is pixel-identical. Deletable: the rail and strip rules keyed on
 `data-layout` in `settings.css` and the `keepInView` ref callback.
 
+### Overlays, commands and auth
+
+#### `DialogBody`, `DialogFooter`, `DialogActions`; `DialogContent` `size`, `close`, `padding`, `keepMounted`
+
+A `DialogBody` as a direct child of `DialogContent` gives a dialog a fixed header, a body that is the only scroller and a
+fixed footer (`:has(> .fui-dialog-body)`, so a dialog without one keeps the plain padded box and no existing dialog
+changes). A long title wraps inside the header instead of pushing the actions away. `close="footer"` draws no X and puts
+a Close button first in `DialogFooter` (`showCloseButton` on `DialogFooter` is shadcn's name for the same), so the primary
+action ends at the inline end. `DialogActions` portals actions into that footer from a stateful child (a form under the
+body); nothing renders until the footer has mounted, so the server output is empty. Under 34rem of dialog the footer
+wraps: the secondary buttons share rows and the ink action, last as in the tab order, takes the full row at the bottom under
+the thumb; every button is 44 px; in a window under 30rem tall the dialog scrolls as a whole and only
+the footer sticks; full-screen dialogs keep the safe areas. `size` is `default` (32rem), `wide` (46rem), `settings` (62 by
+42rem, 72 by 48 from 100rem) or `full-narrow` (default width, the whole screen below 48rem; `wide` and `settings` are
+the whole screen there too). `DialogBody scroll={false}` lets a settings rail and panels scroll themselves.
+`padding="none"` and `keepMounted` (the dialog stays in the DOM, `hidden`, while closed) are new too, and `DialogContent`
+carries `data-size`, `data-padding` and `data-close`. `Dialog`, `AlertDialog` and `Sheet` no longer close on Escape during
+an IME composition. **Two small visual changes:** the corner X is placed with `inset-inline-end` (it was `right`, which was
+wrong in right-to-left), and `AlertDialogFooter` is a plain function (was the `DialogFooter` alias, so `showCloseButton`
+does not apply to it). Deletable: `ui/dialog.tsx`'s `DialogActions`, `FooterSlot` and the IME guard, `data-fixed-footer`
+and `.dialog-body`, `.dialog-footer`, `.dialog-footer-slot` in `patterns.css`, the header, body and footer rules of
+`assistant.css`, and the size and header rules of `settings.css`.
+
+#### Non-modal `Sheet`, `SheetBody`, `keepMounted` on popovers and menus
+
+`Sheet` is now a component, not an alias of `Dialog`: `modal={false}` is a drawer beside the page (no scrim, no focus
+trap, the page stays usable, an outside press does not close it because `disablePointerDismissal` defaults to true, Escape
+and the close control do and focus returns to the trigger); `modal="trap-focus"` traps focus but leaves the page usable.
+The gap entry put `modal` on `SheetContent`; Base UI reads it on the root, so it is on `Sheet` and `SheetContent` follows.
+`PopoverContent`, `DropdownMenuContent` and `DropdownMenuSubContent` take `keepMounted`; `.fui-dialog`, `.fui-backdrop`,
+`.fui-positioner`, `.fui-popover` and `.fui-menu` are `display: none !important` while `[hidden]`.
+
+#### `Accordion variant="rows"`, `AccordionTrigger` `headingLevel`, `headingRef`, `icon`, `aside`
+
+A stack of independent tools: 44 px header rows (icon, title, tags, chevron), the open row marked like the current item
+(accent fill and a 2 px bar), bodies that stay mounted while closed (`keepMounted` defaults to true in this variant only;
+the default accordion is unchanged). `aside` (tags, counts) sits outside the trigger, describes it (`aria-describedby`)
+and is not part of its name; the trigger's `::after` stretches over the row, so the tags and the chevron ignore the pointer
+and the ring is drawn inside the row. `headingLevel` (2 to 4) and `headingRef` (the heading takes `tabIndex={-1}` and hands
+focus to the trigger) replace hand-made headings. Base UI's accordion has no arrow-key roving: each trigger is a tab stop.
+A row whose expansion lives in the URL (the host's `href` mode) is a link, not an accordion trigger, and stays host code.
+Deletable: `ToolSection` (`ui/workspace-tools.tsx`) and `.tool-section*` in `tools-shell.css`.
+
+#### `BulkActions keepMounted`
+
+At a count of 0 the region stays in the DOM: the actions are `hidden` and the `role="status"` span stays, visually hidden
+(clipped, not `display: none`), so a change from 0 to 1 is announced by a live region that already existed. Without the prop
+nothing renders at 0, as before. Deletable: the always-mounted markup of `features/mail/bulk-bar.tsx` (the phone overflow
+menu of the product lane is host layout and stays).
+
+#### `CommandTrigger`, `CommandOptionList`, `CommandOption`; the command dialog
+
+`CommandTrigger` is the launcher: a secondary button with the 3:1 control boundary, a label, `KbdGroup` keys
+(`keys={["mod", "K"]}`, the modifier resolved after hydration, `aria-keyshortcuts` derived and constant), icon-only in a
+container named `command` under 12rem (the `AppHeader` slot) or with `compact`, key hint hidden on coarse pointers. The
+gap entry proposed an outline button; the host's secondary look with `--fui-control-border` is kept. `CommandOptionList`
+and `CommandOption` are the rows of a listbox that is not cmdk (`active`, `disabled`, `detail`, `group`, `reason`, `keys`;
+the group slot is `.fui-command-option-group` because `.fui-command-group` is cmdk's group wrapper). **Visual changes:**
+the cmdk `CommandItem` selected row now has the 2 px Stormlight bar and a square start edge (it had the fill only);
+`.fui-command-dialog` has 6 px corners, the overlay shadow and highlight, and `--fui-command-top: min(14dvh, 9rem)`
+places it and limits its height (it was `14vh` and no limit). Deletable: the markup of the launcher and `.commands-trigger*`,
+`.command-option*` and `.command-then` in `command.css`, and the dialog overrides there.
+
+#### `AuthLayout` `actions` and `align`
+
+`actions` is a corner control at the inline end of the top edge, after the card in the DOM (the first tab stop is the
+sign-in action). `align="auto"` (default) follows DESIGN.md: with an `aside`, the card anchors to the inline start of its
+column from 1024 px (48 px from the storm's hairline); without one it centres. `start` anchors at every width, `center`
+centres beside an aside. **Visual change:** 0.7.0 centred the card in its column beside the storm, contradicting DESIGN.md;
+the code now matches it, so every sign-in that has an `aside` (the Highstorm and Patterns stories, fabrials.com) shifts
+the card to the start of its column; pass `align="center"` to keep the old look. Deletable: `.app-public-corner` and the
+absolutely positioned `PublicPreferences` wrapper.
+
+#### `StatusPopover`
+
+An icon, or an icon and a word, that opens a popover named by its title with what to do about it; `attention` tints the
+trigger with a status ink; `compact` hides the label visually and keeps it in the name. Deletable: `ui/status-details.tsx`
+and `.status-details*` in `navigation.css` (the pane-mode label hiding becomes `compact`).
+
+#### `DescriptionList layout="auto"`
+
+Follows the list's own width: stacked under 30rem, a 8 to 11rem term column from it. The list is a size container, so it
+must fill its parent's width. Deletable: the `@container tool` rules for `.fui-description-list` in `tools-shell.css` and
+`.offline-envelope` in `offline.css`.
+
 ### Changed behaviour
 
 - `StatePanel`, `RelativeTime` and `Badge` markup changes only when the new props are used, except `RelativeTime`,
@@ -276,3 +361,7 @@ onto two rows underlines the right one; a single row is pixel-identical. Deletab
   element-based styles still apply).
 - `SidebarMenuBadge` is a `span` (was a `div`).
 - **New dependency**: `react-resizable-panels` 4.12.4.
+- **`Dialog`, `AlertDialog` and `Sheet` are components** (they were aliases of the Base UI roots); the props and the
+  shadcn names are unchanged, and Escape during an IME composition is ignored.
+- **`.fui-dialog-close`** is placed with `inset-inline-end`; **`AuthLayout`** anchors its card to the start beside an aside;
+  cmdk's selected `CommandItem` has the 2 px bar; `.fui-command-dialog` has 6 px corners and a maximum height.

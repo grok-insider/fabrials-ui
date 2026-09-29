@@ -25,10 +25,12 @@ export function DropdownMenuSubTrigger({ className, children, ...props }: Styled
 export function DropdownMenuSubContent({
   className,
   sideOffset = 4,
+  keepMounted,
   ...props
-}: StyledProps<BaseMenu.Popup.Props> & Pick<BaseMenu.Positioner.Props, "sideOffset">) {
+}: StyledProps<BaseMenu.Popup.Props> &
+  Pick<BaseMenu.Positioner.Props, "sideOffset"> & { keepMounted?: boolean }) {
   return (
-    <BaseMenu.Portal>
+    <BaseMenu.Portal keepMounted={keepMounted}>
       <BaseMenu.Positioner className="fui-positioner" side="right" align="start" sideOffset={sideOffset}>
         <BaseMenu.Popup className={classes("fui-menu", className)} {...props} />
       </BaseMenu.Positioner>
@@ -42,14 +44,18 @@ export function DropdownMenuContent({
   side = "bottom",
   sideOffset = 6,
   collisionAvoidance,
+  keepMounted,
   ...props
 }: StyledProps<BaseMenu.Popup.Props> &
   Pick<
     BaseMenu.Positioner.Props,
     "align" | "side" | "sideOffset" | "collisionAvoidance"
-  >) {
+  > & {
+    /** Keep the menu in the DOM, hidden, while it is closed. */
+    keepMounted?: boolean;
+  }) {
   return (
-    <BaseMenu.Portal>
+    <BaseMenu.Portal keepMounted={keepMounted}>
       <BaseMenu.Positioner
         className="fui-positioner"
         align={align}

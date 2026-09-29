@@ -106,16 +106,18 @@ import { ChatMessage, ChatComposer } from "@fabrials/ai-ui";         // needs @f
 
 | Component | Use for |
 | --- | --- |
-| `Dialog` (`DialogTrigger`, `DialogContent`, `DialogHeader`, `DialogTitle`, `DialogDescription`, `DialogFooter`, `DialogClose`) | A modal task with a title and explicit actions |
+| `Dialog` (`DialogTrigger`, `DialogContent`, `DialogHeader`, `DialogTitle`, `DialogDescription`, `DialogBody`, `DialogFooter`, `DialogActions`, `DialogClose`) | A modal task with a title and explicit actions. A `DialogBody` between header and footer gives a fixed header and footer with one scroller (a long title wraps, the primary action never scrolls away); `close="footer"` puts Close first in the footer; `size` `wide`, `settings` or `full-narrow` (whole screen on a phone); `keepMounted` keeps typed text. Escape during an IME composition does not close it |
 | `AlertDialog` (`AlertDialogTrigger`, `AlertDialogContent`, `AlertDialogTitle`, `AlertDialogDescription`, `AlertDialogCancel`, `AlertDialogAction`, `AlertDialogClose`) | Confirming a destructive or hard-to-undo action; the confirm button names the consequence |
 | `ConfirmDialog`, `ConfirmActionButton` | Confirm, then run an async action with a pending state and an inline error; `finalFocus` names where focus goes (its function gets `"confirmed"` or `"dismissed"`), for an action that removes its trigger |
 | `ConfirmProvider`, `useConfirm` | `const yes = await confirm({ title, description, destructive })`; mount the provider once. Without it the hook is `window.confirm`. Not for back, forward or unload guards |
-| `Sheet` (`SheetTrigger`, `SheetContent side="left" or "right"`, `SheetHeader`, `SheetTitle`, `SheetDescription`, `SheetFooter`) | Filters, a quick record view, phone navigation |
+| `Sheet` (`SheetTrigger`, `SheetContent side="left" or "right"`, `SheetHeader`, `SheetTitle`, `SheetDescription`, `SheetBody`, `SheetFooter`) | Filters, a quick record view, phone navigation. `<Sheet modal={false}>` is a drawer beside the page (no scrim, no trap, an outside press keeps it open) for tools that stay open while people work; `SheetContent padding="none"` |
 | `DropdownMenu` (`DropdownMenuTrigger`, `DropdownMenuContent`, `DropdownMenuItem`, `DropdownMenuCheckboxItem`, `DropdownMenuRadioGroup`, `DropdownMenuRadioItem`, `DropdownMenuLabel`, `DropdownMenuSeparator`, `DropdownMenuShortcut`, `DropdownMenuSub`, `DropdownMenuSubTrigger`, `DropdownMenuSubContent`) | Actions for one record, from a button that names it |
 | `Tooltip` (`TooltipProvider`, `TooltipTrigger`, `TooltipContent`) | The name of an icon button, repeated for sighted users |
-| `Popover` (`PopoverTrigger`, `PopoverContent`, `PopoverHeader`, `PopoverTitle`, `PopoverDescription`) | One small anchored choice |
+| `Popover` (`PopoverTrigger`, `PopoverContent` (`keepMounted`), `PopoverHeader`, `PopoverTitle`, `PopoverDescription`) | One small anchored choice |
+| `StatusPopover` | A one-sentence status in a header or toolbar (an icon, or an icon and a word, with `attention` `warning` or `danger`) that opens a popover with what to do about it; `compact` hides the word and keeps it in the name |
 | `HoverCard` (`HoverCardTrigger`, `HoverCardContent`) | A preview whose content is also reachable by keyboard |
-| `Command`, `CommandDialog` (`CommandInput`, `CommandList`, `CommandEmpty`, `CommandGroup`, `CommandItem`, `CommandShortcut`, `CommandSeparator`) | The Ctrl/Cmd K palette over real destinations |
+| `Command`, `CommandDialog` (`CommandInput`, `CommandList`, `CommandEmpty`, `CommandGroup`, `CommandItem`, `CommandShortcut`, `CommandSeparator`) | The Ctrl/Cmd K palette over real destinations (put a `Command` inside `CommandDialog`; 6 px corners, the selected row has the 2 px bar) |
+| `CommandTrigger` (`keys={["mod", "K"]}`, `compact`), `CommandOptionList`, `CommandOption` (`active`, `disabled`, `detail`, `group`, `reason`, `keys`) | The launcher of a palette (icon-only in the header's command slot under 12rem) and the rows of a palette you drive yourself with `aria-activedescendant`; a disabled row stays selectable so it can say why |
 
 Triggers take `render` to become a Fabrials button: `<DialogTrigger render={<Button variant="outline" />}>Rename</DialogTrigger>`.
 
@@ -129,9 +131,9 @@ Triggers take `render` to become a Fabrials button: `<DialogTrigger render={<But
 | `Badge` | A short status or fact as a 3 px tag: `tone` `neutral`, `info`, `success`, `warning`, `danger`; `variant` `soft`, `outline` (facts such as a license or version), `solid`; `dot` (`"hollow"` for an archived item), `dotColor`, `truncate`; `--fui-badge-solid` (tint, hairline, dot) and `--fui-badge-ink` (text) are public properties for a tag coloured by data, set on the badge itself (a class or `style`) |
 | `Alert` (`AlertTitle`, `AlertDescription`, `AlertAction`) | A status that stays on the page: `variant` `default`, `info`, `success`, `warning`, `destructive`; `layout="inline"` for a one-line notice from 48rem of its own width (fills its container; not for status that refreshes) |
 | `Card` (`CardHeader`, `CardTitle`, `CardDescription`, `CardAction`, `CardContent`, `CardFooter`) | One bounded summary; a panel around a chart. Not for lists of peers, not nested |
-| `DescriptionList` (`DescriptionItem`, `DescriptionTerm`, `DescriptionDetails`) | A record's properties |
+| `DescriptionList` (`DescriptionItem`, `DescriptionTerm`, `DescriptionDetails`) | A record's properties; `layout="auto"` stacks under 30rem of its own width |
 | `Disclosure`, `DisclosureSummary` (`count`, `chevron`, `size`), `DisclosurePanel` | A native `details`: 44 px summary, count in its name, panel always mounted, opens itself on an invalid field, no JavaScript |
-| `Accordion`, `Collapsible` | Short answers in place; reasoning, sources or long detail behind a named trigger |
+| `Accordion`, `Collapsible` | Short answers in place; reasoning, sources or long detail behind a named trigger. `Accordion variant="rows"` with `AccordionTrigger` `icon`, `aside` (tags outside the trigger), `headingLevel`, `headingRef` is a stack of independent tools whose bodies stay mounted |
 | `ScrollArea` | A region that scrolls without moving the page |
 | `Loading`, `placeholderText`, `placeholderList`, `useLoading` | Paints the real components it wraps as their skeleton while `when` is true; placeholder copy and records; a hook for "inside a loading view" |
 | `Skeleton`, `Progress`, `Separator` | A block only where no component exists yet; a known fraction; a decorative break |
@@ -203,11 +205,11 @@ Chart colours come from `--chart-1` to `--chart-6`; the first series reads as St
 | `PageHeader` | `title`, `description`, `actions`, `eyebrow` (sentence-case context such as a breadcrumb); `headingLevel`, `headingRef`, `headingProps` when a page above owns the h1 or code moves focus to the heading |
 | `SectionHeader` | `title`, `description`, `actions` for a section; the same heading controls |
 | `CollectionToolbar` | `search`, `filters`, `actions`, with a group `label` |
-| `BulkActions` | `count` and actions; renders nothing until `count` is at least 1 |
+| `BulkActions` | `count` and actions; renders nothing until `count` is at least 1, or with `keepMounted` keeps the region (hidden actions, a visually hidden status that announces the first selection) |
 | `StatePanel` | `state` `loading`, `empty`, `error`, `stale`, `offline`, `success`; `title`, `description`, `actions`; `align` `start` (default) or `center`; `size="sm"` (16 px, for embedded regions), `variant="inline"` (no border or tint, for overlays), `fill` (fills a region with a height and centres) |
 | `SettingsSection` | A settings row: `title`, `description`, `status`, controls as children; two columns from 36rem of its OWN width (`layout="stacked"` opts out), so it is right in a sheet, a dialog and a page; `headingLevel`, `headingRef`, `headingProps` |
 | `SuggestionCard`, `SuggestionGrid` | Prompts in an empty chat or workspace (grid on wide screens, a scroll row on narrow) |
-| `AuthLayout` | Sign-in: `brand`, `title`, `description`, form as children, `footer`, `aside` |
+| `AuthLayout` | Sign-in: `brand`, `title`, `description`, form as children, `footer`, `aside`, `actions` (a corner control after the card in the DOM), `align` (`auto`: the card anchors to the start beside an aside, centres without one) |
 
 ```tsx
 <PageHeader

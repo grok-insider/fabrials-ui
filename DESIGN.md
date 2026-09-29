@@ -126,8 +126,8 @@ Write from the user's side: name things by what people recognise, in plain verbs
 The catalogue lives in Storybook (`bun run storybook`, port 6041) and at ui.fabrials.com, where every control has a page with a live preview and its import.
 
 - **Controls:** Button (`default`, `accent`, `outline`, `secondary`, `ghost`, `destructive`, `link`; sizes `xs` to `lg` and `icon-*`; `loading`), Input, Textarea, Field, Label, Checkbox, Switch, Select, RadioGroup, NativeRadioGroup, ToggleGroup, ThemeSwitcher, MultiSelect, Combobox, IconButton, FileInput, Toolbar, FieldSet.
-- **Overlays:** Dialog, AlertDialog, Sheet, DropdownMenu (with submenus), Tooltip, Popover, HoverCard, Command, ConfirmDialog (and `useConfirm` for a confirm you can await). They render from `fui-` styles without Tailwind.
-- **Collections:** Table, Tabs (vertical rail, scrolling strip), NavTabs, Item (records as rows), Badge, Progress, Skeleton, Card, Accordion, Disclosure, Breadcrumb, Pagination, DescriptionList, Kbd and KbdGroup.
+- **Overlays:** Dialog, AlertDialog, Sheet, DropdownMenu (with submenus), Tooltip, Popover, StatusPopover, HoverCard, Command (with CommandTrigger), ConfirmDialog (and `useConfirm` for a confirm you can await). They render from `fui-` styles without Tailwind.
+- **Collections:** Table, Tabs (vertical rail, scrolling strip), NavTabs, Item (records as rows), Badge, Progress, Skeleton, Card, Accordion (rows for a stack of tools), Disclosure, Breadcrumb, Pagination, DescriptionList, Kbd and KbdGroup.
 - **Data:** Stat, StatGroup, Sparkline, Meter, StatusDot, NumberTicker, SeriesChart, ActivityStrip, Timeline, RelativeTime.
 - **Docs pieces:** CodePanel, CodeTabs, PackageInstall, Files/Folder/File and RepoInfo. Syntax uses the muted `--fui-syntax-*` inks, never Stormlight.
 - **Brand and chrome:** DitherScene, DitherBand, DitherGem, DitherCanvas, ProductLockup, FabrialsGem, Avatar, Snippet, CopyButton, SiteHeader, AuthLayout, MoonPhase, Starfield.
