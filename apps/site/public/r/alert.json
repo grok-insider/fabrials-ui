@@ -6,7 +6,7 @@
   "description": "shadcn's alert, backed by @fabrials/ui. A status that stays on the page.",
   "author": "Fabrials <admin@grokinsider.net>",
   "dependencies": [
-    "@fabrials/ui@^0.7.1"
+    "@fabrials/ui@^0.8.0"
   ],
   "registryDependencies": [
     "https://ui.fabrials.com/r/styles.json"

@@ -6,7 +6,7 @@
   "description": "A complete working console, composed from the registry.",
   "author": "Fabrials <admin@grokinsider.net>",
   "dependencies": [
-    "@fabrials/ui@^0.7.1",
+    "@fabrials/ui@^0.8.0",
     "@modelcontextprotocol/client@2.0.0",
     "ajv-formats@^3.0.1",
     "ajv@^8.20.0",

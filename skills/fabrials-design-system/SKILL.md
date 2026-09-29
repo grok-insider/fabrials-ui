@@ -19,7 +19,7 @@ Resolve this skill directory's real path (`readlink -f`, it is usually a symlink
 | Catalogue: what each component is for, its exports and notes | `apps/site/lib/ui-catalog.ts` (packages), `apps/site/lib/catalog.ts` (registry blocks) |
 | Reference layouts | `stories/highstorm.stories.tsx` + `highstorm.css`, `apps/site/app/page.tsx`, `apps/site/components/docs/` |
 | Component usage in context | Storybook (`bun run storybook`, port 6041), `apps/site/components/ui-demos*.tsx` |
-| Upgrading or adopting 0.7 | `docs/migration-0.7.md` |
+| Upgrading or adopting 0.7 or 0.8 | `docs/migration-0.7.md`, `docs/migration-0.8.md` |
 | Registry, shims, other libraries, the license gate | `docs/registry.md` |
 
 The Patterns stories (`stories/patterns.stories.tsx`: PublicSite, Settings, Console, SignIn) follow the 0.7 layout rules and are safe references for page composition.
@@ -47,7 +47,7 @@ The full list with checks: [references/style-rules.md](references/style-rules.md
 
 ## Decision flow for a UI task
 
-1. **Read the context.** The product's `AGENTS.md` and `DESIGN.md`; the installed version (`vendor/fabrials-ui-<version>` in a Fabrials product, `package.json` elsewhere). An older version is not permission to migrate; migrating is the product's decision and follows `docs/migration-0.7.md`. Until then the product follows the `DESIGN.md` shipped inside its vendored copy.
+1. **Read the context.** The product's `AGENTS.md` and `DESIGN.md`; the installed version (`vendor/fabrials-ui-<version>` in a Fabrials product, `package.json` elsewhere). An older version is not permission to migrate; migrating is the product's decision and follows `docs/migration-0.7.md` and `docs/migration-0.8.md`. Until then the product follows the `DESIGN.md` shipped inside its vendored copy.
 2. **Name the surface.** Landing, product index, docs, app workspace, settings, sign-in, or a state (empty, loading, error). Each has a recipe in [references/layout.md](references/layout.md); start from it instead of a blank page.
 3. **Pick components before writing markup.** Patterns first (`PageHeader`, `SectionHeader`, `CollectionToolbar`, `Table`, `BulkActions`, `StatePanel`, `SettingsSection`), then controls. See [references/components.md](references/components.md). Do not rebuild a control the package has; do not add a universal component with many flags.
 4. **Compose with tokens.** Spacing on the 4 px grid (`--fui-space-*`), radii from `--fui-radius-*`, colours from roles. In Tailwind hosts use the bridge (`bg-card`, `text-muted-foreground`, `text-brand-ink`, `font-display`, `rounded-md`, `px-(--fui-page-padding)`).

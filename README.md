@@ -61,7 +61,7 @@ bun run registry:sync          # re-snapshot the third-party libraries (network)
 | fabrials.com | 0.4.0 (0.7.0 on its `feat/highstorm` branch) |
 | admin.fabrials.com, Open Mail, Ditox | 0.3.0 |
 
-Upgrading a product is that product's decision; read [docs/migration-0.7.md](docs/migration-0.7.md) first. The 0.3 delivery record is [docs/delivery-0.3.md](docs/delivery-0.3.md).
+Upgrading a product is that product's decision; read [docs/migration-0.8.md](docs/migration-0.8.md) (and 0.7 before it) first. The 0.3 delivery record is [docs/delivery-0.3.md](docs/delivery-0.3.md).
 
 ## Licenses
 

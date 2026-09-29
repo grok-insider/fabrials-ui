@@ -6,7 +6,7 @@
   "description": "shadcn's switch, backed by @fabrials/ui. An immediate on or off setting.",
   "author": "Fabrials <admin@grokinsider.net>",
   "dependencies": [
-    "@fabrials/ui@^0.7.1"
+    "@fabrials/ui@^0.8.0"
   ],
   "registryDependencies": [
     "https://ui.fabrials.com/r/styles.json"
