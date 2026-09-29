@@ -638,7 +638,44 @@ function StatesDemo() {
   );
 }
 
+function ThemeIslandsDemo() {
+  const island = (theme: "light" | "dark", label: string) => (
+    <section
+      data-theme={theme}
+      aria-label={label}
+      style={{
+        background: "var(--background)",
+        color: "var(--foreground)",
+        border: "1px solid var(--border)",
+        borderRadius: "var(--fui-radius-lg)",
+        padding: "var(--fui-space-4)",
+        display: "grid",
+        gap: "var(--fui-space-3)",
+      }}
+    >
+      <strong>{label}</strong>
+      <ProductLockup product="Open Email" gem="emerald" size="sm" />
+      <div style={{ display: "flex", gap: "var(--fui-space-2)", flexWrap: "wrap" }}>
+        <Button>Primary</Button>
+        <Button variant="outline">Outline</Button>
+        <Badge tone="success" dot>Connected</Badge>
+      </div>
+    </section>
+  );
+  return (
+    <main style={{ padding: "var(--fui-page-padding)", display: "grid", gap: "var(--fui-space-4)" }}>
+      <p style={{ margin: 0, color: "var(--muted-foreground)" }}>
+        A light island inside a dark root resets to the light palette, and a dark island inside a light root keeps the dark one.
+        The page theme follows the Storybook toolbar; each island sets its own theme attribute.
+      </p>
+      {island("light", "Light island")}
+      {island("dark", "Dark island")}
+    </main>
+  );
+}
+
 export const Controls: Story = { render: () => <ControlsDemo /> };
 export const Overlays: Story = { render: () => <OverlaysDemo /> };
 export const Accounts: Story = { render: () => <AccountsDemo /> };
 export const States: Story = { render: () => <StatesDemo /> };
+export const ThemeIslands: Story = { render: () => <ThemeIslandsDemo /> };

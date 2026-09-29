@@ -65,7 +65,7 @@ function block(selectorStart: string) {
   for (const [, name, value] of body.matchAll(/--([\w-]+):\s*([^;]+);/g)) vars[name!] = value!.replace(/\s+/g, " ").trim();
   return vars;
 }
-const lightTokens = block(":root {");
+const lightTokens = block(":root,");
 const darkTokens = block(".dark,");
 const pick = (source: Record<string, string>, fallback: Record<string, string> = {}) =>
   Object.fromEntries(SHADCN_TOKENS.map((name) => [name, source[name] ?? fallback[name]]).filter(([, value]) => value));

@@ -1,4 +1,6 @@
-:root {
+:root,
+.light,
+[data-theme="light"] {
   --fui-font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
   --fui-font-mono:
     "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono",

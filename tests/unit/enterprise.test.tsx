@@ -35,4 +35,5 @@ test("server link styles have no client boundary and dark mode supports either h
   assert.doesNotMatch(helper, /use client/);
   const css = readFileSync(new URL("../../packages/ui/src/tokens.css", import.meta.url), "utf8");
   assert.match(css, /\.dark,\s*\[data-theme="dark"\]/);
+  assert.match(css, /:root,\s*\.light,\s*\[data-theme="light"\]\s*\{/);
 });

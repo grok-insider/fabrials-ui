@@ -88,6 +88,16 @@ existing changes.
 
 Nothing; the version moves with `@fabrials/ui`.
 
+## Theme islands
+
+`.light` and `[data-theme="light"]` now scope the light palette next to `:root`
+(dark already had `.dark` and `[data-theme="dark"]`). A light island inside a
+dark root, such as a preview of how a logo looks in the other theme, resets to
+light instead of inheriting dark. A product that draws a gem inside an island
+sets `data-gem` on the island's own root, because `[data-gem]` selectors match
+only the element that carries them. Additive: nothing changes for a page that
+sets the theme on `<html>` only.
+
 ## Where to use the brand
 
 See DESIGN.md › "Dithering is the brand": landing hero and sign-in get a
