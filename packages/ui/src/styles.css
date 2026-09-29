@@ -235,6 +235,9 @@
     box-shadow: none;
     color: inherit;
   }
+  .fui-tooltip .fui-kbd-separator {
+    color: inherit;
+  }
   /* A file picker is a label styled as a button over a hidden input: the label draws the input's focus. */
   .fui-file-input {
     display: grid;
@@ -863,6 +866,15 @@
     align-items: center;
     gap: var(--fui-space-1);
   }
+  /* 0.8: the word between the keys of a sequence, in the muted ink of every hint. */
+  .fui-kbd-separator {
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-sans);
+    font-size: var(--fui-text-xs);
+    font-weight: var(--fui-weight-regular);
+    line-height: 1;
+    white-space: nowrap;
+  }
 
   /* 0.7: code panels, package install tabs, file trees and repository links */
   .fui-code-panel {
@@ -1364,15 +1376,31 @@
     box-shadow: none;
     color: var(--card);
   }
+  /* 0.8: --fui-badge-solid (tint, hairline, dot) and --fui-badge-ink (text) are public: a tag whose colour is data sets
+     them on the badge itself (a class or style; the badge declares them, so an ancestor's value does not reach it, which also keeps
+     tone badges nested in a coloured row untouched). --fui-badge-dot recolours the dot alone (Badge dotColor) and is not
+     declared on the badge, so it also works from an ancestor. The neutral dot used to be
+     hard-coded, which defeated --fui-badge-solid on a neutral tag; its default is the same muted ink. */
   .fui-badge-dot {
     flex: none;
     width: 0.375rem;
     height: 0.375rem;
     border-radius: 1px;
-    background: var(--fui-badge-solid);
+    background: var(--fui-badge-dot, var(--fui-badge-solid));
   }
-  .fui-badge[data-tone="neutral"] .fui-badge-dot {
-    background: var(--muted-foreground);
+  .fui-badge-dot[data-hollow] {
+    background: transparent;
+    box-shadow: inset 0 0 0 1px var(--fui-badge-dot, var(--fui-badge-solid));
+  }
+  .fui-badge[data-truncate] {
+    min-inline-size: 0;
+    max-inline-size: var(--fui-badge-max, 100%);
+  }
+  .fui-badge-text {
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .fui-status {
     --fui-status-color: var(--muted-foreground);
@@ -1532,6 +1560,54 @@
   }
   .fui-alert[data-variant="destructive"] .fui-alert-title {
     color: var(--fui-danger-ink);
+  }
+  /* 0.8: layout="inline". A container cannot restyle itself, so the alert is the container and its body is the grid that
+     answers to it. The alert fills the width it is given (a container with inline containment has no intrinsic width). */
+  .fui-alert[data-layout="inline"] {
+    display: block;
+    inline-size: 100%;
+    container: fui-alert / inline-size;
+  }
+  .fui-alert-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: var(--fui-space-1) var(--fui-space-3);
+    min-inline-size: 0;
+  }
+  .fui-alert-body:has(> svg) {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .fui-alert-body > svg {
+    grid-row: 1 / span 3;
+    width: 1.125rem;
+    height: 1.125rem;
+    margin-top: 0.0625rem;
+    color: var(--fui-alert-ink);
+  }
+  @container fui-alert (min-width: 48rem) {
+    .fui-alert-body {
+      display: flex;
+      align-items: baseline;
+      column-gap: var(--fui-space-3);
+    }
+    .fui-alert-body > svg {
+      flex: none;
+      align-self: flex-start;
+    }
+    .fui-alert-body > .fui-alert-title {
+      flex: none;
+    }
+    .fui-alert-body > .fui-alert-description {
+      flex: 1 1 0;
+      min-inline-size: 0;
+    }
+    .fui-alert-body > .fui-alert-action {
+      flex: none;
+      margin: 0;
+      margin-inline-start: auto;
+      align-self: center;
+    }
   }
 
   /* ----------------------------------------------- separator, skeleton, bars */
@@ -1944,6 +2020,25 @@
     position: absolute;
     inset-block: min(0px, calc((100% - var(--fui-control-height-lg)) / 2));
     inset-inline: min(0px, calc((100% - var(--fui-control-height-lg)) / 2));
+  }
+  /* 0.8: data-hit="44" grows the target of something that paints smaller (an inline control in a dense line) to the
+     control height without growing the layout: the pseudo-element follows borders because percentages resolve against the
+     padding box. Buttons take size="lg" or "icon-lg" instead. Do not combine it with overflow, clip or contain on the same
+     element (they clip the extension; truncate in an inner span), and leave room around it: a later positioned neighbour
+     with its own ::after can cover it. */
+  [data-hit="44"] {
+    position: relative;
+    z-index: 1;
+  }
+  [data-hit="44"]::before {
+    content: "";
+    position: absolute;
+    inset-block: min(0px, calc((100% - var(--fui-control-height-lg)) / 2));
+    inset-inline: min(0px, calc((100% - var(--fui-control-height-lg)) / 2));
+  }
+  .fui-file-size {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
   .fui-disclosure-panel {
     padding-block-start: var(--fui-space-2);
@@ -2509,6 +2604,23 @@
   }
   .fui-state-panel[data-align="center"] .fui-actions {
     justify-content: center;
+  }
+  /* 0.8: size="sm" is 16 px all round (also when centred: it sits in a drawer, a popover or a list slot); variant="inline"
+     drops the border and the tint, and comes after the error rule so it wins at equal specificity; fill takes the height
+     of a region with a definite height and centres the content in it. */
+  .fui-state-panel[data-size="sm"],
+  .fui-state-panel[data-size="sm"][data-align="center"] {
+    padding: var(--fui-space-4);
+  }
+  .fui-state-panel[data-variant="inline"],
+  .fui-state-panel[data-variant="inline"][data-state="error"] {
+    border: 0;
+    background: transparent;
+  }
+  .fui-state-panel[data-fill] {
+    align-content: center;
+    justify-content: center;
+    min-block-size: 100%;
   }
 
   .fui-workspace {

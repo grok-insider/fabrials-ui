@@ -44,6 +44,7 @@ import {
 } from "@fabrials/ai-ui";
 import {
   Alert,
+  AlertAction,
   AlertDescription,
   AlertDialog,
   AlertDialogCancel,
@@ -72,6 +73,8 @@ import {
   CollapsibleTrigger,
   ConfirmActionButton,
   ConfirmDialog,
+  ConfirmProvider,
+  KbdGroup,
   CollectionToolbar,
   Combobox,
   Command,
@@ -166,6 +169,7 @@ import {
   lunarPhase,
   lunarPhaseName,
   toast,
+  useConfirm,
   type ConfirmResult,
 } from "@fabrials/ui";
 
@@ -391,6 +395,11 @@ const demos: Record<string, () => ReactNode> = {
         <Badge variant="solid" tone="info">New</Badge>
         <Badge variant="solid">12</Badge>
       </div>
+      <div className="flex min-w-0 flex-wrap gap-2">
+        <Badge dot dotColor="var(--chart-2)">Travel</Badge>
+        <Badge variant="outline" dot="hollow" dotColor="var(--chart-2)">Travel, archived</Badge>
+        <Badge truncate variant="outline" style={{ "--fui-badge-max": "9rem" } as React.CSSProperties}>A label that is far too long for its row</Badge>
+      </div>
     </Frame>
   ),
   card: () => (
@@ -409,6 +418,13 @@ const demos: Record<string, () => ReactNode> = {
       <Alert>
         <AlertTitle>Observation is stale</AlertTitle>
         <AlertDescription>The last sync is 14 minutes old. Refresh before acting on it.</AlertDescription>
+      </Alert>
+      <Alert layout="inline" variant="warning">
+        <AlertTitle>You are offline</AlertTitle>
+        <AlertDescription>Changes wait for the connection. From 48rem this sits on one line.</AlertDescription>
+        <AlertAction>
+          <Button variant="outline" size="sm">Retry now</Button>
+        </AlertAction>
       </Alert>
     </Frame>
   ),
@@ -553,7 +569,8 @@ const demos: Record<string, () => ReactNode> = {
   kbd: () => (
     <Frame>
       <p className="text-sm">
-        Open the palette with <Kbd>Ctrl</Kbd> <Kbd>K</Kbd>
+        Open the palette with <KbdGroup><Kbd mod /><Kbd>K</Kbd></KbdGroup>, or go to the inbox with{" "}
+        <KbdGroup sequence><Kbd>g</Kbd><Kbd>i</Kbd></KbdGroup>
       </p>
     </Frame>
   ),
@@ -677,6 +694,7 @@ const demos: Record<string, () => ReactNode> = {
         description="Add a provider account to start a sync."
         actions={<Button>Add account</Button>}
       />
+      <StatePanel state="error" size="sm" variant="inline" headingLevel={3} title="Could not load accounts" description="Compact and inline, for a drawer or a palette." actions={<Button variant="secondary" size="sm">Retry</Button>} />
     </Frame>
   ),
   "confirm-dialog": () => <ConfirmDemo />,
@@ -901,6 +919,25 @@ function wait(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function AwaitedConfirm() {
+  const confirm = useConfirm();
+  const [answer, setAnswer] = useState("Nothing asked yet");
+  return (
+    <div className="flex flex-wrap items-center gap-3 text-sm">
+      <Button
+        variant="outline"
+        onClick={async () => {
+          const yes = await confirm({ title: "Discard this draft?", description: "It is not saved anywhere else.", confirmLabel: "Discard", destructive: true });
+          setAnswer(yes ? "Confirmed" : "Dismissed");
+        }}
+      >
+        Await a confirm
+      </Button>
+      <span role="status">{answer}</span>
+    </div>
+  );
+}
+
 function ConfirmDemo() {
   const [open, setOpen] = useState(false);
   const [removed, setRemoved] = useState(0);
@@ -941,6 +978,9 @@ function ConfirmDemo() {
         </Button>
         <span role="status">Removed: {removed}</span>
       </div>
+      <ConfirmProvider>
+        <AwaitedConfirm />
+      </ConfirmProvider>
       <ConfirmDialog
         confirmLabel="Remove 3 members"
         description="They lose access to every shared conversation in this workspace."

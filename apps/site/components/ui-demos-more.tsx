@@ -14,6 +14,7 @@ import {
   AuthLayout,
   Avatar,
   AvatarFallback,
+  avatarInitials,
   Badge,
   Breadcrumb,
   BreadcrumbItem,
@@ -33,6 +34,7 @@ import {
   FieldLegend,
   FieldSet,
   FileInput,
+  FileSize,
   IconButton,
   Input,
   NativeCheckbox,
@@ -547,6 +549,19 @@ export const moreDemos: Record<string, () => ReactNode> = {
       <NativeChoicesDemo />
     </Frame>
   ),
+  "file-size": () => (
+    <Frame>
+      <ul className="grid gap-1 text-sm">
+        {[812, 1536, 25 * 1024 * 1024].map((bytes) => (
+          <li key={bytes} className="flex justify-between gap-3">
+            <FileSize bytes={bytes} />
+            <FileSize bytes={bytes} locale="es" />
+          </li>
+        ))}
+        <li><FileSize bytes={undefined} fallback="Unknown size" /></li>
+      </ul>
+    </Frame>
+  ),
   "toggle-group": () => (
     <Frame inline>
       <ToggleGroupDemo />
@@ -679,13 +694,13 @@ export const moreDemos: Record<string, () => ReactNode> = {
     <Frame>
       <div className="flex items-center gap-3">
         <Avatar size="sm">
-          <AvatarFallback>AD</AvatarFallback>
+          <AvatarFallback>{avatarInitials("Ada Lovelace")}</AvatarFallback>
         </Avatar>
         <Avatar>
-          <AvatarFallback>NR</AvatarFallback>
+          <AvatarFallback>{avatarInitials("nora@example.org")}</AvatarFallback>
         </Avatar>
         <Avatar size="lg">
-          <AvatarFallback>PK</AvatarFallback>
+          <AvatarFallback>{avatarInitials("Paul Kerr Jr")}</AvatarFallback>
         </Avatar>
       </div>
     </Frame>
@@ -749,6 +764,14 @@ export const moreDemos: Record<string, () => ReactNode> = {
       <p className="text-sm">
         Updated <RelativeTime date={ago(3)} />, published <RelativeTime date={ago(60 * 26)} />, in Spanish{" "}
         <RelativeTime date={ago(60 * 26)} locale="es" />.
+      </p>
+      <p className="text-sm">
+        Deterministic, in a fixed zone:{" "}
+        <RelativeTime
+          date="2026-09-29T23:41:00Z"
+          timeZone="Europe/Madrid"
+          absoluteFormat={{ day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }}
+        />
       </p>
     </Frame>
   ),

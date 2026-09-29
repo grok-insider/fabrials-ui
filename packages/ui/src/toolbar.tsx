@@ -4,7 +4,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode, type RefObject } from "react";
 import { Toolbar as BaseToolbar } from "@base-ui/react/toolbar";
 import type { IconButtonSize } from "./icon-button";
-import { IconTooltipContent, keyShortcutsValue } from "./icon-tooltip";
+import { IconTooltipContent, keyShortcutsValue, type ControlShortcut } from "./icon-tooltip";
 import { Tooltip, TooltipTrigger } from "./menu";
 import { classes, type StyledProps } from "./shared";
 import type { ButtonProps } from "./controls";
@@ -108,7 +108,7 @@ export type ToolbarButtonProps = Omit<
     /** A tooltip repeats the name for sighted people (default); `false` leaves it out; a node replaces its text. */
     tooltip?: boolean | ReactNode;
     /** Keys shown in the tooltip and exposed as `aria-keyshortcuts`. */
-    shortcut?: string | readonly string[];
+    shortcut?: ControlShortcut;
     size?: IconButtonSize;
     /**
      * Shows the label beside the icon once the toolbar (or the container around it) is wide enough:

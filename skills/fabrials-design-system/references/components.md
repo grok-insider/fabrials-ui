@@ -40,7 +40,12 @@ import { ChatMessage, ChatComposer } from "@fabrials/ai-ui";         // needs @f
 | A file picker | `FileInput` | A bare `<input type="file">` showing the browser's own text |
 | A form with subsections | `FieldSet` + `FieldLegend` + `FieldGroup` | A bordered box per subsection, a `div` with a bold label |
 | Show or hide detail in place, with no state | `Disclosure` (native `details`) | A hand-styled `details`, an `Accordion` for one block |
-| A destructive confirmation | `AlertDialog`, or `ConfirmDialog` for an async action | `window.confirm` |
+| A destructive confirmation | `AlertDialog`, or `ConfirmDialog` for an async action, or `useConfirm()` to `await` one | `window.confirm` in a flow that can wait (a guard that must answer synchronously keeps it) |
+| A state inside a drawer, popover, palette or list slot | `StatePanel size="sm"` (and `variant="inline"` inside an overlay) | A page-sized empty state in a 358 px pane |
+| A slim notice at the top of a page or pane | `Alert layout="inline"` | A hand-made banner row |
+| A tag whose colour is data (a label) | `Badge` with `--fui-badge-solid` and `dotColor` | A pill with a literal colour, a per-colour class |
+| A date that must not drift (a list row) | `RelativeTime absoluteFormat timeZone` | A hand-made `Intl.DateTimeFormat` in a `time` |
+| A shortcut hint that says Ctrl or the command key | `<Kbd mod />`, `useModifierKey()`; `KbdGroup sequence` for "g then i" | `navigator.platform` read while rendering |
 | A short confirmation after an action | `toast` (mount `Toaster` once) | An alert that stays forever |
 | A shell command | `Snippet`, or `PackageInstall` for package managers | A `pre` with a hand-made copy button |
 | The product's mark | `ProductLockup`, `DitherGem` | A logo tinted with the gem everywhere |
@@ -97,7 +102,8 @@ import { ChatMessage, ChatComposer } from "@fabrials/ai-ui";         // needs @f
 | --- | --- |
 | `Dialog` (`DialogTrigger`, `DialogContent`, `DialogHeader`, `DialogTitle`, `DialogDescription`, `DialogFooter`, `DialogClose`) | A modal task with a title and explicit actions |
 | `AlertDialog` (`AlertDialogTrigger`, `AlertDialogContent`, `AlertDialogTitle`, `AlertDialogDescription`, `AlertDialogCancel`, `AlertDialogAction`, `AlertDialogClose`) | Confirming a destructive or hard-to-undo action; the confirm button names the consequence |
-| `ConfirmDialog`, `ConfirmActionButton` | Confirm, then run an async action with a pending state and an inline error |
+| `ConfirmDialog`, `ConfirmActionButton` | Confirm, then run an async action with a pending state and an inline error; `finalFocus` names where focus goes (its function gets `"confirmed"` or `"dismissed"`), for an action that removes its trigger |
+| `ConfirmProvider`, `useConfirm` | `const yes = await confirm({ title, description, destructive })`; mount the provider once. Without it the hook is `window.confirm`. Not for back, forward or unload guards |
 | `Sheet` (`SheetTrigger`, `SheetContent side="left" or "right"`, `SheetHeader`, `SheetTitle`, `SheetDescription`, `SheetFooter`) | Filters, a quick record view, phone navigation |
 | `DropdownMenu` (`DropdownMenuTrigger`, `DropdownMenuContent`, `DropdownMenuItem`, `DropdownMenuCheckboxItem`, `DropdownMenuRadioGroup`, `DropdownMenuRadioItem`, `DropdownMenuLabel`, `DropdownMenuSeparator`, `DropdownMenuShortcut`, `DropdownMenuSub`, `DropdownMenuSubTrigger`, `DropdownMenuSubContent`) | Actions for one record, from a button that names it |
 | `Tooltip` (`TooltipProvider`, `TooltipTrigger`, `TooltipContent`) | The name of an icon button, repeated for sighted users |
@@ -113,8 +119,8 @@ Triggers take `render` to become a Fabrials button: `<DialogTrigger render={<But
 | --- | --- |
 | `Table` (`TableHeader`, `TableBody`, `TableFooter`, `TableRow`, `TableHead`, `TableCell`, `TableCaption`) | Records. `aria-label` names the scroll region; `numeric` right-aligns figures; `stickyHeader` for long tables |
 | `Tabs` (`TabsList`, `TabsTrigger`, `TabsContent`) | Peer panels on one page; not steps |
-| `Badge` | A short status or fact as a 3 px tag: `tone` `neutral`, `info`, `success`, `warning`, `danger`; `variant` `soft`, `outline` (facts such as a license or version), `solid`; `dot` |
-| `Alert` (`AlertTitle`, `AlertDescription`, `AlertAction`) | A status that stays on the page: `variant` `default`, `info`, `success`, `warning`, `destructive` |
+| `Badge` | A short status or fact as a 3 px tag: `tone` `neutral`, `info`, `success`, `warning`, `danger`; `variant` `soft`, `outline` (facts such as a license or version), `solid`; `dot` (`"hollow"` for an archived item), `dotColor`, `truncate`; `--fui-badge-solid` (tint, hairline, dot) and `--fui-badge-ink` (text) are public properties for a tag coloured by data, set on the badge itself (a class or `style`) |
+| `Alert` (`AlertTitle`, `AlertDescription`, `AlertAction`) | A status that stays on the page: `variant` `default`, `info`, `success`, `warning`, `destructive`; `layout="inline"` for a one-line notice from 48rem of its own width (fills its container; not for status that refreshes) |
 | `Card` (`CardHeader`, `CardTitle`, `CardDescription`, `CardAction`, `CardContent`, `CardFooter`) | One bounded summary; a panel around a chart. Not for lists of peers, not nested |
 | `DescriptionList` (`DescriptionItem`, `DescriptionTerm`, `DescriptionDetails`) | A record's properties |
 | `Disclosure`, `DisclosureSummary` (`count`, `chevron`, `size`), `DisclosurePanel` | A native `details`: 44 px summary, count in its name, panel always mounted, opens itself on an invalid field, no JavaScript |
@@ -122,7 +128,8 @@ Triggers take `render` to become a Fabrials button: `<DialogTrigger render={<But
 | `ScrollArea` | A region that scrolls without moving the page |
 | `Loading`, `placeholderText`, `placeholderList`, `useLoading` | Paints the real components it wraps as their skeleton while `when` is true; placeholder copy and records; a hook for "inside a loading view" |
 | `Skeleton`, `Progress`, `Separator` | A block only where no component exists yet; a known fraction; a decorative break |
-| `Avatar` (`AvatarImage`, `AvatarFallback`) | A person or account |
+| `Avatar` (`AvatarImage`, `AvatarFallback`), `avatarInitials` | A person or account; `avatarInitials(name or address)` is the fallback text |
+| `FileSize`, `formatBytes` | A byte count as people read it ("25 MB"); `FileSize` never throws while rendering |
 | `FileThumb`, `fileTypeLabel` | File previews and type tiles |
 | `TruncatedText` | One line that shows its full text in a tooltip only when cut |
 | `groupByRecency`, `RECENCY_LABELS` | Grouping a history by Today, Yesterday, Previous 7 days… |
@@ -143,7 +150,7 @@ Triggers take `render` to become a Fabrials button: `<DialogTrigger render={<But
 | `Breadcrumb` (`BreadcrumbList`, `BreadcrumbItem`, `BreadcrumbLink`, `BreadcrumbPage`, `BreadcrumbSeparator`, `BreadcrumbEllipsis`) | Where the page sits; also as `PageHeader` `eyebrow` |
 | `NavTabs`, `NavTab` | Linked sections of one record (`current`, `count`) |
 | `Pagination` (`PaginationContent`, `PaginationItem`, `PaginationLink`, `PaginationPrevious`, `PaginationNext`, `PaginationEllipsis`) | Numbered pages, only when numbers mean something |
-| `Kbd`, `KbdGroup` | Flat shortcut hints |
+| `Kbd` (`mod`), `KbdGroup` (`sequence`, `separator`), `useModifierKey` (a control's `shortcut` takes `{ keys, sequence: true }` for a sequence) | Flat shortcut hints; `mod` and the hook print Ctrl on the server and the command key on Apple after hydration; a sequence puts a translatable word between keys |
 
 ## Composition and feedback
 
@@ -166,7 +173,7 @@ Triggers take `render` to become a Fabrials button: `<DialogTrigger render={<But
 | `StatusDot` | A state as a dot and a word; `pulse` only while something is live or in progress |
 | `ActivityStrip`, `activityLevel` | Intensity cells (posts per day or hour) |
 | `Timeline`, `TimelineItem` | An event feed, newest first; `fresh` highlights a new item once |
-| `RelativeTime`, `formatRelativeTime` | "3 minutes ago" with the exact date in a `time` element |
+| `RelativeTime`, `formatRelativeTime`, `formatAbsoluteTime` | "3 minutes ago" with the exact date in a `time` element; `absoluteFormat` (options or a per-date function), `now` (fixed number stops the timer) and `timeZone` make it deterministic and hydration-exact |
 | `NumberTicker` | A total that counts up once; jumps under reduced motion |
 
 Chart colours come from `--chart-1` to `--chart-6`; the first series reads as Stormlight.
@@ -187,7 +194,7 @@ Chart colours come from `--chart-1` to `--chart-6`; the first series reads as St
 | `SectionHeader` | `title`, `description`, `actions` for a section |
 | `CollectionToolbar` | `search`, `filters`, `actions`, with a group `label` |
 | `BulkActions` | `count` and actions; renders nothing until `count` is at least 1 |
-| `StatePanel` | `state` `loading`, `empty`, `error`, `stale`, `offline`, `success`; `title`, `description`, `actions`; `align` `start` (default) or `center` |
+| `StatePanel` | `state` `loading`, `empty`, `error`, `stale`, `offline`, `success`; `title`, `description`, `actions`; `align` `start` (default) or `center`; `size="sm"` (16 px, for embedded regions), `variant="inline"` (no border or tint, for overlays), `fill` (fills a region with a height and centres) |
 | `SettingsSection` | A settings row: `title`, `description`, `status`, controls as children |
 | `SuggestionCard`, `SuggestionGrid` | Prompts in an empty chat or workspace (grid on wide screens, a scroll row on narrow) |
 | `AuthLayout` | Sign-in: `brand`, `title`, `description`, form as children, `footer`, `aside` |

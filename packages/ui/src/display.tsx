@@ -1,6 +1,6 @@
 "use client";
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 import { Tabs as BaseTabs } from "@base-ui/react/tabs";
 import { classes, type StyledProps } from "./shared";
 
@@ -11,13 +11,29 @@ export function Badge({
   tone = "neutral",
   variant = "soft",
   dot = false,
+  dotColor,
+  truncate = false,
+  style,
+  title,
   children,
   ...props
 }: ComponentProps<"span"> & {
   tone?: Tone | "accent";
   variant?: "soft" | "outline" | "solid";
-  /** Adds a leading status dot; the text remains the accessible meaning. */
-  dot?: boolean;
+  /** Adds a leading status dot; the text remains the accessible meaning. `"hollow"` is an outline dot (an archived or inactive item). */
+  dot?: boolean | "hollow";
+  /**
+   * Colours the dot only, with any CSS colour (`var(--label-tone)`); it sets `--fui-badge-dot`. To colour the tag itself
+   * (tint, hairline and dot) from data, set `--fui-badge-solid` on the badge itself (a class or `style`); `--fui-badge-ink`
+   * is the text colour, set the same way. Both are public properties, and the tone attribute only sets their defaults.
+   * (`--fui-badge-dot` is not declared on the badge, so it also works from an ancestor.)
+   */
+  dotColor?: string;
+  /**
+   * The tag shrinks to its container and cuts long text with an ellipsis (the full text goes to `title` when it is a
+   * string and no title is given). `--fui-badge-max` caps the width (default: 100% of the container).
+   */
+  truncate?: boolean;
 }) {
   return (
     <span
@@ -25,10 +41,13 @@ export function Badge({
       className={classes("fui-badge", className)}
       data-tone={tone === "accent" ? "info" : tone}
       data-variant={variant}
+      data-truncate={truncate || undefined}
+      title={title ?? (truncate && typeof children === "string" ? children : undefined)}
+      style={dotColor ? ({ "--fui-badge-dot": dotColor, ...style } as CSSProperties) : style}
       {...props}
     >
-      {dot ? <span aria-hidden className="fui-badge-dot" /> : null}
-      {children}
+      {dot ? <span aria-hidden className="fui-badge-dot" data-hollow={dot === "hollow" || undefined} /> : null}
+      {truncate ? <span className="fui-badge-text">{children}</span> : children}
     </span>
   );
 }
@@ -118,18 +137,29 @@ export function CardFooter({ className, ...props }: ComponentProps<"div">) {
 export function Alert({
   className,
   variant = "default",
+  layout = "stacked",
+  children,
   ...props
 }: ComponentProps<"div"> & {
   variant?: "default" | "info" | "success" | "warning" | "destructive";
+  /**
+   * `inline` is a slim notice for the top of a page or a pane: from a width of 48rem the title and the description share
+   * one line and the action sits at the end; narrower it stacks like the default. It measures its own width, so it fills
+   * its container (give it `flex: 1` in a flex row). Not for status that refreshes periodically: a notice is a one-off.
+   */
+  layout?: "stacked" | "inline";
 }) {
   return (
     <div
       role={variant === "destructive" ? "alert" : "status"}
       data-slot="alert"
       data-variant={variant}
+      data-layout={layout === "inline" ? "inline" : undefined}
       className={classes("fui-alert", className)}
       {...props}
-    />
+    >
+      {layout === "inline" ? <div className="fui-alert-body">{children}</div> : children}
+    </div>
   );
 }
 

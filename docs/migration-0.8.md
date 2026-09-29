@@ -105,7 +105,81 @@ the same neutral shapes as the Base UI ones, with no tick, dash or dot. Deletabl
 (40 px, 44 on touch), and `ThemeSwitcher` gains a `size` prop (default `sm`, as before).
 Deletable: the product overrides that raise `.fui-toggle` to 40 or 44 px.
 
+### Feedback, state and text
+
+#### `StatePanel` `size`, `variant` and `fill`
+
+`size="sm"` is 16 px of padding (also when centred) for a drawer, a popover, a sidebar or a list slot, with the same
+icon and text; `variant="inline"` drops the border and the tint (an overlay, a palette) while the icon and `role`
+still carry the state; `fill` takes the height of a region that has one and centres the content. `StatePanel` now
+spreads the remaining `div` props (`id`, `tabIndex`, `ref`, `role`, `aria-*`). Deletable: `.fui-state-panel.oe-state`
+(patterns.css), `.fui-state-panel.pane-placeholder` (list.css) and the `ui/empty-state.tsx` class.
+
+#### `ConfirmDialog` `finalFocus`, optional `description`, `useConfirm`, `ConfirmProvider`
+
+`finalFocus` is Base UI's option with the outcome as a second argument
+(`(closeType, "confirmed" | "dismissed") => element`); a function that returns nothing or `null` keeps the default,
+which differs from a bare Base UI function returning `undefined` (that means "do not move focus"). It is also accepted
+by `ConfirmActionButton`. A confirmed action that removes its trigger names the element that now holds the result, and
+Cancel and Escape still return to the trigger. `description` is now optional. `useConfirm()` returns
+`(options) => Promise<boolean>` backed by `ConfirmDialog`: `true` on confirm; `false` for Cancel, Escape, the backdrop
+and an unmounted provider; questions asked while one is open wait their turn; focus returns to the control that asked.
+Without a `ConfirmProvider` it is `window.confirm` (title and description as text, or `fallbackText`). It is for flows
+that can await: a guard that must answer synchronously (back, forward, unload) keeps the native confirm. Deletable:
+the AlertDialog parts composed by hand in `features/contacts/delete-panel.tsx`.
+
+#### `RelativeTime` deterministic mode
+
+`absoluteFormat` (`Intl.DateTimeFormatOptions`, or `(date, now) => options` to drop the year when it is this year),
+`now` (a number is a fixed instant and stops the timer; a function is read at every tick) and `timeZone`. No timer runs
+in absolute mode or with a fixed `now`; the exact instant is in `title` (full date, time and zone). With a `timeZone`
+the text and the title are identical on the server and in the browser, and `suppressHydrationWarning` is not set;
+without one the browser's zone is used and hydration differs (the title, and the text of an absolute date, depend on
+the zone even with a fixed `now`), so `timeZone` is required whenever a deterministic time is server-rendered. `formatAbsoluteTime` is the same as a
+function, and `formatRelativeTime` accepts `timeZone`. Deletable: `features/mail/message-date.ts`,
+`features/mail/tool-time.tsx` and the exact dates of the offline page (the per-row year rule is a function you keep).
+
+#### `Kbd mod`, `KbdGroup sequence`, `useModifierKey`
+
+`useModifierKey()` is `"Ctrl"` on the server and at first render and `"⌘"` on Apple platforms after hydration (no
+mismatch); `<Kbd mod />` prints it. `KbdGroup sequence separator="then"` puts the word between the keys, muted
+(`separator` is copy: translate it). Deletable: `ui/use-modifier-key.ts` and `.command-then` in command.css.
+
+#### `Alert layout="inline"`
+
+A slim notice: from 48rem of the alert's own width the title and description share a line and the action sits at the
+end; narrower it stacks like the default. It measures itself (a `container`), so it fills its container: give it
+`flex: 1` in a flex row. Not for status that refreshes periodically. Deletable: `.app-notices` and the notice rules in
+frame.css.
+
+#### `Badge` data colour, `dotColor`, `truncate`, hollow dot
+
+`--fui-badge-solid` (tint, hairline, dot) and `--fui-badge-ink` (text) are public properties, set on the badge itself
+(a class or `style`: the badge declares them, so an ancestor's value does not reach it). The neutral dot was
+hard-coded to the muted ink and defeated `--fui-badge-solid`; it now follows it, with the same default. `dotColor`
+recolours the dot alone (`--fui-badge-dot`), `dot="hollow"` draws an outline dot (an archived item) and `truncate`
+shrinks the tag to its container with an ellipsis, the text in the title; `--fui-badge-max` caps it. Deletable: the
+`::before` dot, the variable override and the ellipsis rules of `.label-chip` (labels.css), and `.contacts-label`.
+
+#### `IconButton` and `ToolbarButton` shortcut sequences (fix to batch 1)
+
+`shortcut` also accepts `{ keys: ["g", "i"], sequence: true, separator? }` for keys pressed one after the other: the
+tooltip renders `KbdGroup sequence` ("g then i") and no `aria-keyshortcuts` is emitted, because that attribute has no
+sequence syntax (a string or array is still a chord, "Control+K"). Before this, a sequence could only be passed as an
+array and was announced as the chord "g+i".
+
+#### `avatarInitials`, `formatBytes`, `FileSize`, `data-hit="44"`
+
+`avatarInitials(value, fallback?, locale?)` and `formatBytes(locale, bytes)` are `platform/format.ts`'s `initials` and
+`formatBytes` (same arguments and results, except that English prints "812 B" and "0 B" where the host printed
+"812 byte"; `formatBytes` also goes up to terabytes and throws a `RangeError`).
+`FileSize` renders a size without ever throwing. `[data-hit="44"]` grows a small control's target to 44 px with a
+pseudo-element (deletable: `.oe-hit`). `formatMinutes` stays a host helper.
+
 ### Changed behaviour
+
+- `StatePanel`, `RelativeTime` and `Badge` markup changes only when the new props are used, except `RelativeTime`,
+  which now carries `data-mode` and skips `suppressHydrationWarning` in deterministic mode.
 
 - **Segmented toggles and tabs are 44 px tall when painted on touch and narrow screens**, at every
   size, instead of 38 px extended by an invisible pseudo-element (0.7.1). A segmented control there

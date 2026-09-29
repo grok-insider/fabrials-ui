@@ -3,8 +3,10 @@
 
 import type { ReactNode } from "react";
 import { Button, type ButtonProps } from "./controls";
-import { IconTooltipContent, keyShortcutsValue } from "./icon-tooltip";
+import { IconTooltipContent, keyShortcutsValue, type ControlShortcut } from "./icon-tooltip";
 import { Tooltip, TooltipTrigger } from "./menu";
+
+export type { ControlShortcut } from "./icon-tooltip";
 
 export type IconButtonSize = "icon" | "icon-xs" | "icon-sm" | "icon-lg";
 
@@ -13,8 +15,8 @@ export type IconButtonProps = Omit<ButtonProps, "aria-label" | "title" | "size" 
   label: string;
   /** A tooltip repeats the name for sighted people (default), `false` leaves it out, a node replaces its text. */
   tooltip?: boolean | ReactNode;
-  /** Keys shown in the tooltip as flat `Kbd`s, and exposed as `aria-keyshortcuts` ("⌘", "K"). */
-  shortcut?: string | readonly string[];
+  /** Keys shown in the tooltip as flat `Kbd`s, and exposed as `aria-keyshortcuts` ("⌘", "K"). Keys pressed one after the other are `{ keys: ["g", "i"], sequence: true }`: the tooltip says "g then i" and no `aria-keyshortcuts` is set (it cannot express steps). */
+  shortcut?: ControlShortcut;
   /** The name is a text node inside the button (for toolbars whose tests, voice control or find-in-page read
    * `textContent`) instead of `aria-label`. It is visually hidden. */
   textName?: boolean;

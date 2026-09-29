@@ -41,6 +41,13 @@ const stories: Record<string, string> = {
   "controls-disclosures": "fabrials-controls--disclosures",
   "controls-field-sets": "fabrials-controls--field-sets",
   "controls-toggles": "fabrials-controls--toggles",
+  "feedback-state-panels": "fabrials-feedback--state-panels",
+  "feedback-confirmations": "fabrials-feedback--confirmations",
+  "feedback-times": "fabrials-feedback--times",
+  "feedback-keys": "fabrials-feedback--keys",
+  "feedback-notices": "fabrials-feedback--notices",
+  "feedback-tags": "fabrials-feedback--tags",
+  "feedback-text": "fabrials-feedback--text",
 };
 
 for (const theme of ["light", "dark"]) {

@@ -108,6 +108,22 @@ const stateIcons = {
   success: CheckCircle2,
 };
 
+export type StatePanelProps = Omit<ComponentProps<"div">, "title" | "children"> & {
+  state: keyof typeof stateIcons;
+  title: ReactNode;
+  description?: ReactNode;
+  actions?: ReactNode;
+  headingLevel?: 2 | 3 | 4;
+  icon?: ReactNode;
+  align?: "start" | "center";
+  /** `sm` is 16 px of padding, for a drawer, a popover, a sidebar or a list slot; the icon and text stay the same. */
+  size?: "md" | "sm";
+  /** `inline` has no border and no tint (an overlay, a palette, a region that already sits in a panel); the icon still carries the state. */
+  variant?: "panel" | "inline";
+  /** Fill the height of the region and centre the content in it (an empty reader pane). */
+  fill?: boolean;
+};
+
 export function StatePanel({
   state,
   title,
@@ -117,25 +133,24 @@ export function StatePanel({
   className,
   icon,
   align = "start",
-}: {
-  state: keyof typeof stateIcons;
-  title: ReactNode;
-  description?: ReactNode;
-  actions?: ReactNode;
-  headingLevel?: 2 | 3 | 4;
-  className?: string;
-  icon?: ReactNode;
-  align?: "start" | "center";
-}) {
+  size = "md",
+  variant = "panel",
+  fill = false,
+  ...props
+}: StatePanelProps) {
   const Icon = stateIcons[state];
   const Heading = `h${headingLevel}` as "h2" | "h3" | "h4";
   return (
     <div
+      role={state === "error" ? "alert" : "status"}
+      aria-busy={state === "loading" || undefined}
+      {...props}
       className={classes("fui-state-panel", className)}
       data-state={state}
       data-align={align}
-      role={state === "error" ? "alert" : "status"}
-      aria-busy={state === "loading" || undefined}
+      data-size={size === "sm" ? "sm" : undefined}
+      data-variant={variant === "inline" ? "inline" : undefined}
+      data-fill={fill || undefined}
     >
       {icon ? (
         <span aria-hidden className="fui-state-icon">
