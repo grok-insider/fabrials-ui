@@ -72,7 +72,7 @@ import { ChatMessage, ChatComposer } from "@fabrials/ai-ui";         // needs @f
 | `FileInput` (`label`, `onFilesChange`, `fileName`, `onClear`, `description`, `error`) | A file picker that is a button; the browser's "Choose File" is never shown |
 | `FieldSet`, `FieldLegend`, `FieldGroup` | Grouped fields on a real fieldset; a legend styled as a subsection title with a hairline above; `layout="columns"` reflows by container |
 | `RadioGroup` + `RadioGroupItem` (or `Radio`) | One visible choice inside a form |
-| `ToggleGroup` + `ToggleGroupItem` (`size` `sm`, `default`, `lg`) | A segmented view or range next to what it changes; painted 44 px on touch at every size |
+| `ToggleGroup` + `ToggleGroupItem` (`size` `sm`, `default`, `lg`) | A segmented view or range next to what it changes; 44 px hit area on touch (`size="lg"` paints the whole height) |
 | `ThemeSwitcher` (`size`) | System, light or dark; the host stores the choice and sets the root class |
 | `MultiSelect` | Several values, for filters |
 | `Combobox` | A text field filtering known values |

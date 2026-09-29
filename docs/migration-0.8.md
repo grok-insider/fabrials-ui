@@ -25,8 +25,8 @@ sets the theme on `<html>` only.
 group with 3 px of padding. Their hit area is now extended by that padding to
 44 px with a pseudo-element, so nothing in the layout moves. Nothing to change in
 hosts; a host that worked around it (a min-height override on the toggles) can
-drop the override. In 0.8 the painted control itself is 44 px there too; see
-"Toggle and ToggleGroup at 44 px" below.
+drop the override. A form row that wants the painted control at 44 px takes
+`size="lg"` (see "Toggles and segments" below).
 
 ## New in `@fabrials/ui` 0.8
 
@@ -99,11 +99,13 @@ the same neutral shapes as the Base UI ones, with no tick, dash or dot. Deletabl
 `<input type="radio">` with a host class, the `.oe-check` label rule, and the `useEffect` that sets
 `indeterminate` on the select-all box.
 
-#### Toggles and segments at 44 px on touch
+#### Toggles and segments: `size="lg"`
 
 `ToggleGroup` (and so `ThemeSwitcher`) gains `size="lg"`, a painted toggle of a whole control height
-(40 px, 44 on touch), and `ThemeSwitcher` gains a `size` prop (default `sm`, as before).
-Deletable: the product overrides that raise `.fui-toggle` to 40 or 44 px.
+(40 px, 44 on touch), and `ThemeSwitcher` gains a `size` prop (default `sm`, as before). The default and `sm` sizes
+keep their painted height everywhere and reach 44 px on touch with the invisible hit-area extension of 0.7.1, so a
+header with a theme switcher keeps its width at 390 px. Deletable: the product overrides that raise `.fui-toggle` to
+40 or 44 px (Open Email's settings rule becomes `size="lg"`).
 
 ### Feedback, state and text
 
@@ -348,10 +350,6 @@ must fill its parent's width. Deletable: the `@container tool` rules for `.fui-d
 - `StatePanel`, `RelativeTime` and `Badge` markup changes only when the new props are used, except `RelativeTime`,
   which now carries `data-mode` and skips `suppressHydrationWarning` in deterministic mode.
 
-- **Segmented toggles and tabs are 44 px tall when painted on touch and narrow screens**, at every
-  size, instead of 38 px extended by an invisible pseudo-element (0.7.1). A segmented control there
-  is now 50 px tall including its 3 px group padding. A product that raised the toggles itself can
-  drop the override, and one that relied on the 38 px painted height should check its rows.
 - `NativeCheckbox` accepts `label`, `labelClassName` and `indeterminate`; without them its markup is
   unchanged (`type="checkbox"` is still accepted).
 - **Sidebar active bar**: 2 px `--brand-ink` on the inline-start edge in every size (was 3 px `--brand` on the left).

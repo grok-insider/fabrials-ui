@@ -5374,13 +5374,27 @@
     .fui-sidebar-menu-button {
       height: auto;
     }
-    /* Segmented toggles and tabs paint 44 px tall here (0.8), not 6 px less: they sit in a 3 px padded group that is
-       then 50 px, so a target is never smaller than it looks. An icon-only theme switcher is square, 44 by 44.
-       The group's sizes (sm, lg) all give way to it. */
+    /* Segmented toggles and tabs are 6 px shorter than a control (they sit inside a 3 px padded group), so their hit area is
+       extended by that padding instead of growing the group: 44 px tall targets, nothing moves (a header with a theme
+       switcher keeps its width at 390 px). An icon-only theme switcher is square and also gains the 3 px each side (the 2 px
+       gap between items means neighbours share a pixel or two). `size="lg"` paints the whole control height instead, 44 px
+       here, and needs no extension. */
     .fui-toggle,
-    .fui-toggle-group[data-size] .fui-toggle,
     .fui-tabs-list[data-variant="segmented"] .fui-tab {
-      min-height: var(--fui-control-height-lg);
+      position: relative;
+    }
+    .fui-toggle::before,
+    .fui-tabs-list[data-variant="segmented"] .fui-tab::before {
+      content: "";
+      position: absolute;
+      inset-block: -3px;
+      inset-inline: 0;
+    }
+    .fui-theme-switcher:not([data-labels]) .fui-toggle::before {
+      inset-inline: -3px;
+    }
+    .fui-toggle-group[data-size="lg"] .fui-toggle::before {
+      content: none;
     }
     :is(.fui-button[data-size="icon"], .fui-button-size-icon),
     :is(.fui-button[data-size="icon-sm"], .fui-button-size-icon-sm),

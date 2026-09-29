@@ -303,7 +303,7 @@ Every collection and panel has these states. Put them where the content would be
 
 ## Responsive checks
 
-- 390 px: one column, 16 px gutter, no sideways scroll, 44 px targets (segmented toggles and tabs paint 44 px there), the storm below the hero text, menus in sheets.
+- 390 px: one column, 16 px gutter, no sideways scroll, 44 px targets (segmented toggles and tabs keep their look and get a 44 px hit area there), the storm below the hero text, menus in sheets.
 - 768 px: gutter 24 px, sidebar visible, settings in two columns.
 - 1440 px: the everyday desktop; the visual suite's widest size.
 - 2560 x 1315: the owner's screen. Content still starts at the left gutter; tables and rows use the width; prose keeps its measure; no giant empty centred column and no stretched 3-up card rows.

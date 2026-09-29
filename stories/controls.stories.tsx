@@ -517,9 +517,9 @@ function TogglesPage() {
   return (
     <Page
       title="Toggles and segments"
-      description="Segmented controls paint 44 px tall on touch and narrow screens, at every size."
+      description="Segmented controls keep their look on touch and narrow screens and get a 44 px hit area; size lg paints the whole height."
     >
-      <Block title="Sizes" description="sm 26 px, default 34 px, lg 40 px painted on a fine pointer; all 44 px on touch.">
+      <Block title="Sizes" description="sm 26 px, default 34 px, lg 40 px painted on a fine pointer; on touch lg paints 44 px and the others get a 44 px hit area.">
         <div className="catalogue-row">
           {(["sm", "default", "lg"] as const).map((size) => (
             <ToggleGroup key={size} aria-label={`Range, ${size}`} size={size} defaultValue={["7d"]}>

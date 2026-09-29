@@ -146,7 +146,7 @@ test("native checkbox keeps its bare markup, gains a mixed hook and an optional 
   assert.match(renderToStaticMarkup(<NativeCheckbox label="Select page" />), /<label class="fui-native-choice"><input[^>]*type="checkbox"[^>]*\/><span>Select page<\/span><\/label>/);
 });
 
-test("toggle groups and the theme switcher take a size; every size paints 44 px on touch", () => {
+test("toggle groups and the theme switcher take a size; lg paints a whole control height and the others extend their hit area", () => {
   const group = renderToStaticMarkup(<ToggleGroup size="lg" aria-label="View"><ToggleGroupItem value="a">A</ToggleGroupItem></ToggleGroup>);
   assert.match(group, /data-size="lg"/);
   assert.match(renderToStaticMarkup(<ThemeSwitcher value="system" onValueChange={() => undefined} />), /data-size="sm"/);

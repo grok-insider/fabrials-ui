@@ -38,15 +38,13 @@ test("server link styles have no client boundary and dark mode supports either h
   assert.match(css, /:root,\s*\.light,\s*\[data-theme="light"\]\s*\{/);
 });
 
-test("segmented toggles and tabs paint 44 px on touch and narrow screens, at every size", () => {
+test("segmented toggles get a 44 px hit area on touch and narrow screens without growing their group", () => {
   const styles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
-  // 0.7.1 extended a 38 px painted control with an invisible pseudo-element; 0.8 paints the 44 px itself,
-  // so the group is 50 px and no target is smaller than it looks.
-  assert.doesNotMatch(styles, /\.fui-toggle::before/);
-  const touch = styles.indexOf("@media (max-width: 767px), (pointer: coarse)", styles.indexOf(".fui-toggle-group[data-size=\"lg\"]"));
-  assert.ok(touch > 0, "the touch block follows the toggle rules");
-  const rule = styles.indexOf(".fui-toggle-group[data-size] .fui-toggle,", touch);
-  assert.match(styles.slice(rule - 40, rule), /\.fui-toggle,\s*$/);
-  assert.ok(rule > touch && rule - touch < 6000, "the sized toggles are in the touch block");
-  assert.match(styles.slice(rule, rule + 260), /\.fui-tabs-list\[data-variant="segmented"\] \.fui-tab \{\s*min-height: var\(--fui-control-height-lg\);/);
+  const at = styles.indexOf(".fui-toggle::before");
+  assert.ok(at > 0, "the toggle extends its hit area with a pseudo-element");
+  assert.match(styles.slice(styles.lastIndexOf("@media", at), at), /^@media \(max-width: 767px\), \(pointer: coarse\)/);
+  assert.match(styles.slice(at, at + 200), /inset-block: -3px/);
+  // A painted 44 px default would make a theme switcher three 44 px squares and break a 390 px site header: only size="lg" paints the whole height.
+  assert.doesNotMatch(styles.slice(styles.lastIndexOf("@media", at), at + 900), /\.fui-toggle,\s*\.fui-toggle-group\[data-size\] \.fui-toggle/);
+  assert.match(styles.slice(at, at + 900), /\.fui-toggle-group\[data-size="lg"\] \.fui-toggle::before \{\s*content: none;/);
 });
