@@ -35,6 +35,11 @@ import { ChatMessage, ChatComposer } from "@fabrials/ai-ui";         // needs @f
 | A view or range switch next to what it changes | `ToggleGroup` | Tabs, a select |
 | Peer views of one subject on one page | `Tabs` | `NavTabs` |
 | Sections of a record, each with its URL | `NavTabs` + `NavTab` | `Tabs` |
+| An icon-only action | `IconButton` (a name, a tooltip, 44 px) | An icon `Button` with a `title` or no name |
+| Several actions in one row that people arrow through | `Toolbar` + `ToolbarButton` (one tab stop) | A row of tabbable buttons in a `div role="group"` |
+| A file picker | `FileInput` | A bare `<input type="file">` showing the browser's own text |
+| A form with subsections | `FieldSet` + `FieldLegend` + `FieldGroup` | A bordered box per subsection, a `div` with a bold label |
+| Show or hide detail in place, with no state | `Disclosure` (native `details`) | A hand-styled `details`, an `Accordion` for one block |
 | A destructive confirmation | `AlertDialog`, or `ConfirmDialog` for an async action | `window.confirm` |
 | A short confirmation after an action | `toast` (mount `Toaster` once) | An alert that stays forever |
 | A shell command | `Snippet`, or `PackageInstall` for package managers | A `pre` with a hand-made copy button |
@@ -49,15 +54,35 @@ import { ChatMessage, ChatComposer } from "@fabrials/ai-ui";         // needs @f
 | `Field` | Wires a label, hint and error to one control through a render prop; validation stays in the host |
 | `Checkbox`, `Switch` | A choice saved with a form; a setting that applies now |
 | `Select` (`SelectTrigger`, `SelectValue`, `SelectContent`, `SelectItem`, `SelectGroup`, `SelectLabel`, `SelectSeparator`) | A closed list |
-| `NativeSelect`, `NativeSelectOption`, `NativeSelectOptGroup`, `NativeCheckbox` | Long lists, phones (platform picker), forms that work without JavaScript |
+| `NativeSelect`, `NativeSelectOption`, `NativeSelectOptGroup`, `NativeCheckbox` (`indeterminate`, `label`) | Long lists, phones (platform picker), forms that work without JavaScript |
+| `NativeRadioGroup` + `NativeRadio` (`label`; `layout="grid"` for swatches) | Native radios in a fieldset with a legend; a disabled fieldset disables them |
+| `IconButton` (`label`, `tooltip`, `shortcut`, `textName`) | An icon-only button: 44 px, named, with a tooltip; a Base UI trigger can `render` it |
+| `Toolbar`, `ToolbarGroup`, `ToolbarSeparator`, `ToolbarButton` (`reveal`, `tier`) | One tab stop for a row of buttons; arrows, Home and End; labels appear and low-priority actions fold into a menu as the toolbar narrows |
+| `FileInput` (`label`, `onFilesChange`, `fileName`, `onClear`, `description`, `error`) | A file picker that is a button; the browser's "Choose File" is never shown |
+| `FieldSet`, `FieldLegend`, `FieldGroup` | Grouped fields on a real fieldset; a legend styled as a subsection title with a hairline above; `layout="columns"` reflows by container |
 | `RadioGroup` + `RadioGroupItem` (or `Radio`) | One visible choice inside a form |
-| `ToggleGroup` + `ToggleGroupItem` | A segmented view or range next to what it changes |
-| `ThemeSwitcher` | System, light or dark; the host stores the choice and sets the root class |
+| `ToggleGroup` + `ToggleGroupItem` (`size` `sm`, `default`, `lg`) | A segmented view or range next to what it changes; painted 44 px on touch at every size |
+| `ThemeSwitcher` (`size`) | System, light or dark; the host stores the choice and sets the root class |
 | `MultiSelect` | Several values, for filters |
 | `Combobox` | A text field filtering known values |
 | `FilterChip` | An active filter with a clear action (`href` or `onRemove`) |
 | `InputGroup` (`InputGroupAddon`, `InputGroupInput`, `InputGroupTextarea`, `InputGroupText`, `InputGroupButton`) | A field with an attached addon or action |
 | `ButtonGroup` (`ButtonGroupText`, `ButtonGroupSeparator`) | Actions on the same subject; not a way to save space |
+
+```tsx
+<Toolbar aria-label="Message actions" variant="bar" sticky>
+  <ToolbarGroup aria-label="Respond">
+    <ToolbarButton label="Reply" variant="secondary" reveal="early"><Reply aria-hidden /></ToolbarButton>
+    <ToolbarButton label="Forward" reveal="middle" tier="low"><Forward aria-hidden /></ToolbarButton>
+  </ToolbarGroup>
+  <DropdownMenu>
+    <DropdownMenuTrigger render={<ToolbarButton label="More actions" tier="overflow"><Ellipsis aria-hidden /></ToolbarButton>} />
+    <DropdownMenuContent align="end">{/* the low tier, as menu items */}</DropdownMenuContent>
+  </DropdownMenu>
+</Toolbar>
+<IconButton label="Search" shortcut={["Ctrl", "K"]}><Search aria-hidden /></IconButton>
+<FileInput label="Choose a file" onFilesChange={setFiles} description="PDF, up to 5 MB." />
+```
 
 ```tsx
 <Field label="Proxy key name" description="Shown in usage reports." error={error}>
@@ -92,6 +117,7 @@ Triggers take `render` to become a Fabrials button: `<DialogTrigger render={<But
 | `Alert` (`AlertTitle`, `AlertDescription`, `AlertAction`) | A status that stays on the page: `variant` `default`, `info`, `success`, `warning`, `destructive` |
 | `Card` (`CardHeader`, `CardTitle`, `CardDescription`, `CardAction`, `CardContent`, `CardFooter`) | One bounded summary; a panel around a chart. Not for lists of peers, not nested |
 | `DescriptionList` (`DescriptionItem`, `DescriptionTerm`, `DescriptionDetails`) | A record's properties |
+| `Disclosure`, `DisclosureSummary` (`count`, `chevron`, `size`), `DisclosurePanel` | A native `details`: 44 px summary, count in its name, panel always mounted, opens itself on an invalid field, no JavaScript |
 | `Accordion`, `Collapsible` | Short answers in place; reasoning, sources or long detail behind a named trigger |
 | `ScrollArea` | A region that scrolls without moving the page |
 | `Loading`, `placeholderText`, `placeholderList`, `useLoading` | Paints the real components it wraps as their skeleton while `when` is true; placeholder copy and records; a hook for "inside a loading view" |

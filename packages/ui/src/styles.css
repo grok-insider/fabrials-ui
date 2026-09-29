@@ -223,6 +223,191 @@
     margin-inline-start: -0.125rem;
   }
 
+  /* ---------------------------------- 0.8: icon button, file input, toolbar */
+  /* Flat keys inside a tooltip take the tooltip's own ink. */
+  .fui-tooltip .fui-icon-button-keys {
+    margin-inline-start: var(--fui-space-2);
+    vertical-align: middle;
+  }
+  .fui-tooltip .fui-kbd {
+    border-color: color-mix(in oklab, var(--fui-tooltip-foreground) 35%, transparent);
+    background: transparent;
+    box-shadow: none;
+    color: inherit;
+  }
+  /* A file picker is a label styled as a button over a hidden input: the label draws the input's focus. */
+  .fui-file-input {
+    display: grid;
+    gap: var(--fui-space-1-5);
+    min-inline-size: 0;
+  }
+  .fui-file-input-row {
+    display: flex;
+    align-items: center;
+    gap: var(--fui-space-2);
+    min-inline-size: 0;
+  }
+  .fui-file-input-button {
+    flex: none;
+    cursor: pointer;
+  }
+  .fui-file-input-button:has(input:focus-visible) {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: 2px;
+  }
+  .fui-file-input-button:has(input:disabled) {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .fui-file-input[data-invalid] .fui-file-input-button {
+    border-color: var(--fui-danger-ink);
+  }
+  .fui-file-input-name {
+    flex: 0 1 auto;
+    min-inline-size: 0;
+    overflow: hidden;
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-sm);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .fui-file-input-name .fui-truncated-text {
+    display: block;
+  }
+  /* A toolbar: one tab stop for a row of controls. Its targets are pinned in px on purpose, the one place that
+     does: at 200 % text a rem-sized 44 px button would double and wrap the bar into a wall. */
+  .fui-toolbar {
+    --fui-control-height-lg: 44px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px;
+    min-inline-size: 0;
+  }
+  .fui-toolbar[data-orientation="vertical"] {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .fui-toolbar .fui-button {
+    flex: none;
+    min-block-size: 44px;
+    min-inline-size: 44px;
+  }
+  .fui-toolbar .fui-button[data-size="icon-lg"] {
+    block-size: 44px;
+  }
+  /* A container takes its width from its parent, never from its buttons. */
+  .fui-toolbar[data-contain] {
+    container: fui-toolbar / inline-size;
+    inline-size: 100%;
+  }
+  /* bar: the page background between two hairlines. Its inline padding puts the icon of the first 44 px button
+     on the page gutter, so the toolbar's icons line up with the text above and below it. */
+  .fui-toolbar[data-variant="bar"] {
+    padding: 3px max(var(--fui-space-1), calc(var(--fui-page-padding) - 0.875rem));
+    border-block: 1px solid var(--border);
+    background: var(--background);
+  }
+  [data-density="compact"] .fui-toolbar[data-variant="bar"] {
+    padding-block: 2px;
+  }
+  .fui-toolbar[data-sticky] {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: var(--fui-z-sticky);
+  }
+  @media (max-height: 30rem) {
+    .fui-toolbar[data-sticky] {
+      position: static;
+    }
+  }
+  .fui-toolbar-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px;
+    min-inline-size: 0;
+  }
+  .fui-toolbar-separator {
+    flex: none;
+    inline-size: 1px;
+    block-size: 1.5rem;
+    margin-inline: var(--fui-space-1);
+    background: var(--border);
+  }
+  .fui-toolbar-separator[data-orientation="horizontal"] {
+    inline-size: auto;
+    block-size: 1px;
+    margin: var(--fui-space-1) 0;
+  }
+  /* The name is a text node, hidden until the toolbar is wide enough to show it. */
+  .fui-toolbar-label {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  /* Tiers and reveals answer to the nearest size container: the toolbar itself (bar) or a pane around it. */
+  /* The overflow trigger is hidden until a container says the row is narrow, so a toolbar with no size container
+     around it shows the whole row and no menu, never both. */
+  .fui-toolbar-button[data-tier="overflow"] {
+    display: none;
+  }
+  @container (max-width: 33.99rem) {
+    .fui-toolbar-button[data-tier="low"],
+    .fui-toolbar-separator[data-tier="low"] {
+      display: none;
+    }
+    .fui-toolbar-button[data-tier="overflow"] {
+      display: inline-flex;
+    }
+  }
+  @container (min-width: 40rem) {
+    .fui-toolbar-button[data-reveal="early"] {
+      aspect-ratio: auto;
+      padding-inline: var(--fui-space-3);
+    }
+    .fui-toolbar-button[data-reveal="early"] .fui-toolbar-label {
+      position: static;
+      inline-size: auto;
+      block-size: auto;
+      margin: 0;
+      overflow: visible;
+      clip-path: none;
+    }
+  }
+  @container (min-width: 52rem) {
+    .fui-toolbar-button[data-reveal="middle"] {
+      aspect-ratio: auto;
+      padding-inline: var(--fui-space-3);
+    }
+    .fui-toolbar-button[data-reveal="middle"] .fui-toolbar-label {
+      position: static;
+      inline-size: auto;
+      block-size: auto;
+      margin: 0;
+      overflow: visible;
+      clip-path: none;
+    }
+  }
+  @container (min-width: 76rem) {
+    .fui-toolbar-button[data-reveal="late"] {
+      aspect-ratio: auto;
+      padding-inline: var(--fui-space-3);
+    }
+    .fui-toolbar-button[data-reveal="late"] .fui-toolbar-label {
+      position: static;
+      inline-size: auto;
+      block-size: auto;
+      margin: 0;
+      overflow: visible;
+      clip-path: none;
+    }
+  }
+
   /* ---------------------------------------------------------------- fields */
   .fui-input {
     width: 100%;
@@ -365,13 +550,91 @@
     cursor: pointer;
   }
 
+  /* -------------------------------------------- 0.8: field sets and groups */
+  .fui-fieldset {
+    display: grid;
+    gap: var(--fui-space-3);
+    min-inline-size: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .fui-field-legend {
+    padding: 0;
+    margin-block-end: var(--fui-space-2);
+    color: var(--foreground);
+    font-size: var(--fui-text-sm);
+    font-weight: var(--fui-weight-medium);
+    line-height: var(--fui-leading-sm);
+  }
+  .fui-field-legend[data-variant="title"] {
+    font-size: var(--fui-text-md);
+    font-weight: var(--fui-weight-semibold);
+    line-height: var(--fui-leading-md);
+  }
+  /* The hairline is the legend's own border: a fieldset's border would run through the legend's text. */
+  .fui-field-legend[data-divider] {
+    inline-size: 100%;
+    padding-block-start: var(--fui-space-5);
+    border-block-start: 1px solid var(--border);
+  }
+  .fui-field-legend[data-variant="label"][data-divider] {
+    padding-block-start: var(--fui-space-4);
+  }
+  .fui-fieldset:is(:first-child, legend + .fui-fieldset) > .fui-field-legend[data-divider] {
+    padding-block-start: 0;
+    border-block-start: 0;
+  }
+  .fui-field-group {
+    display: grid;
+    gap: var(--fui-space-3);
+    min-inline-size: 0;
+  }
+  .fui-field-group[data-layout="columns"] {
+    gap: var(--fui-space-3) var(--fui-space-4);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  }
+  .fui-native-radio-group {
+    gap: var(--fui-space-1);
+  }
+  .fui-native-radio-options {
+    display: grid;
+    min-inline-size: 0;
+  }
+  .fui-native-radio-options[data-layout="grid"] {
+    column-gap: var(--fui-space-3);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  }
+
   /* ----------------------------------------------------- selection controls */
-  .fui-native-checkbox {
+  .fui-native-checkbox,
+  .fui-native-radio {
     width: 1rem;
     height: 1rem;
     margin: 0;
     flex-shrink: 0;
     accent-color: var(--brand);
+  }
+  .fui-native-checkbox:disabled,
+  .fui-native-radio:disabled {
+    cursor: not-allowed;
+  }
+  /* A native choice in its own label: the whole row is the 44 px target and the box stays 16 px. */
+  .fui-native-choice {
+    display: flex;
+    align-items: center;
+    gap: var(--fui-space-3);
+    min-block-size: var(--fui-control-height-lg);
+    min-inline-size: 0;
+    cursor: pointer;
+  }
+  .fui-native-choice > span {
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+  }
+  .fui-native-choice:has(input:disabled) {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
   .fui-checkbox,
   .fui-radio {
@@ -1535,6 +1798,10 @@
     padding: 0 var(--fui-space-2);
     font-size: 0.8125rem;
   }
+  /* lg: the painted toggle is one whole control height (40 px, 44 on touch), as wide as its neighbours in a form row. */
+  .fui-toggle-group[data-size="lg"] .fui-toggle {
+    min-height: var(--fui-control-height);
+  }
   .fui-toggle svg {
     width: 1rem;
     height: 1rem;
@@ -1606,6 +1873,81 @@
   .fui-accordion-content {
     padding-bottom: var(--fui-space-4);
     color: var(--muted-foreground);
+  }
+
+  /* --------------------------------------------- 0.8: native disclosure */
+  .fui-disclosure {
+    min-inline-size: 0;
+  }
+  .fui-disclosure-summary {
+    display: flex;
+    align-items: center;
+    gap: var(--fui-space-2);
+    inline-size: fit-content;
+    max-inline-size: 100%;
+    min-block-size: var(--fui-control-height-lg);
+    border-radius: var(--fui-radius-sm);
+    color: var(--foreground);
+    font-size: var(--fui-text-sm);
+    font-weight: var(--fui-weight-medium);
+    list-style: none;
+    cursor: pointer;
+  }
+  .fui-disclosure-summary::-webkit-details-marker {
+    display: none;
+  }
+  .fui-disclosure-label {
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+  }
+  .fui-disclosure-count {
+    flex: none;
+    color: var(--muted-foreground);
+    font-weight: var(--fui-weight-regular);
+  }
+  .fui-disclosure-chevron {
+    flex: none;
+    inline-size: 1rem;
+    block-size: 1rem;
+    color: var(--muted-foreground);
+    transition: rotate var(--fui-duration-fast) var(--fui-ease);
+  }
+  .fui-disclosure[open] > .fui-disclosure-summary[data-chevron="end"] .fui-disclosure-chevron {
+    rotate: 180deg;
+  }
+  /* A chevron before the label points to the inline end while closed, and down when open. */
+  .fui-disclosure:not([open]) > .fui-disclosure-summary[data-chevron="start"] .fui-disclosure-chevron {
+    rotate: -90deg;
+  }
+  .fui-disclosure:not([open]) > .fui-disclosure-summary[data-chevron="start"] .fui-disclosure-chevron:dir(rtl) {
+    rotate: 90deg;
+  }
+  .fui-disclosure-summary[data-size="lg"] {
+    font-size: var(--fui-text-lg);
+    font-weight: var(--fui-weight-semibold);
+    line-height: var(--fui-leading-lg);
+  }
+  /* sm: a quiet 13 px line (a recipients summary, a "more" line). It paints small and its 44 px target is
+     invisible: the pseudo-element reaches out to the control height, never growing the layout. Do not put
+     overflow, clip or contain on it; truncate text in an inner element. */
+  .fui-disclosure-summary[data-size="sm"] {
+    position: relative;
+    z-index: 1;
+    min-block-size: 0;
+    color: var(--muted-foreground);
+    font-size: 0.8125rem;
+    font-weight: var(--fui-weight-regular);
+    line-height: var(--fui-leading-md);
+  }
+  .fui-disclosure-summary[data-size="sm"]::before {
+    content: "";
+    position: absolute;
+    inset-block: min(0px, calc((100% - var(--fui-control-height-lg)) / 2));
+    inset-inline: min(0px, calc((100% - var(--fui-control-height-lg)) / 2));
+  }
+  .fui-disclosure-panel {
+    padding-block-start: var(--fui-space-2);
+    min-inline-size: 0;
   }
 
   /* ---------------------------------------------------- breadcrumb, pages */
@@ -3590,22 +3932,13 @@
     .fui-sidebar-menu-button {
       height: auto;
     }
-    /* Segmented toggles and tabs are 6 px shorter than a control (they sit inside a 3 px padded group), so their hit area is
-       extended by that padding instead of growing the group: 44 px tall targets, nothing moves. An icon-only theme switcher is
-       square and also gains the 3 px each side (the 2 px gap between items means neighbours share a pixel or two). */
+    /* Segmented toggles and tabs paint 44 px tall here (0.8), not 6 px less: they sit in a 3 px padded group that is
+       then 50 px, so a target is never smaller than it looks. An icon-only theme switcher is square, 44 by 44.
+       The group's sizes (sm, lg) all give way to it. */
     .fui-toggle,
+    .fui-toggle-group[data-size] .fui-toggle,
     .fui-tabs-list[data-variant="segmented"] .fui-tab {
-      position: relative;
-    }
-    .fui-toggle::before,
-    .fui-tabs-list[data-variant="segmented"] .fui-tab::before {
-      content: "";
-      position: absolute;
-      inset-block: -3px;
-      inset-inline: 0;
-    }
-    .fui-theme-switcher:not([data-labels]) .fui-toggle::before {
-      inset-inline: -3px;
+      min-height: var(--fui-control-height-lg);
     }
     :is(.fui-button[data-size="icon"], .fui-button-size-icon),
     :is(.fui-button[data-size="icon-sm"], .fui-button-size-icon-sm),
@@ -3763,6 +4096,22 @@
     border-color: transparent !important;
     box-shadow: none !important;
     text-decoration-color: transparent !important;
+  }
+  /* A native checkbox or radio has no CSS box to paint until it stops using the platform's control: it
+     becomes the same neutral shape as the Base UI one, with no tick, dash or dot. */
+  [data-fui-loading]
+    > .fui-loading-content
+    :is(.fui-native-checkbox, .fui-native-radio):not(:where([data-skeleton="keep"], [data-skeleton="keep"] *)) {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    background-color: var(--fui-skeleton-surface) !important;
+    border: 0 !important;
+    border-radius: var(--fui-radius-xs);
+    box-shadow: none !important;
+    accent-color: var(--fui-skeleton-surface);
+  }
+  [data-fui-loading] > .fui-loading-content .fui-native-radio:not(:where([data-skeleton="keep"], [data-skeleton="keep"] *)) {
+    border-radius: var(--fui-radius-full);
   }
   /* Fields keep their frame and show a short bar where the value would be. */
   [data-fui-loading]

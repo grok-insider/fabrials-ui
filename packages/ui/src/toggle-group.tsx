@@ -10,7 +10,10 @@ export function ToggleGroup({
   className,
   size = "default",
   ...props
-}: StyledProps<BaseToggleGroup.Props> & { size?: "default" | "sm" }) {
+}: StyledProps<BaseToggleGroup.Props> & {
+  /** `sm` 26 px, `default` 34 px, `lg` 40 px painted (a whole control height); every size is 44 px on touch and narrow screens. */
+  size?: "default" | "sm" | "lg";
+}) {
   return (
     <BaseToggleGroup
       data-slot="toggle-group"
@@ -51,6 +54,7 @@ export function ThemeSwitcher({
   labels = { system: "System", light: "Light", dark: "Dark" },
   showLabels = false,
   label = "Theme",
+  size = "sm",
   className,
 }: {
   value: ThemePreference;
@@ -58,12 +62,14 @@ export function ThemeSwitcher({
   labels?: Record<ThemePreference, ReactNode>;
   showLabels?: boolean;
   label?: string;
+  /** As `ToggleGroup`; `lg` matches the 40 px controls of a settings row. */
+  size?: "default" | "sm" | "lg";
   className?: string;
 }) {
   return (
     <ToggleGroup
       aria-label={label}
-      size="sm"
+      size={size}
       value={[value]}
       onValueChange={(next) => {
         const selected = next[0] as ThemePreference | undefined;

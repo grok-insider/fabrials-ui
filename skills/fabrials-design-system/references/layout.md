@@ -202,6 +202,7 @@ import { Users } from "lucide-react";
 - **Records are rows.** `Table` with `numeric` columns right-aligned in tabular figures; the table scrolls inside its own labelled region. Row actions: a `DropdownMenu` from a button that names the record. Do not render records as cards.
 - **Summary numbers.** `StatGroup` of `Stat` above the collection when the page has totals; `SeriesChart` or `Sparkline` for trends; `Meter` for quotas.
 - **Panels.** Group a chart or a secondary table in one panel (`border`, `rounded-lg`, `bg-card`) with a title row and hairline dividers inside. Never a card inside a card.
+- **Actions on one record.** A `Toolbar variant="bar" sticky` under the title: one tab stop, `ToolbarGroup`s named for what they hold, a `ToolbarSeparator` between them. The primary action is `variant="secondary"` with `reveal="early"` so its label appears once there is room; low-priority actions are `tier="low"` and reappear as items of a `DropdownMenu` whose trigger is a `tier="overflow"` `ToolbarButton`. The toolbar measures its own width, so it works in a 358 px pane and a 62 rem column alike.
 - **Detail.** A record opens on its own URL with `NavTabs` for its sections, or in a `Sheet` (`side="right"`) for a quick look. Properties use `DescriptionList`; history uses `Timeline`.
 - **Density.** `data-density="compact"` on a container tightens its controls to 32 px and its rows; it is a composition choice for dense tables, not a user preference.
 - References: `stories/patterns.stories.tsx` › Console (sidebar shell), `stories/foundation.stories.tsx` › Accounts (`WorkspaceShell`), `stories/monitoring.stories.tsx`.
@@ -299,7 +300,7 @@ Every collection and panel has these states. Put them where the content would be
 
 ## Responsive checks
 
-- 390 px: one column, 16 px gutter, no sideways scroll, 44 px targets, the storm below the hero text, menus in sheets.
+- 390 px: one column, 16 px gutter, no sideways scroll, 44 px targets (segmented toggles and tabs paint 44 px there), the storm below the hero text, menus in sheets.
 - 768 px: gutter 24 px, sidebar visible, settings in two columns.
 - 1440 px: the everyday desktop; the visual suite's widest size.
 - 2560 x 1315: the owner's screen. Content still starts at the left gutter; tables and rows use the width; prose keeps its measure; no giant empty centred column and no stretched 3-up card rows.

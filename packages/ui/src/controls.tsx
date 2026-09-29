@@ -1,6 +1,6 @@
 "use client";
 
-import type { ComponentProps } from "react";
+import { useEffect, useRef, type ComponentProps, type ReactNode, type Ref } from "react";
 import { Button as BaseButton } from "@base-ui/react/button";
 import { Checkbox as BaseCheckbox } from "@base-ui/react/checkbox";
 import { Switch as BaseSwitch } from "@base-ui/react/switch";
@@ -80,17 +80,85 @@ export function NativeSelectOptGroup(props: ComponentProps<"optgroup">) {
   return <optgroup {...props} />;
 }
 
-export function NativeCheckbox({
+type NativeChoiceProps = Omit<ComponentProps<"input">, "type"> & {
+  /** Puts the input in a whole-row label, a 44 px target; the text is the input's name. */
+  label?: ReactNode;
+  labelClassName?: string;
+};
+
+function NativeChoice({
   className,
+  label,
+  labelClassName,
+  type,
   ...props
-}: ComponentProps<"input"> & { type?: "checkbox" }) {
-  return (
+}: NativeChoiceProps & { type: "checkbox" | "radio" }) {
+  const input = (
     <input
-      className={classes("fui-native-checkbox", className)}
+      className={classes(type === "radio" ? "fui-native-radio" : "fui-native-checkbox", className)}
       {...props}
-      type="checkbox"
+      type={type}
     />
   );
+  if (label == null) return input;
+  return (
+    <label className={classes("fui-native-choice", labelClassName)}>
+      {input}
+      <span>{label}</span>
+    </label>
+  );
+}
+
+function setRef<T>(ref: Ref<T> | undefined, node: T | null) {
+  if (typeof ref === "function") return ref(node);
+  if (ref) ref.current = node;
+}
+
+export type NativeCheckboxProps = NativeChoiceProps & {
+  type?: "checkbox";
+  /** Mixed state (some of a group are ticked). It is a property of the element, never an attribute, so
+   * it is applied after mount and again after every render and change: a click clears it in the browser
+   * even when the host's state does not change. */
+  indeterminate?: boolean;
+};
+
+export function NativeCheckbox({
+  indeterminate,
+  onChange,
+  ref,
+  ...props
+}: NativeCheckboxProps) {
+  const own = useRef<HTMLInputElement | null>(null);
+  const wanted = useRef(indeterminate);
+  useEffect(() => {
+    wanted.current = indeterminate;
+    if (own.current && indeterminate !== undefined) own.current.indeterminate = indeterminate;
+  });
+  return (
+    <NativeChoice
+      {...props}
+      type="checkbox"
+      data-indeterminate={indeterminate ? "" : undefined}
+      ref={(node) => {
+        own.current = node;
+        return setRef(ref, node);
+      }}
+      onChange={(event) => {
+        onChange?.(event);
+        if (indeterminate === undefined) return;
+        // The browser cleared the mixed state on the click; the host's state decides after it has rendered.
+        queueMicrotask(() => {
+          if (own.current) own.current.indeterminate = !!wanted.current;
+        });
+      }}
+    />
+  );
+}
+
+/** The browser's own radio: submits with the form, keeps the arrow keys of its name group and is disabled by a
+ * disabled fieldset (a Base UI radio is a span that a fieldset does not disable). Use `NativeRadioGroup`. */
+export function NativeRadio(props: NativeChoiceProps) {
+  return <NativeChoice {...props} type="radio" />;
 }
 
 export function Label({ className, ...props }: ComponentProps<"label">) {

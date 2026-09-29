@@ -3,7 +3,7 @@
 // Previews for the controls added to the catalogue in 0.7: brand, data, navigation and chrome.
 // Synthetic data only.
 import { useEffect, useState, type ReactNode } from "react";
-import { AtSign, Eye, Trash2, UserPlus } from "lucide-react";
+import { Archive, AtSign, Ellipsis, Eye, Forward, MailOpen, Reply, Search, Star, Trash2, UserPlus } from "lucide-react";
 import { ProviderIcon } from "@fabrials/ai-ui";
 import {
   Accordion,
@@ -22,6 +22,26 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
   Button,
+  Disclosure,
+  DisclosurePanel,
+  DisclosureSummary,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  FieldGroup,
+  FieldLegend,
+  FieldSet,
+  FileInput,
+  IconButton,
+  Input,
+  NativeCheckbox,
+  NativeRadio,
+  NativeRadioGroup,
+  Toolbar,
+  ToolbarButton,
+  ToolbarGroup,
+  ToolbarSeparator,
   DescriptionDetails,
   DescriptionItem,
   DescriptionList,
@@ -106,6 +126,50 @@ const TELEMETRY_RAMP = {
   dark: ["background", "#1c2129", "#252b35", "#3a4351", "#6f7d92", "#9cc4ff"],
   light: ["background", "#dcdfe0", "#b9c0c8", "#8e98a5", "#5f6a79", "#2a63c4"],
 };
+
+function FileInputDemo() {
+  const [name, setName] = useState<string | null>(null);
+  return (
+    <FileInput
+      label="Choose a file"
+      name="attachment"
+      description="PDF or an image, up to 5 MB."
+      fileName={name}
+      onFilesChange={(files) => setName(files[0]?.name ?? null)}
+      onClear={() => setName(null)}
+    />
+  );
+}
+
+function NativeChoicesDemo() {
+  const [rows, setRows] = useState([true, false, false]);
+  const ticked = rows.filter(Boolean).length;
+  return (
+    <>
+      <NativeRadioGroup legend="Sort messages by" name="sort-demo">
+        <NativeRadio name="sort-demo" value="date" label="Date received" defaultChecked />
+        <NativeRadio name="sort-demo" value="sender" label="Sender" />
+        <NativeRadio name="sort-demo" value="size" label="Size" />
+      </NativeRadioGroup>
+      <div className="grid gap-1">
+        <NativeCheckbox
+          label="Select all"
+          checked={ticked === rows.length}
+          indeterminate={ticked > 0 && ticked < rows.length}
+          onChange={(event) => setRows(rows.map(() => event.currentTarget.checked))}
+        />
+        {["Ana Lopez", "Kai Nakamura", "Priya Shah"].map((name, index) => (
+          <NativeCheckbox
+            key={name}
+            label={name}
+            checked={rows[index]}
+            onChange={() => setRows(rows.map((value, at) => (at === index ? !value : value)))}
+          />
+        ))}
+      </div>
+    </>
+  );
+}
 
 function MultiSelectDemo() {
   const [value, setValue] = useState<string[]>(["grok"]);
@@ -406,6 +470,81 @@ export const moreDemos: Record<string, () => ReactNode> = {
           <RadioGroupItem value="manual" /> Manual only
         </Label>
       </RadioGroup>
+    </Frame>
+  ),
+  "icon-button": () => (
+    <Frame inline>
+      <IconButton label="Search" shortcut={["Ctrl", "K"]}><Search aria-hidden /></IconButton>
+      <IconButton label="Star" variant="outline"><Star aria-hidden /></IconButton>
+      <IconButton label="Archive" variant="outline" textName><Archive aria-hidden /></IconButton>
+      <IconButton label="Delete" variant="destructive" disabled><Trash2 aria-hidden /></IconButton>
+      <DropdownMenu>
+        <DropdownMenuTrigger render={<IconButton label="More actions" variant="outline"><Ellipsis aria-hidden /></IconButton>} />
+        <DropdownMenuContent>
+          <DropdownMenuItem><Forward aria-hidden />Forward</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </Frame>
+  ),
+  toolbar: () => (
+    <Frame>
+      <Toolbar aria-label="Message actions" variant="bar">
+        <ToolbarGroup aria-label="Respond">
+          <ToolbarButton label="Reply" variant="secondary" reveal="early"><Reply aria-hidden /></ToolbarButton>
+          <ToolbarButton label="Forward" variant="secondary" reveal="middle" tier="low"><Forward aria-hidden /></ToolbarButton>
+        </ToolbarGroup>
+        <ToolbarSeparator tier="low" />
+        <ToolbarGroup aria-label="Organise">
+          <ToolbarButton label="Mark as unread" reveal="late"><MailOpen aria-hidden /></ToolbarButton>
+          <ToolbarButton label="Archive" reveal="late"><Archive aria-hidden /></ToolbarButton>
+          <ToolbarButton label="Delete" reveal="late" disabled><Trash2 aria-hidden /></ToolbarButton>
+        </ToolbarGroup>
+        <DropdownMenu>
+          <DropdownMenuTrigger render={<ToolbarButton label="More actions" tier="overflow"><Ellipsis aria-hidden /></ToolbarButton>} />
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem><Forward aria-hidden />Forward</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </Toolbar>
+    </Frame>
+  ),
+  "file-input": () => (
+    <Frame>
+      <FileInputDemo />
+    </Frame>
+  ),
+  disclosure: () => (
+    <Frame>
+      <Disclosure>
+        <DisclosureSummary>Advanced options</DisclosureSummary>
+        <DisclosurePanel>Options that most people never change.</DisclosurePanel>
+      </Disclosure>
+      <Disclosure open>
+        <DisclosureSummary size="lg" chevron="start" count={<Badge variant="outline">3</Badge>}>Conversation</DisclosureSummary>
+        <DisclosurePanel>Three messages in this conversation.</DisclosurePanel>
+      </Disclosure>
+    </Frame>
+  ),
+  "field-set": () => (
+    <Frame>
+      <form onSubmit={(event) => event.preventDefault()} className="grid gap-5">
+        <FieldSet>
+          <FieldLegend>Name</FieldLegend>
+          <FieldGroup layout="columns">
+            <div className="grid gap-1.5"><Label htmlFor="demo-given">Given name</Label><Input id="demo-given" defaultValue="Ana" /></div>
+            <div className="grid gap-1.5"><Label htmlFor="demo-family">Family name</Label><Input id="demo-family" defaultValue="Lopez" /></div>
+          </FieldGroup>
+        </FieldSet>
+        <FieldSet>
+          <FieldLegend>Email addresses</FieldLegend>
+          <div className="grid gap-1.5"><Label htmlFor="demo-email">Address</Label><Input id="demo-email" type="email" defaultValue="ana@example.com" /></div>
+        </FieldSet>
+      </form>
+    </Frame>
+  ),
+  "native-radio": () => (
+    <Frame>
+      <NativeChoicesDemo />
     </Frame>
   ),
   "toggle-group": () => (

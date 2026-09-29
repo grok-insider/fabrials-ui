@@ -35,6 +35,12 @@ const stories: Record<string, string> = {
   "shadcn-parts": "fabrials-shadcn-parts--gallery",
   "docs-pieces": "fabrials-docs-pieces--gallery",
   loading: "fabrials-loading--gallery",
+  "controls-icon-buttons": "fabrials-controls--icon-buttons",
+  "controls-toolbars": "fabrials-controls--toolbars",
+  "controls-file-inputs": "fabrials-controls--file-inputs",
+  "controls-disclosures": "fabrials-controls--disclosures",
+  "controls-field-sets": "fabrials-controls--field-sets",
+  "controls-toggles": "fabrials-controls--toggles",
 };
 
 for (const theme of ["light", "dark"]) {

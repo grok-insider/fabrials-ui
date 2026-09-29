@@ -30,4 +30,86 @@ drop the override. In 0.8 the painted control itself is 44 px there too; see
 
 ## New in `@fabrials/ui` 0.8
 
-### Batch 1: controls
+### Controls
+
+Every entry names the host workaround it makes deletable. Nothing here changes an
+existing export except the two called out under "Changed behaviour".
+
+#### `IconButton`
+
+`IconButton({ label, tooltip = true, shortcut?, textName?, size = "icon-lg", variant = "ghost", loading?, ...ButtonProps })`.
+A 44 px icon-only button named by `label` (`aria-label`, or a hidden text node with
+`textName`), with a tooltip on hover and on keyboard focus and, with `shortcut`, flat
+`Kbd`s in it and `aria-keyshortcuts`. It spreads its props on the `Button`, so a Base UI
+trigger can `render` it. The tooltip wrapper stays mounted when the button is disabled.
+Deletable: a product's own `ui/icon-button.tsx` (Tooltip + Button + `aria-label`).
+
+#### `Toolbar`, `ToolbarGroup`, `ToolbarSeparator`, `ToolbarButton`
+
+One tab stop for a row of controls over Base UI's toolbar: Tab enters and leaves once,
+the arrows, Home and End move between the items (Base UI provides the arrows only; Home
+and End are added here). `Toolbar` and `ToolbarGroup` require a name. `variant="bar"` is the
+page background between two hairlines with its icons on the page gutter, `sticky` keeps it
+under the top of its scroll container. A disabled `ToolbarButton` stays in the arrow order
+(`aria-disabled`, no click). `ToolbarButton` is named by a text node (`textContent`
+equals the action) with a tooltip; `reveal="early" | "middle" | "late"` shows the label from a
+container width of 40, 52 and 76 rem, and `tier="low"` (hidden below 34 rem, for an overflow menu)
+or `tier="overflow"` (the menu's trigger, only there below 34 rem) fold actions away. Hidden
+items leave the arrow-key order, so the toolbar never loses its tab stop to an item nobody
+can see. Deletable: `role="group"` clusters with every button tabbable, the reader's
+`ToolbarButton` and its `.reader-action`, `.reader-label`, `[data-reveal]`, `[data-tier]` and
+`.oe-sep` rules, and the pinned 44 px rules of `.reader-toolbar`.
+
+The thresholds are measured on the toolbar's own content box (`bar`), or on the nearest
+size container above a `plain` one (`contain={false}`), not on a named pane container.
+
+#### `FileInput`
+
+`FileInput({ label, name, accept, onFilesChange, fileName?, onClear?, clearLabel?, description?, error?, variant, size, ...inputProps })`:
+a label styled as a `Button` over a visually hidden real input, the chosen name, an optional
+clear action (the picker is emptied so the same file can be chosen again) and a description
+and error read with the input. The browser's "Choose File" text is never shown.
+Deletable: `ui/file-button.tsx` and `.oe-file-button`.
+
+#### `Disclosure`, `DisclosureSummary`, `DisclosurePanel`
+
+A styled native `details`: a 44 px summary with a chevron (`end` or `start`, RTL-aware), a
+`count` slot inside the summary, sizes `sm` (quiet, invisible 44 px target), `md`, `lg`, a panel that
+stays mounted, no JavaScript, exact on the server. It opens itself when a field inside
+fails validation (`revealInvalid`). Deletable: the `details > summary` rules for the reader
+header, the conversation, the tool blocks, the search filters and the offline page, and the
+`onInvalidCapture` handler of the label form.
+
+#### `FieldSet`, `FieldLegend`, `FieldGroup`
+
+A real fieldset (`min-inline-size: 0`, `disabled` passes through to native controls only), a legend
+styled as a subsection title (`variant="title" | "label"`) with a hairline above drawn on the legend
+(`divider`, left out for the first fieldset of a container), and a grid of fields
+(`layout="columns"` reflows by container). Deletable: `.contacts-fieldset`, `.contacts-name > legend`
+and the other hand-made fieldset and legend rules.
+
+#### `NativeRadio`, `NativeRadioGroup`; `NativeCheckbox` `indeterminate` and `label`
+
+`NativeRadioGroup({ legend, hideLegend?, layout = "stack" | "grid" })` is a fieldset with a legend;
+a disabled fieldset disables every native radio. `NativeRadio` takes an optional `label` that
+wraps the input in a 44 px row. `NativeCheckbox` gains `indeterminate` (applied as the element
+property after mount and after every render and change, so a click that leaves the host's state
+unchanged does not lose it; the ref is merged) and the same `label`. Under `Loading`, native boxes become
+the same neutral shapes as the Base UI ones, with no tick, dash or dot. Deletable: the swatch picker's
+`<input type="radio">` with a host class, the `.oe-check` label rule, and the `useEffect` that sets
+`indeterminate` on the select-all box.
+
+#### Toggles and segments at 44 px on touch
+
+`ToggleGroup` (and so `ThemeSwitcher`) gains `size="lg"`, a painted toggle of a whole control height
+(40 px, 44 on touch), and `ThemeSwitcher` gains a `size` prop (default `sm`, as before).
+Deletable: the product overrides that raise `.fui-toggle` to 40 or 44 px.
+
+### Changed behaviour
+
+- **Segmented toggles and tabs are 44 px tall when painted on touch and narrow screens**, at every
+  size, instead of 38 px extended by an invisible pseudo-element (0.7.1). A segmented control there
+  is now 50 px tall including its 3 px group padding. A product that raised the toggles itself can
+  drop the override, and one that relied on the 38 px painted height should check its rows.
+- `NativeCheckbox` accepts `label`, `labelClassName` and `indeterminate`; without them its markup is
+  unchanged (`type="checkbox"` is still accepted).

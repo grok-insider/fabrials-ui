@@ -70,7 +70,7 @@ Scale tokens: `--fui-text-xs` 12, `sm` 14, `md` 16, `lg` 18, `xl` 20, `title` 24
 ## Space and density
 
 - 4 px grid: `--fui-space-0-5` (2 px) to `--fui-space-24` (96 px). Tailwind's default spacing scale is also 4 px based; stay on it.
-- Controls: 40 px (`--fui-control-height`), `sm` 32, `xs` 28, `lg` 44. Below 768 px or with a coarse pointer every control is 44 px.
+- Controls: 40 px (`--fui-control-height`), `sm` 32, `xs` 28, `lg` 44. Below 768 px or with a coarse pointer every control is 44 px, including segmented toggles and tabs, which are painted 44 px there (their group is then 50 px). A `Toolbar` pins its 44 px targets in px so 200 % text does not wrap it.
 - `data-density="compact"` on a container: controls 32 px, row padding 8 px. A composition choice for dense tables, not a stored preference.
 - Header 56 px (`--fui-header-height`), sidebar 16rem (icon rail 3.5rem), page gutter 24 px (16 px below 768 px).
 - Working sizes: body 14 px in apps; an operational page shows its data above the fold at 1440 x 900. Loose padding (48 px inside a panel, 24 px gaps between every control) is a defect.
