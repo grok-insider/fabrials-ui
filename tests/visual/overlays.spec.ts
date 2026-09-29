@@ -116,7 +116,9 @@ test("kept-mounted content survives closing: what was typed is there when it ope
   await page.getByRole("button", { name: "Popover" }).click();
   await page.getByLabel("New name").fill("kept name");
   await page.keyboard.press("Escape");
-  expect(await page.locator(".fui-popover").evaluate((element) => getComputedStyle(element.closest("[hidden]") ?? element).display)).toBe("none");
+  // Base UI marks the closed popup hidden once its close has settled, not synchronously with Escape: retry, do not sample once.
+  await expect.poll(() => page.locator(".fui-popover").evaluate((element) => getComputedStyle(element.closest("[hidden]") ?? element).display)).toBe("none");
+  await expect(page.getByLabel("New name")).toBeAttached();
   await page.getByRole("button", { name: "Popover" }).click();
   await expect(page.getByLabel("New name")).toHaveValue("kept name");
 });
