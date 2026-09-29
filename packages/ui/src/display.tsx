@@ -1,6 +1,6 @@
 "use client";
 
-import type { ComponentProps, CSSProperties } from "react";
+import { useEffect, useRef, type ComponentProps, type CSSProperties, type RefObject } from "react";
 import { Tabs as BaseTabs } from "@base-ui/react/tabs";
 import { classes, type StyledProps } from "./shared";
 
@@ -254,7 +254,13 @@ export function Table({
   );
 }
 
-export const Tabs = BaseTabs.Root;
+/**
+ * The tabs root. Horizontal tabs need no layout of their own; with `orientation="vertical"` the list sits beside
+ * the panel (a rail: `TabsList` styles itself for it) and the panel takes the rest.
+ */
+export function Tabs({ className, ...props }: StyledProps<BaseTabs.Root.Props>) {
+  return <BaseTabs.Root data-slot="tabs" className={classes("fui-tabs", className)} {...props} />;
+}
 
 export function TableHeader(props: ComponentProps<"thead">) {
   return <thead {...props} />;
@@ -284,15 +290,58 @@ export function TableCaption(props: ComponentProps<"caption">) {
   return <caption {...props} />;
 }
 
+/** Keeps the selected tab of a scrolling list in view: when it is (partly) out of the list's box, the list scrolls its OWN box until the tab is centred. Never scrolls the page or a dialog, works in RTL, and only acts when the selection changes (or on mount), so it never fights a manual scroll. */
+function useRevealSelectedTab(ref: RefObject<HTMLDivElement | null>, enabled: boolean) {
+  useEffect(() => {
+    const list = ref.current;
+    if (!enabled || !list) return;
+    const reveal = () => {
+      const tab = list.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]');
+      if (!tab) return;
+      const box = list.getBoundingClientRect();
+      const at = tab.getBoundingClientRect();
+      if (at.left >= box.left + 8 && at.right <= box.right - 8) return;
+      const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+      // Physical geometry, so the same delta is right in left-to-right and right-to-left lists.
+      list.scrollBy({ left: at.left + at.width / 2 - (box.left + box.width / 2), behavior: reduce ? "auto" : "smooth" });
+    };
+    const frame = requestAnimationFrame(reveal);
+    const observer = new MutationObserver(reveal);
+    observer.observe(list, { attributes: true, attributeFilter: ["aria-selected"], subtree: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
+  }, [ref, enabled]);
+}
+
 export function TabsList({
   className,
   variant = "underline",
+  scrollable = false,
+  ref,
   ...props
-}: StyledProps<BaseTabs.List.Props> & { variant?: "underline" | "segmented" }) {
+}: StyledProps<BaseTabs.List.Props> & {
+  variant?: "underline" | "segmented";
+  /**
+   * One line that scrolls sideways instead of wrapping: no scrollbar, snap to the tabs, and the selected tab is kept
+   * in view. `true` always; `"narrow"` only below 48rem of viewport (wraps above it, for a few tabs on a wide screen).
+   */
+  scrollable?: boolean | "narrow";
+}) {
+  const own = useRef<HTMLDivElement | null>(null);
+  useRevealSelectedTab(own, scrollable !== false);
+  const setRef = (node: HTMLDivElement | null) => {
+    own.current = node;
+    if (typeof ref === "function") ref(node);
+    else if (ref) (ref as { current: HTMLDivElement | null }).current = node;
+  };
   return (
     <BaseTabs.List
       data-variant={variant}
+      data-scrollable={scrollable === false ? undefined : scrollable === true ? "always" : scrollable}
       className={classes("fui-tabs-list", className)}
+      ref={setRef}
       {...props}
     >
       {props.children}

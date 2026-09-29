@@ -3,7 +3,7 @@
 // Previews for the controls added to the catalogue in 0.7: brand, data, navigation and chrome.
 // Synthetic data only.
 import { useEffect, useState, type ReactNode } from "react";
-import { Archive, AtSign, Ellipsis, Eye, Forward, MailOpen, Reply, Search, Star, Trash2, UserPlus } from "lucide-react";
+import { Archive, AtSign, ContactRound, Ellipsis, Eye, FileText, Forward, Inbox, Layers, MailOpen, Plus, Reply, Search, Settings, Star, Trash2, UserPlus } from "lucide-react";
 import { ProviderIcon } from "@fabrials/ai-ui";
 import {
   Accordion,
@@ -40,6 +40,34 @@ import {
   NativeCheckbox,
   NativeRadio,
   NativeRadioGroup,
+  AppHeader,
+  AppHeaderAction,
+  AppHeaderBrand,
+  AppHeaderCaret,
+  AppHeaderLabel,
+  AppHeaderLink,
+  AppHeaderNav,
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemDescription,
+  ItemGroup,
+  ItemLink,
+  ItemMedia,
+  ItemTitle,
+  NavSwitcher,
+  NavSwitcherContent,
+  NavSwitcherItem,
+  NavSwitcherSeparator,
+  NavSwitcherTrigger,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+  SidebarGroup,
+  SidebarMenu,
+  SidebarMenuBadge,
+  SidebarMenuButton,
+  SidebarMenuItem,
   Toolbar,
   ToolbarButton,
   ToolbarGroup,
@@ -525,6 +553,100 @@ export const moreDemos: Record<string, () => ReactNode> = {
         <DisclosureSummary size="lg" chevron="start" count={<Badge variant="outline">3</Badge>}>Conversation</DisclosureSummary>
         <DisclosurePanel>Three messages in this conversation.</DisclosurePanel>
       </Disclosure>
+    </Frame>
+  ),
+  item: () => (
+    <Frame>
+      <ItemGroup bordered aria-label="Messages" className="rounded-md border-x">
+        {[
+          { id: "a", from: "Ana Ruiz", subject: "Quarterly planning notes", preview: "Attached are the notes from Tuesday.", unread: true },
+          { id: "b", from: "Build server", subject: "Nightly build 4182 passed", preview: "All 1,204 checks passed.", current: true },
+          { id: "c", from: "Calendar", subject: "Invitation: Design review", preview: "Thursday 14:00 in the small room.", unread: false },
+        ].map((message) => (
+          <Item key={message.id} stretch current={message.current} unread={message.unread}>
+            <ItemMedia variant="icon">
+              <FileText aria-hidden />
+            </ItemMedia>
+            <ItemContent>
+              <ItemTitle render={<h3 />}>
+                <ItemLink href="#item" current={message.current}>{message.subject}</ItemLink>
+              </ItemTitle>
+              <ItemDescription>{message.from} · {message.preview}</ItemDescription>
+            </ItemContent>
+            <ItemActions>
+              <IconButton label={`Star: ${message.subject}`}><Star aria-hidden /></IconButton>
+            </ItemActions>
+          </Item>
+        ))}
+      </ItemGroup>
+    </Frame>
+  ),
+  "app-header": () => (
+    <Frame>
+      <div className="overflow-hidden rounded-md border">
+        <AppHeader
+          brand={
+            <AppHeaderBrand href="#app-header">
+              <ProductLockup product="Open Email" gem="emerald" />
+            </AppHeaderBrand>
+          }
+          navigation={
+            <AppHeaderNav label="Workspace">
+              <AppHeaderLink href="#app-header" current><Inbox aria-hidden /><span>Mail</span></AppHeaderLink>
+              <AppHeaderLink href="#app-header"><ContactRound aria-hidden /><span>Contacts</span></AppHeaderLink>
+            </AppHeaderNav>
+          }
+          actions={
+            <>
+              <IconButton label="Settings"><Settings aria-hidden /></IconButton>
+              <AppHeaderAction>
+                <Avatar size="sm" aria-hidden><AvatarFallback>A</AvatarFallback></Avatar>
+                <AppHeaderLabel>ana@example.test</AppHeaderLabel>
+                <AppHeaderCaret />
+              </AppHeaderAction>
+            </>
+          }
+        />
+      </div>
+    </Frame>
+  ),
+  "nav-switcher": () => (
+    <Frame>
+      <div className="grid max-w-72 gap-3 rounded-md bg-sidebar p-2">
+        <NavSwitcher>
+          <NavSwitcherTrigger label="Switch mailbox" mark={<Avatar size="sm"><AvatarFallback>A</AvatarFallback></Avatar>} title="ana@example.test" description="Personal" />
+          <NavSwitcherContent label="Switch mailbox">
+            <NavSwitcherItem render={<a href="#all" />} mark={<Layers aria-hidden />}>All inboxes</NavSwitcherItem>
+            <NavSwitcherItem render={<a href="#ana" />} current mark={<Avatar size="sm"><AvatarFallback>A</AvatarFallback></Avatar>}>ana@example.test</NavSwitcherItem>
+            <NavSwitcherItem render={<a href="#work" />} mark={<Avatar size="sm"><AvatarFallback>W</AvatarFallback></Avatar>} description={<Badge tone="warning" dot>Needs authorization</Badge>}>ana@work.example.test</NavSwitcherItem>
+            <NavSwitcherSeparator />
+            <NavSwitcherItem render={<a href="#link" />} mark={<Plus aria-hidden />}>Link a mailbox</NavSwitcherItem>
+          </NavSwitcherContent>
+        </NavSwitcher>
+        <nav aria-label="Folders">
+          <SidebarGroup className="p-0">
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton size="touch" isActive render={<a href="#inbox" />}><Inbox aria-hidden /><span>Inbox</span><SidebarMenuBadge>12</SidebarMenuBadge></SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton size="touch" render={<a href="#drafts" />}><FileText aria-hidden /><span>Drafts</span><SidebarMenuBadge>2</SidebarMenuBadge></SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroup>
+        </nav>
+      </div>
+    </Frame>
+  ),
+  resizable: () => (
+    <Frame>
+      <div className="overflow-hidden rounded-md border">
+        <ResizablePanelGroup orientation="horizontal" style={{ height: 160 }}>
+          <ResizablePanel id="demo-nav" defaultSize="30%" minSize="6rem" className="bg-sidebar p-3 text-sm">Navigation</ResizablePanel>
+          <ResizableHandle label="Resize the navigation" />
+          <ResizablePanel id="demo-list" defaultSize="70%" minSize="8rem" className="bg-card p-3 text-sm">Drag the line, or focus it and use the arrow keys, Home and End.</ResizablePanel>
+        </ResizablePanelGroup>
+      </div>
     </Frame>
   ),
   "field-set": () => (

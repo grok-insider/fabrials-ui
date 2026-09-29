@@ -1,0 +1,29 @@
+/* Story-only: a stand-in for the palette trigger that fills the header's command slot. It answers to the container named
+   `command`, exactly as the real trigger will: an icon at the slot's smallest width, icon, label and keys from 12rem. */
+.fui-button.structure-command {
+  inline-size: 100%;
+  min-inline-size: var(--fui-control-height-lg);
+  justify-content: center;
+  padding-inline: 0;
+}
+.structure-command-label,
+.structure-command-keys {
+  display: none;
+}
+@container command (min-width: 12rem) {
+  .fui-button.structure-command {
+    justify-content: flex-start;
+    padding-inline: var(--fui-space-3);
+  }
+  .structure-command-label {
+    display: inline;
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .structure-command-keys {
+    display: inline-flex;
+    margin-inline-start: auto;
+  }
+}

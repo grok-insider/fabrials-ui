@@ -372,6 +372,23 @@ const demos: Record<string, () => ReactNode> = {
         <TabsContent value="usage" className="pt-3 text-sm">420 requests in June.</TabsContent>
         <TabsContent value="cost" className="pt-3 text-sm">18 in June.</TabsContent>
       </Tabs>
+      <Tabs defaultValue="identity" orientation="vertical" className="overflow-hidden rounded-md border">
+        <TabsList aria-label="Settings sections">
+          <TabsTrigger value="accounts">Mailboxes</TabsTrigger>
+          <TabsTrigger value="identity">Identity</TabsTrigger>
+          <TabsTrigger value="privacy">Privacy</TabsTrigger>
+        </TabsList>
+        <TabsContent value="accounts" className="p-3 text-sm">Mailboxes.</TabsContent>
+        <TabsContent value="identity" className="p-3 text-sm">A vertical rail: the current row has a Stormlight bar.</TabsContent>
+        <TabsContent value="privacy" className="p-3 text-sm">Privacy.</TabsContent>
+      </Tabs>
+      <Tabs defaultValue="assistant" className="max-w-xs">
+        <TabsList aria-label="Sections" scrollable>
+          {["Mailboxes", "Appearance", "Identity", "Privacy", "Assistant", "Notifications"].map((label) => (
+            <TabsTrigger key={label} value={label.toLowerCase()}>{label}</TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
     </Frame>
   ),
   badge: () => (

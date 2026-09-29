@@ -1233,6 +1233,32 @@
       ]
     },
     {
+      "name": "item",
+      "type": "registry:ui",
+      "title": "Item",
+      "description": "shadcn's item, backed by @fabrials/ui. A record row for master-detail panes: one stretched target, controls above it, current and selected fills, unread weight.",
+      "author": "Fabrials <admin@grokinsider.net>",
+      "dependencies": [
+        "@fabrials/ui@^0.8.0"
+      ],
+      "registryDependencies": [
+        "https://ui.fabrials.com/r/styles.json"
+      ],
+      "meta": {
+        "source": "shim",
+        "tier": "fabrials",
+        "license": "MIT",
+        "category": "Shims",
+        "shadcn": "item"
+      },
+      "files": [
+        {
+          "path": "registry/shims/item.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "kbd",
       "type": "registry:ui",
       "title": "Kbd",
@@ -1410,6 +1436,32 @@
       "files": [
         {
           "path": "registry/shims/radio-group.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "resizable",
+      "type": "registry:ui",
+      "title": "Resizable panes",
+      "description": "shadcn's resizable, backed by @fabrials/ui. Panes with draggable, keyboard-operable handles: navigation, list and reader.",
+      "author": "Fabrials <admin@grokinsider.net>",
+      "dependencies": [
+        "@fabrials/ui@^0.8.0"
+      ],
+      "registryDependencies": [
+        "https://ui.fabrials.com/r/styles.json"
+      ],
+      "meta": {
+        "source": "shim",
+        "tier": "fabrials",
+        "license": "MIT",
+        "category": "Shims",
+        "shadcn": "resizable"
+      },
+      "files": [
+        {
+          "path": "registry/shims/resizable.tsx",
           "type": "registry:ui"
         }
       ]

@@ -150,6 +150,8 @@ Operational screens (consoles, trackers, mail, admin) use a shell with persisten
 - `WorkspaceShell`: `navigation` slot, `header` slot and a `main` with a skip link. The host renders its own `aside`/`nav` and phone sheet.
 - `SidebarProvider` + `Sidebar` + `SidebarInset`: the shadcn-style sidebar with groups, badges, an icon-collapsed state (`collapsible="icon"`, Ctrl/Cmd+B) and a sheet below 768 px.
 
+Recipes for a mail-style workspace (0.8): the top bar is `AppHeader` (56 px, no blur; `brand`, `navigation`, a `command` slot and `actions`); it answers to its own width, so nothing in it uses the viewport. Below it the panes are `ResizablePanelGroup` with a 1 px `ResizableHandle` (name every handle; a `minSize` in rem keeps a pane usable). Navigation in a pane, a sheet or a popover is `SidebarMenu` rows of `size="touch"` (no provider); which mailbox or project you are in is a `NavSwitcher` above them. Records in the list pane are `ItemGroup` and `Item stretch` rows; the open one is `current` (soft Stormlight fill, 2 px bar), a picked one is `selected`. A settings dialog with a section rail is `Tabs orientation="vertical"` (`scrollable` on a phone), and the sections in its panel are `SettingsSection`s that follow the panel's width.
+
 ```tsx
 import {
   Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, Button, CollectionToolbar, Input, PageHeader, ProductLockup,

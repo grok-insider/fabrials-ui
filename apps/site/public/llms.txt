@@ -68,6 +68,7 @@ Namespace: add "registries": { "@fabrials": "https://ui.fabrials.com/r/{name}.js
 - hover-card: npx shadcn@latest add https://ui.fabrials.com/r/hover-card.json
 - input: npx shadcn@latest add https://ui.fabrials.com/r/input.json
 - input-group: npx shadcn@latest add https://ui.fabrials.com/r/input-group.json
+- item: npx shadcn@latest add https://ui.fabrials.com/r/item.json
 - kbd: npx shadcn@latest add https://ui.fabrials.com/r/kbd.json
 - label: npx shadcn@latest add https://ui.fabrials.com/r/label.json
 - native-select: npx shadcn@latest add https://ui.fabrials.com/r/native-select.json
@@ -75,6 +76,7 @@ Namespace: add "registries": { "@fabrials": "https://ui.fabrials.com/r/{name}.js
 - pagination: npx shadcn@latest add https://ui.fabrials.com/r/pagination.json
 - popover: npx shadcn@latest add https://ui.fabrials.com/r/popover.json
 - radio-group: npx shadcn@latest add https://ui.fabrials.com/r/radio-group.json
+- resizable: npx shadcn@latest add https://ui.fabrials.com/r/resizable.json
 - scroll-area: npx shadcn@latest add https://ui.fabrials.com/r/scroll-area.json
 - select: npx shadcn@latest add https://ui.fabrials.com/r/select.json
 - separator: npx shadcn@latest add https://ui.fabrials.com/r/separator.json

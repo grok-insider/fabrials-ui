@@ -37,6 +37,12 @@ import { ChatMessage, ChatComposer } from "@fabrials/ai-ui";         // needs @f
 | Sections of a record, each with its URL | `NavTabs` + `NavTab` | `Tabs` |
 | An icon-only action | `IconButton` (a name, a tooltip, 44 px) | An icon `Button` with a `title` or no name |
 | Several actions in one row that people arrow through | `Toolbar` + `ToolbarButton` (one tab stop) | A row of tabbable buttons in a `div role="group"` |
+| A list of records next to a detail pane (messages, contacts, copies) | `ItemGroup` + `Item stretch` (`ItemLink`, `ItemCheck`, `ItemActions`) | A `Table` with a click handler on the row, a hand-made stretched link |
+| The top bar of an app (brand, navigation, command, session controls) | `AppHeader` with `AppHeaderBrand`, `AppHeaderNav` and `AppHeaderLink` | A `SiteHeader` (that is for a public site) or a flex row per product |
+| Navigation rows without a shell (a pane, a popover, a sheet) | `SidebarMenu` + `SidebarMenuButton size="touch"` (no provider needed) | A hand-made `nav-row` with its own current bar |
+| Which mailbox, workspace or project you are in | `NavSwitcher` | A `Select`, a menu of links |
+| Panes the person can resize | `ResizablePanelGroup` + `ResizableHandle label` | A hand-made drag handle, a library used directly |
+| A settings dialog with a section rail, or many tabs on a phone | `Tabs orientation="vertical"`, `TabsList scrollable` | Wrapping tabs on two rows, a custom scroller |
 | A file picker | `FileInput` | A bare `<input type="file">` showing the browser's own text |
 | A form with subsections | `FieldSet` + `FieldLegend` + `FieldGroup` | A bordered box per subsection, a `div` with a bold label |
 | Show or hide detail in place, with no state | `Disclosure` (native `details`) | A hand-styled `details`, an `Accordion` for one block |
@@ -118,7 +124,8 @@ Triggers take `render` to become a Fabrials button: `<DialogTrigger render={<But
 | Component | Use for |
 | --- | --- |
 | `Table` (`TableHeader`, `TableBody`, `TableFooter`, `TableRow`, `TableHead`, `TableCell`, `TableCaption`) | Records. `aria-label` names the scroll region; `numeric` right-aligns figures; `stickyHeader` for long tables |
-| `Tabs` (`TabsList`, `TabsTrigger`, `TabsContent`) | Peer panels on one page; not steps |
+| `Tabs` (`TabsList`, `TabsTrigger`, `TabsContent`) | Peer panels on one page; not steps. `orientation="vertical"` is a rail (sidebar surface, 2 px Stormlight bar); `TabsList scrollable` (`true`, or `"narrow"` below 48rem) is one line that scrolls, snaps and keeps the selected tab in view |
+| `ItemGroup`, `Item` (`stretch`, `current`, `selected`, `unread`), `ItemLink`, `ItemMedia`, `ItemContent`, `ItemTitle`, `ItemDescription`, `ItemActions`, `ItemControl`, `ItemCheck`, `ItemUnread`, `ItemHeader`, `ItemFooter`, `ItemSeparator` | Records as rows: one stretched target, controls above it, a soft Stormlight fill and 2 px bar for the open record, the focus ring inside the row, the actions wrapping under the text in a narrow list |
 | `Badge` | A short status or fact as a 3 px tag: `tone` `neutral`, `info`, `success`, `warning`, `danger`; `variant` `soft`, `outline` (facts such as a license or version), `solid`; `dot` (`"hollow"` for an archived item), `dotColor`, `truncate`; `--fui-badge-solid` (tint, hairline, dot) and `--fui-badge-ink` (text) are public properties for a tag coloured by data, set on the badge itself (a class or `style`) |
 | `Alert` (`AlertTitle`, `AlertDescription`, `AlertAction`) | A status that stays on the page: `variant` `default`, `info`, `success`, `warning`, `destructive`; `layout="inline"` for a one-line notice from 48rem of its own width (fills its container; not for status that refreshes) |
 | `Card` (`CardHeader`, `CardTitle`, `CardDescription`, `CardAction`, `CardContent`, `CardFooter`) | One bounded summary; a panel around a chart. Not for lists of peers, not nested |
@@ -145,8 +152,11 @@ Triggers take `render` to become a Fabrials button: `<DialogTrigger render={<But
 | Component | Use for |
 | --- | --- |
 | `SiteHeader` | The top bar of a public site (see layout.md) |
+| `AppHeader` (`AppHeaderBrand`, `AppHeaderLogo`, `AppHeaderNav`, `AppHeaderLink`, `AppHeaderAction`, `AppHeaderLabel`, `AppHeaderCaret`, `AppHeaderPlaceholder`) | The top bar of an application: one 56 px row, no blur; modes follow the header's own width (48rem, 72rem, wrap at 19rem); the command slot is the container `command` with a definite width |
+| `NavSwitcher` (`NavSwitcherTrigger`, `NavSwitcherContent`, `NavSwitcherItem`, `NavSwitcherSeparator`) | "Where am I": a trigger with mark, title, description and tag, and a popover that is a `nav` list of links with `aria-current`, a status per item and a footer; `layout="block"` or `"inline"` |
+| `ResizablePanelGroup`, `ResizablePanel`, `ResizableHandle` (`label`), `useResizableGroupRef` | Resizable panes: a hairline with a 3 px Stormlight line on hover, drag and focus; save in `onLayoutChanged` when `meta.isUserInteraction` (a double click reset counts) |
 | `NavigationMenu` (`NavigationMenuList`, `NavigationMenuItem`, `NavigationMenuTrigger`, `NavigationMenuContent`, `NavigationMenuLink`) | Grouped top-level links on public sites |
-| `Sidebar` family (`SidebarProvider`, `Sidebar`, `SidebarHeader`, `SidebarContent`, `SidebarGroup`, `SidebarGroupLabel`, `SidebarGroupContent`, `SidebarMenu`, `SidebarMenuItem`, `SidebarMenuButton`, `SidebarMenuBadge`, `SidebarMenuSub`, `SidebarFooter`, `SidebarRail`, `SidebarTrigger`, `SidebarInset`, `SidebarMenuSkeleton`) | Persistent app navigation; a sheet below 768 px |
+| `Sidebar` family (`SidebarProvider`, `Sidebar`, `SidebarHeader`, `SidebarContent`, `SidebarGroup`, `SidebarGroupLabel`, `SidebarGroupContent`, `SidebarMenu`, `SidebarMenuItem`, `SidebarMenuButton`, `SidebarMenuBadge`, `SidebarMenuSub`, `SidebarFooter`, `SidebarRail`, `SidebarTrigger`, `SidebarInset`, `SidebarMenuSkeleton`) | Persistent app navigation; a sheet below 768 px. The menu parts work without a provider: `size="touch"` is a 44 px row, the count goes inside the link. `SidebarProvider` takes `keyboardShortcut` (ignored in editors) and `persist`; `Sidebar labels`, `SidebarTrigger label` and `SidebarRail label` are for translation |
 | `Breadcrumb` (`BreadcrumbList`, `BreadcrumbItem`, `BreadcrumbLink`, `BreadcrumbPage`, `BreadcrumbSeparator`, `BreadcrumbEllipsis`) | Where the page sits; also as `PageHeader` `eyebrow` |
 | `NavTabs`, `NavTab` | Linked sections of one record (`current`, `count`) |
 | `Pagination` (`PaginationContent`, `PaginationItem`, `PaginationLink`, `PaginationPrevious`, `PaginationNext`, `PaginationEllipsis`) | Numbered pages, only when numbers mean something |
@@ -190,12 +200,12 @@ Chart colours come from `--chart-1` to `--chart-6`; the first series reads as St
 | Component | Use for |
 | --- | --- |
 | `WorkspaceShell` | App shell with `navigation` and `header` slots and a skip link |
-| `PageHeader` | `title`, `description`, `actions`, `eyebrow` (sentence-case context such as a breadcrumb) |
-| `SectionHeader` | `title`, `description`, `actions` for a section |
+| `PageHeader` | `title`, `description`, `actions`, `eyebrow` (sentence-case context such as a breadcrumb); `headingLevel`, `headingRef`, `headingProps` when a page above owns the h1 or code moves focus to the heading |
+| `SectionHeader` | `title`, `description`, `actions` for a section; the same heading controls |
 | `CollectionToolbar` | `search`, `filters`, `actions`, with a group `label` |
 | `BulkActions` | `count` and actions; renders nothing until `count` is at least 1 |
 | `StatePanel` | `state` `loading`, `empty`, `error`, `stale`, `offline`, `success`; `title`, `description`, `actions`; `align` `start` (default) or `center`; `size="sm"` (16 px, for embedded regions), `variant="inline"` (no border or tint, for overlays), `fill` (fills a region with a height and centres) |
-| `SettingsSection` | A settings row: `title`, `description`, `status`, controls as children |
+| `SettingsSection` | A settings row: `title`, `description`, `status`, controls as children; two columns from 36rem of its OWN width (`layout="stacked"` opts out), so it is right in a sheet, a dialog and a page; `headingLevel`, `headingRef`, `headingProps` |
 | `SuggestionCard`, `SuggestionGrid` | Prompts in an empty chat or workspace (grid on wide screens, a scroll row on narrow) |
 | `AuthLayout` | Sign-in: `brand`, `title`, `description`, form as children, `footer`, `aside` |
 

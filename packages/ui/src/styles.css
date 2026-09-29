@@ -3,6 +3,7 @@
   :where(
     .fui-workspace,
     .fui-site-header,
+    .fui-app-header,
     .fui-auth,
     .fui-dialog,
     .fui-menu,
@@ -1236,6 +1237,157 @@
     transform: scale(0.97);
   }
 
+  /* ------------------------------------------------------ nav switcher (0.8)
+     "Where am I": a bordered trigger (block) or a quiet one (inline) and a popover that is a list of links. The rows are
+     sidebar menu buttons of size touch, so the band, the bar and the focus ring are the navigation rows'; here they read
+     --accent because --sidebar-accent is nearly --popover in dark. */
+  .fui-nav-switcher-trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--fui-space-2-5);
+    min-block-size: 3.5rem;
+    padding: var(--fui-space-1-5) var(--fui-space-2);
+    border: 1px solid var(--border);
+    border-radius: var(--fui-radius-md);
+    background: var(--card);
+    color: var(--foreground);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+    transition: background-color var(--fui-duration-fast) var(--fui-ease);
+  }
+  [data-density="compact"] .fui-nav-switcher-trigger[data-layout="block"] {
+    min-block-size: 3rem;
+  }
+  .fui-nav-switcher-trigger[data-layout="block"] {
+    container: nav-switcher / inline-size;
+    inline-size: 100%;
+  }
+  .fui-nav-switcher-trigger[data-layout="inline"] {
+    display: inline-flex;
+    max-inline-size: 100%;
+    min-block-size: var(--fui-control-height-lg);
+    border-color: transparent;
+    background: transparent;
+  }
+  .fui-nav-switcher-trigger[data-popup-open] {
+    background: var(--accent);
+  }
+  @media (hover: hover) {
+    .fui-nav-switcher-trigger:hover {
+      background: var(--accent);
+    }
+  }
+  .fui-nav-switcher-mark {
+    flex: none;
+  }
+  .fui-nav-switcher-mark svg {
+    inline-size: 0.875rem;
+    block-size: 0.875rem;
+  }
+  .fui-nav-switcher-text {
+    display: grid;
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    line-height: 1.25;
+  }
+  .fui-nav-switcher-trigger[data-layout="inline"] .fui-nav-switcher-text {
+    flex: 0 1 auto;
+  }
+  .fui-nav-switcher-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: var(--fui-weight-medium);
+  }
+  .fui-nav-switcher-detail {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+  }
+  .fui-nav-switcher-detail .fui-badge {
+    justify-self: start;
+    margin-block: 0.125rem;
+  }
+  .fui-nav-switcher-tag {
+    flex: none;
+  }
+  .fui-nav-switcher-chevron {
+    flex: none;
+    inline-size: 1rem;
+    block-size: 1rem;
+    color: var(--muted-foreground);
+  }
+  /* A narrow column (a resized pane, 200 % text): the mark gives its room to the name, first when a tag is beside it. */
+  @container nav-switcher (max-width: 17.5rem) {
+    .fui-nav-switcher-mark:has(~ .fui-nav-switcher-tag) {
+      display: none;
+    }
+  }
+  @container nav-switcher (max-width: 15rem) {
+    .fui-nav-switcher-mark {
+      display: none;
+    }
+  }
+  .fui-popover.fui-nav-switcher-popover {
+    --sidebar-accent: var(--accent);
+    --sidebar-accent-foreground: var(--foreground);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    inline-size: max(var(--anchor-width, 0px), 15rem);
+    max-block-size: min(24rem, var(--available-height, 24rem));
+    padding: var(--fui-space-1) 0;
+    overflow: hidden;
+  }
+  /* Only the list scrolls: a footer stays in view under it instead of after ten entries. */
+  .fui-nav-switcher-list {
+    flex: 1 1 auto;
+    min-block-size: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .fui-nav-switcher-list > ul {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0 var(--fui-space-1);
+    list-style: none;
+  }
+  .fui-nav-switcher-popover > :not(.fui-nav-switcher-list) {
+    flex: none;
+  }
+  .fui-nav-switcher-name {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+  .fui-nav-switcher-status {
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+    line-height: var(--fui-leading-xs);
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+  .fui-nav-switcher-check {
+    flex: none;
+    inline-size: 1rem;
+    block-size: 1rem;
+    color: var(--brand-ink);
+  }
+  .fui-nav-switcher-rule {
+    block-size: 1px;
+    margin-block: var(--fui-space-1);
+    background: var(--border);
+    list-style: none;
+  }
+
   /* ---------------------------------------------------------------- dialog */
   .fui-backdrop {
     position: fixed;
@@ -1825,7 +1977,9 @@
   }
   .fui-tabs-indicator {
     position: absolute;
-    bottom: -1px;
+    pointer-events: none; /* it sits over the edge of the active tab: it must not take the pointer, or the tab's real target is short */
+    /* Anchored to the active tab's own bottom edge (not the list's), so a list that wraps onto two rows still underlines the right one. */
+    top: calc(var(--active-tab-top) + var(--active-tab-height) - 1px);
     left: 0;
     height: 2px;
     width: var(--active-tab-width);
@@ -1898,6 +2052,351 @@
   .fui-tab-panel {
     padding-top: var(--fui-space-5);
     outline: none;
+  }
+  /* 0.8: tabs for a vertical rail and a one-line strip that scrolls. The rail sits on the sidebar surface (its current
+     row is --sidebar-accent, a 2 px Stormlight bar on the inline-start edge); the strip keeps the underline. */
+  .fui-tabs[data-orientation="vertical"] {
+    display: grid;
+    grid-template-columns: minmax(10rem, 13rem) minmax(0, 1fr);
+    min-inline-size: 0;
+    min-block-size: 0;
+  }
+  .fui-tabs-list[data-orientation="vertical"] {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-content: start;
+    gap: 2px;
+    padding: var(--fui-space-3);
+    border-bottom: 0;
+    border-inline-end: 1px solid var(--sidebar-border);
+    background: var(--sidebar);
+    overflow-y: auto;
+  }
+  .fui-tabs-list[data-orientation="vertical"] .fui-tab {
+    justify-content: flex-start;
+    inline-size: 100%;
+    min-block-size: var(--fui-control-height-lg);
+    border-radius: var(--fui-radius-md);
+    text-align: start;
+    white-space: nowrap;
+  }
+  .fui-tabs-list[data-orientation="vertical"] .fui-tab:focus-visible {
+    outline-offset: -2px;
+  }
+  .fui-tabs-list[data-orientation="vertical"] .fui-tab[data-active] {
+    background: var(--sidebar-accent);
+    color: var(--sidebar-accent-foreground);
+  }
+  .fui-tabs-list[data-orientation="vertical"] .fui-tabs-indicator {
+    top: 0;
+    bottom: auto;
+    left: auto;
+    inset-inline-start: 0;
+    width: var(--fui-bar);
+    height: var(--active-tab-height);
+    translate: 0 var(--active-tab-top);
+    border-radius: 0;
+    background: var(--brand-ink);
+  }
+  .fui-tabs-list[data-scrollable="always"] {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
+  .fui-tabs-list[data-scrollable="always"]::-webkit-scrollbar {
+    display: none;
+  }
+  .fui-tabs-list[data-scrollable="always"] .fui-tab {
+    flex: none;
+    scroll-snap-align: center;
+    white-space: nowrap;
+  }
+  /* The list scrolls, so the indicator moves inside its box and the ring stays inside the tab (an outline would be clipped). */
+  .fui-tabs-list[data-scrollable="always"] .fui-tabs-indicator {
+    top: calc(var(--active-tab-top) + var(--active-tab-height) - 2px);
+  }
+  .fui-tabs-list[data-scrollable="always"] .fui-tab:focus-visible {
+    outline-offset: -2px;
+  }
+  @media (max-width: 47.99rem) {
+    .fui-tabs-list[data-scrollable="narrow"] {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x proximity;
+      scrollbar-width: none;
+    }
+    .fui-tabs-list[data-scrollable="narrow"]::-webkit-scrollbar {
+      display: none;
+    }
+    .fui-tabs-list[data-scrollable="narrow"] .fui-tab {
+      flex: none;
+      scroll-snap-align: center;
+      white-space: nowrap;
+    }
+    .fui-tabs-list[data-scrollable="narrow"] .fui-tabs-indicator {
+      top: calc(var(--active-tab-top) + var(--active-tab-height) - 2px);
+    }
+    .fui-tabs-list[data-scrollable="narrow"] .fui-tab:focus-visible {
+      outline-offset: -2px;
+    }
+  }
+
+  /* ---------------------------------------------------------- items (0.8)
+     A record row for master-detail panes (shadcn's Item names, Open Email's geometry). The root carries only the row:
+     a 44 px minimum, a hairline below, hover, current and selected. Layout of the slots applies only when they are direct
+     children, so a host that draws its own grid inside the row adds nothing. Pseudo-elements stay disjoint: the bar of the
+     current row is the ROW's ::before, the stretched target and its focus ring are the LINK's ::after. Never give a slot
+     (content, title) position, transform, contain or filter: it would become the containing block of the stretched target. */
+  .fui-item-group {
+    container: fui-item-group / inline-size;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .fui-item-group[data-bordered] {
+    border-block-start: 1px solid var(--border);
+  }
+  .fui-item {
+    position: relative;
+    box-sizing: border-box;
+    min-block-size: var(--fui-control-height-lg);
+    border-block-end: 1px solid var(--border);
+    color: var(--foreground);
+    transition: background-color var(--fui-duration-fast) var(--fui-ease);
+  }
+  .fui-item:is([data-current], [data-selected]),
+  .fui-item:has(.fui-item-check :checked) {
+    background: var(--brand-soft);
+  }
+  .fui-item[data-current]::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    inline-size: var(--fui-bar);
+    background: var(--brand-ink);
+    pointer-events: none;
+  }
+  .fui-item[data-variant="outline"] {
+    border: 1px solid var(--border);
+    border-radius: var(--fui-radius-md);
+  }
+  .fui-item[data-variant="muted"] {
+    border-color: transparent;
+    border-radius: var(--fui-radius-md);
+    background: color-mix(in oklab, var(--muted) 50%, transparent);
+  }
+  .fui-item-link {
+    color: inherit;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+  button.fui-item-link {
+    appearance: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+  .fui-item[data-stretch] :is(.fui-item-link, .fui-item-title :is(a, button))::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+  /* The ring is drawn on the pseudo-element, inside the row, so a scroll container can never clip it. */
+  .fui-item[data-stretch] :is(.fui-item-link, .fui-item-title :is(a, button)):focus-visible {
+    outline: 0;
+  }
+  .fui-item[data-stretch] :is(.fui-item-link, .fui-item-title :is(a, button)):focus-visible::after {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: -2px;
+  }
+  .fui-item:has(
+      > :is(.fui-item-media, .fui-item-content, .fui-item-actions, .fui-item-header, .fui-item-footer)
+    ) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--fui-space-1) var(--fui-space-3);
+    padding: var(--fui-row-padding) var(--fui-space-4);
+  }
+  .fui-item[data-size="sm"]:has(> :is(.fui-item-media, .fui-item-content, .fui-item-actions)) {
+    gap: var(--fui-space-1) var(--fui-space-2);
+    padding: var(--fui-space-2) var(--fui-space-3);
+  }
+  .fui-item-media {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+  }
+  .fui-item-media[data-variant="icon"] {
+    inline-size: 2rem;
+    block-size: 2rem;
+    border: 1px solid var(--border);
+    border-radius: var(--fui-radius-md);
+    background: var(--muted);
+    color: var(--muted-foreground);
+  }
+  .fui-item-media[data-variant="icon"] svg {
+    inline-size: 1rem;
+    block-size: 1rem;
+  }
+  .fui-item-media[data-variant="image"] {
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+    overflow: hidden;
+    border-radius: var(--fui-radius-md);
+  }
+  .fui-item-media[data-variant="image"] img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+  .fui-item-content {
+    display: grid;
+    flex: 1 1 0;
+    gap: 2px;
+    min-inline-size: 0;
+  }
+  .fui-item-title {
+    min-inline-size: 0;
+    margin: 0; /* a heading rendered as the title has no browser margins */
+    font-size: var(--fui-text-sm);
+    font-weight: var(--fui-weight-medium);
+    line-height: var(--fui-leading-sm);
+    overflow-wrap: anywhere;
+  }
+  .fui-item[data-unread] .fui-item-title {
+    font-weight: var(--fui-weight-semibold);
+  }
+  .fui-item-description {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    margin: 0;
+    overflow: hidden;
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+    line-height: var(--fui-leading-xs);
+    overflow-wrap: anywhere;
+  }
+  .fui-item-control {
+    position: relative;
+    z-index: 1;
+  }
+  .fui-item-actions {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--fui-space-1);
+  }
+  .fui-item-check {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    inline-size: var(--fui-control-height-lg);
+    min-block-size: var(--fui-control-height-lg);
+    cursor: pointer;
+  }
+  .fui-item-unread {
+    flex: none;
+    inline-size: 0.375rem;
+    block-size: 0.375rem;
+    border-radius: 1px;
+    background: var(--foreground);
+  }
+  .fui-item-header,
+  .fui-item-footer {
+    display: flex;
+    flex-basis: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--fui-space-2);
+  }
+  .fui-item-separator {
+    block-size: 1px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: var(--border);
+    list-style: none;
+  }
+  .fui-item:has(+ .fui-item-separator) {
+    border-block-end: 0;
+  }
+  /* A narrow list (a phone pane, 200 % text): the actions wrap under the text instead of squeezing it. */
+  @container fui-item-group (max-width: 24rem) {
+    .fui-item > .fui-item-actions {
+      flex-basis: 100%;
+      justify-content: flex-start;
+    }
+  }
+  @media (hover: hover) {
+    .fui-item[data-stretch]:not([data-current], [data-selected]):not(:has(.fui-item-check :checked)):hover {
+      background: var(--accent);
+    }
+  }
+  @media (forced-colors: active) {
+    .fui-item[data-current]::before {
+      background: Highlight;
+    }
+  }
+
+  /* ------------------------------------------------------ resizable panes (0.8)
+     A hairline; a 3 px Stormlight line on hover, drag and keyboard focus. The outline goes because it would draw a 5 px rail
+     around a 1 px separator; the line itself is the indicator (forced colours get an outline back). */
+  .fui-resizable-group {
+    min-height: 0;
+    min-width: 0;
+  }
+  .fui-resizable-handle {
+    position: relative;
+    flex: none;
+    inline-size: 1px;
+    background: var(--border);
+    outline: 0;
+  }
+  .fui-resizable-handle[aria-orientation="horizontal"] {
+    inline-size: auto;
+    block-size: 1px;
+  }
+  .fui-resizable-handle:is([data-separator="hover"], [data-separator="active"], [data-separator="focus"]) {
+    background: var(--ring);
+    box-shadow: 0 0 0 1px var(--ring);
+  }
+  .fui-resizable-handle[data-separator="disabled"] {
+    background: transparent;
+  }
+  .fui-resizable-grip {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: 0.75rem;
+    block-size: 1.5rem;
+    translate: -50% -50%;
+    border: 1px solid var(--fui-control-border);
+    border-radius: var(--fui-radius-xs);
+    background: var(--card);
+  }
+  .fui-resizable-handle[aria-orientation="horizontal"] .fui-resizable-grip {
+    inline-size: 1.5rem;
+    block-size: 0.75rem;
+  }
+  @media (forced-colors: active) {
+    .fui-resizable-handle:is([data-separator="hover"], [data-separator="active"], [data-separator="focus"]) {
+      outline: 3px solid Highlight;
+    }
   }
 
   /* ------------------------------------------------------------- accordion */
@@ -2477,7 +2976,8 @@
     flex: 1 1 16rem;
     min-width: 0;
   }
-  .fui-page-heading h1 {
+  .fui-page-heading h1,
+  .fui-page-title {
     margin: 0;
     font-family: var(--fui-font-display);
     font-size: var(--fui-text-title);
@@ -2486,6 +2986,12 @@
     letter-spacing: var(--fui-tracking-tight);
     overflow-wrap: anywhere;
     text-wrap: balance;
+  }
+  /* A heading a host focuses from code (tabIndex -1) shows where focus went. */
+  :is(.fui-page-title, .fui-section-title, .fui-settings-section-title):focus-visible {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: 2px;
+    border-radius: var(--fui-radius-sm);
   }
   .fui-description {
     margin: 0;
@@ -2509,6 +3015,7 @@
     margin-bottom: var(--fui-space-3);
   }
   .fui-section-header h2,
+  .fui-section-title,
   .fui-state-panel :is(h2, h3, h4) {
     margin: 0;
     font-size: var(--fui-text-md);
@@ -2731,6 +3238,238 @@
   }
   .fui-site-mobile-menu {
     display: none;
+  }
+
+  /* ---------------------------------------------------- application header (0.8)
+     One row of 56 px with a hairline below, no blur, spanning the window, its content on the page gutter. Modes are container
+     queries in rem on the header's own width (the pane-mode numbers, 48rem and 72rem), so text zoom collapses the header
+     instead of overflowing it. The command slot is the size container `command`: a palette trigger fills it and switches
+     between its icon and its label from its width. */
+  .fui-app-header {
+    container: app-header / inline-size;
+    position: relative;
+    z-index: var(--fui-z-sticky);
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--background);
+  }
+  .fui-app-header[data-sticky] {
+    position: sticky;
+    top: 0;
+  }
+  .fui-app-header-inner {
+    display: flex;
+    flex-wrap: nowrap; /* wraps only in the last mode below: very large text on a phone */
+    align-items: center;
+    column-gap: var(--fui-space-1);
+    min-height: var(--fui-header-height);
+    padding-left: max(var(--fui-page-padding), env(safe-area-inset-left));
+    padding-right: max(var(--fui-page-padding), env(safe-area-inset-right));
+  }
+  /* Never shrinks: the brand name is what gives way. */
+  .fui-app-header-actions {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--fui-space-1);
+    margin-inline-start: auto;
+  }
+  /* The link grows into the gutter so the mark itself starts on it (the panes below align their icons to the same x).
+     A long name gives way with an ellipsis, the mark never does. */
+  .fui-app-header-brand {
+    display: inline-flex;
+    align-items: center;
+    flex: 0 1 auto;
+    min-width: var(--fui-control-height-lg);
+    min-height: var(--fui-control-height-lg);
+    margin-inline: calc(var(--fui-space-2) * -1) var(--fui-space-2);
+    padding-inline: var(--fui-space-2);
+    border-radius: var(--fui-radius-md);
+    color: var(--foreground);
+    text-decoration: none;
+  }
+  .fui-app-header-brand .fui-lockup {
+    min-width: 0;
+  }
+  .fui-app-header-logo {
+    display: block;
+    width: auto;
+    height: 1.5rem;
+    max-width: 9rem;
+    object-fit: contain;
+  }
+  .fui-lockup[data-size="sm"] .fui-app-header-logo {
+    height: 1.125rem;
+    max-width: 6rem;
+  }
+  .fui-lockup[data-size="lg"] .fui-app-header-logo {
+    height: 2rem;
+    max-width: 12rem;
+  }
+  /* Primary navigation: plain links. The current one is full ink plus a 2 px Stormlight bar that sits on the header hairline. */
+  .fui-app-header-nav {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--fui-space-0-5);
+    margin-inline-start: var(--fui-space-4);
+  }
+  .fui-app-header-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--fui-space-2);
+    min-height: var(--fui-control-height-lg);
+    min-width: var(--fui-control-height-lg);
+    padding-inline: var(--fui-space-3);
+    border-radius: var(--fui-radius-md);
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-sm);
+    font-weight: var(--fui-weight-medium);
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+      color var(--fui-duration) var(--fui-ease),
+      background-color var(--fui-duration) var(--fui-ease);
+  }
+  .fui-app-header-link svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+  .fui-app-header-link[aria-current="page"] {
+    color: var(--foreground);
+  }
+  .fui-app-header-link[aria-current="page"]::after {
+    content: "";
+    position: absolute;
+    inset-inline: var(--fui-space-2);
+    bottom: calc((var(--fui-control-height-lg) - var(--fui-header-height)) / 2 - 1px);
+    height: var(--fui-bar);
+    background: var(--brand-ink);
+  }
+  @media (hover: hover) {
+    .fui-app-header-link:hover {
+      background: var(--accent);
+      color: var(--foreground);
+    }
+  }
+  @media (forced-colors: active) {
+    .fui-app-header-link[aria-current="page"]::after {
+      background: Highlight;
+    }
+  }
+  /* Command slot: the header sizes it, the palette fills it. Its width is DEFINITE, not only a flex-basis: the slot is a size
+     container, and Firefox and WebKit size the actions cluster (auto width) from the item's content, ignoring the basis, so the
+     cluster came out too narrow and the header overflowed. Every mode below sets `width`, never a basis alone. */
+  .fui-app-header-command {
+    container: command / inline-size;
+    flex: none;
+    width: var(--fui-control-height-lg);
+    min-width: 0;
+  }
+  /* The box of a control that is not there yet: same size, so nothing shifts. */
+  .fui-app-header-placeholder {
+    display: block;
+    flex: none;
+    width: var(--fui-control-height-lg);
+    height: var(--fui-control-height-lg);
+  }
+  /* .fui-button[data-size] outranks a lone class, so the action names the button as well. */
+  .fui-button.fui-app-header-action {
+    flex: 0 1 auto;
+    gap: var(--fui-space-2);
+    min-width: var(--fui-control-height-lg);
+    padding-inline: var(--fui-space-2);
+  }
+  .fui-app-header-label {
+    min-width: 0;
+    max-width: 14rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .fui-app-header-caret {
+    color: var(--muted-foreground);
+  }
+  /* Header modes */
+  @container app-header (max-width: 47.99rem) {
+    .fui-app-header-inner {
+      column-gap: 0;
+    }
+    .fui-app-header-brand {
+      margin-inline-end: 0;
+    }
+    .fui-app-header-nav {
+      margin-inline-start: 0;
+    }
+    .fui-app-header-link {
+      padding-inline: 0;
+    }
+    .fui-app-header-link > span,
+    .fui-app-header-label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+    .fui-app-header-caret {
+      display: none;
+    }
+    .fui-button.fui-app-header-action:has(> .fui-app-header-label) {
+      padding-inline: 0;
+      aspect-ratio: 1;
+    }
+    .fui-app-header-link[aria-current="page"]::after {
+      inset-inline: var(--fui-space-1-5);
+    }
+  }
+  @container app-header (min-width: 72rem) {
+    .fui-app-header-command {
+      width: 14rem;
+    }
+  }
+  @container app-header (min-width: 90rem) {
+    .fui-app-header-command {
+      width: 18rem;
+    }
+  }
+  @container app-header (min-width: 120rem) {
+    .fui-app-header-command {
+      width: 22rem;
+    }
+  }
+  /* Phones: a wide logo gives way before the controls do (the row is nowrap and every control keeps its 44 px). */
+  @container app-header (max-width: 30rem) {
+    .fui-app-header-logo {
+      max-width: 4.5rem;
+    }
+  }
+  /* Narrow boxes: the name gives way first, then the row wraps in two (only reached by very large text). */
+  @container app-header (max-width: 24rem) {
+    .fui-app-header-brand .fui-lockup-text {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+    }
+    .fui-app-header-logo {
+      max-width: 3.5rem;
+    }
+  }
+  @container app-header (max-width: 19rem) {
+    .fui-app-header-inner {
+      flex-wrap: wrap;
+      row-gap: var(--fui-space-1);
+      padding-block: var(--fui-space-1);
+    }
+    .fui-app-header-link[aria-current="page"]::after {
+      bottom: 0;
+    }
   }
 
   .fui-auth {
@@ -3000,6 +3739,10 @@
     padding: 0;
     list-style: none;
   }
+  /* Navigation rows (size touch) carry their own 2 px of transparent border above and below: no gap between them. */
+  .fui-sidebar-menu:has(> .fui-sidebar-menu-item > .fui-sidebar-menu-button[data-size="touch"]) {
+    gap: 0;
+  }
   .fui-sidebar-menu-item {
     position: relative;
   }
@@ -3032,10 +3775,18 @@
     color: var(--muted-foreground);
     transition: color var(--fui-duration) var(--fui-ease);
   }
-  .fui-sidebar-menu-button > span:last-child {
+  .fui-sidebar-menu-button > span:last-child,
+  .fui-sidebar-menu-button > span:has(+ :is(.fui-sidebar-menu-badge, .fui-badge)) {
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  .fui-sidebar-menu-button > span:has(+ :is(.fui-sidebar-menu-badge, .fui-badge)) {
+    flex: 1 1 auto;
+  }
+  .fui-sidebar-menu-button > .fui-badge {
+    flex: none;
   }
   .fui-sidebar-menu-item:has(> .fui-sidebar-menu-action) > .fui-sidebar-menu-button {
     padding-inline-end: 2rem;
@@ -3062,12 +3813,45 @@
   .fui-sidebar-menu-button[data-active]::before {
     content: "";
     position: absolute;
-    top: 0.5rem;
-    bottom: 0.5rem;
-    left: 0;
-    width: 3px;
-    border-radius: 0 3px 3px 0;
-    background: var(--brand);
+    inset-block: 0.5rem;
+    inset-inline-start: 0;
+    width: var(--fui-bar);
+    border-radius: 1px;
+    background: var(--brand-ink);
+  }
+  /* touch: a navigation row. The border box is the 44 px target, the padding box the 40 px band (the transparent block
+     borders are the 2 px above and below), so the focus ring is drawn on the element and hugs the band. */
+  .fui-sidebar-menu-button[data-size="touch"] {
+    --fui-sidebar-inset: var(--fui-space-0-5);
+    height: auto;
+    min-block-size: var(--fui-control-height-lg);
+    gap: var(--fui-space-2-5);
+    padding-inline: var(--fui-space-2);
+    padding-inline-start: calc(var(--fui-space-2) + var(--fui-sidebar-depth, 0) * 0.75rem);
+    border: solid transparent;
+    border-width: var(--fui-sidebar-inset) 0;
+    background-clip: padding-box;
+    line-height: var(--fui-leading-sm);
+  }
+  [data-density="compact"] .fui-sidebar-menu-button[data-size="touch"] {
+    --fui-sidebar-inset: var(--fui-space-1-5);
+  }
+  .fui-sidebar-menu-button[data-size="touch"]:focus-visible {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: calc(-1 * (var(--fui-sidebar-inset) + 2px));
+  }
+  .fui-sidebar-menu-button[data-size="touch"][data-active]::before {
+    inset-block: var(--fui-space-1-5);
+  }
+  /* The icon column stays quiet: a row's state is its fill and bar, not a darker glyph. */
+  .fui-sidebar-menu-button[data-size="touch"] svg,
+  .fui-sidebar-menu-button[data-size="touch"]:hover svg {
+    color: var(--muted-foreground);
+  }
+  @media (forced-colors: active) {
+    .fui-sidebar-menu-button[data-active]::before {
+      background: Highlight;
+    }
   }
   .fui-sidebar-menu-button:disabled,
   .fui-sidebar-menu-button[aria-disabled="true"] {
@@ -3123,6 +3907,14 @@
   }
   .fui-sidebar[data-collapsible="icon"] :is(.fui-sidebar-menu-action, .fui-sidebar-menu-badge, .fui-sidebar-menu-sub) {
     display: none;
+  }
+  /* Inside the button the count is in the row (part of its name), at its end. */
+  .fui-sidebar-menu-button > .fui-sidebar-menu-badge {
+    position: static;
+    flex: none;
+    margin-inline-start: auto;
+    height: auto;
+    padding-inline: 0;
   }
   .fui-sidebar-menu-badge {
     position: absolute;
@@ -4559,13 +5351,21 @@
     overflow-wrap: anywhere;
   }
 
+  /* 0.8: the section is the size container and an inner element is the grid, so the two columns follow the space the section
+     has (a sheet, a dialog, a page) instead of the viewport. inline-size: 100% because a container with inline containment
+     has no intrinsic width. */
   .fui-settings-section {
-    display: grid;
-    gap: var(--fui-space-4);
+    container: fui-settings-section / inline-size;
+    inline-size: 100%;
+    min-inline-size: 0;
     padding-top: var(--fui-space-6);
     border-top: 1px solid var(--border);
     color: var(--foreground);
     font-family: var(--fui-font-sans);
+  }
+  .fui-settings-section-layout {
+    display: grid;
+    gap: var(--fui-space-4);
   }
   .fui-settings-section:first-child {
     padding-top: 0;
@@ -4602,8 +5402,8 @@
   .fui-settings-section-body {
     min-width: 0;
   }
-  @media (min-width: 768px) {
-    .fui-settings-section {
+  @container fui-settings-section (min-width: 36rem) {
+    .fui-settings-section:not([data-layout="stacked"]) > .fui-settings-section-layout {
       grid-template-columns: minmax(0, 13rem) minmax(0, 1fr);
       gap: var(--fui-space-8);
     }

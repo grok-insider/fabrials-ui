@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, type ComponentProps, type ReactNode } from "react";
+import { useId, type ComponentProps, type ReactNode, type Ref } from "react";
 import {
   AlertCircle,
   CheckCircle2,
@@ -11,11 +11,18 @@ import {
 } from "lucide-react";
 import { classes } from "./shared";
 
+export type HeadingLevel = 1 | 2 | 3 | 4;
+/** What a caller may set on the heading element itself: `tabIndex={-1}` so code can focus it, an `id`, a `data-*`. */
+export type HeadingProps = Omit<ComponentProps<"h1">, "children" | "className" | "ref">;
+
 export function PageHeader({
   title,
   description,
   actions,
   eyebrow,
+  headingLevel = 1,
+  headingRef,
+  headingProps,
   className,
 }: {
   title: ReactNode;
@@ -23,13 +30,21 @@ export function PageHeader({
   actions?: ReactNode;
   /** Context above the title, e.g. a Breadcrumb. Sentence case, not a tracked label. */
   eyebrow?: ReactNode;
+  /** The heading element (default 1). The look is the page title's at every level. */
+  headingLevel?: HeadingLevel;
+  /** The heading element, for code that moves focus to it (give it `headingProps={{ tabIndex: -1 }}`). */
+  headingRef?: Ref<HTMLHeadingElement>;
+  headingProps?: HeadingProps;
   className?: string;
 }) {
+  const Heading = `h${headingLevel}` as "h1";
   return (
     <header className={classes("fui-page-header", className)}>
       <div className="fui-page-heading">
         {eyebrow && <div className="fui-eyebrow">{eyebrow}</div>}
-        <h1>{title}</h1>
+        <Heading {...headingProps} ref={headingRef} className="fui-page-title">
+          {title}
+        </Heading>
         {description && <p className="fui-description">{description}</p>}
       </div>
       {actions && <div className="fui-actions">{actions}</div>}
@@ -41,17 +56,28 @@ export function SectionHeader({
   title,
   description,
   actions,
+  headingLevel = 2,
+  headingRef,
+  headingProps,
   className,
 }: {
   title: ReactNode;
   description?: ReactNode;
   actions?: ReactNode;
+  /** The heading element (default 2). The look is the section title's at every level. */
+  headingLevel?: HeadingLevel;
+  /** The heading element, for code that moves focus to it (give it `headingProps={{ tabIndex: -1 }}`). */
+  headingRef?: Ref<HTMLHeadingElement>;
+  headingProps?: HeadingProps;
   className?: string;
 }) {
+  const Heading = `h${headingLevel}` as "h2";
   return (
     <header className={classes("fui-section-header", className)}>
       <div>
-        <h2>{title}</h2>
+        <Heading {...headingProps} ref={headingRef} className="fui-section-title">
+          {title}
+        </Heading>
         {description && <p className="fui-description">{description}</p>}
       </div>
       {actions && <div className="fui-actions">{actions}</div>}

@@ -175,6 +175,21 @@ export const shimIndex: { name: string; exports: string[] }[] = [
     ]
   },
   {
+    "name": "item",
+    "exports": [
+      "Item",
+      "ItemActions",
+      "ItemContent",
+      "ItemDescription",
+      "ItemFooter",
+      "ItemGroup",
+      "ItemHeader",
+      "ItemMedia",
+      "ItemSeparator",
+      "ItemTitle"
+    ]
+  },
+  {
     "name": "kbd",
     "exports": [
       "Kbd",
@@ -237,6 +252,14 @@ export const shimIndex: { name: string; exports: string[] }[] = [
     "exports": [
       "RadioGroup",
       "RadioGroupItem"
+    ]
+  },
+  {
+    "name": "resizable",
+    "exports": [
+      "ResizableHandle",
+      "ResizablePanel",
+      "ResizablePanelGroup"
     ]
   },
   {

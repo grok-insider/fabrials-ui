@@ -27,7 +27,7 @@ Values live in `packages/ui/src/tokens.css`; the reasons in `DESIGN.md`. This fi
 
 Rules:
 
-- **Stormlight is the only interaction colour.** It marks focus, links, checked controls, the current navigation item and the first data series. Check: no blue (`--brand*`, `text-blue-*`, `#2…b3`-style literals) on decorative text, icons, headings, backgrounds, borders or illustrations.
+- **Stormlight is the only interaction colour.** It marks focus, links, checked controls, the current navigation item (a 2 px `--fui-bar` bar on the inline-start edge, or on the header hairline for the current link of `AppHeader`) and the first data series. Check: no blue (`--brand*`, `text-blue-*`, `#2…b3`-style literals) on decorative text, icons, headings, backgrounds, borders or illustrations.
 - **Primary is ink.** `Button variant="default"` is ink on paper (paper on ink in dark). `variant="accent"` (Stormlight fill) at most once per view, only when one action must stand out.
 - **Status travels with a word or icon** and uses the status inks, not the gem or Stormlight.
 - **Crem** `#5a5247` exists only inside the storm's dither ramp. Check: it never appears in CSS or components.

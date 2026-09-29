@@ -48,6 +48,12 @@ const stories: Record<string, string> = {
   "feedback-notices": "fabrials-feedback--notices",
   "feedback-tags": "fabrials-feedback--tags",
   "feedback-text": "fabrials-feedback--text",
+  "structure-items": "fabrials-structure--items",
+  "structure-header": "fabrials-structure--application-header",
+  "structure-header-full": "fabrials-structure--full-width-header",
+  "structure-navigation": "fabrials-structure--navigation",
+  "structure-switcher-open": "fabrials-structure--switcher-open",
+  "structure-sections": "fabrials-structure--sections",
 };
 
 for (const theme of ["light", "dark"]) {

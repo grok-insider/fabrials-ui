@@ -28,6 +28,7 @@ test("generic source only depends on presentation libraries and local modules", 
           "cmdk",
           "embla-carousel-react",
           "motion/react",
+          "react-resizable-panels",
           "recharts",
           "sonner",
         ]);

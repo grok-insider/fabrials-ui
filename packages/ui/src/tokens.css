@@ -64,6 +64,7 @@
   --fui-sidebar-width: 16rem;
   --fui-sidebar-width-icon: 3.5rem;
   --fui-page-padding: 1.5rem;
+  --fui-bar: 2px; /* the bar that marks the current or selected item on its inline-start edge */
   --fui-content: 80rem;
   --fui-content-narrow: 42rem;
 

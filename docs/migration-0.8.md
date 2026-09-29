@@ -176,6 +176,88 @@ array and was announced as the chord "g+i".
 `FileSize` renders a size without ever throwing. `[data-hit="44"]` grows a small control's target to 44 px with a
 pseudo-element (deletable: `.oe-hit`). `formatMinutes` stays a host helper.
 
+### Structure and navigation
+
+#### `Item`, `ItemGroup` and the row parts
+
+A record row for master-detail panes, with shadcn's part names (`Item`, `ItemGroup`, `ItemMedia`, `ItemContent`,
+`ItemTitle`, `ItemDescription`, `ItemActions`, `ItemHeader`, `ItemFooter`, `ItemSeparator`) and the hooks Open Email's
+`.oe-row*` rules had. `ItemGroup` is a `ul` and the size container its rows answer to; `Item` is a `li` in it and a
+`div` alone. `stretch` makes the link or button of the title cover the whole row (`ItemLink`, or a link inside
+`ItemTitle`); `ItemActions`, `ItemControl` and `ItemCheck` sit above it as separate targets; `current` is the soft
+Stormlight fill with a 2 px bar (`--fui-bar`, a new token), `selected` the fill without the bar (a checked native
+checkbox inside an `ItemCheck` does it without JavaScript), `unread` weight 600 with `ItemUnread` for the square.
+The focus ring is drawn on the link's `::after` inside the row, so a scrolling parent never clips it. The row root
+carries only the row (44 px minimum, a hairline below, hover, fills); the slots lay themselves out only when they are
+direct children, so a row that draws its own grid inside (a message row) is untouched. Renames: `.oe-row` to `Item`
+with `stretch`, `.oe-row-link` to `ItemLink`, `.oe-row-check` to `ItemCheck`, `.oe-row-control` to `ItemControl`,
+`.oe-unread` to `ItemUnread`. Deletable: the `.oe-row*` and `.oe-unread` rules of `patterns.css`.
+
+#### `AppHeader` and its parts
+
+`AppHeader({ brand, navigation, command, actions, sticky })` is one 56 px row with a hairline, no blur, its content on
+the page gutter. Parts: `AppHeaderBrand` (44 px link that grows into the gutter), `AppHeaderLogo`, `AppHeaderNav`,
+`AppHeaderLink` (`current`: full ink and a 2 px bar on the hairline), `AppHeaderAction` (a ghost `Button`),
+`AppHeaderLabel`, `AppHeaderCaret`, `AppHeaderPlaceholder`. Modes are container queries on the header (compact below
+48rem, wide from 72rem, the name gives way at 24rem, two rows at 19rem). The command slot is the size container
+`command` with a definite width in every mode (44 px, then 14, 18 and 22rem): Firefox and WebKit size the actions
+cluster from its content and ignore a flex-basis, which made the header overflow. Deletable: the header rules of
+`frame.css` (`.app-header*`, `.app-brand*`, `.app-nav*`, the account and preferences trigger sizing) and
+`ui/app-header.tsx`.
+
+#### Sidebar menu without a provider; shortcut and labels
+
+`SidebarMenu`, `SidebarMenuItem`, `SidebarMenuButton` and `SidebarMenuBadge` render without a `SidebarProvider`
+(expanded, not mobile). `SidebarMenuButton` gains `size="touch"` (a 44 px target around a 40 px band, the focus ring
+inside the band, muted icons; `depth` indents nested rows), and `SidebarMenuBadge` is a `span`: inside the button it
+is a count in the row and part of the link's name. `SidebarProvider` gains `keyboardShortcut` (`string | false`,
+default `"b"`) and `persist` (`false` writes no cookie); the shortcut is now ignored while a person types in a
+field or an editor (it used to swallow Ctrl+B in every editor). `Sidebar` takes `labels`, `SidebarTrigger` and
+`SidebarRail` take `label`. **Visual change:** the active bar of every size is the 2 px Stormlight ink bar
+(`--brand-ink`, inline-start) instead of a 3 px `--brand` bar on the left edge. Deletable: `ui/nav-row.tsx` and the
+`.oe-nav-row*` rules of `navigation.css`.
+
+#### `ResizablePanelGroup`, `ResizablePanel`, `ResizableHandle`
+
+Highstorm resizable panes over `react-resizable-panels` **4.12.4, now a dependency of `@fabrials/ui`** (a product
+that re-vendors 0.8 installs it; Open Email already has it). The handle is a 1 px hairline with a 3 px Stormlight
+line on hover, drag and keyboard focus, transparent when disabled. `resizeTargetMinimumSize` defaults to 10 px for a
+mouse and 24 px for touch. The double-click lesson is built in: the library resets a layout when a double click lands
+anywhere in a handle's hit target and does not call that a user interaction, so a host that saves in `onLayoutChanged`
+kept the stale layout; the group now reports the reset with `meta.isUserInteraction` true, whatever element was hit.
+Names follow shadcn (`ResizablePanelGroup` accepts `direction`, `ResizableHandle` accepts `withHandle`), so the
+shadcn `resizable` shim now exists. Deletable: `ui/primitives/resizable.tsx`, `.oe-resize-handle`, and the
+`onDoubleClick` persistence code of `ui/mail-pane-layout.tsx`.
+
+#### `NavSwitcher`
+
+A trigger that names the current entity (mark, title, description, a tag, chevrons; `layout="block"` or `"inline"`)
+and a popover that is a `nav` list of links (`NavSwitcherItem` with `current`, a status `description`, a `tag`; a
+separator; a `footer` that stays under the scrolling list). It opens on the current link and Escape returns focus to
+the trigger. Deletable: the markup and `.connection-switcher-*` rules of `features/identity/connection-navigation.tsx`.
+
+#### `SettingsSection` follows its container; heading controls
+
+The section is now the size container and an inner `.fui-settings-section-layout` is the grid: two columns (13rem and
+the rest) from 36rem of the SECTION's own width, one column below it, instead of a viewport media query at 768 px.
+`layout="stacked"` opts out. **The section is no longer the grid:** a host rule that set `grid-template-columns`, `gap` or `align-items` on `.fui-settings-section` (to stack it or to change the columns) now does nothing and must target `.fui-settings-section-layout`; `padding`, `border-top` and `margin` on the section still apply. Any product that restyled sections, not only Open Email, should search for `.fui-settings-section` in its CSS. The section takes its width from its parent (`inline-size: 100%`), so keep it in a block,
+grid or column flex parent. **Visual change:** a section in a narrow sheet on a wide screen is now stacked (it used to
+be two columns), and one in a dialog narrower than 36rem too. `PageHeader`, `SectionHeader` and `SettingsSection` take
+`headingLevel` (1 to 4; the look does not change with the level), `headingRef` and `headingProps` (`tabIndex`, `id`,
+`data-*`; a custom `id` keeps `aria-labelledby` right); a focused heading shows a Stormlight ring. Deletable: the
+container overrides of `settings.css`, `tools-shell.css` and `offline.css`, and hand-made headings with the `fui-`
+classes.
+
+#### Tabs: a vertical rail and a scrolling strip
+
+`Tabs orientation="vertical"` makes a rail (the list on the sidebar surface, the current row `--sidebar-accent`, a 2 px
+Stormlight bar on the inline-start edge). `TabsList scrollable` (`true`, or `"narrow"` below 48rem) keeps one line that
+scrolls sideways without a scrollbar, snaps to the tabs and keeps the selected tab in view by scrolling its own box
+(never the page; right to left works), only when the selection changes. `Tabs` now renders a `fui-tabs` class on its
+root. **Visual change:** the underline indicator is anchored to the active tab's own bottom edge, so a list that wraps
+onto two rows underlines the right one; a single row is pixel-identical. Deletable: the rail and strip rules keyed on
+`data-layout` in `settings.css` and the `keepInView` ref callback.
+
 ### Changed behaviour
 
 - `StatePanel`, `RelativeTime` and `Badge` markup changes only when the new props are used, except `RelativeTime`,
@@ -187,3 +269,10 @@ pseudo-element (deletable: `.oe-hit`). `formatMinutes` stays a host helper.
   drop the override, and one that relied on the 38 px painted height should check its rows.
 - `NativeCheckbox` accepts `label`, `labelClassName` and `indeterminate`; without them its markup is
   unchanged (`type="checkbox"` is still accepted).
+- **Sidebar active bar**: 2 px `--brand-ink` on the inline-start edge in every size (was 3 px `--brand` on the left).
+- **`SettingsSection`** answers to its container (36rem), and its DOM gains one wrapper (`.fui-settings-section-layout`).
+- **Tabs**: the underline indicator follows the active tab's own edge; `Tabs` has a `fui-tabs` class.
+- `PageHeader` and `SectionHeader` headings now carry `fui-page-title` and `fui-section-title` classes (their
+  element-based styles still apply).
+- `SidebarMenuBadge` is a `span` (was a `div`).
+- **New dependency**: `react-resizable-panels` 4.12.4.

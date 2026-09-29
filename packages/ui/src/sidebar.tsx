@@ -32,6 +32,7 @@ function useIsMobile() {
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
+const defaultSidebarLabels = { title: "Navigation", description: "Primary navigation for this workspace." };
 
 type SidebarContextProps = {
   state: "expanded" | "collapsed";
@@ -53,10 +54,25 @@ function useSidebar() {
   return context;
 }
 
+const standalone: Pick<SidebarContextProps, "state" | "isMobile"> = { state: "expanded", isMobile: false };
+
+/** The menu parts read only the state, so a list of navigation rows renders without a provider: expanded, not mobile. */
+function useSidebarState() {
+  return React.useContext(SidebarContext) ?? standalone;
+}
+
+/** A field a person types in: the sidebar shortcut leaves the keystroke to it (Ctrl+B is Bold in an editor). */
+function isEditable(target: EventTarget | null) {
+  if (!(target instanceof HTMLElement)) return false;
+  return target.isContentEditable || target.closest("input, textarea, select, [contenteditable]:not([contenteditable='false']), [role='textbox']") !== null;
+}
+
 function SidebarProvider({
   defaultOpen = true,
   open: openProp,
   onOpenChange: setOpenProp,
+  keyboardShortcut = SIDEBAR_KEYBOARD_SHORTCUT,
+  persist = true,
   className,
   style,
   children,
@@ -65,6 +81,10 @@ function SidebarProvider({
   defaultOpen?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /** The key that toggles the sidebar with Ctrl or Command (default `"b"`), or `false` for none. It is ignored while a person types in a field or an editor. */
+  keyboardShortcut?: string | false;
+  /** Remember the state in the `sidebar_state` cookie (default). `false` writes nothing: use it when the host keeps the state. */
+  persist?: boolean;
 }) {
   const isMobile = useIsMobile();
   const [openMobile, setOpenMobile] = React.useState(false);
@@ -75,9 +95,9 @@ function SidebarProvider({
       const openState = typeof value === "function" ? value(open) : value;
       if (setOpenProp) setOpenProp(openState);
       else _setOpen(openState);
-      document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
+      if (persist) document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
     },
-    [setOpenProp, open],
+    [setOpenProp, open, persist],
   );
 
   const toggleSidebar = React.useCallback(() => {
@@ -85,10 +105,14 @@ function SidebarProvider({
   }, [isMobile, setOpen, setOpenMobile]);
 
   React.useEffect(() => {
+    if (keyboardShortcut === false) return;
     const handleKeyDown = (event: KeyboardEvent) => {
       if (
-        event.key === SIDEBAR_KEYBOARD_SHORTCUT &&
-        (event.metaKey || event.ctrlKey)
+        event.key.toLowerCase() === keyboardShortcut.toLowerCase() &&
+        (event.metaKey || event.ctrlKey) &&
+        !event.altKey &&
+        !event.defaultPrevented &&
+        !isEditable(event.target)
       ) {
         event.preventDefault();
         toggleSidebar();
@@ -96,7 +120,7 @@ function SidebarProvider({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [toggleSidebar]);
+  }, [toggleSidebar, keyboardShortcut]);
 
   const state = open ? "expanded" : "collapsed";
   const contextValue = React.useMemo<SidebarContextProps>(
@@ -131,6 +155,7 @@ function Sidebar({
   side = "left",
   variant = "sidebar",
   collapsible = "offcanvas",
+  labels = defaultSidebarLabels,
   className,
   children,
   dir,
@@ -139,6 +164,8 @@ function Sidebar({
   side?: "left" | "right";
   variant?: "sidebar" | "floating" | "inset";
   collapsible?: "offcanvas" | "icon" | "none";
+  /** The name and description the phone sheet announces (screen-reader text, English by default). */
+  labels?: { title: string; description: string };
 }) {
   const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
 
@@ -168,8 +195,8 @@ function Sidebar({
           side={side}
         >
           <SheetHeader className="fui-sr-only">
-            <SheetTitle>Navigation</SheetTitle>
-            <SheetDescription>Primary navigation for this workspace.</SheetDescription>
+            <SheetTitle>{labels.title}</SheetTitle>
+            <SheetDescription>{labels.description}</SheetDescription>
           </SheetHeader>
           <div className="fui-sidebar-inner">{children}</div>
         </SheetContent>
@@ -209,8 +236,12 @@ function SidebarTrigger({
   className,
   onClick,
   children,
+  label = "Toggle navigation",
   ...props
-}: React.ComponentProps<typeof Button>) {
+}: React.ComponentProps<typeof Button> & {
+  /** The button's name (screen-reader text). */
+  label?: string;
+}) {
   const { toggleSidebar, isMobile, openMobile, open } = useSidebar();
   return (
     <Button
@@ -227,21 +258,28 @@ function SidebarTrigger({
       {...props}
     >
       {children ?? <PanelLeftIcon aria-hidden />}
-      <span className="fui-sr-only">Toggle navigation</span>
+      <span className="fui-sr-only">{label}</span>
     </Button>
   );
 }
 
-function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
+function SidebarRail({
+  className,
+  label = "Toggle navigation",
+  ...props
+}: React.ComponentProps<"button"> & {
+  /** The rail's name and tooltip. */
+  label?: string;
+}) {
   const { toggleSidebar } = useSidebar();
   return (
     <button
       data-sidebar="rail"
       data-slot="sidebar-rail"
-      aria-label="Toggle navigation"
+      aria-label={label}
       tabIndex={-1}
       onClick={toggleSidebar}
-      title="Toggle navigation"
+      title={label}
       className={cn("fui-sidebar-rail", className)}
       {...props}
     />
@@ -403,17 +441,22 @@ function SidebarMenuButton({
   isActive = false,
   variant = "default",
   size = "default",
+  depth = 0,
   tooltip,
   className,
+  style,
   ...props
 }: useRender.ComponentProps<"button"> &
   React.ComponentProps<"button"> & {
     isActive?: boolean;
     variant?: "default" | "outline";
-    size?: "default" | "sm" | "lg";
+    /** `touch` is a navigation row: a 44 px target around a 40 px band, a 2 px Stormlight bar when active, the focus ring inside the band. */
+    size?: "default" | "sm" | "lg" | "touch";
+    /** Indent of a nested row (folders in a tree), 0 to 4 steps of 0.75rem, in `touch` rows. */
+    depth?: number;
     tooltip?: string | React.ComponentProps<typeof TooltipContent>;
   }) {
-  const { isMobile, state } = useSidebar();
+  const { isMobile, state } = useSidebarState();
   const comp = useRender({
     defaultTagName: "button",
     props: mergeProps<"button">(
@@ -424,6 +467,7 @@ function SidebarMenuButton({
           className,
         ),
         "aria-current": isActive ? "page" : undefined,
+        style: depth > 0 ? ({ ...style, "--fui-sidebar-depth": Math.min(depth, 4) } as React.CSSProperties) : style,
       },
       props,
     ),
@@ -476,12 +520,17 @@ function SidebarMenuAction({
   });
 }
 
+/**
+ * A count at the end of a row. As a sibling of the menu button it floats over the button's end; INSIDE the button
+ * (a `span`, so it is valid in a link or a button) it takes its place in the row and is part of the link's accessible
+ * name: a screen reader hears "Inbox 12".
+ */
 function SidebarMenuBadge({
   className,
   ...props
-}: React.ComponentProps<"div">) {
+}: React.ComponentProps<"span">) {
   return (
-    <div
+    <span
       data-slot="sidebar-menu-badge"
       data-sidebar="menu-badge"
       className={cn("fui-sidebar-menu-badge", className)}
