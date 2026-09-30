@@ -404,13 +404,17 @@ select {
 .catalogue-combobox {
   max-width: 20rem;
 }
-/* A consumer's bare rule on a menu row name (Navigation labels): it wins over the package's ellipsis rule without !important. */
-.catalogue-wrap-name {
-  overflow-wrap: anywhere;
-  white-space: normal;
-}
-.catalogue-wrap-row {
-  height: auto;
-  min-height: 1.875rem;
-  padding-block: var(--fui-space-1);
+/* A consumer's bare rule on a menu row name (Navigation labels): it wins over the package's ellipsis rule without !important.
+   In the package's own layer, as a host that layers its CSS has it: an unlayered rule beats any layered one whatever its
+   specificity, which would make the story pass with the old (0,2,1) rule too and prove nothing. */
+@layer components {
+  .catalogue-wrap-name {
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+  .catalogue-wrap-row {
+    height: auto;
+    min-height: 1.875rem;
+    padding-block: var(--fui-space-1);
+  }
 }
