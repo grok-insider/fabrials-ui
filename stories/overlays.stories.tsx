@@ -280,8 +280,9 @@ function ModalSheetPage() {
 function CloseVariantPage() {
   return (
     <Page title="Close as an outline" description="The footer Close is a secondary (grey) button by default. A product whose secondary actions are outlines sets closeVariant once on the DialogContent; a DialogFooter closeVariant wins.">
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--fui-space-3)" }}>
       <Dialog defaultOpen>
-        <DialogTrigger render={<Button variant="secondary" style={{ justifySelf: "start" }}>Discard changes</Button>} />
+        <DialogTrigger render={<Button variant="secondary">Discard changes</Button>} />
         <DialogContent close="footer" closeVariant="outline">
           <DialogHeader>
             <DialogTitle>Discard your changes?</DialogTitle>
@@ -294,7 +295,7 @@ function CloseVariantPage() {
         </DialogContent>
       </Dialog>
       <Dialog>
-        <DialogTrigger render={<Button variant="secondary" style={{ justifySelf: "start" }}>Footer wins</Button>} />
+        <DialogTrigger render={<Button variant="secondary">Footer wins</Button>} />
         <DialogContent close="footer" closeVariant="outline">
           <DialogHeader>
             <DialogTitle>The footer decides</DialogTitle>
@@ -305,6 +306,7 @@ function CloseVariantPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      </div>
     </Page>
   );
 }
