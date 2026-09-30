@@ -11,6 +11,10 @@ import {
   AppHeaderLink,
   AppHeaderNav,
   AppHeaderPlaceholder,
+  BulkActions,
+  BulkActionsContent,
+  BulkActionsRoot,
+  BulkActionsStatus,
   Item,
   ItemActions,
   ItemCheck,
@@ -316,6 +320,58 @@ test("SectionHeader aside: beside the title, outside the heading; without it the
   assert.match(rule(".fui-section-heading-row {"), /align-items: center/);
   assert.doesNotMatch(rule(".fui-section-heading-row {"), /container/);
   assert.doesNotMatch(rule(".fui-section-header {"), /container/);
+});
+
+test("BulkActions: used as one piece the markup is the 0.8.0 markup at counts 0, 2 and 0 kept mounted", () => {
+  // Captured from 0.8.0 before the parts were added.
+  assert.equal(renderToStaticMarkup(<BulkActions count={0}><b>x</b></BulkActions>), "");
+  assert.equal(renderToStaticMarkup(<BulkActions count={2}><b>x</b></BulkActions>), "<div class=\"fui-bulk-actions\" role=\"group\" aria-label=\"Selection actions\"><span role=\"status\">2 selected</span><div class=\"fui-actions\"><b>x</b></div></div>");
+  assert.equal(renderToStaticMarkup(<BulkActions count={0} keepMounted><b>x</b></BulkActions>), "<div class=\"fui-bulk-actions\" role=\"group\" aria-label=\"Selection actions\" data-empty=\"true\"><span role=\"status\">0 selected</span><div class=\"fui-actions\" hidden=\"\"><b>x</b></div></div>");
+});
+
+test("BulkActions parts: one count for a status and an actions group that sit in different places", () => {
+  const layout = (count: number, keepMounted?: boolean, hidden?: boolean) =>
+    renderToStaticMarkup(
+      <BulkActionsRoot count={count} keepMounted={keepMounted} className="bar">
+        <label>Select all</label>
+        <BulkActionsStatus />
+        <form>
+          <BulkActionsContent hidden={hidden}>
+            <button type="button">Apply</button>
+          </BulkActionsContent>
+        </form>
+      </BulkActionsRoot>,
+    );
+  // 2: a plain div (no role, no bar look) around what the consumer puts in it; the status outside the group, the group labelled.
+  assert.equal(
+    layout(2),
+    '<div class="fui-bulk-actions-root bar"><label>Select all</label><span role="status" class="fui-bulk-actions-status">2 selected</span><form><div role="group" aria-label="Selection actions" class="fui-bulk-actions-content"><button type="button">Apply</button></div></form></div>',
+  );
+  // 0 without keepMounted: the parts are not rendered, what else is in the root is (select-all must stay).
+  assert.equal(layout(0), '<div class="fui-bulk-actions-root bar" data-empty="true"><label>Select all</label><form></form></div>');
+  // 0 kept mounted: the live region exists (visually hidden by data-empty), the actions are hidden but mounted.
+  assert.equal(
+    layout(0, true),
+    '<div class="fui-bulk-actions-root bar" data-empty="true"><label>Select all</label><span role="status" class="fui-bulk-actions-status" data-empty="true">0 selected</span><form><div role="group" aria-label="Selection actions" class="fui-bulk-actions-content" hidden=""><button type="button">Apply</button></div></form></div>',
+  );
+  // A layout may keep the actions closed at any count (a phone row) without unmounting them.
+  assert.match(layout(3, false, true), /class="fui-bulk-actions-content" hidden=""/);
+  // Words are the consumer's: the status text, the group's name.
+  const custom = renderToStaticMarkup(
+    <BulkActionsRoot count={1} regionLabel="Acciones de selección">
+      <BulkActionsStatus>Seleccionados: 1</BulkActionsStatus>
+      <BulkActionsContent id="form">x</BulkActionsContent>
+    </BulkActionsRoot>,
+  );
+  assert.match(custom, /<span role="status" class="fui-bulk-actions-status">Seleccionados: 1<\/span>/);
+  assert.match(custom, /<div role="group" aria-label="Acciones de selección" id="form" class="fui-bulk-actions-content">x<\/div>/);
+  // The parts need the root (a status without a count is a bug, not an empty render).
+  assert.throws(() => renderToStaticMarkup(<BulkActionsStatus />), /must be inside BulkActionsRoot/);
+  assert.throws(() => renderToStaticMarkup(<BulkActionsContent>x</BulkActionsContent>), /must be inside BulkActionsRoot/);
+  // CSS: the status is visually hidden at 0 without leaving the tree; a hidden group wins over the layout's display.
+  assert.match(rule(".fui-bulk-actions-status[data-empty] {"), /clip-path: inset\(50%\)/);
+  assert.match(rule(".fui-bulk-actions-content[hidden] {"), /display: none !important/);
+  assert.doesNotMatch(styles, /\.fui-bulk-actions-root\s*\{/); // no look of its own: the layout is the consumer's
 });
 
 test("tabs: the root has a class, a strip is data-scrollable, a vertical rail has its own rules and the indicator follows the active tab", () => {

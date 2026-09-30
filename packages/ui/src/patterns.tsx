@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, type ComponentProps, type ReactNode, type Ref } from "react";
+import { createContext, useContext, useId, type ComponentProps, type ReactNode, type Ref } from "react";
 import {
   AlertCircle,
   CheckCircle2,
@@ -152,6 +152,75 @@ export function BulkActions({
       <div className="fui-actions" hidden={empty}>
         {children}
       </div>
+    </div>
+  );
+}
+
+type BulkState = { count: number; empty: boolean; keepMounted: boolean; regionLabel: string };
+const BulkContext = createContext<BulkState | null>(null);
+function useBulk(part: string) {
+  const state = useContext(BulkContext);
+  if (!state) throw new Error(`${part} must be inside BulkActionsRoot.`);
+  return state;
+}
+
+/**
+ * The parts of `BulkActions` for a layout the bar does not fit: the status in a title row (beside select-all and the folder
+ * name), the actions in a form under it. `BulkActionsRoot` shares ONE count, ONE empty state and ONE `keepMounted` with
+ * `BulkActionsStatus` and `BulkActionsContent`, and renders a plain `div` (no role, no bar look) that the consumer lays out
+ * with `className` and puts the parts anywhere inside. `BulkActions` itself is unchanged.
+ *
+ * Labelling: the group is the actions (`BulkActionsContent`, `role="group"`, named by `regionLabel`); the status is a live
+ * region beside it, not inside a group, so a title row that also holds select-all and a heading is not "Selection actions".
+ *
+ * At a count of 0 the parts render nothing unless `keepMounted`: then the status is always in the DOM (visually hidden at
+ * 0, so the change to 1 is announced) and the actions are `hidden` but mounted (a controller or a focus handoff that relies
+ * on them keeps working). The rest of what is inside the root (select-all, the heading) is never affected.
+ */
+export function BulkActionsRoot({
+  count,
+  regionLabel = "Selection actions",
+  keepMounted = false,
+  className,
+  children,
+  ...props
+}: Omit<ComponentProps<"div">, "role"> & {
+  count: number;
+  /** The accessible name of the actions group. */
+  regionLabel?: string;
+  keepMounted?: boolean;
+}) {
+  const empty = count < 1;
+  return (
+    <BulkContext.Provider value={{ count, empty, keepMounted, regionLabel }}>
+      <div {...props} className={classes("fui-bulk-actions-root", className)} data-empty={empty || undefined}>
+        {children}
+      </div>
+    </BulkContext.Provider>
+  );
+}
+
+/** The live status: `role="status"`, "N selected" unless it has children. Visually hidden (and still announced) at a count of 0 with `keepMounted`. */
+export function BulkActionsStatus({ className, children, ...props }: ComponentProps<"span">) {
+  const { count, empty, keepMounted } = useBulk("BulkActionsStatus");
+  if (empty && !keepMounted) return null;
+  return (
+    <span role="status" {...props} className={classes("fui-bulk-actions-status", className)} data-empty={empty || undefined}>
+      {children ?? `${count} selected`}
+    </span>
+  );
+}
+
+/**
+ * The actions, a `role="group"` named by the root's `regionLabel` (`aria-label` overrides it). `hidden` is combined with the
+ * empty state: a layout that keeps the actions closed until asked for (a phone) passes it, and they stay mounted. It takes a `ref`.
+ */
+export function BulkActionsContent({ className, children, hidden = false, ...props }: ComponentProps<"div">) {
+  const { empty, keepMounted, regionLabel } = useBulk("BulkActionsContent");
+  if (empty && !keepMounted) return null;
+  return (
+    <div role="group" aria-label={regionLabel} {...props} className={classes("fui-bulk-actions-content", className)} hidden={empty || hidden}>
+      {children}
     </div>
   );
 }

@@ -68,6 +68,7 @@ const stories: Record<string, string> = {
   "commands-palette": "fabrials-commands--palette-dialog",
   "commands-tools": "fabrials-commands--tools",
   "commands-bulk": "fabrials-commands--bulk",
+  "commands-bulk-parts": "fabrials-commands--bulk-parts",
   "auth-aside": "fabrials-auth--aside-auto",
   "auth-aside-centred": "fabrials-auth--aside-centred",
   "auth-centred": "fabrials-auth--centred",

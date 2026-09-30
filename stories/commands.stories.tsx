@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Archive, Bell, ContactRound, Folder, Inbox, Mail, PenLine, Search, Trash2, Wrench } from "lucide-react";
+import { Archive, Bell, ContactRound, Ellipsis, Folder, Inbox, Mail, MailOpen, PenLine, Search, Star, Trash2, Wrench } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -10,6 +10,9 @@ import {
   AppHeaderBrand,
   Badge,
   BulkActions,
+  BulkActionsContent,
+  BulkActionsRoot,
+  BulkActionsStatus,
   Button,
   Command,
   CommandDialog,
@@ -27,9 +30,13 @@ import {
   Kbd,
   KbdGroup,
   Loading,
+  NativeCheckbox,
+  NativeSelect,
   PageHeader,
   SectionHeader,
   Textarea,
+  Toolbar,
+  ToolbarButton,
   TooltipProvider,
   placeholderText,
 } from "@fabrials/ui";
@@ -384,9 +391,91 @@ function BulkPage() {
   );
 }
 
+
+// ------------------------------------------------------------ Bulk, parts apart
+
+const bulkRows = ["Quarterly planning notes", "Nightly build 4182 passed", "Renewal for the procurement group", "Invitation: Design review"];
+
+/** A title row that shares select-all, the folder name and the live status, with the actions in a form under it. `phone` is one 48 px row whose form opens from a menu button. */
+function BulkPartsDemo({ phone = false, initial = [] as number[] }: { phone?: boolean; initial?: number[] }) {
+  const [ticked, setTicked] = useState<number[]>(initial);
+  const [open, setOpen] = useState(false);
+  const count = ticked.length;
+  const all = count === bulkRows.length;
+  const box = { display: "flex", alignItems: "center", gap: "var(--fui-space-2)", minBlockSize: "3rem", padding: "0 var(--fui-space-3)" } as const;
+  return (
+    <BulkActionsRoot count={count} keepMounted regionLabel="Selection actions" style={{ display: "grid" }}>
+      <div style={{ ...box, borderBlockEnd: "1px solid var(--border)" }}>
+        <NativeCheckbox
+          aria-label="Select all"
+          checked={all}
+          indeterminate={count > 0 && !all}
+          onChange={(event) => setTicked(event.currentTarget.checked ? bulkRows.map((_, index) => index) : [])}
+        />
+        {count === 0 && <strong style={{ fontSize: "var(--fui-text-sm)" }}>Inbox</strong>}
+        <BulkActionsStatus>{`Selected: ${count}`}</BulkActionsStatus>
+        {phone && count > 0 && (
+          <Toolbar aria-label="Quick actions" style={{ marginInlineStart: "auto" }}>
+            <ToolbarButton label="Mark as read"><MailOpen aria-hidden /></ToolbarButton>
+            <ToolbarButton label="Flag"><Star aria-hidden /></ToolbarButton>
+            <ToolbarButton label={open ? "Hide options" : "More actions"} onClick={() => setOpen(!open)}><Ellipsis aria-hidden /></ToolbarButton>
+          </Toolbar>
+        )}
+      </div>
+      <BulkActionsContent hidden={phone && !open} style={{ display: "flex", flexWrap: "wrap", alignItems: "end", gap: "var(--fui-space-3)", padding: "var(--fui-space-3)", borderBlockEnd: "1px solid var(--border)" }}>
+        <div style={{ flex: "1 1 11rem" }}>
+          <Field label="Action">
+            {(props) => (
+              <NativeSelect {...props} defaultValue="read">
+                <option value="read">Mark as read</option>
+                <option value="move">Move to a folder</option>
+              </NativeSelect>
+            )}
+          </Field>
+        </div>
+        <Button variant="secondary" size="sm">Apply</Button>
+        <Button variant="ghost" size="sm" onClick={() => setTicked([])}>Clear selection</Button>
+      </BulkActionsContent>
+      <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
+        {bulkRows.map((row, index) => (
+          <li key={row} style={{ ...box, borderBlockEnd: "1px solid var(--border)" }}>
+            <NativeCheckbox
+              aria-label={`Select ${row}`}
+              checked={ticked.includes(index)}
+              onChange={(event) => setTicked(event.currentTarget.checked ? [...ticked, index] : ticked.filter((value) => value !== index))}
+            />
+            <span style={{ fontSize: "var(--fui-text-sm)" }}>{row}</span>
+          </li>
+        ))}
+      </ul>
+    </BulkActionsRoot>
+  );
+}
+
+function BulkPartsPage() {
+  return (
+    <Page title="Bulk actions, parts apart" description="BulkActionsRoot shares one count with BulkActionsStatus and BulkActionsContent, so the status can live in a title row and the actions in a form under it. The layout is the consumer's.">
+      <Block title="Title row and form (nothing selected, then two)" description="At 0 the status is in the DOM but visually hidden and the form is hidden; tick a row and both appear. The title row keeps select-all and the folder name.">
+        <Frame width={720} flush>
+          <BulkPartsDemo />
+        </Frame>
+        <Frame width={720} flush>
+          <BulkPartsDemo initial={[0, 2]} />
+        </Frame>
+      </Block>
+      <Block title="A phone row (358 px)" description="One 48 px row: select-all, the status, quick icon buttons and a menu button that opens the form under the row.">
+        <Frame width={358} flush>
+          <BulkPartsDemo phone initial={[1]} />
+        </Frame>
+      </Block>
+    </Page>
+  );
+}
+
 export const Launcher: Story = { render: () => <LauncherPage /> };
 export const LauncherOutline: Story = { render: () => <LauncherVariantsPage /> };
 export const Options: Story = { render: () => <OptionsPage /> };
 export const PaletteDialog: Story = { render: () => <CommandDialogPage /> };
 export const Tools: Story = { render: () => <ToolsPage /> };
 export const Bulk: Story = { render: () => <BulkPage /> };
+export const BulkParts: Story = { render: () => <BulkPartsPage /> };

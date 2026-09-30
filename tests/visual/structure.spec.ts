@@ -133,3 +133,68 @@ test("a header that spans the window grows its command slot to 18rem at 90rem an
     expect(slot, `${width} px window`).toBe(expected);
   }
 });
+
+// ---------------------------------------------------------------------------------------- BulkActions parts (0.8.1)
+
+const focusedName = (page: Page) =>
+  page.evaluate(() => {
+    const element = document.activeElement as HTMLElement | null;
+    if (!element) return null;
+    if (element.tagName === "SELECT") return (element as HTMLSelectElement).labels?.[0]?.textContent?.trim() ?? "select";
+    return element.getAttribute("aria-label") ?? element.textContent?.trim() ?? element.tagName;
+  });
+
+test("BulkActions parts: the status is a live region that exists at 0 and is the same node at 1; the hidden actions are out of the tab order and the shown ones follow the title row", async ({ page }) => {
+  await open(page, "fabrials-commands--bulk-parts", 1440);
+  const root = page.locator(".fui-bulk-actions-root").first();
+  const status = root.getByRole("status");
+  // 0: the live region is in the DOM, visually hidden (1 px), and the group of actions is not rendered.
+  await expect(status).toHaveText("Selected: 0");
+  expect(await status.evaluate((element) => ({ live: element.getAttribute("role"), width: element.getBoundingClientRect().width, hidden: element.hasAttribute("data-empty") }))).toEqual({ live: "status", width: 1, hidden: true });
+  await expect(root.getByRole("group", { name: "Selection actions" })).toBeHidden();
+  await status.evaluate((element) => ((element as HTMLElement & { marked?: boolean }).marked = true));
+  // Tab from select-all skips the closed form: the next stop is the first row.
+  await root.getByRole("checkbox", { name: "Select all" }).focus();
+  await page.keyboard.press("Tab");
+  expect(await focusedName(page)).toBe("Select Quarterly planning notes");
+  // 1: the same element now says one is selected (a live region that was replaced would not be announced), and the form appears.
+  await page.keyboard.press("Space");
+  await expect(status).toHaveText("Selected: 1");
+  expect(await status.evaluate((element) => (element as HTMLElement & { marked?: boolean }).marked)).toBe(true);
+  expect(await status.evaluate((element) => element.hasAttribute("data-empty"))).toBe(false);
+  await expect(root.getByRole("group", { name: "Selection actions" })).toBeVisible();
+  // The order: select-all, the form's controls, then the rows.
+  await root.getByRole("checkbox", { name: "Select all" }).focus();
+  const order: (string | null)[] = [];
+  for (let index = 0; index < 4; index += 1) {
+    await page.keyboard.press("Tab");
+    order.push(await focusedName(page));
+  }
+  expect(order).toEqual(["Action", "Apply", "Clear selection", "Select Quarterly planning notes"]);
+  // Clearing empties the region again: the form leaves the tab order and the status is back to hidden, still mounted.
+  await root.getByRole("button", { name: "Clear selection" }).click();
+  await expect(status).toHaveText("Selected: 0");
+  await expect(root.getByRole("group", { name: "Selection actions" })).toBeHidden();
+});
+
+test("BulkActions parts on a phone row: the form stays closed (mounted) until the menu button opens it, and the layout does not overflow", async ({ page }) => {
+  await open(page, "fabrials-commands--bulk-parts", 390);
+  const root = page.locator(".fui-bulk-actions-root").nth(2);
+  const group = root.getByRole("group", { name: "Selection actions" });
+  await expect(root.getByRole("status")).toHaveText("Selected: 1");
+  await expect(group).toBeHidden();
+  expect(await root.locator(".fui-bulk-actions-content[hidden]").count()).toBe(1); // mounted, hidden (a role query does not see it)
+  const row = await root.locator("> div").first().boundingBox();
+  expect(row!.height).toBeLessThanOrEqual(49);
+  await root.getByRole("button", { name: "More actions" }).click();
+  await expect(group).toBeVisible();
+  await expect(root.getByRole("button", { name: "Hide options" })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
+test("BulkActions parts: a layout's own display does not reopen a hidden form", async ({ page }) => {
+  await open(page, "fabrials-commands--bulk-parts", 1440);
+  // The story gives the form `display: flex` inline; [hidden] must still win, or Tab would reach a closed form.
+  const form = page.locator(".fui-bulk-actions-root").first().locator(".fui-bulk-actions-content");
+  expect(await form.evaluate((element) => ({ hidden: element.hasAttribute("hidden"), display: getComputedStyle(element).display }))).toEqual({ hidden: true, display: "none" });
+});

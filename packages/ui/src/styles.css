@@ -3412,6 +3412,24 @@
   .fui-bulk-actions > .fui-actions[hidden] {
     display: none;
   }
+  /* 0.8.1: the parts (BulkActionsRoot, BulkActionsStatus, BulkActionsContent). The root has no look (the consumer lays it out);
+     the status is visually hidden at a count of 0 like the one-piece region, without leaving the accessibility tree. */
+  .fui-bulk-actions-status[data-empty] {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  /* The actions stay mounted while hidden, and the consumer lays them out with its own `display` (a grid, a flex row): a rule that
+     sets display must not win over hidden, or a form that is closed would still be reachable with Tab. */
+  .fui-bulk-actions-content[hidden] {
+    display: none !important;
+  }
   .fui-state-panel {
     display: flex;
     flex-wrap: wrap;
