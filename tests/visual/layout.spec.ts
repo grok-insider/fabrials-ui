@@ -81,11 +81,13 @@ for (const engine of Object.keys(engines) as (keyof typeof engines)[]) {
             stacked: details.top >= term.bottom - 0.5,
           };
         });
-      for (const width of ["20rem", "29.9rem"]) expect(await read(width), width).toMatchObject({ columns: 1, stacked: true, rowGap: "2px" });
+      // The column gap is declared outside the query (0.8.1), so it is the same 1 rem stacked and side by side: this is what fails on 0.8.0,
+      // where the gap of a stacked item was the 2 px row gap and only the query set the column gap (an engine that dropped it left 2 px).
+      for (const width of ["20rem", "29.9rem"]) expect(await read(width), width).toMatchObject({ columns: 1, stacked: true, columnGap: "16px", rowGap: "2px" });
       for (const width of ["30rem", "30.1rem", "44rem"]) expect(await read(width), width).toMatchObject({ columns: 2, columnGap: "16px", rowGap: "2px", between: 16, stacked: false });
       // A list resized across the threshold in the page (a drawer that opens, a pane that is dragged) follows it both ways.
       const list = page.locator("[data-desc='44rem']");
-      for (const [width, columns, gap] of [["20rem", 1, undefined], ["44rem", 2, "16px"], ["25rem", 1, undefined], ["31rem", 2, "16px"]] as const) {
+      for (const [width, columns, gap] of [["20rem", 1, "16px"], ["44rem", 2, "16px"], ["25rem", 1, "16px"], ["31rem", 2, "16px"]] as const) {
         await list.evaluate((element, value) => ((element as HTMLElement).style.inlineSize = value), width);
         const item = list.locator(".fui-description-item").first();
         expect(await item.evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length), width).toBe(columns);
