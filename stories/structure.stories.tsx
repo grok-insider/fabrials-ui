@@ -21,6 +21,7 @@ import {
   DescriptionItem,
   DescriptionList,
   DescriptionTerm,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
@@ -856,8 +857,8 @@ const hitBox = { display: "inline-grid", placeItems: "center", inlineSize: 24, b
 function HitAreasPage() {
   return (
     <Page title="Hit areas" description='data-hit grows the target of something that paints smaller than 44 px without growing the layout. "44" reaches on all four sides, "y" block-wise only, "end" block-wise and past the end edge only.'>
-      <style>{`.story-hit [data-hit]::before { outline: 1px dashed var(--brand-ink); background: color-mix(in oklab, var(--brand) 14%, transparent); }`}</style>
-      <div className="story-hit" style={{ display: "contents" }}>
+      <style>{`.catalogue [data-hit]::before { outline: 1px dashed var(--brand-ink); background: color-mix(in oklab, var(--brand) 14%, transparent); }`}</style>
+      <>
         <Block title='data-hit="44"' description="A 24 px control in a dense line: the dashed box is the 44 px target, drawn by this story only. Four sides.">
           <Frame width={420}>
             <div data-demo="44" style={{ display: "flex", gap: "var(--fui-space-8)", alignItems: "center", padding: "var(--fui-space-3)" }}>
@@ -869,9 +870,9 @@ function HitAreasPage() {
         <Block title='data-hit="y"' description="A small control between two fields: it grows above and below, and its inline neighbours keep their own targets.">
           <Frame width={420}>
             <div data-demo="y" style={{ display: "flex", alignItems: "center", padding: "var(--fui-space-3)" }}>
-              <input aria-label="From" placeholder="From" style={{ flex: 1, minInlineSize: 0, blockSize: 28 }} />
+              <Input aria-label="From" placeholder="From" style={{ flex: 1, minInlineSize: 0 }} />
               <button type="button" data-hit="y" aria-label="Swap" style={hitBox}>&harr;</button>
-              <input aria-label="To" placeholder="To" style={{ flex: 1, minInlineSize: 0, blockSize: 28 }} />
+              <Input aria-label="To" placeholder="To" style={{ flex: 1, minInlineSize: 0 }} />
             </div>
           </Frame>
         </Block>
@@ -901,7 +902,7 @@ function HitAreasPage() {
             </Frame>
           </div>
         </Block>
-      </div>
+      </>
     </Page>
   );
 }
