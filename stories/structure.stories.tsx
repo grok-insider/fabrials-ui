@@ -1,6 +1,6 @@
 import { useRef, useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Archive, ContactRound, FileText, FolderOpen, Inbox, Layers, Plus, Send, Settings, Star, Trash2, TriangleAlert, UserRound } from "lucide-react";
+import { Archive, ContactRound, FileText, FolderOpen, Inbox, Layers, Plus, Search, Send, Settings, Star, Trash2, TriangleAlert, UserRound } from "lucide-react";
 import {
   AppHeader,
   AppHeaderAction,
@@ -17,6 +17,10 @@ import {
   Button,
   CommandTrigger,
   IconButton,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
   Item,
   ItemActions,
   ItemCheck,
@@ -48,6 +52,9 @@ import {
   SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
   StatePanel,
   Tabs,
   TabsContent,
@@ -838,6 +845,63 @@ function SectionAsidePage() {
   );
 }
 
+// ------------------------------------------------------------------------ Hit areas
+
+const hitBox = { display: "inline-grid", placeItems: "center", inlineSize: 24, blockSize: 24, padding: 0, border: "1px solid var(--border)", borderRadius: "var(--fui-radius-sm)", background: "var(--card)", color: "var(--foreground)", font: "inherit", fontSize: "0.75rem", cursor: "pointer" } as const;
+
+function HitAreasPage() {
+  return (
+    <Page title="Hit areas" description='data-hit grows the target of something that paints smaller than 44 px without growing the layout. "44" reaches on all four sides, "y" block-wise only, "end" block-wise and past the end edge only.'>
+      <style>{`.story-hit [data-hit]::before { outline: 1px dashed var(--brand-ink); background: color-mix(in oklab, var(--brand) 14%, transparent); }`}</style>
+      <div className="story-hit" style={{ display: "contents" }}>
+        <Block title='data-hit="44"' description="A 24 px control in a dense line: the dashed box is the 44 px target, drawn by this story only. Four sides.">
+          <Frame width={420}>
+            <div data-demo="44" style={{ display: "flex", gap: "var(--fui-space-8)", alignItems: "center", padding: "var(--fui-space-3)" }}>
+              <button type="button" data-hit="44" aria-label="Star" style={hitBox}>*</button>
+              <a href="#hit" data-hit="44" className="fui-link" style={{ fontSize: "0.8125rem" }}>Unsubscribe</a>
+            </div>
+          </Frame>
+        </Block>
+        <Block title='data-hit="y"' description="A small control between two fields: it grows above and below, and its inline neighbours keep their own targets.">
+          <Frame width={420}>
+            <div data-demo="y" style={{ display: "flex", alignItems: "center", padding: "var(--fui-space-3)" }}>
+              <input aria-label="From" placeholder="From" style={{ flex: 1, minInlineSize: 0, blockSize: 28 }} />
+              <button type="button" data-hit="y" aria-label="Swap" style={hitBox}>&harr;</button>
+              <input aria-label="To" placeholder="To" style={{ flex: 1, minInlineSize: 0, blockSize: 28 }} />
+            </div>
+          </Frame>
+        </Block>
+        <Block title='data-hit="end"' description="An icon-only button at the end of an input group: it grows above, below and past the end edge, never over the field. The second group is right to left.">
+          <div className="catalogue-grid">
+            <Frame width={360}>
+              <div data-demo="end" style={{ padding: "var(--fui-space-3)" }}>
+                <InputGroup>
+                  <InputGroupAddon align="inline-start"><Search aria-hidden /></InputGroupAddon>
+                  <InputGroupInput aria-label="Search contacts" placeholder="Search contacts" />
+                  <InputGroupAddon align="inline-end">
+                    <InputGroupButton size="icon-xs" aria-label="Search" data-hit="end" type="submit"><Search aria-hidden /></InputGroupButton>
+                  </InputGroupAddon>
+                </InputGroup>
+              </div>
+            </Frame>
+            <Frame width={360} dir="rtl">
+              <div data-demo="end-rtl" style={{ padding: "var(--fui-space-3)" }}>
+                <InputGroup>
+                  <InputGroupAddon align="inline-start"><Search aria-hidden /></InputGroupAddon>
+                  <InputGroupInput aria-label="بحث في جهات الاتصال" placeholder="بحث في جهات الاتصال" />
+                  <InputGroupAddon align="inline-end">
+                    <InputGroupButton size="icon-xs" aria-label="بحث" data-hit="end" type="submit"><Search aria-hidden /></InputGroupButton>
+                  </InputGroupAddon>
+                </InputGroup>
+              </div>
+            </Frame>
+          </div>
+        </Block>
+      </div>
+    </Page>
+  );
+}
+
 export const Items: Story = { render: () => <ItemsPage /> };
 export const ApplicationHeader: Story = { render: () => <AppHeaderPage /> };
 /** The header the way an app uses it: it spans the window, outside any page column, so every mode of the command slot is reachable. */
@@ -858,3 +922,5 @@ export const SwitcherInPane: Story = { render: () => <SwitcherPanePage /> };
 export const SwitcherOpen: Story = { render: () => <OpenSwitcherPage /> };
 export const Sections: Story = { render: () => <SectionsPage /> };
 export const SectionAside: Story = { render: () => <SectionAsidePage /> };
+export const HitAreas: Story = { render: () => <HitAreasPage /> };
+

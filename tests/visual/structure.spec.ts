@@ -230,3 +230,61 @@ test("a switcher with contain={false} follows the pane named nav-switcher; the d
     expect(await pane.locator(".fui-nav-switcher-mark").evaluate((element) => getComputedStyle(element).display !== "none")).toBe(mark);
   }
 });
+
+// ---------------------------------------------------------------------------------------- data-hit shapes (0.8.1)
+
+test("data-hit: 44 reaches four sides, y block-wise only, end block-wise and past the end edge only (LTR and RTL)", async ({ page }) => {
+  await open(page, "fabrials-structure--hit-areas");
+  const reach = (demo: string) =>
+    page.locator(`[data-demo="${demo}"] [data-hit]`).first().evaluate((element) => {
+      const box = element.getBoundingClientRect();
+      const before = getComputedStyle(element, "::before");
+      const number = (value: string) => Math.round(parseFloat(value));
+      // Pixels the target reaches past each painted edge (a negative inset is reach).
+      // The insets are from the padding box, so the border is added back to measure from the painted edge.
+      const edge = getComputedStyle(element);
+      const top = -(number(before.top) + number(edge.borderTopWidth));
+      const bottom = -(number(before.bottom) + number(edge.borderBottomWidth));
+      const left = -(number(before.left) + number(edge.borderLeftWidth));
+      const right = -(number(before.right) + number(edge.borderRightWidth));
+      const hit = (x: number, y: number) => document.elementFromPoint(x, y) === element;
+      const mid = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+      return {
+        top, bottom, left, right,
+        painted: { width: Math.round(box.width), height: Math.round(box.height) },
+        // Hit testing: the element answers 6 px beyond each edge, or it does not.
+        above: hit(mid.x, box.y - 6), below: hit(mid.x, box.bottom + 6), before: hit(box.x - 6, mid.y), after: hit(box.right + 6, mid.y),
+      };
+    });
+  const four = await reach("44");
+  expect(four).toMatchObject({ top: 10, bottom: 10, left: 10, right: 10, above: true, below: true, before: true, after: true });
+  const y = await reach("y");
+  // left and right are -1: inset 0 is the padding box, which sits inside the 1 px border, so there is no reach there.
+  expect(y).toMatchObject({ top: 10, bottom: 10, left: -1, right: -1, above: true, below: true, before: false, after: false });
+  const end = await reach("end");
+  expect(end.left).toBe(-1);
+  expect(end.right).toBeGreaterThan(0);
+  expect(end.top).toBeGreaterThan(0);
+  expect(end).toMatchObject({ above: true, below: true, before: false, after: true });
+  // The extension is whole: the target is exactly the control height wide and high, however small the painted control is.
+  expect(end.painted.width + end.left + end.right).toBe(44);
+  expect(end.left).toBeLessThanOrEqual(0);
+  expect(end.painted.height + end.top + end.bottom).toBe(44);
+  // Right to left the end edge is on the left.
+  const rtl = await reach("end-rtl");
+  expect(rtl).toMatchObject({ above: true, below: true, before: true, after: false });
+  expect(rtl.left).toBeGreaterThan(0);
+  expect(rtl.right).toBe(-1);
+});
+
+test("the three data-hit shapes, with the target drawn", async ({ page }) => {
+  for (const theme of ["light", "dark"] as const) {
+    await page.setViewportSize({ width: 1000, height: 900 });
+    await page.goto(`/iframe.html?id=fabrials-structure--hit-areas&viewMode=story&globals=theme:${theme}`);
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
+    await expect(page.locator("main.catalogue")).toHaveScreenshot(`hit-areas-${theme}.png`);
+  }
+});
+
+// Request 7: the row's name rule costs no specificity, so a consumer's bare class wins, and a trailing count or tag keeps its width.

@@ -126,6 +126,7 @@ export const uiCatalog: UiCatalogItem[] = [
       ["variant", "default | accent | outline | secondary | ghost | destructive | link", "Visual weight of the action. default is ink, the primary; accent (Stormlight) only when one action must stand out."],
       ["disabled", "boolean", "Unavailable actions stay visible and unnamed as the next step."],
       ["type", "button | submit | reset", "Use submit inside a form."],
+      ["data-hit", "44 | y | end", "An attribute for any element that paints smaller than 44 px (an inline link, a dense icon button). It grows the target with an invisible pseudo-element, never the layout: 44 reaches on all four sides, y block-wise only (the inline neighbours keep their own targets), end block-wise and past the end edge only (an icon-only button at the end of an input group, in either direction). Do not combine it with overflow, clip or contain on the same element."],
     ],
     "Standard controls are 40px. Compact density is a composition option on the parent, not a second button size.",
   ),

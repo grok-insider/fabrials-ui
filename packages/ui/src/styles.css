@@ -2843,6 +2843,25 @@
     inset-block: min(0px, calc((100% - var(--fui-control-height-lg)) / 2));
     inset-inline: min(0px, calc((100% - var(--fui-control-height-lg)) / 2));
   }
+  /* 0.8.1: two more shapes of the same extension. Block-wise only, for a control whose inline neighbours (an input, the
+     next segment) keep their own targets: data-hit="y". Block-wise, and inline only past the END edge where the control is
+     narrower than 44 px, for an icon-only button at the end of an input group: data-hit="end". The inline start is 0, so
+     nothing reaches over the field beside it; percentages resolve against the padding box, as for "44". */
+  [data-hit="y"],
+  [data-hit="end"] {
+    position: relative;
+    z-index: 1;
+  }
+  [data-hit="y"]::before,
+  [data-hit="end"]::before {
+    content: "";
+    position: absolute;
+    inset-block: min(0px, calc((100% - var(--fui-control-height-lg)) / 2));
+    inset-inline: 0;
+  }
+  [data-hit="end"]::before {
+    inset-inline: 0 min(0px, calc(100% - var(--fui-control-height-lg)));
+  }
   .fui-file-size {
     font-variant-numeric: tabular-nums;
     white-space: nowrap;

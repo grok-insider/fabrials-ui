@@ -227,6 +227,17 @@ test("data-hit grows the target to the control height with a pseudo-element, nev
   assert.match(rule('[data-hit="44"]::before {'), /inset-block: min\(0px, calc\(\(100% - var\(--fui-control-height-lg\)\) \/ 2\)\)/);
 });
 
+test("data-hit has two more shapes: block-wise only (y) and block-wise plus past the end edge only (end), same stacking as 44", () => {
+  assert.match(rule('[data-hit="y"],\n  [data-hit="end"] {'), /position: relative;\s*z-index: 1/);
+  const shared = rule('[data-hit="y"]::before,\n  [data-hit="end"]::before {');
+  assert.match(shared, /position: absolute/);
+  assert.match(shared, /inset-block: min\(0px, calc\(\(100% - var\(--fui-control-height-lg\)\) \/ 2\)\)/);
+  assert.match(shared, /inset-inline: 0;/);
+  assert.match(styles, /\n  \[data-hit="end"\]::before \{\n    inset-inline: 0 min\(0px, calc\(100% - var\(--fui-control-height-lg\)\)\);/);
+  // "44" is untouched: the same four-sided reach it always had.
+  assert.match(rule('[data-hit="44"]::before {'), /inset-inline: min\(0px, calc\(\(100% - var\(--fui-control-height-lg\)\) \/ 2\)\)/);
+});
+
 test("a shortcut can be a sequence: no aria-keyshortcuts (it cannot express steps), together keys still do", () => {
   assert.equal(keyShortcutsValue({ keys: ["g", "i"], sequence: true }), undefined);
   assert.equal(keyShortcutsValue({ keys: ["Ctrl", "K"] }), "Control+K");
