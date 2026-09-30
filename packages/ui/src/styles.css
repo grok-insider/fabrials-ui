@@ -1401,7 +1401,8 @@
   }
   .fui-dialog {
     position: fixed;
-    z-index: calc(var(--fui-z-overlay) + 1);
+    /* one class, as it always was: an override with one class keeps working. --fui-sheet-z is the documented way to move a sheet. */
+    z-index: var(--fui-sheet-z, calc(var(--fui-z-overlay) + 1));
     width: min(32rem, calc(100vw - 2rem));
     max-height: calc(100dvh - 2rem);
     overflow-y: auto;
@@ -1432,7 +1433,6 @@
     top: var(--fui-sheet-inset-block-start, 0px);
     height: calc(100dvh - var(--fui-sheet-inset-block-start, 0px) - var(--fui-sheet-inset-block-end, 0px));
     max-height: calc(100dvh - var(--fui-sheet-inset-block-start, 0px) - var(--fui-sheet-inset-block-end, 0px));
-    z-index: var(--fui-sheet-z, calc(var(--fui-z-overlay) + 1));
     width: min(var(--fui-sheet-width, 26rem), 100vw);
     border-radius: 0;
     border-block: 0;

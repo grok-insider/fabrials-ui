@@ -292,7 +292,9 @@ test("a sheet is placed by four public custom properties whose defaults are the 
   assert.match(sheet, /top: var\(--fui-sheet-inset-block-start, 0px\)/);
   assert.match(sheet, /height: calc\(100dvh - var\(--fui-sheet-inset-block-start, 0px\) - var\(--fui-sheet-inset-block-end, 0px\)\)/);
   assert.match(sheet, /max-height: calc\(100dvh - var\(--fui-sheet-inset-block-start, 0px\) - var\(--fui-sheet-inset-block-end, 0px\)\)/);
-  assert.match(sheet, /z-index: var\(--fui-sheet-z, calc\(var\(--fui-z-overlay\) \+ 1\)\)/);
+  // the level stays on the one-class base rule (an override with one class keeps working); the property moves it
+  assert.doesNotMatch(sheet, /z-index/);
+  assert.match(rule(".fui-dialog {"), /z-index: var\(--fui-sheet-z, calc\(var\(--fui-z-overlay\) \+ 1\)\)/);
   assert.match(sheet, /width: min\(var\(--fui-sheet-width, 26rem\), 100vw\)/);
   // tokens only: no literal length other than the documented defaults
   assert.doesNotMatch(sheet, /#[0-9a-fA-F]{3,8}\b|rgb\(|hsl\(|oklch\(|!important/);
