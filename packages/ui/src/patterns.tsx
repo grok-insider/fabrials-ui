@@ -68,7 +68,7 @@ export function SectionHeader({
   /**
    * A tag beside the title (a count, a status: "Connected mailboxes" `3 of 10`), outside the heading element so the
    * heading's accessible name stays the title. It sits on the title's line and wraps below it when the header is
-   * narrow. Nothing changes without it.
+   * narrow. Nothing changes without it (`false`, `null` and `""` mean no aside; a count of `0` is a tag).
    */
   aside?: ReactNode;
   /** The heading element (default 2). The look is the section title's at every level. */
@@ -82,7 +82,7 @@ export function SectionHeader({
   return (
     <header className={classes("fui-section-header", className)}>
       <div>
-        {aside ? (
+        {aside || aside === 0 ? (
           <div className="fui-section-heading-row">
             <Heading {...headingProps} ref={headingRef} className="fui-section-title">
               {title}

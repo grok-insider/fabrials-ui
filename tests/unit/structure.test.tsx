@@ -345,6 +345,12 @@ test("SectionHeader aside: beside the title, outside the heading; without it the
   assert.doesNotMatch(rule(".fui-section-header {"), /container/);
 });
 
+test("SectionHeader aside: a count of 0 is content (a tag), while false, null and an empty string mean no aside", () => {
+  const bare = '<header class="fui-section-header"><div><h2 class="fui-section-title">Runs</h2></div></header>';
+  for (const nothing of [undefined, null, false, ""]) assert.equal(renderToStaticMarkup(<SectionHeader title="Runs" aside={nothing} />), bare);
+  assert.match(renderToStaticMarkup(<SectionHeader title="Runs" aside={0} />), /<span class="fui-section-aside">0<\/span>/);
+});
+
 test("BulkActions: used as one piece the markup is the 0.8.0 markup at counts 0, 2 and 0 kept mounted", () => {
   // Captured from 0.8.0 before the parts were added.
   assert.equal(renderToStaticMarkup(<BulkActions count={0}><b>x</b></BulkActions>), "");
