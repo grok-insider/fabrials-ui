@@ -134,6 +134,13 @@ test("field sets are real fieldsets and legends, and radios are native inputs a 
   assert.match(renderToStaticMarkup(<NativeRadioGroup legend="Hidden" hideLegend><i /></NativeRadioGroup>), /class="fui-field-legend fui-sr-only"/);
 });
 
+test("native radio grid: the column floor is a custom property whose default is the old 9rem", () => {
+  assert.match(styles, /\.fui-native-radio-options\[data-layout="grid"\] \{\n    column-gap: var\(--fui-space-3\);\n    grid-template-columns: repeat\(auto-fit, minmax\(min\(100%, var\(--fui-native-radio-min, 9rem\)\), 1fr\)\);/);
+  // Unused, the markup is what it was: no inline style, no extra attribute.
+  const group = renderToStaticMarkup(<NativeRadioGroup legend="Colour" layout="grid"><i /></NativeRadioGroup>);
+  assert.doesNotMatch(group, /style=/);
+});
+
 test("native checkbox keeps its bare markup, gains a mixed hook and an optional whole-row label", () => {
   const bare = renderToStaticMarkup(<NativeCheckbox name="a" />);
   assert.match(bare, /^<input class="fui-native-checkbox"/);

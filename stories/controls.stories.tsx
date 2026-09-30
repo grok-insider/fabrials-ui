@@ -1,8 +1,9 @@
-import { useState, type ReactNode } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import {
   Archive,
   ArrowDownUp,
+  ArrowLeft,
   Bold,
   Ellipsis,
   Forward,
@@ -567,9 +568,77 @@ function TogglesPage() {
   );
 }
 
+// ------------------------------------------------------ Native radio grid, long labels
+
+const longColours = [
+  ["Slate", "Gris pizarra azulado muy oscuro"],
+  ["Blue", "Azul ultramarino"],
+  ["Teal", "Verde azulado intenso"],
+  ["Green", "Verde"],
+  ["Amber", "Ámbar anaranjado claro"],
+  ["Red", "Rojo"],
+  ["Violet", "Violeta"],
+  ["Ink", "Anticonstitucionalmente"],
+] as const;
+
+const arabicColours = [
+  ["Slate", "رمادي أردوازي مائل إلى الزرقة الداكنة جدا"],
+  ["Blue", "أزرق بحري"],
+  ["Teal", "أخضر مزرق مكثف"],
+  ["Green", "أخضر"],
+  ["Amber", "كهرماني برتقالي فاتح"],
+  ["Red", "أحمر"],
+] as const;
+
+function Swatch({ tone }: { tone: string }) {
+  return <span aria-hidden="true" data-tone={tone} style={{ display: "inline-block", inlineSize: "0.875rem", blockSize: "0.875rem", flex: "none", borderRadius: "var(--fui-radius-xs)", background: "var(--brand)" }} />;
+}
+
+function RadioGridPage() {
+  const [value, setValue] = useState("Blue");
+  const group = (legend: string, style?: CSSProperties, names: typeof longColours | typeof arabicColours = longColours) => (
+    <NativeRadioGroup legend={legend} layout="grid" style={style} name={`grid-${legend}`}>
+      {names.map(([tone, name]) => (
+        <NativeRadio
+          key={tone}
+          name={`grid-${legend}`}
+          value={tone}
+          checked={value === tone}
+          onChange={() => setValue(tone)}
+          label={<span style={{ display: "inline-flex", alignItems: "center", gap: "var(--fui-space-2)" }}><Swatch tone={tone} />{name}</span>}
+        />
+      ))}
+    </NativeRadioGroup>
+  );
+  return (
+    <Page
+      title="Native radio grid, long labels"
+      description="layout=grid flows the options into columns that are never narrower than --fui-native-radio-min (9rem unless the group sets it) and never wider than the group: a long name wraps at its spaces, and the grid drops to fewer columns as the pane narrows."
+    >
+      <Block title="The default minimum" description="A 358 px pane: two columns of 9rem. Short names sit on one line; longer names wrap to two or three lines, and one long word (the last) breaks inside its column. Nothing is cut or overlaps. Below two columns' room (a 320 px window) the grid is one column.">
+        <div data-frame="default">
+          <Frame width={358}>{group("Label colour")}</Frame>
+        </div>
+      </Block>
+      <Block title="A wider minimum" description="A host that knows its names are long sets the minimum on the group, in a style prop or a class: --fui-native-radio-min: 12rem. The same pane is one column and every name is on one line.">
+        <div data-frame="wide-min">
+          <Frame width={358}>{group("Label colour, wider minimum", { "--fui-native-radio-min": "12rem" } as CSSProperties)}</Frame>
+        </div>
+      </Block>
+      <Block title="A wide pane and right to left" description="The same group in 640 px, and in Arabic. The minimum is a floor: room above it becomes wider columns, not more of them.">
+        <div data-frame="wide">
+          <Frame width={640}>{group("Label colour, wide pane")}</Frame>
+        </div>
+        <Frame width={358} dir="rtl">{group("لون التسمية", undefined, arabicColours)}</Frame>
+      </Block>
+    </Page>
+  );
+}
+
 export const IconButtons: Story = { render: () => <IconButtonsPage /> };
 export const Toolbars: Story = { render: () => <ToolbarsPage /> };
 export const FileInputs: Story = { render: () => <FileInputsPage /> };
 export const Disclosures: Story = { render: () => <DisclosuresPage /> };
 export const FieldSets: Story = { render: () => <FieldSetsPage /> };
 export const Toggles: Story = { render: () => <TogglesPage /> };
+export const NativeRadioGrid: Story = { render: () => <RadioGridPage /> };

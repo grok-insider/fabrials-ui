@@ -605,9 +605,11 @@
     display: grid;
     min-inline-size: 0;
   }
+  /* Columns never get narrower than --fui-native-radio-min (9rem unless the group sets it), and never wider than the group:
+     a long name wraps at its spaces and the grid drops to fewer columns, down to one, instead of crushing a column. */
   .fui-native-radio-options[data-layout="grid"] {
     column-gap: var(--fui-space-3);
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--fui-native-radio-min, 9rem)), 1fr));
   }
 
   /* ----------------------------------------------------- selection controls */

@@ -50,7 +50,9 @@ export function FieldGroup({
 /**
  * A group of native radios sharing one `name`: a fieldset with its legend, mirroring `NativeSelect` and
  * `NativeCheckbox`. A disabled fieldset disables every radio. The arrow keys move within the group natively.
- * `layout="grid"` flows the options into columns of at least 9rem (swatch and colour pickers).
+ * `layout="grid"` flows the options into columns of at least `--fui-native-radio-min` (9rem unless you set it on the group,
+ * radio and gap included) and never wider than the group, so a narrow pane gets fewer columns instead of crushed labels.
+ * Long names: `style={{ "--fui-native-radio-min": "12rem" }}` (swatch and colour pickers).
  */
 export function NativeRadioGroup({
   legend,

@@ -1124,7 +1124,8 @@ export const uiCatalog: UiCatalogItem[] = [
     [
       ["legend", "ReactNode", "The name of the group. Required."],
       ["hideLegend", "boolean", "Keeps the legend for assistive technology and hides it."],
-      ["layout", "stack | grid", "grid flows the options into columns of at least 9rem."],
+      ["layout", "stack | grid", "grid flows the options into columns that are never narrower than --fui-native-radio-min (9rem by default) and never wider than the group, so a narrow pane gets fewer columns, down to one."],
+      ["--fui-native-radio-min", "length (9rem)", "Custom property on the group (a style prop or a class): the narrowest a grid column may be, the radio and its gap included. Raise it (12rem) when the names are long; the pane then drops to fewer columns before a name wraps to three lines or a long word breaks."],
       ["NativeRadio label", "ReactNode", "A whole-row label, a 44px target. name and value are the form's."],
       ["disabled", "boolean", "On the group it disables every native radio."],
     ],
