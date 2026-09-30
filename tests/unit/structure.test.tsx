@@ -263,6 +263,20 @@ test("nav switcher: the trigger is named by its words, the title and the detail,
   assert.match(rule(".fui-popover.fui-nav-switcher-popover {"), /--sidebar-accent: var\(--accent\)/);
 });
 
+test("nav switcher: contain is on by default (markup unchanged); contain={false} marks the trigger so it makes no container", () => {
+  const trigger = <NavSwitcherTrigger label="Switch mailbox" mark="A" title="ana@example.test" />;
+  const base = renderToStaticMarkup(<NavSwitcher>{trigger}</NavSwitcher>);
+  assert.match(base, /data-layout="block"/);
+  assert.doesNotMatch(base, /data-contain/);
+  assert.equal(renderToStaticMarkup(<NavSwitcher contain>{trigger}</NavSwitcher>), base);
+  const open = renderToStaticMarkup(<NavSwitcher contain={false}>{trigger}</NavSwitcher>);
+  assert.match(open, /data-layout="block"[^>]*data-contain="false"/);
+  assert.match(rule('.fui-nav-switcher-trigger[data-layout="block"][data-contain="false"] {'), /container: none/);
+  // The mark rules keep reading the name nav-switcher, on the trigger or on an ancestor the host names.
+  assert.match(styles, /@container nav-switcher \(max-width: 17\.5rem\)/);
+  assert.match(styles, /@container nav-switcher \(max-width: 15rem\)/);
+});
+
 // -------------------------------------------------------------------------- SettingsSection
 
 test("settings section: the section is the size container, an inner grid answers to it, stacked opts out", () => {

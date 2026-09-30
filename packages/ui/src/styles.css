@@ -1270,6 +1270,10 @@
     border-color: transparent;
     background: transparent;
   }
+  /* contain={false}: no container of its own; the rules below read an ancestor named nav-switcher. */
+  .fui-nav-switcher-trigger[data-layout="block"][data-contain="false"] {
+    container: none;
+  }
   .fui-nav-switcher-trigger[data-popup-open] {
     background: var(--accent);
   }
@@ -1320,7 +1324,9 @@
     block-size: 1rem;
     color: var(--muted-foreground);
   }
-  /* A narrow column (a resized pane, 200 % text): the mark gives its room to the name, first when a tag is beside it. */
+  /* A narrow column (a resized pane, 200 % text): the mark gives its room to the name, first when a tag is beside it.
+     The thresholds are widths of the container's content box. With the default the container is the trigger; with
+     contain={false} it is the ancestor the host names nav-switcher (its pane), which reads correctly there as it is. */
   @container nav-switcher (max-width: 17.5rem) {
     .fui-nav-switcher-mark:has(~ .fui-nav-switcher-tag) {
       display: none;

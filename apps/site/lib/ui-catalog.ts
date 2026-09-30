@@ -1404,6 +1404,7 @@ export const uiCatalog: UiCatalogItem[] = [
     ["NavSwitcher", "NavSwitcherTrigger", "NavSwitcherContent", "NavSwitcherItem", "NavSwitcherSeparator"],
     [
       ["NavSwitcher layout", "block | inline", "block fills its column with a bordered 56 px box; inline sizes to its content, for a header or a toolbar."],
+      ["NavSwitcher contain", "boolean (true)", "On, a block trigger is the size container its mark rules read, so the mark follows the trigger. false makes no container: the rules read the nearest ancestor container named nav-switcher (name your pane: container: nav-switcher / inline-size), so the mark follows the pane. Thresholds on the container's content width: below 17.5rem a mark that has a tag is hidden, below 15rem every mark."],
       ["NavSwitcherTrigger mark / title / description / tag / label", "ReactNode / string", "The current entity. label is the screen-reader prefix (Switch mailbox); the mark is hidden from assistive technology; tag is an attention count or status."],
       ["NavSwitcherContent label / listLabel / footer", "string / ReactNode", "The popover's name, the link list's name, and a footer that stays in view under the scrolling list (a stale note, a retry)."],
       ["NavSwitcherItem current / mark / description / tag / render", "boolean / ReactNode / ReactElement", "One link. current sets aria-current, the fill, the bar and a check mark; description is a status tag inside the link and part of its name."],

@@ -198,3 +198,35 @@ test("BulkActions parts: a layout's own display does not reopen a hidden form", 
   const form = page.locator(".fui-bulk-actions-root").first().locator(".fui-bulk-actions-content");
   expect(await form.evaluate((element) => ({ hidden: element.hasAttribute("hidden"), display: getComputedStyle(element).display }))).toEqual({ hidden: true, display: "none" });
 });
+
+test("a switcher with contain={false} follows the pane named nav-switcher; the default follows its own trigger", async ({ page }) => {
+  await open(page, "fabrials-structure--switcher-in-pane");
+  const state = () =>
+    page.evaluate(() =>
+      [...document.querySelectorAll("[data-pane]")].map((pane) => {
+        const trigger = pane.querySelector(".fui-nav-switcher-trigger")!;
+        const mark = pane.querySelector(".fui-nav-switcher-mark")!;
+        return {
+          width: Math.round(pane.getBoundingClientRect().width / 16 * 100) / 100,
+          container: getComputedStyle(trigger).containerType,
+          mark: getComputedStyle(mark).display !== "none",
+          tag: getComputedStyle(pane.querySelector(".fui-nav-switcher-tag")!).display !== "none",
+          overflow: trigger.scrollWidth - trigger.clientWidth,
+        };
+      }),
+    );
+  const rows = await state();
+  // Four named panes (14, 17.5, 17.75, 24rem), the default trigger in an 18rem pane, and the resizable one (24rem).
+  expect(rows.map((row) => row.container)).toEqual(["normal", "normal", "normal", "normal", "inline-size", "normal"]);
+  expect(rows.map((row) => row.mark)).toEqual([false, false, true, true, false, true]);
+  for (const row of rows) {
+    expect(row.tag).toBe(true);
+    expect(row.overflow).toBe(0);
+  }
+  // Dragging the resizable pane below and above the threshold moves the mark, with no script in the page.
+  const pane = page.locator("[data-pane]").last();
+  for (const [width, mark] of [[16 * 16, false], [17.4 * 16, false], [17.9 * 16, true]] as const) {
+    await pane.evaluate((element, value) => ((element as HTMLElement).style.inlineSize = `${value}px`), width);
+    expect(await pane.locator(".fui-nav-switcher-mark").evaluate((element) => getComputedStyle(element).display !== "none")).toBe(mark);
+  }
+});

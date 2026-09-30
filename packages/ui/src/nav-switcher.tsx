@@ -1,7 +1,7 @@
 "use client";
 // Origin: Fabrials, 0.8 (promoted from Open Email's mailbox switcher).
 
-import { createContext, useContext, useRef, type ComponentProps, type ReactNode, type Ref } from "react";
+import { createContext, useContext, useMemo, useRef, type ComponentProps, type ReactNode, type Ref } from "react";
 import { useRender } from "@base-ui/react/use-render";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
@@ -9,11 +9,19 @@ import { SidebarMenuButton } from "./sidebar";
 import { classes } from "./shared";
 
 type Layout = "block" | "inline";
-const LayoutContext = createContext<Layout>("block");
+type Setup = { layout: Layout; contain: boolean };
+const LayoutContext = createContext<Setup>({ layout: "block", contain: true });
 
 export type NavSwitcherProps = ComponentProps<typeof Popover> & {
   /** `block` fills its column (a sidebar, a pane) with a bordered 56 px box; `inline` sizes to its content (a header, a toolbar). */
   layout?: Layout;
+  /** Whether a `block` trigger is the size container its `mark` and `tag` rules read (default `true`: it measures its own
+   * box, which is about 2 rem narrower than the column around it). `false` creates no container: the rules then read the
+   * nearest ancestor container named `nav-switcher`, so the host names its pane (`container: nav-switcher / inline-size`,
+   * or `container-name: sidebar nav-switcher`) and the mark follows the pane's width. Without such an ancestor the
+   * container rules do not apply and the mark stays. The thresholds are the pane's content width: below 17.5rem a
+   * mark that has a `tag` beside it is hidden, below 15rem every mark is. */
+  contain?: boolean;
 };
 
 /**
@@ -33,9 +41,10 @@ export type NavSwitcherProps = ComponentProps<typeof Popover> & {
  * </NavSwitcher>
  * ```
  */
-export function NavSwitcher({ layout = "block", ...props }: NavSwitcherProps) {
+export function NavSwitcher({ layout = "block", contain = true, ...props }: NavSwitcherProps) {
+  const setup = useMemo<Setup>(() => ({ layout, contain }), [layout, contain]);
   return (
-    <LayoutContext.Provider value={layout}>
+    <LayoutContext.Provider value={setup}>
       <Popover {...props} />
     </LayoutContext.Provider>
   );
@@ -56,9 +65,9 @@ export type NavSwitcherTriggerProps = Omit<ComponentProps<typeof PopoverTrigger>
 };
 
 export function NavSwitcherTrigger({ mark, title, description, tag, label, className, ...props }: NavSwitcherTriggerProps) {
-  const layout = useContext(LayoutContext);
+  const { layout, contain } = useContext(LayoutContext);
   return (
-    <PopoverTrigger data-layout={layout} className={classes("fui-nav-switcher-trigger", className)} {...props}>
+    <PopoverTrigger data-layout={layout} data-contain={contain ? undefined : "false"} className={classes("fui-nav-switcher-trigger", className)} {...props}>
       {mark ? (
         <span className="fui-nav-switcher-mark" aria-hidden="true">
           {mark}

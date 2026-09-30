@@ -486,7 +486,7 @@ function Rows({ withState = true }: { withState?: boolean }) {
   );
 }
 
-function Switcher({ layout = "block", open = false, current = "ana", many = false }: { layout?: "block" | "inline"; open?: boolean; current?: string; many?: boolean }) {
+function Switcher({ layout = "block", open = false, current = "ana", many = false, contain }: { layout?: "block" | "inline"; open?: boolean; current?: string; many?: boolean; contain?: boolean }) {
   const entries = [
     { id: "ana", label: "ana@example.test", detail: "Personal", state: "active" },
     { id: "work", label: "ana.ruiz@a-very-long-company-domain.example.test", detail: "Work", state: "reauth" },
@@ -495,7 +495,7 @@ function Switcher({ layout = "block", open = false, current = "ana", many = fals
   ];
   const shown = entries.find((entry) => entry.id === current) ?? entries[0]!;
   return (
-    <NavSwitcher layout={layout} defaultOpen={open}>
+    <NavSwitcher layout={layout} defaultOpen={open} contain={contain}>
       <NavSwitcherTrigger
         label="Switch mailbox"
         mark={<Avatar size="sm"><AvatarFallback>{shown.label.slice(0, 1).toUpperCase()}</AvatarFallback></Avatar>}
@@ -622,6 +622,66 @@ function NavigationPage() {
         <Frame flush>
           <ResizeDemo vertical />
         </Frame>
+      </Block>
+    </Page>
+  );
+}
+
+/** A pane the host names `nav-switcher`: the switcher's mark rules read the pane's own width, not the trigger's. */
+function NamedPane({ children, ...style }: { children: ReactNode; width?: string; height?: string; resize?: boolean }) {
+  return (
+    <div
+      data-pane
+      style={{
+        containerType: "inline-size",
+        containerName: "nav-switcher",
+        inlineSize: style.width,
+        maxInlineSize: "100%",
+        boxSizing: "border-box",
+        border: "1px solid var(--border)",
+        borderRadius: "var(--fui-radius-lg)",
+        background: "var(--sidebar)",
+        color: "var(--sidebar-foreground)",
+        resize: style.resize ? "horizontal" : undefined,
+        overflow: style.resize ? "auto" : undefined,
+        minInlineSize: style.resize ? "12rem" : undefined,
+      }}
+    >
+      <div style={{ padding: "var(--fui-space-2)" }}>{children}</div>
+    </div>
+  );
+}
+
+function SwitcherPanePage() {
+  const widths = [
+    ["14rem", "Narrow: 14rem, no mark"],
+    ["17.5rem", "At the threshold: 17.5rem, the mark beside a tag is hidden"],
+    ["17.75rem", "Just above: the mark is back"],
+    ["24rem", "Wide"],
+  ] as const;
+  return (
+    <Page title="Switcher in a pane" description='contain={false}: the switcher makes no container of its own; its mark and tag rules read the ancestor container named nav-switcher (here the pane, 1 px border and 0.5rem padding around the trigger). Thresholds: 17.5rem hides a mark that has a tag, 15rem hides every mark.'>
+      <Block title="Pane width" description="Each frame is a size container named nav-switcher; its width is the width the rules read.">
+        <div className="catalogue-grid">
+          {widths.map(([width, label]) => (
+            <div key={width} style={{ display: "grid", gap: "var(--fui-space-2)", alignContent: "start" }}>
+              <strong style={{ fontSize: "var(--fui-text-sm)" }}>{label}</strong>
+              <NamedPane width={width}>
+                <Switcher contain={false} />
+              </NamedPane>
+            </div>
+          ))}
+        </div>
+      </Block>
+      <Block title="Same pane, default" description="Without contain={false} the trigger measures its own content box, about 2 rem narrower than the pane here (the pane's inset and the trigger's own padding), so the mark hides at a wider pane: 18rem shows no mark.">
+        <NamedPane width="18rem">
+          <Switcher />
+        </NamedPane>
+      </Block>
+      <Block title="Resizable" description="Drag the corner of the pane: the mark goes at 17.5rem (with the tag) and the tag stays.">
+        <NamedPane width="24rem" resize>
+          <Switcher contain={false} />
+        </NamedPane>
       </Block>
     </Page>
   );
@@ -794,6 +854,7 @@ function FullWidthPage() {
 
 export const FullWidthHeader: Story = { render: () => <FullWidthPage /> };
 export const Navigation: Story = { render: () => <NavigationPage /> };
+export const SwitcherInPane: Story = { render: () => <SwitcherPanePage /> };
 export const SwitcherOpen: Story = { render: () => <OpenSwitcherPage /> };
 export const Sections: Story = { render: () => <SectionsPage /> };
 export const SectionAside: Story = { render: () => <SectionAsidePage /> };
