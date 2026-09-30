@@ -158,7 +158,7 @@ test("toggle groups and the theme switcher take a size; lg paints a whole contro
   assert.match(group, /data-size="lg"/);
   assert.match(renderToStaticMarkup(<ThemeSwitcher value="system" onValueChange={() => undefined} />), /data-size="sm"/);
   assert.match(renderToStaticMarkup(<ThemeSwitcher size="lg" value="dark" onValueChange={() => undefined} />), /data-size="lg"/);
-  assert.match(styles, /\.fui-toggle-group\[data-size="lg"\] \.fui-toggle \{\s*min-height: var\(--fui-control-height\);/);
+  assert.match(styles, /\.fui-toggle-group\[data-size="lg"\] \.fui-toggle \{\s*min-height: var\(--fui-control-height-lg\);/);
 });
 
 test("loading turns native choices into neutral shapes without a tick, dash or dot", () => {
@@ -177,4 +177,20 @@ test("the toolbar's targets are pinned in px, and tiers and reveals answer to a 
   for (const [name, width] of [["early", "40"], ["middle", "52"], ["late", "76"]])
     assert.match(styles, new RegExp(`@container \\(min-width: ${width}rem\\) \\{\\s*\\.fui-toolbar-button\\[data-reveal="${name}"\\]`));
   assert.match(styles, /\.fui-toolbar\[data-contain\] \{\s*container: fui-toolbar \/ inline-size;\s*inline-size: 100%;/);
+});
+
+// Request 6. The cascade itself is checked in a real browser (tests/visual/structure.spec.ts); this keeps the rule that makes it work from being reworded away.
+test("a toolbar's px pin out-ranks the package's own touch rule", () => {
+  assert.match(styles, /\.fui-toolbar \.fui-button:is\(\[data-size\], \[class\*="fui-button-size"\]\) \{\s*min-block-size: 44px;\s*min-inline-size: 44px;/);
+});
+
+// Request 7.
+test("the menu row label rule costs no specificity and skips a trailing count or tag", () => {
+  assert.match(styles, /:where\(\s*\.fui-sidebar-menu-button > span:last-child:not\(\.fui-sidebar-menu-badge, \.fui-badge, \[data-slot="badge"\]\),/);
+  assert.match(styles, /:where\(\.fui-sidebar-menu-sub-button > span:last-child:not\(\.fui-sidebar-menu-badge, \.fui-badge, \[data-slot="badge"\]\)\) \{/);
+});
+
+// Request 11.
+test("the rows accordion is not underlined on hover", () => {
+  assert.match(styles, /\.fui-accordion\[data-variant="rows"\] \.fui-accordion-trigger:hover \{\s*text-decoration: none;/);
 });

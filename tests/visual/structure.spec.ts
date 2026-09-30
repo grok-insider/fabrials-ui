@@ -231,6 +231,63 @@ test("a switcher with contain={false} follows the pane named nav-switcher; the d
   }
 });
 
+// Request 6: a toolbar's targets are pinned in px and beat the package's own touch-and-narrow rule (min 2.75rem), which
+// jsdom cannot see (cascade order and media queries). A coarse pointer on a 390 px screen, at 100 % and 200 % root text, set
+// before the first paint (Firefox does not re-evaluate rem container queries on a live change).
+test.describe("a toolbar on a phone keeps its targets at 44 px", () => {
+  test.use({ hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } });
+  for (const scale of [100, 200]) {
+    test(`at ${scale} % root text`, async ({ page }) => {
+      await page.addInitScript((size) => {
+        const set = () => {
+          if (!document.documentElement) return false;
+          document.documentElement.style.fontSize = `${size}%`;
+          return true;
+        };
+        if (!set()) new MutationObserver((_, observer) => {
+          if (set()) observer.disconnect();
+        }).observe(document, { childList: true });
+      }, scale);
+      await page.goto("/iframe.html?id=fabrials-controls--toolbars&viewMode=story&globals=theme:light");
+      await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+      await page.evaluate(() => document.fonts.ready);
+      expect(await page.evaluate(() => matchMedia("(pointer: coarse)").matches)).toBe(true);
+      const bars = await page.evaluate(() =>
+        [...document.querySelectorAll(".fui-toolbar")].map((bar) => ({
+          label: bar.getAttribute("aria-label"),
+          height: Math.round(bar.getBoundingClientRect().height),
+          boxes: [...bar.querySelectorAll(".fui-button")]
+            .map((button) => button.getBoundingClientRect())
+            .filter((box) => box.width > 0)
+            .map((box) => [Math.round(box.width), Math.round(box.height)]),
+        })),
+      );
+      expect(bars.length).toBeGreaterThan(3);
+      for (const bar of bars) {
+        for (const [width, height] of bar.boxes) {
+          expect(height, `${bar.label} button height`).toBe(44);
+          expect(width, `${bar.label} button width`).toBeGreaterThanOrEqual(44);
+        }
+      }
+      // An icon button (a ToolbarButton and a class-only back link) stays square, and the row stays one row.
+      const touch = bars.find((bar) => bar.label === "Message actions, touch")!;
+      expect(touch.height).toBe(44);
+      expect(touch.boxes.filter(([width]) => width === 44).length).toBeGreaterThanOrEqual(4);
+      // Outside a toolbar the touch rule is untouched: a Button asks for 2.75rem.
+      const outside = await page.evaluate(() => {
+        const button = document.createElement("button");
+        button.className = "fui-button";
+        button.dataset.size = "icon";
+        document.body.append(button);
+        const box = button.getBoundingClientRect();
+        button.remove();
+        return [Math.round(box.width), Math.round(box.height)];
+      });
+      expect(outside).toEqual([44 * (scale / 100), 44 * (scale / 100)]);
+    });
+  }
+});
+
 // ---------------------------------------------------------------------------------------- data-hit shapes (0.8.1)
 
 test("data-hit: 44 reaches four sides, y block-wise only, end block-wise and past the end edge only (LTR and RTL)", async ({ page }) => {
@@ -288,3 +345,106 @@ test("the three data-hit shapes, with the target drawn", async ({ page }) => {
 });
 
 // Request 7: the row's name rule costs no specificity, so a consumer's bare class wins, and a trailing count or tag keeps its width.
+test("a menu row cuts a long name by default, keeps a trailing count and tag at their width, and lets a bare consumer class wrap the name", async ({ page }) => {
+  await open(page, "fabrials-structure--navigation-labels");
+  const measure = () =>
+    page.evaluate(() => {
+      const row = (label: string, href: string) => document.querySelector(`nav[aria-label="${label}"] a[href="${href}"]`)!;
+      const info = (label: string, href: string) => {
+        const link = row(label, href);
+        const name = [...link.children].find((child) => child.tagName === "SPAN")! as HTMLElement;
+        const tail = link.lastElementChild as HTMLElement;
+        const style = getComputedStyle(name);
+        return {
+          whiteSpace: style.whiteSpace,
+          ellipsis: style.textOverflow,
+          cut: name.scrollWidth > name.clientWidth,
+          height: name.getBoundingClientRect().height,
+          line: parseFloat(style.lineHeight),
+          tailWidth: tail === name ? 0 : Math.round(tail.getBoundingClientRect().width * 10) / 10,
+        };
+      };
+      return {
+        cutPlain: info("Cut labels", "#long"),
+        cutCount: info("Cut labels", "#count"),
+        cutTag: info("Cut labels", "#tag"),
+        cutSub: info("Cut labels", "#sub-long"),
+        wrapPlain: info("Wrapped labels", "#long"),
+        wrapCount: info("Wrapped labels", "#count"),
+        wrapSub: info("Wrapped labels", "#sub-long"),
+      };
+    });
+  const narrow = await measure();
+  for (const key of ["cutPlain", "cutCount", "cutTag", "cutSub"] as const) {
+    expect(narrow[key].whiteSpace, key).toBe("nowrap");
+    expect(narrow[key].ellipsis, key).toBe("ellipsis");
+    expect(narrow[key].cut, key).toBe(true);
+  }
+  // A bare `.catalogue-wrap-name { white-space: normal }` (no !important, no row in front) wins, and the name takes more than one line.
+  for (const key of ["wrapPlain", "wrapCount", "wrapSub"] as const) {
+    expect(narrow[key].whiteSpace, key).toBe("normal");
+    expect(narrow[key].height, key).toBeGreaterThan(narrow[key].line * 1.5);
+  }
+  // The count and the tag are exactly as wide as they are with room to spare: a long name never crushes them.
+  await page.evaluate(() => document.querySelectorAll("nav").forEach((nav) => ((nav.parentElement as HTMLElement).style.maxWidth = "900px")));
+  const wide = await measure();
+  expect(narrow.cutCount.tailWidth).toBe(wide.cutCount.tailWidth);
+  expect(narrow.cutTag.tailWidth).toBe(wide.cutTag.tailWidth);
+  expect(narrow.cutCount.tailWidth).toBeGreaterThan(0);
+  expect(narrow.wrapCount.tailWidth).toBe(wide.wrapCount.tailWidth);
+});
+
+// Request 10: size="lg" of a toggle group paints the large control height (44 px) on every pointer; sm and default are unchanged.
+const toggleHeights = (page: Page) =>
+  page.evaluate(() => {
+    const items = (label: string) => [...document.querySelectorAll(`[role="group"][aria-label="${label}"] .fui-toggle`)].map((item) => item.getBoundingClientRect());
+    const group = (label: string) => document.querySelector(`[role="group"][aria-label="${label}"]`)!.getBoundingClientRect();
+    return {
+      sm: items("Range, sm")[0].height,
+      base: items("Range, default")[0].height,
+      lg: items("Range, lg")[0].height,
+      groupLg: group("Range, lg").height,
+      themeLg: items("Theme, large").map((box) => [box.width, box.height]),
+      pointerCoarse: matchMedia("(pointer: coarse)").matches,
+    };
+  });
+test("a large toggle group and theme switcher paint 44 px on a fine pointer, the group's padding around them", async ({ page }) => {
+  await open(page, "fabrials-controls--toggles");
+  const heights = await toggleHeights(page);
+  expect(heights.pointerCoarse).toBe(false);
+  expect(heights.lg).toBe(44);
+  expect(heights.groupLg).toBe(50);
+  expect(heights.sm).toBe(26);
+  expect(heights.base).toBe(34);
+  expect(heights.themeLg).toEqual([[44, 44], [44, 44], [44, 44]]);
+});
+test.describe("on a coarse pointer", () => {
+  test.use({ hasTouch: true, isMobile: true });
+  test("a large toggle group paints the same 44 px", async ({ page }) => {
+    await page.goto("/iframe.html?id=fabrials-controls--toggles&viewMode=story&globals=theme:light");
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
+    const heights = await toggleHeights(page);
+    expect(heights.pointerCoarse).toBe(true);
+    expect(heights.lg).toBe(44);
+    expect(heights.groupLg).toBe(50);
+    expect(heights.themeLg.every(([width, height]) => width === 44 && height === 44)).toBe(true);
+  });
+});
+
+// Request 11: the rows variant has its fill as the hover cue and does not underline the title; the default accordion still does.
+test("an accordion trigger underlines on hover in the default look and not in the rows variant", async ({ page }) => {
+  await open(page, "fabrials-commands--tools");
+  const line = (locator: ReturnType<Page["locator"]>) => locator.evaluate((element) => getComputedStyle(element).textDecorationLine);
+  const rows = page.locator(".fui-accordion[data-variant='rows'] .fui-accordion-trigger").first();
+  const plain = page.locator(".fui-accordion:not([data-variant='rows']) .fui-accordion-trigger").last();
+  expect(await line(rows)).toBe("none");
+  expect(await line(plain)).toBe("none");
+  await rows.hover();
+  expect(await line(rows)).toBe("none");
+  await plain.hover();
+  expect(await line(plain)).toBe("underline");
+  await rows.focus();
+  await page.keyboard.press("Tab");
+  expect(await line(rows)).toBe("none");
+});

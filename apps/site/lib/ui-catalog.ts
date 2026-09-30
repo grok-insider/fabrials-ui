@@ -1069,7 +1069,7 @@ export const uiCatalog: UiCatalogItem[] = [
     [
       ["value", "string[]", "Selected items."],
       ["onValueChange", "(value: string[]) => void", "Keep at least one selected for a single choice."],
-      ["size", "default | sm | lg", "Painted height 34, 26 or 40px; every size is 44px on touch and narrow screens."],
+      ["size", "default | sm | lg", "Painted height 34, 26 or 44px (lg is 44px on every pointer, group padding around it); default and sm are 44px on touch and narrow screens."],
     ],
     "Use it for a view or range next to what it changes; use RadioGroup inside forms.",
   ),
@@ -1083,7 +1083,7 @@ export const uiCatalog: UiCatalogItem[] = [
       ["value", "system | light | dark", "The stored preference."],
       ["onValueChange", "(value) => void", "The host applies and stores it."],
       ["showLabels", "boolean", "Words next to the icons."],
-      ["size", "default | sm | lg", "sm by default; lg matches the 40px controls of a settings row."],
+      ["size", "default | sm | lg", "sm by default; lg paints 44px on every pointer (a settings row of primary targets), so the group is 50px tall."],
     ],
     "The host owns storage and the class on the root element; the switcher only presents the choice.",
   ),

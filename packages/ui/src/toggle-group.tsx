@@ -11,7 +11,7 @@ export function ToggleGroup({
   size = "default",
   ...props
 }: StyledProps<BaseToggleGroup.Props> & {
-  /** `sm` 26 px, `default` 34 px, `lg` 40 px painted (a whole control height); every size is 44 px on touch and narrow screens. */
+  /** `sm` 26 px, `default` 34 px, `lg` 44 px painted on every pointer (the large control height); `sm` and `default` are 44 px on touch and narrow screens. */
   size?: "default" | "sm" | "lg";
 }) {
   return (
@@ -62,7 +62,7 @@ export function ThemeSwitcher({
   labels?: Record<ThemePreference, ReactNode>;
   showLabels?: boolean;
   label?: string;
-  /** As `ToggleGroup`; `lg` matches the 40 px controls of a settings row. */
+  /** As `ToggleGroup`; `lg` paints 44 px on every pointer, for a row of primary 44 px targets. */
   size?: "default" | "sm" | "lg";
   className?: string;
 }) {

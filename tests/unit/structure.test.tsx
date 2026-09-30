@@ -227,8 +227,8 @@ test("sidebar menu: rows render without a provider (expanded), the count is a sp
   // The active bar is the 2 px Stormlight ink bar everywhere, inline-start (RTL-correct).
   assert.match(rule('.fui-sidebar-menu-button[data-active]::before'), /inset-inline-start: 0/);
   assert.match(rule('.fui-sidebar-menu-button[data-active]::before'), /var\(--fui-bar\)/);
-  // The name ellipsizes, not the count that follows it.
-  assert.match(styles, /\.fui-sidebar-menu-button > span:has\(\+ :is\(\.fui-sidebar-menu-badge, \.fui-badge\)\)/);
+  // The name ellipsizes, not the count that follows it, and the rule costs no specificity (a consumer's bare class wins).
+  assert.match(styles, /:where\(\.fui-sidebar-menu-button > span:has\(\+ :is\(\.fui-sidebar-menu-badge, \.fui-badge, \[data-slot="badge"\]\)\)\) \{\s*flex: 1 1 auto;/);
 });
 
 // ------------------------------------------------------------------------------ Resizable

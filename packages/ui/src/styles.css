@@ -297,6 +297,13 @@
     min-block-size: 44px;
     min-inline-size: 44px;
   }
+  /* One attribute more specific than the touch-and-narrow block far below (min 2.75rem, 0,2,0), so the pin wins wherever the
+     two sit in the file: a rem target would double at 200 % text on a phone and wrap the bar. Every Button, ToolbarButton and
+     class-only button inside a toolbar is pinned; outside a toolbar the touch rule is untouched. */
+  .fui-toolbar .fui-button:is([data-size], [class*="fui-button-size"]) {
+    min-block-size: 44px;
+    min-inline-size: 44px;
+  }
   .fui-toolbar .fui-button[data-size="icon-lg"] {
     block-size: 44px;
   }
@@ -2232,9 +2239,10 @@
     padding: 0 var(--fui-space-2);
     font-size: 0.8125rem;
   }
-  /* lg: the painted toggle is one whole control height (40 px, 44 on touch), as wide as its neighbours in a form row. */
+  /* lg: the painted toggle is the large control height, 44 px on every pointer (the group's own 3 px padding and hairline stay
+     around it), as tall as a primary target and as its large neighbours in a form row. */
   .fui-toggle-group[data-size="lg"] .fui-toggle {
-    min-height: var(--fui-control-height);
+    min-height: var(--fui-control-height-lg);
   }
   .fui-toggle svg {
     width: 1rem;
@@ -4232,14 +4240,19 @@
     color: var(--muted-foreground);
     transition: color var(--fui-duration) var(--fui-ease);
   }
-  .fui-sidebar-menu-button > span:last-child,
-  .fui-sidebar-menu-button > span:has(+ :is(.fui-sidebar-menu-badge, .fui-badge)) {
+  /* The name of a row cuts itself with an ellipsis. The rule costs no specificity (:where), so any consumer rule wins without
+     an !important (a touch screen has no tooltip: a host can let the name wrap), and it leaves a trailing count or tag alone
+     (a SidebarMenuBadge, a Badge), which keeps its own width. */
+  :where(
+      .fui-sidebar-menu-button > span:last-child:not(.fui-sidebar-menu-badge, .fui-badge, [data-slot="badge"]),
+      .fui-sidebar-menu-button > span:has(+ :is(.fui-sidebar-menu-badge, .fui-badge, [data-slot="badge"]))
+    ) {
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  .fui-sidebar-menu-button > span:has(+ :is(.fui-sidebar-menu-badge, .fui-badge)) {
+  :where(.fui-sidebar-menu-button > span:has(+ :is(.fui-sidebar-menu-badge, .fui-badge, [data-slot="badge"]))) {
     flex: 1 1 auto;
   }
   .fui-sidebar-menu-button > .fui-badge {
@@ -4368,6 +4381,7 @@
   /* Inside the button the count is in the row (part of its name), at its end. */
   .fui-sidebar-menu-button > .fui-sidebar-menu-badge {
     position: static;
+    min-width: 0; /* as wide as its text, as it always was (the 1.25rem floor is the floating badge's); no longer a side effect of the label rule */
     flex: none;
     margin-inline-start: auto;
     height: auto;
@@ -4443,7 +4457,7 @@
     color: var(--sidebar-accent-foreground);
     font-weight: var(--fui-weight-medium);
   }
-  .fui-sidebar-menu-sub-button > span:last-child {
+  :where(.fui-sidebar-menu-sub-button > span:last-child:not(.fui-sidebar-menu-badge, .fui-badge, [data-slot="badge"])) {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -5401,6 +5415,10 @@
       text-decoration: underline;
       text-underline-offset: 3px;
     }
+    /* A row's fill is its hover cue; the title is not underlined on top of it. */
+    .fui-accordion[data-variant="rows"] .fui-accordion-trigger:hover {
+      text-decoration: none;
+    }
     .fui-lockup:is(a):hover .fui-lockup-product {
       text-decoration: underline;
       text-underline-offset: 3px;
@@ -5472,8 +5490,8 @@
     /* Segmented toggles and tabs are 6 px shorter than a control (they sit inside a 3 px padded group), so their hit area is
        extended by that padding instead of growing the group: 44 px tall targets, nothing moves (a header with a theme
        switcher keeps its width at 390 px). An icon-only theme switcher is square and also gains the 3 px each side (the 2 px
-       gap between items means neighbours share a pixel or two). `size="lg"` paints the whole control height instead, 44 px
-       here, and needs no extension. */
+       gap between items means neighbours share a pixel or two). `size="lg"` paints the whole 44 px instead
+       (on every pointer) and needs no extension. */
     .fui-toggle,
     .fui-tabs-list[data-variant="segmented"] .fui-tab {
       position: relative;

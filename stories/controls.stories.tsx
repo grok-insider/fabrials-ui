@@ -23,6 +23,7 @@ import {
 import {
   Badge,
   Button,
+  buttonVariants,
   Disclosure,
   DisclosurePanel,
   DisclosureSummary,
@@ -275,6 +276,22 @@ function ToolbarsPage() {
           </Toolbar>
         </Frame>
       </Block>
+      <Block
+        title="Touch and a larger text size"
+        description="Every target in a toolbar is pinned at 44 px, an icon button, a named ToolbarButton and a Button you put in it (a back link). On a phone (767 px or narrower, or a coarse pointer) the package's touch rule asks for 2.75rem; inside a toolbar the pin wins, so the row keeps its height at a 200 % root font size instead of doubling and wrapping."
+      >
+        <Frame width={358}>
+          <Toolbar aria-label="Message actions, touch">
+            <a href="#back" aria-label="Back to the inbox" className={buttonVariants({ variant: "ghost", size: "icon-lg" })}>
+              <ArrowLeft aria-hidden />
+            </a>
+            <Button variant="outline" size="sm">Reply</Button>
+            <ToolbarButton label="Archive"><Archive aria-hidden /></ToolbarButton>
+            <ToolbarButton label="Delete"><Trash2 aria-hidden /></ToolbarButton>
+            <ToolbarButton label="More"><Ellipsis aria-hidden /></ToolbarButton>
+          </Toolbar>
+        </Frame>
+      </Block>
       <Block title="Loading">
         <Frame width={640}>
           <Loading when label="Loading message actions">
@@ -520,7 +537,7 @@ function TogglesPage() {
       title="Toggles and segments"
       description="Segmented controls keep their look on touch and narrow screens and get a 44 px hit area; size lg paints the whole height."
     >
-      <Block title="Sizes" description="sm 26 px, default 34 px, lg 40 px painted on a fine pointer; on touch lg paints 44 px and the others get a 44 px hit area.">
+      <Block title="Sizes" description="sm 26 px, default 34 px, lg 44 px painted on every pointer (the group's own 3 px padding stays around it, so an lg group is 50 px tall); on touch the others get a 44 px hit area.">
         <div className="catalogue-row">
           {(["sm", "default", "lg"] as const).map((size) => (
             <ToggleGroup key={size} aria-label={`Range, ${size}`} size={size} defaultValue={["7d"]}>
@@ -531,7 +548,7 @@ function TogglesPage() {
           ))}
         </div>
       </Block>
-      <Block title="Theme switcher" description="size defaults to sm, as before; lg matches the 40 px controls of a settings row.">
+      <Block title="Theme switcher" description="size defaults to sm, as before; lg paints 44 px on every pointer, for a settings row of primary 44 px targets.">
         <div className="catalogue-row">
           <ThemeSwitcher value={theme} onValueChange={setTheme} label="Theme, small" />
           <ThemeSwitcher value={theme} onValueChange={setTheme} label="Theme, default" size="default" />

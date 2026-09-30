@@ -960,4 +960,87 @@ export const SwitcherOpen: Story = { render: () => <OpenSwitcherPage /> };
 export const Sections: Story = { render: () => <SectionsPage /> };
 export const SectionAside: Story = { render: () => <SectionAsidePage /> };
 export const HitAreas: Story = { render: () => <HitAreasPage /> };
+
+// ------------------------------------------------------- Menu row labels (request 7)
+
+const longName = "Quarterly planning notes for the whole procurement group";
+
+function LabelRows({ wrap = false }: { wrap?: boolean }) {
+  const name = wrap ? "catalogue-wrap-name" : undefined;
+  return (
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <SidebarMenuButton size="touch" render={<a href="#long" />}>
+          <FolderOpen aria-hidden />
+          <span className={name}>{longName}</span>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+      <SidebarMenuItem>
+        <SidebarMenuButton size="touch" render={<a href="#count" />}>
+          <FolderOpen aria-hidden />
+          <span className={name}>{longName}</span>
+          <SidebarMenuBadge>1204</SidebarMenuBadge>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+      <SidebarMenuItem>
+        <SidebarMenuButton size="touch" render={<a href="#tag" />}>
+          <FolderOpen aria-hidden />
+          <span className={name}>{longName}</span>
+          <Badge>New</Badge>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+      <SidebarMenuItem>
+        <SidebarMenuButton size="touch" render={<a href="#short" />}>
+          <Inbox aria-hidden />
+          <span className={name}>Inbox</span>
+          <SidebarMenuBadge>12</SidebarMenuBadge>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    </SidebarMenu>
+  );
+}
+
+function LabelSubRows({ wrap = false }: { wrap?: boolean }) {
+  return (
+    <SidebarMenuSub>
+      <SidebarMenuSubItem>
+        <SidebarMenuSubButton href="#sub-long" className={wrap ? "catalogue-wrap-row" : undefined}>
+          <span className={wrap ? "catalogue-wrap-name" : undefined}>{longName}</span>
+        </SidebarMenuSubButton>
+      </SidebarMenuSubItem>
+    </SidebarMenuSub>
+  );
+}
+
+function NavigationLabelsPage() {
+  return (
+    <Page
+      title="Navigation labels"
+      description="A row cuts a long name with an ellipsis. The rule costs no specificity, so a class of your own on the name wins without !important (a touch screen has no tooltip: let it wrap), and a trailing count or tag keeps its own width."
+    >
+      <Block title="Cut by default" description="The name is on one line and ends in an ellipsis; a SidebarMenuBadge and a Badge after it keep their full width. The last row is short: nothing is cut.">
+        <div className="catalogue-grid">
+          <Frame width={280} surface="sidebar">
+            <nav aria-label="Cut labels">
+              <LabelRows />
+              <LabelSubRows />
+            </nav>
+          </Frame>
+        </div>
+      </Block>
+      <Block title="Wrapped by a class of yours" description={'.catalogue-wrap-name { white-space: normal } on the name is the whole override: no !important, no row in front of it.'}>
+        <div className="catalogue-grid">
+          <Frame width={280} surface="sidebar">
+            <nav aria-label="Wrapped labels">
+              <LabelRows wrap />
+              <LabelSubRows wrap />
+            </nav>
+          </Frame>
+        </div>
+      </Block>
+    </Page>
+  );
+}
+
+export const NavigationLabels: Story = { render: () => <NavigationLabelsPage /> };
 export const DescriptionAuto: Story = { render: () => <DescriptionAutoPage /> };
