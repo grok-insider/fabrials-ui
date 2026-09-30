@@ -363,3 +363,57 @@ must fill its parent's width. Deletable: the `@container tool` rules for `.fui-d
   shadcn names are unchanged, and Escape during an IME composition is ignored.
 - **`.fui-dialog-close`** is placed with `inset-inline-end`; **`AuthLayout`** anchors its card to the start beside an aside;
   cmdk's selected `CommandItem` has the 2 px bar; `.fui-command-dialog` has 6 px corners and a maximum height.
+
+## 0.8.1: the fifteen requests Open Email still had after 0.8.0
+
+0.8.1 keeps every 0.8.0 export, token and class name, and adds what Open Email's adoption of 0.8.0 still had to carry as host code (`docs/fabrials-ui-gaps.md` in that repository lists them). Everything is optional: without the new prop or attribute, markup and geometry are those of 0.8.0. The exceptions are the CSS fixes listed under "Changed behaviour" below.
+
+### Overlays and dialogs
+
+#### `SheetContent` container, logical sides, offsets; `Sheet` `closeOnEscape`
+
+`SheetContent side` also takes `start` and `end` (logical: the other edge in a right-to-left page; `left` and `right` stay physical). `container` portals the sheet next to its trigger, so the tab order is the trigger and then the sheet (hold the element in state when the sheet can be open on the first render: a ref object is still empty then and the sheet falls back to the body; Base UI leaves its empty portal element in the container, which a flex or grid `gap` there will notice). Four documented properties place a sheet without host JavaScript or `!important`: `--fui-sheet-inset-block-start` and `--fui-sheet-inset-block-end` (default `0px`; a drawer under an app header sets the first), `--fui-sheet-z` (default one above the overlay level) and `--fui-sheet-width` (default `26rem`, still capped at the window). `Sheet closeOnEscape="focus-inside"` closes the sheet on Escape only when focus is inside it, so a drawer that stays open beside the page is not closed by an Escape meant for the editor next to it; Escape from inside still returns focus to the trigger. A Base UI menu, popover or dialog opened inside the sheet takes that Escape first; a hand-built listbox that is not a Base UI popup does not, so it must stop the event itself. `initialFocus={false}` leaves focus on the trigger when the sheet opens. Deletable: the fixed-position, inset, z-index and width plumbing of a hand-made drawer, and its own Escape handler.
+
+#### `closeVariant` on `DialogFooter` and `DialogContent`
+
+The Close that `close="footer"` draws is `secondary` by default. `closeVariant="outline"`, set once on the content (or on one footer, which wins), draws it in the look of a product whose secondary actions are outlines. Deletable: a wrapper that re-draws the footer's Close by hand.
+
+#### Scroll padding under a sticky dialog footer
+
+In a window under 30rem tall, where a dialog with a `DialogBody` scrolls as a whole and only the footer sticks, `DialogFooter` publishes its height as `--fui-dialog-footer-size` on the dialog, and the dialog pads its scrolling with it plus 1rem: a field that gets focus is scrolled above the footer instead of under it. Nothing changes for a dialog that is not in that state. Known limit: WebKit scrolls the line of text of a field into view, not its box, so in that engine the focus ring can sit close above the footer (measured 3 px at 568 x 320) and a one-line description under the field stays under it; Chromium and Firefox show the whole field.
+
+### Patterns and commands
+
+#### `BulkActionsRoot`, `BulkActionsStatus`, `BulkActionsContent`
+
+For a layout where the live status is shared with other controls (a title row that holds select-all, the folder title and the count) and the actions are a form under it. `BulkActionsRoot` provides one count, one `keepMounted` and one region label and renders a plain element the consumer lays out; `BulkActionsStatus` is the `role="status"` span (at a count of 0 it is not rendered, or with `keepMounted` it stays, visually hidden, so the change from 0 to 1 is announced by a region that already existed); `BulkActionsContent` is the labelled `role="group"` of actions, hidden at a count of 0 and out of the tab order while hidden (its own `hidden` prop keeps a closed form mounted). `BulkActions` is unchanged. Deletable: a hand-made status span, its empty-state rule, its hidden rule and its hand-made group.
+
+#### `SectionHeader` `aside`
+
+A count or a status beside the title, outside the heading element (the heading's name stays the title), wrapping under the title by the header's own width. `aside={0}` renders a `0` (an empty collection keeps its count); `false`, `null`, `undefined` and `""` render nothing. Nothing changes without it.
+
+#### `CommandTrigger` `variant`
+
+Default `secondary` (the 0.8.0 look). `outline` is the card fill and hairline of a launcher that looks like a field. Deletable: a `data-variant="outline"` written at the call site.
+
+### Structure and navigation
+
+#### `NavSwitcher` `contain`
+
+`contain={false}` makes no size container of its own, so its mark and tag rules follow the nearest ancestor container named `nav-switcher` (name a pane with `container: <yours> nav-switcher / inline-size`). The thresholds are unchanged and measured on that container's content width: 17.5rem hides a mark that has a tag, 15rem hides every mark. Deletable: a host copy of the two `@container nav-switcher` rules that shifted the thresholds by the trigger's padding.
+
+#### `data-hit="y"` and `data-hit="end"`
+
+Two more shapes of the invisible 44 px target next to `"44"`. `y` grows block-wise only, so the inline neighbours keep their own targets. `end` grows block-wise and past the end edge only, for an icon-only button at the end of an input group (in a right-to-left page too). Deletable: host classes that draw the same extension.
+
+#### `NativeRadioGroup` column floor
+
+With `layout="grid"` the column floor is the custom property `--fui-native-radio-min` (default `9rem`, radio and gap included, as before). Raise it on the group when the names are long: the pane drops to fewer columns, down to one, before a name wraps to three lines.
+
+### Changed behaviour (CSS fixes)
+
+- **Toolbar targets stay 44 px on touch.** A `Toolbar`'s pin (44 px) now out-ranks the package's own touch rule (`2.75rem`, which scales with the text size), so at 200 % text on a phone every button in a toolbar keeps 44 px and the bar no longer doubles in width and wraps. A `Button`, `ToolbarButton` or `buttonVariants` link inside a `Toolbar` is covered. At 100 % text nothing changes; outside a `Toolbar` nothing changes. Deletable: a host re-pin of the same targets.
+- **Menu row names are overridable.** The ellipsis rule of `SidebarMenuButton` and `SidebarMenuSubButton` labels costs no specificity and skips a trailing `SidebarMenuBadge` or `Badge`: a bare class of yours (`white-space: normal`) wins without `!important`, and a count beside the name keeps its size. Rendering is unchanged.
+- **`ToggleGroup size="lg"` is 44 px on every pointer**, and so is `ThemeSwitcher size="lg"`. The group is 50 px tall (its 3 px padding stays), which is 4 px more than before on a fine pointer; in compact density `lg` is no longer compacted, like `Button size="lg"`. Touch and narrow widths are unchanged.
+- **`Accordion variant="rows"` is not underlined on hover.** The row fill is its cue; the default accordion is unchanged.
+- **`DescriptionList layout="auto"`** declares its 1 rem column gap together with the row gap, outside the container query (the query only changes the columns), so no engine can drop it. Visible effect: none (one column has nothing to separate). This answers a report of Firefox dropping the gap that could not be reproduced (Firefox 1509, Chromium and WebKit all gave 16 px from 30rem on 0.8.0 too): if a host still sees the term touching its details, the cause is in the host page.

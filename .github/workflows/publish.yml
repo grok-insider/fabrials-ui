@@ -1,5 +1,5 @@
 name: Publish packages
-# Runs only for a version tag pushed on purpose (v0.8.0 and so on). Publishing uses
+# Runs only for a version tag pushed on purpose (v0.8.1 and so on). Publishing uses
 # npm trusted publishing (OIDC): each package on npmjs.com trusts this repository's
 # publish.yml, so no npm token is stored anywhere. Provenance comes with it.
 on:

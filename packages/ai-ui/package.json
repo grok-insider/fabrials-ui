@@ -1,6 +1,6 @@
 {
   "name": "@fabrials/ai-ui",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Fabrials UI pieces for AI products: providers, quotas, history and chat.",
   "homepage": "https://ui.fabrials.com",
   "repository": {
@@ -28,7 +28,7 @@
     "LOBE-ICONS-LICENSE"
   ],
   "peerDependencies": {
-    "@fabrials/ui": "0.8.0",
+    "@fabrials/ui": "0.8.1",
     "react": "^19",
     "react-dom": "^19"
   },

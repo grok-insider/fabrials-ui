@@ -6,7 +6,7 @@
   "description": "shadcn's breadcrumb, backed by @fabrials/ui. Where the page sits, with a way back up.",
   "author": "Fabrials <admin@grokinsider.net>",
   "dependencies": [
-    "@fabrials/ui@^0.8.0"
+    "@fabrials/ui@^0.8.1"
   ],
   "registryDependencies": [
     "https://ui.fabrials.com/r/styles.json"

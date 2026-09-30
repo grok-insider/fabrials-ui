@@ -6,7 +6,7 @@
   "description": "shadcn's alert-dialog, backed by @fabrials/ui. A confirmation for a destructive or hard-to-undo action.",
   "author": "Fabrials <admin@grokinsider.net>",
   "dependencies": [
-    "@fabrials/ui@^0.8.0"
+    "@fabrials/ui@^0.8.1"
   ],
   "registryDependencies": [
     "https://ui.fabrials.com/r/styles.json"

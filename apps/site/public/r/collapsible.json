@@ -6,7 +6,7 @@
   "description": "shadcn's collapsible, backed by @fabrials/ui. A disclosure for reasoning, sources or a long detail.",
   "author": "Fabrials <admin@grokinsider.net>",
   "dependencies": [
-    "@fabrials/ui@^0.8.0"
+    "@fabrials/ui@^0.8.1"
   ],
   "registryDependencies": [
     "https://ui.fabrials.com/r/styles.json"
