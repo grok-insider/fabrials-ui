@@ -76,7 +76,7 @@ test("the footer wraps under 34rem: the ink action keeps its place, last, on a f
 test("a short window scrolls the dialog as a whole and keeps only the footer; a phone keeps the safe areas", () => {
   const at = styles.indexOf("@media (max-height: 30rem) {\n    .fui-dialog:has(> .fui-dialog-body) {");
   assert.ok(at > 0);
-  const block = styles.slice(at, at + 700);
+  const block = styles.slice(at, at + 1400);
   assert.match(block, /position: sticky/);
   assert.match(block, /inset-block-end: 0/);
   assert.match(styles, /padding-block-end: max\(var\(--fui-space-3\), env\(safe-area-inset-bottom, 0px\)\)/);
@@ -283,4 +283,48 @@ test("the new rules use tokens only: no literal colour in the 0.8 overlay blocks
     const block = styles.slice(at, at + 9000);
     assert.doesNotMatch(block.slice(0, block.indexOf("*/", 10) + 4 + 4000), /#[0-9a-fA-F]{3,8}\b|rgb\(|hsl\(|oklch\(/);
   }
+});
+
+// ------------------------------------------------- 0.8.1: sheet placement, close variant, scroll padding
+
+test("a sheet is placed by four public custom properties whose defaults are the full-height panel it always was", () => {
+  const sheet = rule('.fui-dialog:is([data-placement="start"], [data-placement="end"]) {');
+  assert.match(sheet, /top: var\(--fui-sheet-inset-block-start, 0px\)/);
+  assert.match(sheet, /height: calc\(100dvh - var\(--fui-sheet-inset-block-start, 0px\) - var\(--fui-sheet-inset-block-end, 0px\)\)/);
+  assert.match(sheet, /max-height: calc\(100dvh - var\(--fui-sheet-inset-block-start, 0px\) - var\(--fui-sheet-inset-block-end, 0px\)\)/);
+  assert.match(sheet, /z-index: var\(--fui-sheet-z, calc\(var\(--fui-z-overlay\) \+ 1\)\)/);
+  assert.match(sheet, /width: min\(var\(--fui-sheet-width, 26rem\), 100vw\)/);
+  // tokens only: no literal length other than the documented defaults
+  assert.doesNotMatch(sheet, /#[0-9a-fA-F]{3,8}\b|rgb\(|hsl\(|oklch\(|!important/);
+});
+
+test("the physical sides keep their rules; the logical sides are inline insets that follow the direction", () => {
+  assert.match(rule('.fui-dialog[data-placement="end"] {'), /right: 0;/);
+  assert.match(rule('.fui-dialog[data-placement="start"] {'), /left: 0;/);
+  assert.match(styles, /\.fui-dialog\[data-side="start"\] \{\s*inset-inline-start: 0;\s*\}/);
+  assert.match(styles, /\.fui-dialog\[data-side="end"\] \{\s*inset-inline-end: 0;\s*\}/);
+  // the slide in and out follows the direction: the end edge is the left one in a right-to-left page
+  assert.match(styles, /\.fui-dialog\[data-side="end"\]:dir\(rtl\):is\(\[data-starting-style\], \[data-ending-style\]\) \{\s*transform: translateX\(-100%\)/);
+  assert.match(styles, /\.fui-dialog\[data-side="end"\]:dir\(ltr\):is\(\[data-starting-style\], \[data-ending-style\]\)/);
+});
+
+test("the sticky footer is the one that pads the scroll: only in the short-window rule, only from the published height", () => {
+  const at = styles.indexOf("@media (max-height: 30rem) {\n    .fui-dialog:has(> .fui-dialog-body) {");
+  assert.ok(at > 0);
+  const block = styles.slice(at, styles.indexOf("/* A full-screen dialog keeps its bars", at));
+  assert.match(block, /scroll-padding-block-end: calc\(var\(--fui-dialog-footer-size\) \+ var\(--fui-space-4\)\)/);
+  // no fallback in the var(): without a published height the declaration is invalid at computed-value time, so there is no padding
+  assert.doesNotMatch(block, /--fui-dialog-footer-size,/);
+  assert.equal(styles.split("scroll-padding-block-end").length - 1 >= 1, true);
+  // and nowhere else does a dialog rule set a scroll padding
+  assert.equal(styles.slice(0, at).includes("--fui-dialog-footer-size"), false);
+});
+
+test("the dialog source: closeVariant defaults to secondary and reaches the footer through the chrome, and Sheet scopes Escape by focus", () => {
+  const source = readFileSync(new URL("../../packages/ui/src/dialog.tsx", import.meta.url), "utf8");
+  assert.match(source, /closeVariant = "secondary"/);
+  assert.match(source, /closeVariant \?\? chrome\?\.closeVariant \?\? "secondary"/);
+  assert.match(source, /closeOnEscape = "anywhere"/);
+  assert.match(source, /closeOnEscape === "focus-inside" && details\.reason === "escape-key"/);
+  assert.match(source, /<BaseDialog\.Portal keepMounted=\{keepMounted\} container=\{container\}>/);
 });

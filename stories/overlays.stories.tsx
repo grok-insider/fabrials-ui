@@ -1,4 +1,4 @@
-import { useEffect, useId, useState, type ReactNode } from "react";
+import { useEffect, useId, useState, type CSSProperties, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { CircleAlert, CircleCheck, RefreshCw, Settings, Wrench } from "lucide-react";
 import {
@@ -274,6 +274,141 @@ function ModalSheetPage() {
   );
 }
 
+// ------------------------------------------------------------ Close variant
+
+/** `closeVariant` on the content sets the footer Close once: here an outline, like the other secondary action beside it. */
+function CloseVariantPage() {
+  return (
+    <Page title="Close as an outline" description="The footer Close is a secondary (grey) button by default. A product whose secondary actions are outlines sets closeVariant once on the DialogContent; a DialogFooter closeVariant wins.">
+      <Dialog defaultOpen>
+        <DialogTrigger render={<Button variant="secondary" style={{ justifySelf: "start" }}>Discard changes</Button>} />
+        <DialogContent close="footer" closeVariant="outline">
+          <DialogHeader>
+            <DialogTitle>Discard your changes?</DialogTitle>
+            <DialogDescription>Close and Keep editing are both outlines; the primary action is the ink one.</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline">Keep editing</Button>
+            <DialogClose render={<Button>Discard</Button>} />
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog>
+        <DialogTrigger render={<Button variant="secondary" style={{ justifySelf: "start" }}>Footer wins</Button>} />
+        <DialogContent close="footer" closeVariant="outline">
+          <DialogHeader>
+            <DialogTitle>The footer decides</DialogTitle>
+            <DialogDescription>The content says outline; this footer says ghost, and the footer wins.</DialogDescription>
+          </DialogHeader>
+          <DialogFooter closeVariant="ghost">
+            <Button>Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </Page>
+  );
+}
+
+// ------------------------------------------------------------- Long form
+
+/** A long form in a fixed dialog: in a short window the footer sticks and the last field must stay clear of it when it takes focus. */
+function LongFormDialogPage() {
+  return (
+    <Page title="Long form in a short window" description="Under 30rem of window height the dialog scrolls as a whole and only the footer sticks. Tab to the last field: it scrolls into view above the footer, not under it.">
+      <Dialog defaultOpen>
+        <DialogTrigger render={<Button variant="secondary" style={{ justifySelf: "start" }}>New signature</Button>} />
+        <DialogContent size="wide" close="footer">
+          <DialogHeader>
+            <DialogTitle>New signature</DialogTitle>
+          </DialogHeader>
+          <DialogBody>
+            <form style={grid} onSubmit={(event) => event.preventDefault()}>
+              {["Name", "Title", "Company", "Street", "City", "Region", "Postal code", "Country", "Phone", "Website"].map((label) => (
+                <Field key={label} label={label}>{(props) => <Input {...props} />}</Field>
+              ))}
+              <Field label="Closing line" description="The last field: it stays clear of the footer when it takes focus.">
+                {(props) => <Input {...props} data-last />}
+              </Field>
+            </form>
+          </DialogBody>
+          <DialogFooter>
+            <Button>Save signature</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </Page>
+  );
+}
+
+// ---------------------------------------------------- A drawer under a header
+
+const headerHeight = "3.5rem";
+
+/**
+ * The tools drawer of a workspace, made with the package alone: non-modal, kept mounted, on the inline end, under the header
+ * (its top is the header's bottom edge), portalled next to its trigger, not taking focus on open, and closed by Escape only from
+ * inside. A composer stands beside it: Escape in the composer leaves the drawer open.
+ */
+function DrawerUnderHeaderPage({ rtl = false }: { rtl?: boolean }) {
+  const [draft, setDraft] = useState("");
+  // an element in state, not a ref object: `null` makes the portal wait, and a sheet that is open on the first render finds it
+  const [slot, setSlot] = useState<HTMLDivElement | null>(null);
+  const style = {
+    "--fui-sheet-inset-block-start": headerHeight,
+    "--fui-sheet-z": "calc(var(--fui-z-overlay) - 10)",
+    "--fui-sheet-width": "24rem",
+  } as CSSProperties;
+  return (
+    <div dir={rtl ? "rtl" : undefined} style={{ minBlockSize: "100dvh", background: "var(--background)" }}>
+      <header
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "var(--fui-space-3)",
+          boxSizing: "border-box",
+          blockSize: headerHeight,
+          paddingInline: "var(--fui-space-4)",
+          borderBlockEnd: "1px solid var(--border)",
+          background: "var(--card)",
+          position: "relative",
+        }}
+      >
+        <strong style={{ marginInlineEnd: "auto" }}>Mail</strong>
+        <div ref={setSlot} style={{ display: "contents" }}>
+          <Sheet modal={false} defaultOpen closeOnEscape="focus-inside">
+            <SheetTrigger render={<Button variant="ghost" size="lg"><Wrench aria-hidden />Tools</Button>} />
+            <SheetContent
+              side="end"
+              container={slot}
+              keepMounted
+              initialFocus={false}
+              closeLabel="Close tools"
+              padding="none"
+              style={style}
+            >
+              <SheetHeader style={{ padding: "var(--fui-space-4)", borderBottom: "1px solid var(--border)", margin: 0 }}>
+                <SheetTitle>Tools</SheetTitle>
+                <SheetDescription>Under the header, on the inline end.</SheetDescription>
+              </SheetHeader>
+              <div style={{ padding: "var(--fui-space-4)", ...grid }}>
+                <Field label="Search the tools">{(props) => <Input {...props} />}</Field>
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
+      </header>
+      <main className="catalogue">
+        <PageHeader title={rtl ? "Drawer under a header, right to left" : "Drawer under a header"} description="Press Escape in the reply: the drawer stays. Press it inside the drawer: it closes and Tools has focus." />
+        <div style={{ ...grid, maxWidth: "28rem" }}>
+          <Field label="Reply">
+            {(props) => <Textarea {...props} rows={5} value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="Write while the drawer is open" />}
+          </Field>
+        </div>
+      </main>
+    </div>
+  );
+}
+
 // -------------------------------------------------------------- Keep mounted
 
 function KeepMountedPage() {
@@ -355,5 +490,9 @@ export const LongTitle: Story = { render: () => <LongTitlePage /> };
 export const SettingsDialog: Story = { render: () => <SettingsDialogPage /> };
 export const NonModalSheet: Story = { render: () => <NonModalSheetPage /> };
 export const ModalSheet: Story = { render: () => <ModalSheetPage /> };
+export const CloseVariant: Story = { render: () => <CloseVariantPage /> };
+export const LongFormDialog: Story = { render: () => <LongFormDialogPage /> };
+export const DrawerUnderHeader: Story = { render: () => <DrawerUnderHeaderPage /> };
+export const DrawerUnderHeaderRtl: Story = { render: () => <DrawerUnderHeaderPage rtl /> };
 export const KeepMounted: Story = { render: () => <KeepMountedPage /> };
 export const StatusPopovers: Story = { render: () => <StatusPopoversPage /> };

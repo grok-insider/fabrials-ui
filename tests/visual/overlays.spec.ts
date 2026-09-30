@@ -1,6 +1,7 @@
 // Geometry and behaviour of the 0.8 overlay, command and auth pieces in a real browser: what jsdom cannot see (layout, scrolling,
 // hit testing, the library's own event order). Engine-agnostic on purpose: the assertions read computed geometry, never pixels.
 import { expect, test, type Page } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 
 const open = async (page: Page, id: string, width = 1440, height = 900) => {
   await page.setViewportSize({ width, height });
@@ -220,4 +221,199 @@ test("a status popover opens from its named trigger and Escape returns focus to 
   await page.keyboard.press("Escape");
   await expect(popup).toBeHidden();
   await expect(trigger).toBeFocused();
+});
+
+// ------------------------------------------------- 0.8.1: the drawer, the Close variant, the sticky footer
+
+const drawerId = (rtl: boolean) => `fabrials-overlays--drawer-under-header${rtl ? "-rtl" : ""}`;
+const openTheme = async (page: Page, id: string, theme: "light" | "dark", width = 1440, height = 900) => {
+  await page.setViewportSize({ width, height });
+  await page.goto(`/iframe.html?id=${id}&viewMode=story&globals=theme:${theme}`);
+  await expect(page.locator("#storybook-root h1").first()).toBeVisible();
+  await page.evaluate(() => document.fonts.ready);
+};
+
+for (const rtl of [false, true]) {
+  test(`a drawer under a header (${rtl ? "right to left" : "left to right"}): under the header, on the inline end, next to its trigger, with its own level, no scrim and no focus taken`, async ({ page }) => {
+    await open(page, drawerId(rtl), 1440, 900);
+    const drawer = page.getByRole("dialog", { name: "Tools" });
+    await expect(drawer).toBeVisible();
+    const geometry = await page.evaluate(() => {
+      const popup = document.querySelector<HTMLElement>(".fui-dialog")!;
+      const box = popup.getBoundingClientRect();
+      const header = document.querySelector("header")!.getBoundingClientRect();
+      return {
+        top: Math.round(box.top), headerBottom: Math.round(header.bottom), left: Math.round(box.left), right: Math.round(box.right),
+        width: Math.round(box.width), bottom: Math.round(box.bottom), viewport: [innerWidth, innerHeight],
+        z: getComputedStyle(popup).zIndex, inHeader: !!popup.closest("header"), side: popup.dataset.side,
+        scrims: document.querySelectorAll(".fui-backdrop").length, inside: popup.contains(document.activeElement),
+      };
+    });
+    expect(geometry.top).toBe(geometry.headerBottom); // --fui-sheet-inset-block-start
+    expect(geometry.bottom).toBe(geometry.viewport[1]);
+    expect(geometry.width).toBe(384); // --fui-sheet-width: 24rem
+    if (rtl) expect(geometry.left).toBe(0);
+    else expect(geometry.right).toBe(geometry.viewport[0]);
+    expect(geometry.z).toBe("40"); // --fui-sheet-z
+    expect(geometry.side).toBe("end");
+    expect(geometry.inHeader).toBe(true); // container: portalled where the host asked
+    expect(geometry.scrims).toBe(0);
+    expect(geometry.inside).toBe(false); // initialFocus={false}
+    const result = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
+    expect(result.violations).toEqual([]);
+  });
+}
+
+test("a drawer under a header: Tab goes from the trigger into the drawer; Escape closes it only from inside and hands focus back", async ({ page }) => {
+  await open(page, drawerId(false), 1440, 900);
+  const drawer = page.getByRole("dialog", { name: "Tools" });
+  const trigger = page.getByRole("button", { name: "Tools", exact: true });
+  const search = drawer.getByLabel("Search the tools");
+  await expect(drawer).toBeVisible();
+  // the drawer comes right after its trigger in the tab order
+  await trigger.focus();
+  await page.keyboard.press("Tab");
+  await expect(search).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(drawer.getByRole("button", { name: "Close tools" })).toBeFocused();
+  // Escape from the composer, from the page and from the trigger leaves it open
+  await page.getByLabel("Reply").focus();
+  await page.keyboard.press("Escape");
+  await expect(drawer).toBeVisible();
+  await trigger.focus();
+  await page.keyboard.press("Escape");
+  await expect(drawer).toBeVisible();
+  // Escape that ends an input method composition inside it does not close it either
+  await search.focus();
+  await search.evaluate((element) => element.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", isComposing: true, bubbles: true, cancelable: true })));
+  await page.waitForTimeout(150);
+  await expect(drawer).toBeVisible();
+  // a plain Escape from inside closes it and focus returns to the trigger
+  await search.fill("kept");
+  await page.keyboard.press("Escape");
+  await expect(drawer).toBeHidden();
+  await expect(trigger).toBeFocused();
+  // kept mounted: hidden with display none, and what was typed is still there when it opens again
+  expect(await page.locator(".fui-dialog").count()).toBe(1);
+  expect(await page.locator(".fui-dialog").evaluate((element) => getComputedStyle(element).display)).toBe("none");
+  await page.keyboard.press("Enter");
+  await expect(drawer).toBeVisible();
+  await expect(search).toHaveValue("kept");
+  // opening it from the keyboard did not move focus into it either: the trigger keeps it
+  await expect(trigger).toBeFocused();
+});
+
+test("a sheet with no options keeps its geometry: full height, 26rem, at the overlay level, on the physical side", async ({ page }) => {
+  await open(page, "fabrials-overlays--modal-sheet", 1440, 900);
+  const geometry = await page.evaluate(() => {
+    const popup = document.querySelector<HTMLElement>(".fui-dialog")!;
+    const box = popup.getBoundingClientRect();
+    return { top: box.top, left: box.left, width: box.width, height: box.height, z: getComputedStyle(popup).zIndex, side: popup.dataset.side, inBody: popup.closest("body") !== null && popup.parentElement?.parentElement === document.body };
+  });
+  expect(geometry).toEqual({ top: 0, left: 0, width: 416, height: 900, z: "51", side: "left", inBody: true });
+});
+
+test("a close variant: the footer Close takes the variant of the content, the footer's own wins, the default stays secondary", async ({ page }) => {
+  await open(page, "fabrials-overlays--close-variant", 1440, 900);
+  const dialog = page.getByRole("dialog", { name: "Discard your changes?" });
+  await expect(dialog).toBeVisible();
+  const variant = (name: string) => dialog.getByRole("button", { name, exact: true }).getAttribute("data-variant");
+  expect(await variant("Close")).toBe("outline");
+  expect(await variant("Keep editing")).toBe("outline");
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "Footer wins" }).click();
+  const second = page.getByRole("dialog", { name: "The footer decides" });
+  await expect(second).toBeVisible();
+  expect(await second.getByRole("button", { name: "Close", exact: true }).getAttribute("data-variant")).toBe("ghost");
+  await page.keyboard.press("Escape");
+  await open(page, "fabrials-overlays--fixed-dialog", 1440, 900);
+  expect(await page.getByRole("dialog").getByRole("button", { name: "Close", exact: true }).getAttribute("data-variant")).toBe("secondary");
+});
+
+/**
+ * Tab through every field of the long form: each one must end up fully above the sticky footer (and inside the window). A
+ * field that is not there yet is given a second to get there: WebKit scrolls a focused field smoothly, and slowly.
+ */
+const tabThroughFields = async (page: Page) => {
+  await page.locator(".fui-dialog input").first().focus();
+  const measure = () =>
+    page.evaluate(() => {
+      const active = document.activeElement;
+      if (!(active instanceof HTMLInputElement)) return null;
+      const footer = document.querySelector(".fui-dialog-footer")!;
+      const sticky = getComputedStyle(footer).position === "sticky";
+      const box = active.getBoundingClientRect();
+      const floor = sticky ? footer.getBoundingClientRect().top : document.querySelector(".fui-dialog-body")!.getBoundingClientRect().bottom;
+      return { sticky, bottom: box.bottom, footer: floor, ok: box.bottom <= floor + 0.5 && box.top >= 0 };
+    });
+  const seen: NonNullable<Awaited<ReturnType<typeof measure>>>[] = [];
+  for (let step = 0; step < 12; step += 1) {
+    await page.keyboard.press("Tab");
+    let result = await measure();
+    for (let wait = 0; result && !result.ok && wait < 10; wait += 1) {
+      await page.waitForTimeout(100);
+      result = await measure();
+    }
+    if (result) seen.push(result);
+  }
+  return seen;
+};
+
+for (const [width, height, text] of [[568, 320, 100], [1024, 400, 100], [320, 568, 200]] as const) {
+  test(`a focused field is never under the sticky footer of a fixed dialog ${width}x${height} at ${text}% text`, async ({ page, browserName }) => {
+    test.skip(text === 200 && browserName !== "chromium", "the browser's default font size can only be set through CDP here; Firefox is checked with its own preference by hand");
+    await page.setViewportSize({ width, height });
+    // 200 % text is the browser's default font size doubled: it moves the rem of the media query too, which a root style does not
+    if (text === 200) await (await page.context().newCDPSession(page)).send("Page.setFontSizes", { fontSizes: { standard: 32, fixed: 26 } });
+    await page.goto("/iframe.html?id=fabrials-overlays--long-form-dialog&viewMode=story&globals=theme:light");
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
+    const dialog = page.locator(".fui-dialog");
+    // the layout under test: the dialog scrolls as a whole and only the footer sticks
+    expect(await page.locator(".fui-dialog-footer").evaluate((element) => getComputedStyle(element).position)).toBe("sticky");
+    const size = await dialog.evaluate((element) => parseFloat(element.style.getPropertyValue("--fui-dialog-footer-size")));
+    expect(size).toBeGreaterThan(40);
+    expect(await dialog.evaluate((element) => Math.round(parseFloat(getComputedStyle(element).scrollPaddingBlockEnd)) - Math.round(parseFloat(element.style.getPropertyValue("--fui-dialog-footer-size"))))).toBeGreaterThanOrEqual(16); // the footer plus some air (a spacing token)
+    const seen = await tabThroughFields(page);
+    expect(seen.length).toBeGreaterThanOrEqual(10);
+    expect(seen.filter((field) => !field.ok)).toEqual([]);
+    // the proof that the test sees the problem: without the padding the same walk leaves fields under the footer
+    await dialog.evaluate((element) => element.style.setProperty("scroll-padding-block-end", "0px", "important"));
+    await dialog.evaluate((element) => (element.scrollTop = 0));
+    const without = await tabThroughFields(page);
+    expect(without.filter((field) => !field.ok).length).toBeGreaterThan(0);
+  });
+}
+
+test("a dialog whose footer is not sticky gets no scroll padding", async ({ page }) => {
+  await open(page, "fabrials-overlays--long-form-dialog", 1440, 900);
+  const dialog = page.locator(".fui-dialog");
+  expect(await page.locator(".fui-dialog-footer").evaluate((element) => getComputedStyle(element).position)).not.toBe("sticky");
+  expect(await dialog.evaluate((element) => getComputedStyle(element).scrollPaddingBlockEnd)).toBe("auto");
+  expect(await dialog.locator(".fui-dialog-body").evaluate((element) => getComputedStyle(element).scrollPaddingBlockEnd)).toBe("auto");
+  // a dialog with no DialogBody is the plain padded box: it has no rule for it either
+  await open(page, "fabrials-overlays--keep-mounted", 1440, 900);
+  await page.getByRole("button", { name: "Dialog" }).click();
+  expect(await page.locator(".fui-dialog").evaluate((element) => getComputedStyle(element).scrollPaddingBlockEnd)).toBe("auto");
+});
+
+// visual references
+for (const [name, id, theme] of [
+  ["drawer-under-header-light", drawerId(false), "light"],
+  ["drawer-under-header-dark", drawerId(false), "dark"],
+  ["drawer-under-header-rtl-light", drawerId(true), "light"],
+  ["close-variant-light", "fabrials-overlays--close-variant", "light"],
+] as const) {
+  test(`visual: ${name} 1440`, async ({ page }) => {
+    await openTheme(page, id, theme);
+    await page.waitForTimeout(300);
+    await expect(page).toHaveScreenshot(`${name}-1440.png`);
+  });
+}
+
+test("visual: a long form in a short window, the last field focused above the footer 568x320", async ({ page }) => {
+  await openTheme(page, "fabrials-overlays--long-form-dialog", "light", 568, 320);
+  await page.locator(".fui-dialog input[data-last]").focus();
+  await page.waitForTimeout(300);
+  await expect(page).toHaveScreenshot("long-form-short-window-568x320.png");
 });

@@ -5,9 +5,13 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
+  useRef,
   useState,
   type ComponentProps,
   type ReactNode,
+  type Ref,
+  type RefObject,
 } from "react";
 import { createPortal } from "react-dom";
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
@@ -15,6 +19,14 @@ import { AlertDialog as BaseAlertDialog } from "@base-ui/react/alert-dialog";
 import { X } from "lucide-react";
 import { Button } from "./controls";
 import { classes, type StyledProps } from "./shared";
+
+type ButtonVariant = ComponentProps<typeof Button>["variant"];
+
+/** Hands one element to several refs (a callback ref or a ref object each). */
+function assignRef<T>(ref: Ref<T> | undefined, value: T | null) {
+  if (typeof ref === "function") ref(value);
+  else if (ref) (ref as RefObject<T | null>).current = value;
+}
 
 type OpenChangeDetails = { reason: string; event: Event; cancel(): void };
 
@@ -62,6 +74,7 @@ export function DialogOverlay({ className, ...props }: StyledProps<BaseDialog.Ba
 type DialogChrome = {
   close: "corner" | "footer" | "none";
   closeLabel: string;
+  closeVariant: ButtonVariant;
   slotWanted: boolean;
   /** A DialogActions registers here and gets its cleanup: the footer keeps its slot while any of them is mounted. */
   addSlotUser(): () => void;
@@ -72,6 +85,21 @@ const ChromeContext = createContext<DialogChrome | null>(null);
 
 export type DialogContentProps = StyledProps<BaseDialog.Popup.Props> & {
   closeLabel?: string;
+  /**
+   * The `Button` variant of the Close that `close="footer"` puts in the footer. `"secondary"` (a grey fill) by default; a product
+   * whose secondary actions are outlines sets `"outline"` once here. A `DialogFooter` `closeVariant` wins. The corner X is always
+   * the ghost icon button.
+   */
+  closeVariant?: ButtonVariant;
+  /**
+   * Where the dialog is portalled: an element, a ref to one, or `null` to wait until there is one. The default is the document
+   * body. Hold the element in state (`useState` with the setter as its `ref`) when the dialog can be open on the first render: a
+   * ref object is still empty then, and the dialog falls back to the body. Put a sheet next to its trigger and the tab order is
+   * trigger, then the sheet, with nothing between them. A
+   * position-fixed popup is placed against the window whatever the container is, unless the container is itself a containing
+   * block (`transform`, `contain: paint`).
+   */
+  container?: BaseDialog.Portal.Props["container"];
   /** The corner X. `close` overrides it. */
   showCloseButton?: boolean;
   /**
@@ -98,6 +126,8 @@ export function DialogContent({
   className,
   children,
   closeLabel = "Close",
+  closeVariant = "secondary",
+  container,
   showCloseButton = true,
   close,
   placement = "center",
@@ -115,7 +145,7 @@ export function DialogContent({
   }, []);
   const [slot, setSlot] = useState<HTMLElement | null>(null);
   return (
-    <BaseDialog.Portal keepMounted={keepMounted}>
+    <BaseDialog.Portal keepMounted={keepMounted} container={container}>
       {backdrop && <BaseDialog.Backdrop className="fui-backdrop" />}
       <BaseDialog.Popup
         className={classes("fui-dialog", className)}
@@ -126,7 +156,7 @@ export function DialogContent({
         {...props}
       >
         <ChromeContext.Provider
-          value={{ close: mode, closeLabel, slotWanted: slotUsers > 0, addSlotUser, slot, setSlot }}
+          value={{ close: mode, closeLabel, closeVariant, slotWanted: slotUsers > 0, addSlotUser, slot, setSlot }}
         >
           {children}
         </ChromeContext.Provider>
@@ -211,14 +241,49 @@ export function DialogFooter({
   children,
   showCloseButton,
   closeLabel,
+  closeVariant,
+  ref,
   ...props
-}: ComponentProps<"div"> & { showCloseButton?: boolean; closeLabel?: string }) {
+}: ComponentProps<"div"> & {
+  showCloseButton?: boolean;
+  closeLabel?: string;
+  /** The variant of the Close this footer draws. Default: the `DialogContent`'s `closeVariant`, else `"secondary"`. */
+  closeVariant?: ButtonVariant;
+}) {
   const chrome = useContext(ChromeContext);
   const close = showCloseButton ?? chrome?.close === "footer";
+  const element = useRef<HTMLDivElement | null>(null);
+  const setElement = useCallback(
+    (node: HTMLDivElement | null) => {
+      element.current = node;
+      assignRef(ref, node);
+    },
+    [ref],
+  );
+  // In a short window the dialog scrolls as a whole and this footer sticks over its bottom edge (styles.css). CSS cannot read the
+  // footer's height, so it is published on the dialog as `--fui-dialog-footer-size`, and the dialog pads its scrolling with it:
+  // a field that gets focus is scrolled into view above the footer, not under it. Only that rule reads it.
+  useLayoutEffect(() => {
+    const footer = element.current;
+    const dialog = footer?.closest<HTMLElement>(".fui-dialog");
+    if (!footer || !dialog || typeof ResizeObserver === "undefined") return;
+    const publish = () => dialog.style.setProperty("--fui-dialog-footer-size", `${footer.getBoundingClientRect().height}px`);
+    publish();
+    const observer = new ResizeObserver(publish);
+    observer.observe(footer);
+    return () => {
+      observer.disconnect();
+      dialog.style.removeProperty("--fui-dialog-footer-size");
+    };
+  }, []);
   return (
-    <div className={classes("fui-dialog-footer", className)} {...props}>
+    <div
+      ref={setElement}
+      className={classes("fui-dialog-footer", className)}
+      {...props}
+    >
       {close && (
-        <BaseDialog.Close render={<Button variant="secondary" />}>
+        <BaseDialog.Close render={<Button variant={closeVariant ?? chrome?.closeVariant ?? "secondary"} />}>
           {closeLabel ?? chrome?.closeLabel ?? "Close"}
         </BaseDialog.Close>
       )}
@@ -242,27 +307,47 @@ export function DialogActions({ children }: { children: ReactNode }) {
   return chrome?.slot ? createPortal(children, chrome.slot) : null;
 }
 
-const SheetModal = createContext(true);
+/** What a `Sheet` shares with its `SheetContent`: whether it is modal, and the Escape scope with the popup it applies to. */
+type SheetState = { modal: boolean; popup: RefObject<HTMLElement | null>; closeOnEscape: "anywhere" | "focus-inside" };
+const SheetContext = createContext<SheetState | null>(null);
 
 /**
  * A sheet is a dialog attached to an edge. `modal` is Base UI's: `true` (default) traps focus, locks the page scroll and draws a
  * scrim; `false` is a drawer beside the page (no scrim, no trap, the page stays usable, an outside press does not close it,
  * Escape and the close control do); `"trap-focus"` traps focus but leaves the page usable. Base UI reads `modal` on the
  * root, which is why it is set here and `SheetContent` follows it.
+ *
+ * `closeOnEscape` says where Escape is heard. `"anywhere"` (the default) is a dialog's: Escape closes it from wherever focus is in
+ * the document. `"focus-inside"` closes it only when focus is inside the sheet, so a drawer that stays open beside the page is not
+ * closed by an Escape meant for the editor next to it; Escape from inside still hands focus back to the trigger.
  */
 export function Sheet<Payload = unknown>({
   modal = true,
   disablePointerDismissal,
+  closeOnEscape = "anywhere",
+  onOpenChange,
   ...props
-}: BaseDialog.Root.Props<Payload>) {
+}: BaseDialog.Root.Props<Payload> & { closeOnEscape?: "anywhere" | "focus-inside" }) {
+  const popup = useRef<HTMLElement | null>(null);
+  const scoped: typeof onOpenChange = (open, details) => {
+    if (!open && closeOnEscape === "focus-inside" && details.reason === "escape-key") {
+      const target = details.event.target;
+      if (!(target instanceof Node) || !popup.current?.contains(target)) {
+        details.cancel();
+        return;
+      }
+    }
+    onOpenChange?.(open, details);
+  };
   return (
-    <SheetModal.Provider value={modal === true}>
+    <SheetContext.Provider value={{ modal: modal === true, popup, closeOnEscape }}>
       <Dialog<Payload>
         {...props}
         modal={modal}
+        onOpenChange={scoped}
         disablePointerDismissal={disablePointerDismissal ?? (modal === false ? true : undefined)}
       />
-    </SheetModal.Provider>
+    </SheetContext.Provider>
   );
 }
 export const SheetTrigger = DialogTrigger;
@@ -273,17 +358,40 @@ export const SheetDescription = DialogDescription;
 export const SheetFooter = DialogFooter;
 export const SheetBody = DialogBody;
 
+/**
+ * The panel of a `Sheet`.
+ *
+ * `side` is `"left"` or `"right"` (physical: the same edge in every writing direction) or `"start"` or `"end"` (logical: the
+ * inline start or end, which is the other edge in a right-to-left page). `container` portals it somewhere other than the body
+ * (see `DialogContent`), and `initialFocus` / `finalFocus` are Base UI's: `initialFocus={false}` leaves focus where it was when
+ * the sheet opens (a drawer that must not steal it from its trigger).
+ *
+ * Placement is set with custom properties on the popup, from `style` or `className`, with no `!important`:
+ * `--fui-sheet-inset-block-start` and `--fui-sheet-inset-block-end` (a length, default 0: a drawer under a header),
+ * `--fui-sheet-z` (default: the overlay level, one above the scrim) and `--fui-sheet-width` (default 26rem; never wider than the
+ * window).
+ */
 export function SheetContent({
   side = "right",
+  ref,
   ...props
-}: Omit<DialogContentProps, "placement" | "size" | "backdrop"> & { side?: "left" | "right" }) {
-  const modal = useContext(SheetModal);
+}: Omit<DialogContentProps, "placement" | "size" | "backdrop"> & { side?: "left" | "right" | "start" | "end" }) {
+  const sheet = useContext(SheetContext);
+  const popup = sheet?.popup;
+  const setPopup = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (popup) popup.current = node;
+      assignRef(ref, node);
+    },
+    [popup, ref],
+  );
   return (
     <DialogContent
       {...props}
+      ref={setPopup}
       data-side={side}
-      backdrop={modal}
-      placement={side === "left" ? "start" : "end"}
+      backdrop={sheet?.modal ?? true}
+      placement={side === "left" || side === "start" ? "start" : "end"}
     />
   );
 }

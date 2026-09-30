@@ -1426,11 +1426,14 @@
     opacity: 0;
     transform: translate(-50%, -48%) scale(0.98);
   }
+  /* A sheet. Its placement is four public custom properties, all optional (a drawer under a header sets the first): the block
+     offsets, the stacking level and the width. Their defaults are the full-height panel a sheet has always been. */
   .fui-dialog:is([data-placement="start"], [data-placement="end"]) {
-    top: 0;
-    height: 100dvh;
-    max-height: 100dvh;
-    width: min(26rem, 100vw);
+    top: var(--fui-sheet-inset-block-start, 0px);
+    height: calc(100dvh - var(--fui-sheet-inset-block-start, 0px) - var(--fui-sheet-inset-block-end, 0px));
+    max-height: calc(100dvh - var(--fui-sheet-inset-block-start, 0px) - var(--fui-sheet-inset-block-end, 0px));
+    z-index: var(--fui-sheet-z, calc(var(--fui-z-overlay) + 1));
+    width: min(var(--fui-sheet-width, 26rem), 100vw);
     border-radius: 0;
     border-block: 0;
   }
@@ -1446,6 +1449,27 @@
     transform: translateX(100%);
   }
   .fui-dialog[data-placement="start"]:is([data-starting-style], [data-ending-style]) {
+    transform: translateX(-100%);
+  }
+  /* A logical side (SheetContent side="start" | "end"): the inline start or end edge, so the other one when the page reads right to
+     left. The physical sides above are untouched. */
+  .fui-dialog[data-side="start"],
+  .fui-dialog[data-side="end"] {
+    left: auto;
+    right: auto;
+  }
+  .fui-dialog[data-side="start"] {
+    inset-inline-start: 0;
+  }
+  .fui-dialog[data-side="end"] {
+    inset-inline-end: 0;
+  }
+  .fui-dialog[data-side="start"]:dir(rtl):is([data-starting-style], [data-ending-style]),
+  .fui-dialog[data-side="end"]:dir(ltr):is([data-starting-style], [data-ending-style]) {
+    transform: translateX(100%);
+  }
+  .fui-dialog[data-side="start"]:dir(ltr):is([data-starting-style], [data-ending-style]),
+  .fui-dialog[data-side="end"]:dir(rtl):is([data-starting-style], [data-ending-style]) {
     transform: translateX(-100%);
   }
   .fui-dialog-header {
@@ -1615,6 +1639,10 @@
     .fui-dialog:has(> .fui-dialog-body) {
       display: block;
       overflow-y: auto;
+      /* The footer sticks over the bottom of this scroller: a focused field is scrolled into view above it, not under it.
+         DialogFooter publishes its height, plus a little air (WebKit reveals the text line of a field, not its box). With no
+         footer the variable is missing, the declaration is invalid at computed-value time and there is no padding. */
+      scroll-padding-block-end: calc(var(--fui-dialog-footer-size) + var(--fui-space-4));
     }
     .fui-dialog:has(> .fui-dialog-body) > .fui-dialog-body {
       overflow: visible;
