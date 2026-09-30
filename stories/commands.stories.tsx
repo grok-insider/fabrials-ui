@@ -145,6 +145,33 @@ function LauncherPage() {
   );
 }
 
+function LauncherVariantsPage() {
+  return (
+    <Page title="Launcher look" description="variant is the button's own: secondary (the default, a grey fill) or outline (the card fill and hairline of a field).">
+      <Block title="Secondary and outline" description="Same size, same keys, same control boundary; only the fill differs. Hover, focus with Tab and the disabled state stay the button's.">
+        <Frame width={480}>
+          <div style={{ display: "grid", gap: "var(--fui-space-3)" }}>
+            <CommandTrigger label="Search or run a command" keys={["mod", "K"]} />
+            <CommandTrigger label="Search or run a command" keys={["mod", "K"]} variant="outline" />
+            <CommandTrigger label="Search or run a command" keys={["mod", "K"]} variant="outline" disabled />
+            <div style={{ width: "3rem" }}>
+              <CommandTrigger label="Search or run a command" keys={["mod", "K"]} variant="outline" compact />
+            </div>
+          </div>
+        </Frame>
+      </Block>
+      <Block title="In the application header" description="The outline launcher in the command slot.">
+        <Frame flush>
+          <AppHeader
+            brand={<AppHeaderBrand href="#">Open Email</AppHeaderBrand>}
+            command={<CommandTrigger label="Search or run a command" keys={["mod", "K"]} variant="outline" />}
+          />
+        </Frame>
+      </Block>
+    </Page>
+  );
+}
+
 // ------------------------------------------------------------------- Options
 
 const options = [
@@ -358,6 +385,7 @@ function BulkPage() {
 }
 
 export const Launcher: Story = { render: () => <LauncherPage /> };
+export const LauncherOutline: Story = { render: () => <LauncherVariantsPage /> };
 export const Options: Story = { render: () => <OptionsPage /> };
 export const PaletteDialog: Story = { render: () => <CommandDialogPage /> };
 export const Tools: Story = { render: () => <ToolsPage /> };

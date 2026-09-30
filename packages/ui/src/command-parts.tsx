@@ -34,9 +34,10 @@ export function CommandTrigger({
   separator = "then",
   shortcut,
   compact = false,
+  variant = "secondary",
   className,
   ...props
-}: Omit<ComponentProps<typeof Button>, "variant" | "size" | "children" | "aria-label"> & {
+}: Omit<ComponentProps<typeof Button>, "size" | "children" | "aria-label"> & {
   /** Defaults to a magnifier. Decorative: it is hidden from assistive technology. */
   icon?: ReactNode;
   /** The visible text ("Search or run a command"). */
@@ -52,11 +53,13 @@ export function CommandTrigger({
   shortcut?: string | false;
   /** Icon only, whatever the container's width. */
   compact?: boolean;
+  /** The button's look (`secondary`, a grey fill, by default). `outline` is the card fill and hairline of a launcher that looks like a field. */
+  variant?: ComponentProps<typeof Button>["variant"];
 }) {
   const derived = shortcut === false ? undefined : (shortcut ?? (keys && !sequence ? shortcutOf(keys) : undefined));
   return (
     <Button
-      variant="secondary"
+      variant={variant}
       size="lg"
       className={classes("fui-command-trigger", className)}
       data-compact={compact || undefined}

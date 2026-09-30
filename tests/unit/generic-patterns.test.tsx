@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { renderToStaticMarkup } from "react-dom/server";
 import {
+  CommandTrigger,
   ConfirmActionButton,
   ConfirmDialog,
   FileThumb,
@@ -142,4 +143,18 @@ test("file thumb shows an image for image sources and a typed tile otherwise", (
   assert.equal(fileTypeLabel("notes", "text/markdown; charset=utf-8"), "MARK");
   assert.equal(fileTypeLabel(undefined, undefined), "FILE");
   assert.equal(fileTypeLabel("photo.JPEG", "image/jpeg"), "JPEG");
+});
+
+// ---------------------------------------------------------- CommandTrigger variant (0.8.1)
+
+test("CommandTrigger: `variant` reaches the button, the default is the 0.8.0 look byte for byte", () => {
+  const before = "<button type=\"button\" tabindex=\"0\" data-slot=\"button\" data-variant=\"secondary\" data-size=\"lg\" aria-label=\"Search\" aria-keyshortcuts=\"Control+K Meta+K\" class=\"fui-button fui-command-trigger\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-search\" aria-hidden=\"true\"><path d=\"m21 21-4.34-4.34\"></path><circle cx=\"11\" cy=\"11\" r=\"8\"></circle></svg><span class=\"fui-command-trigger-label\">Search</span><kbd class=\"fui-kbd-group fui-command-trigger-keys\" aria-hidden=\"true\"><kbd class=\"fui-kbd\">Ctrl</kbd><kbd class=\"fui-kbd\">K</kbd></kbd></button>";
+  assert.equal(renderToStaticMarkup(<CommandTrigger label="Search" keys={["mod", "K"]} />), before);
+  assert.equal(renderToStaticMarkup(<CommandTrigger label="Search" keys={["mod", "K"]} variant="secondary" />), before);
+  const outline = renderToStaticMarkup(<CommandTrigger label="Search" keys={["mod", "K"]} variant="outline" />);
+  assert.equal(outline, before.replace('data-variant="secondary"', 'data-variant="outline"'));
+  // it is a launcher whatever its look: the size, the class and the accessible name do not change
+  assert.match(outline, /data-size="lg"/);
+  assert.match(outline, /class="fui-button fui-command-trigger"/);
+  assert.match(outline, /aria-label="Search"/);
 });

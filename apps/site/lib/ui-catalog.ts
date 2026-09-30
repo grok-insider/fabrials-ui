@@ -529,6 +529,7 @@ export const uiCatalog: UiCatalogItem[] = [
     [
       ["CommandTrigger label / name / icon", "ReactNode / string", "The visible text; the accessible name when it must say more (it should contain the label); a decorative icon (a magnifier by default)."],
       ["CommandTrigger keys / sequence / shortcut", "string[] / boolean / string | false", "Key caps, \"mod\" being the main modifier resolved after hydration (Ctrl on the server). aria-keyshortcuts is derived from them (Control+K Meta+K) and constant; false omits it. sequence shows \"G then K\" and derives none, because aria-keyshortcuts cannot express steps."],
+      ["CommandTrigger variant", "secondary | outline | ...", "The button's look; secondary (a grey fill) by default. outline is the card fill and hairline of a launcher that looks like a field. Every other Button variant is accepted."],
       ["CommandTrigger compact", "boolean", "Icon only at any width. Inside a container named command narrower than 12rem (the command slot of AppHeader) it is icon-only without the prop. The key hint hides on coarse pointers."],
       ["CommandOption active / disabled", "boolean", "active is the virtual focus (aria-selected, data-active): accent fill and a 2 px Stormlight bar. disabled sets aria-disabled and mutes the label but stays selectable, so activating it can say why."],
       ["CommandOption icon / label / detail / group / reason / keys", "ReactNode", "The slots. Below 32rem of list width the label takes its own line, then detail and group, then the reason."],
