@@ -54,6 +54,7 @@ const stories: Record<string, string> = {
   "structure-navigation": "fabrials-structure--navigation",
   "structure-switcher-open": "fabrials-structure--switcher-open",
   "structure-sections": "fabrials-structure--sections",
+  "structure-section-aside": "fabrials-structure--section-aside",
   "overlays-dialog-fixed": "fabrials-overlays--fixed-dialog",
   "overlays-dialog-long-title": "fabrials-overlays--long-title",
   "overlays-dialog-settings": "fabrials-overlays--settings-dialog",

@@ -56,6 +56,7 @@ export function SectionHeader({
   title,
   description,
   actions,
+  aside,
   headingLevel = 2,
   headingRef,
   headingProps,
@@ -64,6 +65,12 @@ export function SectionHeader({
   title: ReactNode;
   description?: ReactNode;
   actions?: ReactNode;
+  /**
+   * A tag beside the title (a count, a status: "Connected mailboxes" `3 of 10`), outside the heading element so the
+   * heading's accessible name stays the title. It sits on the title's line and wraps below it when the header is
+   * narrow. Nothing changes without it.
+   */
+  aside?: ReactNode;
   /** The heading element (default 2). The look is the section title's at every level. */
   headingLevel?: HeadingLevel;
   /** The heading element, for code that moves focus to it (give it `headingProps={{ tabIndex: -1 }}`). */
@@ -75,9 +82,18 @@ export function SectionHeader({
   return (
     <header className={classes("fui-section-header", className)}>
       <div>
-        <Heading {...headingProps} ref={headingRef} className="fui-section-title">
-          {title}
-        </Heading>
+        {aside ? (
+          <div className="fui-section-heading-row">
+            <Heading {...headingProps} ref={headingRef} className="fui-section-title">
+              {title}
+            </Heading>
+            <span className="fui-section-aside">{aside}</span>
+          </div>
+        ) : (
+          <Heading {...headingProps} ref={headingRef} className="fui-section-title">
+            {title}
+          </Heading>
+        )}
         {description && <p className="fui-description">{description}</p>}
       </div>
       {actions && <div className="fui-actions">{actions}</div>}

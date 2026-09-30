@@ -746,6 +746,38 @@ function SectionsPage() {
   );
 }
 
+function SectionAsidePage() {
+  return (
+    <Page title="Section header tag" description="aside puts a count or a status on the title's line, outside the heading, so the heading's name is still the title. It wraps below the title when the header is narrow.">
+      <Block title="A count beside the title" description="With a description and actions, at a wide and a narrow frame (the header follows its own width).">
+        {[720, 358].map((width) => (
+          <Frame key={width} width={width}>
+            <SectionHeader
+              title="Connected mailboxes"
+              aside={<Badge variant="outline">3 of 10</Badge>}
+              description="Each mailbox keeps its own folders and sync state."
+              actions={<Button variant="outline" size="sm"><Plus aria-hidden />Add mailbox</Button>}
+            />
+          </Frame>
+        ))}
+      </Block>
+      <Block title="A long title, a status, right to left" description="A title that is longer than the frame wraps inside itself; the tag drops under it.">
+        <Frame width={358}>
+          <SectionHeader title="Notification rules for shared and delegated mailboxes" aside={<Badge tone="warning">Paused</Badge>} headingLevel={3} />
+        </Frame>
+        <Frame width={358} dir="rtl">
+          <SectionHeader title="الصناديق المتصلة" aside={<Badge variant="outline">3 من 10</Badge>} description="لكل صندوق مجلداته وحالة مزامنته." />
+        </Frame>
+      </Block>
+      <Block title="Without aside" description="The header is what it was: the same markup and the same look.">
+        <Frame width={720}>
+          <SectionHeader title="Connected mailboxes" description="Each mailbox keeps its own folders and sync state." actions={<Button variant="outline" size="sm">Add mailbox</Button>} />
+        </Frame>
+      </Block>
+    </Page>
+  );
+}
+
 export const Items: Story = { render: () => <ItemsPage /> };
 export const ApplicationHeader: Story = { render: () => <AppHeaderPage /> };
 /** The header the way an app uses it: it spans the window, outside any page column, so every mode of the command slot is reachable. */
@@ -764,3 +796,4 @@ export const FullWidthHeader: Story = { render: () => <FullWidthPage /> };
 export const Navigation: Story = { render: () => <NavigationPage /> };
 export const SwitcherOpen: Story = { render: () => <OpenSwitcherPage /> };
 export const Sections: Story = { render: () => <SectionsPage /> };
+export const SectionAside: Story = { render: () => <SectionAsidePage /> };

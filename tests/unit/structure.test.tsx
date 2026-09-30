@@ -296,6 +296,28 @@ test("headings: a level, a ref target and attributes on PageHeader and SectionHe
   assert.match(rule(":is(.fui-page-title, .fui-section-title, .fui-settings-section-title):focus-visible"), /outline: 2px solid var\(--fui-focus\)/);
 });
 
+test("SectionHeader aside: beside the title, outside the heading; without it the markup is the 0.8.0 markup", () => {
+  // Captured from 0.8.0 before the change.
+  assert.equal(
+    renderToStaticMarkup(<SectionHeader title="Runs" description="d" actions={<i>a</i>} />),
+    '<header class="fui-section-header"><div><h2 class="fui-section-title">Runs</h2><p class="fui-description">d</p></div><div class="fui-actions"><i>a</i></div></header>',
+  );
+  assert.equal(renderToStaticMarkup(<SectionHeader title="Runs" />), '<header class="fui-section-header"><div><h2 class="fui-section-title">Runs</h2></div></header>');
+  const html = renderToStaticMarkup(<SectionHeader title="Mailboxes" aside={<b>3 of 10</b>} description="d" actions={<i>a</i>} headingLevel={3} headingProps={{ id: "h" }} />);
+  assert.equal(
+    html,
+    '<header class="fui-section-header"><div><div class="fui-section-heading-row"><h3 id="h" class="fui-section-title">Mailboxes</h3><span class="fui-section-aside"><b>3 of 10</b></span></div><p class="fui-description">d</p></div><div class="fui-actions"><i>a</i></div></header>',
+  );
+  // The heading's accessible name is the title: the tag is a sibling, never inside it.
+  assert.doesNotMatch(html, /<h3[^>]*>[^<]*<[^/]/);
+  assert.doesNotMatch(html, /<h3[^>]*>[^<]*3 of 10/);
+  // The row wraps by the header's own width and adds no containment (a size container would change every existing header).
+  assert.match(rule(".fui-section-heading-row {"), /flex-wrap: wrap/);
+  assert.match(rule(".fui-section-heading-row {"), /align-items: center/);
+  assert.doesNotMatch(rule(".fui-section-heading-row {"), /container/);
+  assert.doesNotMatch(rule(".fui-section-header {"), /container/);
+});
+
 test("tabs: the root has a class, a strip is data-scrollable, a vertical rail has its own rules and the indicator follows the active tab", () => {
   const html = renderToStaticMarkup(
     <Tabs defaultValue="a" orientation="vertical">

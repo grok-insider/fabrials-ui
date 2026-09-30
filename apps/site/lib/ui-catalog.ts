@@ -671,6 +671,7 @@ export const uiCatalog: UiCatalogItem[] = [
       ["title", "ReactNode", "Section heading."],
       ["description", "ReactNode", "Optional supporting line."],
       ["actions", "ReactNode", "Actions for this section only."],
+      ["aside", "ReactNode", "A tag beside the title (a count, a status), outside the heading so its name stays the title. It wraps under the title when the header is narrow."],
       ["headingLevel", "1 | 2 | 3 | 4", "The heading element (h2 by default). The look is the section title's at every level."],
       ["headingRef / headingProps", "Ref / { tabIndex, id, data-* }", "For code that moves focus to the heading; tabIndex -1 makes it focusable and it shows a ring."],
     ],
