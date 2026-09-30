@@ -277,6 +277,15 @@ test("nav switcher: contain is on by default (markup unchanged); contain={false}
   assert.match(styles, /@container nav-switcher \(max-width: 15rem\)/);
 });
 
+test("description list auto: the column gap is stated outside the query, which only changes the tracks", () => {
+  const base = styles.slice(styles.indexOf('.fui-description-list[data-layout="auto"] .fui-description-item {'));
+  assert.match(base.slice(0, base.indexOf("}")), /grid-template-columns: minmax\(0, 1fr\);\s*gap: var\(--fui-space-0-5\) var\(--fui-space-4\);/);
+  const query = base.slice(base.indexOf("@container fui-description-list (min-width: 30rem) {"));
+  const inner = query.slice(0, query.indexOf("\n  }\n") + 5);
+  assert.match(inner, /grid-template-columns: minmax\(8rem, 11rem\) minmax\(0, 1fr\);/);
+  assert.doesNotMatch(inner, /gap/);
+});
+
 // -------------------------------------------------------------------------- SettingsSection
 
 test("settings section: the section is the size container, an inner grid answers to it, stacked opts out", () => {

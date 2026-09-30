@@ -1230,7 +1230,7 @@ export const uiCatalog: UiCatalogItem[] = [
     "Collections",
     "Terms and values, such as a record's properties.",
     ["DescriptionList", "DescriptionItem", "DescriptionTerm", "DescriptionDetails"],
-    [["layout", "grid | stacked | auto", "Side by side, stacked, or auto: it follows the list's own width, stacked under 30rem and a 8 to 11rem term column from it (the list becomes a size container, so it must fill its parent's width)."]],
+    [["layout", "grid | stacked | auto", "Side by side, stacked, or auto: it follows the list's own width, stacked under 30rem and a 8 to 11rem term column from it with a 1 rem gap before its details (the list becomes a size container, so it must fill its parent's width)."]],
     "A configured value is not a verified one: say which it is.",
   ),
   ui(

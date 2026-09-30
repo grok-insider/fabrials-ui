@@ -17,6 +17,10 @@ import {
   Button,
   CommandTrigger,
   IconButton,
+  DescriptionDetails,
+  DescriptionItem,
+  DescriptionList,
+  DescriptionTerm,
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
@@ -902,6 +906,39 @@ function HitAreasPage() {
   );
 }
 
+// ------------------------------------------------------------------------ Description list, auto layout
+
+function DescriptionAutoPage() {
+  const rows = (
+    <>
+      <DescriptionItem><DescriptionTerm>Address</DescriptionTerm><DescriptionDetails>ana@example.test</DescriptionDetails></DescriptionItem>
+      <DescriptionItem><DescriptionTerm>Protocol</DescriptionTerm><DescriptionDetails>IMAP over TLS, port 993</DescriptionDetails></DescriptionItem>
+      <DescriptionItem><DescriptionTerm>Last synchronised</DescriptionTerm><DescriptionDetails>Today at 09:41, 1,204 messages, nothing new since the last check on this device</DescriptionDetails></DescriptionItem>
+    </>
+  );
+  return (
+    <Page title="Description list, auto layout" description='layout="auto" follows the list&apos;s own width: stacked under 30rem, and from 30rem the term in a column of 8 to 11rem with a 1 rem gap (space-4) between the term and its details.'>
+      <Block title="Container widths" description="Each list is a different width (the list is the container). 29.9rem is stacked, 30rem and up has the term beside its details.">
+        <div style={{ display: "grid", gap: "var(--fui-space-5)", justifyItems: "start" }}>
+          {["20rem", "29.9rem", "30rem", "30.1rem", "44rem"].map((width) => (
+            <div key={width} style={{ display: "grid", gap: "var(--fui-space-2)", alignContent: "start" }}>
+              <strong style={{ fontSize: "var(--fui-text-sm)" }}>{width}</strong>
+              <div data-desc={width} style={{ inlineSize: width, maxInlineSize: "100%", outline: "1px solid var(--border)", background: "var(--card)" }}>
+                <DescriptionList layout="auto" style={{ inlineSize: "100%" }}>{rows}</DescriptionList>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Block>
+      <Block title="Right to left" description="The gap is a column gap: it is the same on the other side.">
+        <Frame width={640} dir="rtl">
+          <div data-desc="rtl"><DescriptionList layout="auto">{rows}</DescriptionList></div>
+        </Frame>
+      </Block>
+    </Page>
+  );
+}
+
 export const Items: Story = { render: () => <ItemsPage /> };
 export const ApplicationHeader: Story = { render: () => <AppHeaderPage /> };
 /** The header the way an app uses it: it spans the window, outside any page column, so every mode of the command slot is reachable. */
@@ -923,4 +960,4 @@ export const SwitcherOpen: Story = { render: () => <OpenSwitcherPage /> };
 export const Sections: Story = { render: () => <SectionsPage /> };
 export const SectionAside: Story = { render: () => <SectionAsidePage /> };
 export const HitAreas: Story = { render: () => <HitAreasPage /> };
-
+export const DescriptionAuto: Story = { render: () => <DescriptionAutoPage /> };

@@ -59,3 +59,45 @@ for (const engine of Object.keys(engines) as (keyof typeof engines)[]) {
     });
   });
 }
+
+// ------------------------------------------------------------------------------------ DescriptionList auto (0.8.1)
+
+for (const engine of Object.keys(engines) as (keyof typeof engines)[]) {
+  test.describe(`${engine} description list`, () => {
+    test("layout=auto: stacked under 30rem, and from 30rem a term column with the 1 rem column gap between it and its details", async () => {
+      const page = await launchPage(engine);
+      await open(page, "fabrials-structure--description-auto", 1440);
+      const read = (width: string) =>
+        page.locator(`[data-desc="${width}"] .fui-description-item`).nth(1).evaluate((item) => {
+          const style = getComputedStyle(item);
+          const term = item.querySelector("dt")!.getBoundingClientRect();
+          const details = item.querySelector("dd")!.getBoundingClientRect();
+          return {
+            columns: style.gridTemplateColumns.split(" ").length,
+            columnGap: style.columnGap,
+            rowGap: style.rowGap,
+            // Distance between the term and its details on the same line (LTR): the column gap, or negative when stacked.
+            between: Math.round(details.left - term.right),
+            stacked: details.top >= term.bottom - 0.5,
+          };
+        });
+      for (const width of ["20rem", "29.9rem"]) expect(await read(width), width).toMatchObject({ columns: 1, stacked: true, rowGap: "2px" });
+      for (const width of ["30rem", "30.1rem", "44rem"]) expect(await read(width), width).toMatchObject({ columns: 2, columnGap: "16px", rowGap: "2px", between: 16, stacked: false });
+      // A list resized across the threshold in the page (a drawer that opens, a pane that is dragged) follows it both ways.
+      const list = page.locator("[data-desc='44rem']");
+      for (const [width, columns, gap] of [["20rem", 1, undefined], ["44rem", 2, "16px"], ["25rem", 1, undefined], ["31rem", 2, "16px"]] as const) {
+        await list.evaluate((element, value) => ((element as HTMLElement).style.inlineSize = value), width);
+        const item = list.locator(".fui-description-item").first();
+        expect(await item.evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length), width).toBe(columns);
+        if (gap) expect(await item.evaluate((element) => getComputedStyle(element).columnGap), width).toBe(gap);
+      }
+      // Right to left: the details are on the left and the same gap separates them from the term.
+      const rtl = await page.locator("[data-desc='rtl'] .fui-description-item").nth(1).evaluate((item) => {
+        const term = item.querySelector("dt")!.getBoundingClientRect();
+        const details = item.querySelector("dd")!.getBoundingClientRect();
+        return { columnGap: getComputedStyle(item).columnGap, between: Math.round(term.left - details.right) };
+      });
+      expect(rtl).toEqual({ columnGap: "16px", between: 16 });
+    });
+  });
+}

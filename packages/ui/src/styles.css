@@ -3245,14 +3245,16 @@
     display: block;
     container: fui-description-list / inline-size;
   }
+  /* The column gap is stated here, where it applies whatever the query says: with one column it has nothing to separate, and from
+     30rem it is the space between the term and its details. A host reported (Firefox) that a column-gap declared only inside the
+     query stayed at the 2 px row gap; the query now changes the tracks and nothing else. */
   .fui-description-list[data-layout="auto"] .fui-description-item {
     grid-template-columns: minmax(0, 1fr);
-    gap: var(--fui-space-0-5);
+    gap: var(--fui-space-0-5) var(--fui-space-4);
   }
   @container fui-description-list (min-width: 30rem) {
     .fui-description-list[data-layout="auto"] .fui-description-item {
       grid-template-columns: minmax(8rem, 11rem) minmax(0, 1fr);
-      column-gap: var(--fui-space-4);
     }
   }
 
