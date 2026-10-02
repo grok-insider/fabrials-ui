@@ -26,6 +26,7 @@ import {
   type ConfirmFunction,
 } from "../../packages/ui/src/index";
 import { keyShortcutsValue } from "../../packages/ui/src/icon-tooltip";
+import { isApplePlatform } from "../../packages/ui/src/use-modifier-key";
 
 const styles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
 const rule = (selector: string) => {
@@ -251,4 +252,27 @@ test("a shortcut can be a sequence: no aria-keyshortcuts (it cannot express step
     <Toolbar aria-label="Actions"><ToolbarButton label="Inbox" shortcut={{ keys: ["g", "i"], sequence: true }}><svg /></ToolbarButton></Toolbar>,
   );
   assert.doesNotMatch(bar, /aria-keyshortcuts/);
+});
+
+test("the modifier key is the Apple one for every string an Apple browser reports, «macOS» of Chromium included", () => {
+  // `navigator.platform` (Safari, Firefox) and `userAgentData.platform` (Chromium) spell the same thing differently.
+  for (const platform of ["MacIntel", "MacPPC", "macOS", "iPhone", "iPad", "iPod touch"]) assert.equal(isApplePlatform(platform), true, platform);
+  for (const platform of ["", "Win32", "Windows", "Linux x86_64", "Linux armv8l", "Android", "Chrome OS", "Unknown"]) assert.equal(isApplePlatform(platform), false, platform);
+});
+
+test("a toast's cancel button outranks Sonner's own dark rule, which would paint it a 30 % white fill and sink its contrast", () => {
+  // Sonner injects its sheet after ours; its dark rule is `[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast][data-styled=true] [data-cancel]`
+  // (five attributes). Ours had five too and lost by coming first: it needs the sixth, `[data-sonner-theme]`, which the Toaster always sets.
+  const selector = '.fui-toaster[data-sonner-toaster][data-sonner-theme] [data-sonner-toast][data-styled="true"] [data-cancel] {';
+  assert.match(rule(selector), /background: transparent/);
+  assert.match(rule(selector), /color: var\(--foreground\)/);
+  // Selector lines only: the comment above the rule names the attribute too.
+  const bare = styles.split("\n").filter((line) => /^\.fui-toaster.*\[data-cancel\]/.test(line) && !/\[data-sonner-theme\]/.test(line));
+  assert.deepEqual(bare, [], "every rule on the cancel button carries the theme attribute");
+});
+
+test("the transparent block borders of a touch navigation row are Canvas in forced colors, not a line above and below every row", () => {
+  const forced = styles.slice(styles.indexOf('.fui-sidebar-menu-button[data-active]::before {\n      background: Highlight;'));
+  const block = forced.slice(0, forced.indexOf("\n  }\n  .fui-sidebar-menu-button:disabled"));
+  assert.match(block, /\.fui-sidebar-menu-button\[data-size="touch"\] \{\s*border-block-color: Canvas;/);
 });

@@ -4322,6 +4322,11 @@
     .fui-sidebar-menu-button[data-active]::before {
       background: Highlight;
     }
+    /* The 2 px block borders of a touch row are transparent so the row has a 44 px target; forced colors paints a transparent
+       border in the system text colour, which drew a line above and below every row. A system colour in the author value is kept. */
+    .fui-sidebar-menu-button[data-size="touch"] {
+      border-block-color: Canvas;
+    }
   }
   .fui-sidebar-menu-button:disabled,
   .fui-sidebar-menu-button[aria-disabled="true"] {
@@ -5867,7 +5872,10 @@
   font-size: var(--fui-text-xs);
   font-weight: var(--fui-weight-medium);
 }
-.fui-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"] [data-cancel] {
+/* `[data-sonner-theme]` is not decoration: Sonner injects its own sheet after this one, and its dark rule for the cancel button
+   (`[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast][data-styled=true] [data-cancel]`, a 30 % white fill) ties
+   this selector at five and wins by coming later. One more attribute outranks it in both themes. */
+.fui-toaster[data-sonner-toaster][data-sonner-theme] [data-sonner-toast][data-styled="true"] [data-cancel] {
   border: 1px solid var(--border);
   background: transparent;
   color: var(--foreground);

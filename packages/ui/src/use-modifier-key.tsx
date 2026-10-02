@@ -7,9 +7,18 @@ export type ModifierKey = "Ctrl" | "⌘";
 
 const noSubscription = () => () => {};
 
+/**
+ * Whether a platform string names an Apple device. Case-insensitive on purpose: `navigator.platform` says "MacIntel" but
+ * Chromium's `userAgentData.platform` says "macOS", which a case-sensitive `/Mac/` does not match (the hint stayed «Ctrl»
+ * on Chrome and Edge for Mac).
+ */
+export function isApplePlatform(platform: string): boolean {
+  return /mac|iphone|ipad|ipod/i.test(platform);
+}
+
 function onApplePlatform() {
   const nav = navigator as Navigator & { userAgentData?: { platform?: string } };
-  return /Mac|iPhone|iPad|iPod/.test(nav.userAgentData?.platform || nav.platform || "");
+  return isApplePlatform(nav.userAgentData?.platform || nav.platform || "");
 }
 
 /**
