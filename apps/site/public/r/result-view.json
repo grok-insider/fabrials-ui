@@ -6,7 +6,7 @@
   "description": "Readable text, structured content and media, with raw data one click away.",
   "author": "Fabrials <admin@grokinsider.net>",
   "dependencies": [
-    "@fabrials/ui@^0.8.1"
+    "@fabrials/ui@^0.8.2"
   ],
   "registryDependencies": [
     "https://ui.fabrials.com/r/styles.json",

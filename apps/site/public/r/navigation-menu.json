@@ -6,7 +6,7 @@
   "description": "shadcn's navigation-menu, backed by @fabrials/ui. The top-level links of a site, with one panel of related links.",
   "author": "Fabrials <admin@grokinsider.net>",
   "dependencies": [
-    "@fabrials/ui@^0.8.1"
+    "@fabrials/ui@^0.8.2"
   ],
   "registryDependencies": [
     "https://ui.fabrials.com/r/styles.json"

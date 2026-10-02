@@ -6,7 +6,7 @@
   "description": "shadcn's select, backed by @fabrials/ui. A closed list of options.",
   "author": "Fabrials <admin@grokinsider.net>",
   "dependencies": [
-    "@fabrials/ui@^0.8.1"
+    "@fabrials/ui@^0.8.2"
   ],
   "registryDependencies": [
     "https://ui.fabrials.com/r/styles.json"

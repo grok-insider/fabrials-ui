@@ -6,7 +6,7 @@
   "description": "shadcn's toggle-group, backed by @fabrials/ui. A segmented choice for ranges and views.",
   "author": "Fabrials <admin@grokinsider.net>",
   "dependencies": [
-    "@fabrials/ui@^0.8.1"
+    "@fabrials/ui@^0.8.2"
   ],
   "registryDependencies": [
     "https://ui.fabrials.com/r/styles.json"

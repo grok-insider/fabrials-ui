@@ -19,7 +19,7 @@ Resolve this skill directory's real path (`readlink -f`, it is usually a symlink
 | Catalogue: what each component is for, its exports and notes | `apps/site/lib/ui-catalog.ts` (packages), `apps/site/lib/catalog.ts` (registry blocks) |
 | Reference layouts | `stories/highstorm.stories.tsx` + `highstorm.css`, `apps/site/app/page.tsx`, `apps/site/components/docs/` |
 | Component usage in context | Storybook (`bun run storybook`, port 6041), `apps/site/components/ui-demos*.tsx` |
-| Upgrading or adopting 0.7, 0.8 or 0.8.1 | `docs/migration-0.7.md`, `docs/migration-0.8.md` |
+| Upgrading or adopting 0.7, 0.8, 0.8.1 or 0.8.2 | `docs/migration-0.7.md`, `docs/migration-0.8.md` |
 | Registry, shims, other libraries, the license gate | `docs/registry.md` |
 
 The Patterns stories (`stories/patterns.stories.tsx`: PublicSite, Settings, Console, SignIn) follow the 0.7 layout rules and are safe references for page composition.
