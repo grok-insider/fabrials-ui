@@ -26,6 +26,7 @@ import {
   type ConfirmFunction,
 } from "../../packages/ui/src/index";
 import { keyShortcutsValue } from "../../packages/ui/src/icon-tooltip";
+import * as ui from "../../packages/ui/src/index";
 import { isApplePlatform } from "../../packages/ui/src/use-modifier-key";
 
 const styles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
@@ -258,6 +259,9 @@ test("the modifier key is the Apple one for every string an Apple browser report
   // `navigator.platform` (Safari, Firefox) and `userAgentData.platform` (Chromium) spell the same thing differently.
   for (const platform of ["MacIntel", "MacPPC", "macOS", "iPhone", "iPad", "iPod touch"]) assert.equal(isApplePlatform(platform), true, platform);
   for (const platform of ["", "Win32", "Windows", "Linux x86_64", "Linux armv8l", "Android", "Chrome OS", "Unknown"]) assert.equal(isApplePlatform(platform), false, platform);
+  // The helper is for the hook and its test: a new public export would need a story and a visual reference.
+  assert.equal("isApplePlatform" in ui, false);
+  assert.equal(typeof ui.useModifierKey, "function");
 });
 
 test("a toast's cancel button outranks Sonner's own dark rule, which would paint it a 30 % white fill and sink its contrast", () => {

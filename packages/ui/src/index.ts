@@ -59,7 +59,8 @@ export * from "./icon-button";
 export * from "./file-input";
 export * from "./toolbar";
 export * from "./use-confirm";
-export * from "./use-modifier-key";
+// `isApplePlatform` stays inside the module (its test imports it from there): it is not part of the public API.
+export { ModifierKeyText, useModifierKey, type ModifierKey } from "./use-modifier-key";
 export * from "./file-size";
 export * from "./item";
 export * from "./app-header";
