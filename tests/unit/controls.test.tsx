@@ -194,3 +194,33 @@ test("the menu row label rule costs no specificity and skips a trailing count or
 test("the rows accordion is not underlined on hover", () => {
   assert.match(styles, /\.fui-accordion\[data-variant="rows"\] \.fui-accordion-trigger:hover \{\s*text-decoration: none;/);
 });
+
+test("native select: the chevron follows --muted-foreground, flips for rtl, survives disabled and gives way to the native arrow in forced colors", () => {
+  const rule = (selector: string) => {
+    const start = styles.indexOf(`${selector} {`);
+    assert.ok(start >= 0, `${selector} has a rule`);
+    return styles.slice(start, styles.indexOf("\n  }", start));
+  };
+  const base = rule(".fui-input.fui-native-select");
+  // Two strokes of linear-gradient in the theme's secondary ink: a data URI cannot read a custom property, so the old chevron
+  // was a fixed warm grey in both themes.
+  assert.equal(base.match(/linear-gradient\(/g)?.length, 2);
+  assert.match(base, /var\(--muted-foreground\)/);
+  assert.doesNotMatch(base, /url\(/);
+  assert.match(base, /background-position:\s*right 1\.25rem center,\s*right 1rem center;/);
+  // The control's end is physical in background-position: rtl places it again, at the inline end (the left).
+  assert.match(rule(".fui-input.fui-native-select:dir(rtl)"), /left 1rem center,\s*left 1\.25rem center;/);
+  // `.fui-input:disabled { background: var(--muted) }` resets every background longhand and ties the chevron's rule at two classes:
+  // the chevron's rule must come after it or a disabled select loses its chevron.
+  const disabled = styles.indexOf(".fui-input:disabled,\n  .fui-input[data-disabled] {");
+  assert.ok(disabled >= 0, "the input's disabled fill is where this test expects");
+  assert.ok(
+    styles.indexOf(".fui-input.fui-native-select {") > Math.max(disabled, styles.indexOf(".fui-input[readonly] {")),
+    "the chevron's rule follows the disabled and read-only fills",
+  );
+  // Forced colors keep a gradient's own colors on a Canvas fill, so the browser draws its native arrow.
+  assert.match(
+    styles,
+    /@media \(forced-colors: active\) \{\n    \.fui-input\.fui-native-select \{\n      appearance: auto;\n      background-image: none;\n    \}\n  \}/,
+  );
+});
