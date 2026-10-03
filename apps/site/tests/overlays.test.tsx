@@ -518,8 +518,31 @@ describe("AuthLayout", () => {
     await user.tab();
     expect(document.activeElement).toBe(screen.getByRole("button", { name: "English" }));
     const layout = document.querySelector(".fui-auth") as HTMLElement;
-    expect(layout.lastElementChild?.className).toBe("fui-auth-actions");
+    // the corner closes the landmark, after the card; the aside is outside it
+    expect(layout.lastElementChild?.tagName).toBe("MAIN");
+    expect(layout.lastElementChild?.lastElementChild?.className).toBe("fui-auth-actions");
+    expect(layout.querySelector(":scope > aside")?.textContent).toBe("storm");
     expect(layout.getAttribute("data-align")).toBeNull();
+  });
+
+  it("is the page's main landmark, unless as is div", () => {
+    const { unmount } = render(
+      <AuthLayout title="Sign in" id="main" aria-label="Sign in to Fabrials">
+        <Button>Go</Button>
+      </AuthLayout>,
+    );
+    const main = screen.getByRole("main", { name: "Sign in to Fabrials" });
+    expect(main.id).toBe("main");
+    expect(main.className).toBe("fui-auth-main");
+    expect(screen.getByRole("heading", { level: 1 }).closest("main")).toBe(main);
+    unmount();
+    render(
+      <AuthLayout as="div" title="Sign in">
+        <Button>Go</Button>
+      </AuthLayout>,
+    );
+    expect(screen.queryByRole("main")).toBeNull();
+    expect(document.querySelector(".fui-auth-main")?.tagName).toBe("DIV");
   });
 
   it("carries an explicit alignment", () => {

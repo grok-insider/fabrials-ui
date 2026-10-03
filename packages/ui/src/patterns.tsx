@@ -421,8 +421,10 @@ export function AuthLayout({
   actions,
   align = "auto",
   headingLevel = 1,
+  as: Landmark = "main",
   className,
-}: {
+  ...props
+}: Omit<ComponentProps<"main">, "title" | "children" | "className" | "ref"> & {
   brand?: ReactNode;
   title: ReactNode;
   description?: ReactNode;
@@ -433,7 +435,8 @@ export function AuthLayout({
   aside?: ReactNode;
   /**
    * A corner control for the page (an appearance and language menu). It sits at the inline end of the top edge, above the aside,
-   * and comes AFTER the card in the DOM, so the first tab stop is the sign-in action, not the menu.
+   * and comes AFTER the card in the DOM, so the first tab stop is the sign-in action, not the menu. It is part of the page's
+   * column (inside the landmark), positioned against the whole layout.
    */
   actions?: ReactNode;
   /**
@@ -443,6 +446,13 @@ export function AuthLayout({
    */
   align?: "auto" | "start" | "center";
   headingLevel?: 1 | 2;
+  /**
+   * The element of the page's column. A sign-in page is a `<main>` landmark, so that is the default, and the aside sits outside it
+   * (a complementary landmark must be top level). Pass `"div"` where the host already renders its own `<main>` around the layout:
+   * two of them are invalid and axe reports them.
+   */
+  as?: "main" | "div";
+  /** The class of the layout's root, not of the landmark. */
   className?: string;
 }) {
   const Heading = `h${headingLevel}` as "h1" | "h2";
@@ -454,7 +464,8 @@ export function AuthLayout({
       className={classes("fui-auth", className)}
     >
       {aside ? <aside className="fui-auth-aside">{aside}</aside> : null}
-      <div className="fui-auth-main">
+      {/* The rest of the props (id for a skip link, aria-label, tabIndex) go to the landmark. */}
+      <Landmark {...props} className="fui-auth-main">
         {brand ? <div className="fui-auth-brand">{brand}</div> : null}
         <section className="fui-auth-card">
           <header className="fui-auth-header">
@@ -464,8 +475,8 @@ export function AuthLayout({
           {children}
         </section>
         {footer ? <p className="fui-auth-footer">{footer}</p> : null}
-      </div>
-      {actions ? <div className="fui-auth-actions">{actions}</div> : null}
+        {actions ? <div className="fui-auth-actions">{actions}</div> : null}
+      </Landmark>
     </div>
   );
 }

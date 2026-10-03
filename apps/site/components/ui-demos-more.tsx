@@ -946,6 +946,8 @@ export const moreDemos: Record<string, () => ReactNode> = {
         footer="We read your X handle and avatar, nothing else."
         actions={<Button variant="ghost" size="sm">English</Button>}
         headingLevel={2}
+        // The docs page already has its <main>; the layout's default landmark would be a second one.
+        as="div"
       >
         <Button>Continue with X</Button>
       </AuthLayout>

@@ -1454,8 +1454,10 @@ export const uiCatalog: UiCatalogItem[] = [
       ["align", "auto | start | center", "auto follows DESIGN.md: with an aside the card anchors to the inline start of its column from 1024 px, without one it centres. start anchors it at every width."],
       ["aside", "ReactNode", "Shown beside the card on wide screens; put a DitherScene variant=\"full\" in it."],
       ["footer", "ReactNode", "What the session can and cannot do."],
+      ["as", "main | div", "The element of the page's column. main (the default) makes the sign-in page its own landmark, with the card, the footer and the corner inside it and the aside beside it. Pass div where the host already renders a <main> around the layout: two are invalid."],
+      ["id / aria-* / tabIndex", "main props", "Every other prop goes to the column, the landmark: the id a skip link targets, an aria-label, tabIndex -1. className stays on the layout's root."],
     ],
-    "The aside is a positioning context whose surface the dither fades into.",
+    "The page is a main landmark by default (0.9); the aside is a positioning context whose surface the dither fades into.",
   ),
   ui(
     "loading",

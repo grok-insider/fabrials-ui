@@ -255,10 +255,44 @@ test("AuthLayout: the corner actions come after the card, the alignment is an at
     </AuthLayout>,
   );
   assert.ok(html.indexOf("Go") < html.indexOf("Menu"));
-  assert.match(html, /<div class="fui-auth-actions"><button>Menu<\/button><\/div><\/div>$/);
+  // the corner is the last thing in the landmark (after the card), not a sibling of it
+  assert.match(html, /<div class="fui-auth-actions"><button>Menu<\/button><\/div><\/main><\/div>$/);
   assert.doesNotMatch(html, /data-align/);
   assert.match(renderToStaticMarkup(<AuthLayout title="t" align="center">x</AuthLayout>), /data-align="center"/);
   assert.match(renderToStaticMarkup(<AuthLayout title="t" align="start">x</AuthLayout>), /data-align="start"/);
+});
+
+test("AuthLayout is the page's <main> by default, with the aside beside it and the corner inside it", () => {
+  const html = renderToStaticMarkup(
+    <AuthLayout title="Sign in" actions={<button>Menu</button>} aside={<div>storm</div>} footer="note">
+      <button>Go</button>
+    </AuthLayout>,
+  );
+  assert.equal(html.match(/<main/g)?.length, 1);
+  assert.match(html, /<aside class="fui-auth-aside"><div>storm<\/div><\/aside><main class="fui-auth-main">/);
+  // a complementary landmark must be top level: the aside is not inside the main
+  assert.ok(html.indexOf("</aside>") < html.indexOf("<main"));
+  const main = html.slice(html.indexOf("<main"), html.indexOf("</main>"));
+  for (const part of ["fui-auth-card", "fui-auth-footer", "fui-auth-actions", "Go"]) assert.ok(main.includes(part), `${part} is inside the landmark`);
+  assert.ok(main.indexOf("fui-auth-card") < main.indexOf("fui-auth-actions"), "the corner follows the card");
+  assert.match(html, /^<div data-slot="auth-layout" data-aside="" class="fui-auth">/);
+});
+
+test("AuthLayout as=\"div\" is no landmark, and the other props go to the column, not the root", () => {
+  const div = renderToStaticMarkup(<AuthLayout as="div" title="Sign in">x</AuthLayout>);
+  assert.doesNotMatch(div, /<main/);
+  assert.match(div, /<div class="fui-auth-main">/);
+  const props = renderToStaticMarkup(
+    <AuthLayout title="Sign in" id="main" tabIndex={-1} aria-label="Sign in to Open Email" className="host-root" data-testid="auth">
+      x
+    </AuthLayout>,
+  );
+  assert.match(props, /<main id="main" tabIndex="-1"|<main id="main" tabindex="-1"/);
+  assert.match(props, /<main[^>]*aria-label="Sign in to Open Email"[^>]*class="fui-auth-main"|<main[^>]*class="fui-auth-main"[^>]*aria-label/);
+  assert.match(props, /data-testid="auth"/);
+  assert.match(props, /^<div data-slot="auth-layout" class="fui-auth host-root">/);
+  // the column's class is the layout's, a caller cannot replace it
+  assert.doesNotMatch(renderToStaticMarkup(<AuthLayout title="t" {...({ className: "x" } as object)}>y</AuthLayout>), /<main[^>]*class="x"/);
 });
 
 test("AuthLayout CSS: with an aside the card anchors to the inline start from 1024 px (DESIGN.md), and the corner is a logical, safe-area inset", () => {
@@ -266,6 +300,14 @@ test("AuthLayout CSS: with an aside the card anchors to the inline start from 10
   assert.match(rule(".fui-auth {"), /position: relative/);
   assert.match(styles, /\.fui-auth\[data-aside\]:not\(\[data-align\]\) \.fui-auth-main \{\s*justify-items: start/);
   assert.match(rule('.fui-auth[data-align="start"] .fui-auth-main {'), /justify-items: start/);
+});
+
+test("the corner stays anchored to the whole layout: its parent, the column, makes no containing block", () => {
+  // `.fui-auth-actions` is position: absolute inside `.fui-auth-main` since 0.9. Anything below on the column would re-anchor it to the
+  // column (half the window beside an aside) and move it: a positioned box, containment, a container, a transform or a filter.
+  const column = rule(".fui-auth-main {");
+  assert.doesNotMatch(column, /\b(position|contain|container|container-type|transform|filter|perspective|will-change|backdrop-filter|overflow):/);
+  assert.doesNotMatch(styles, /\.fui-auth-main[^{}]*\{[^}]*\b(position|contain|container-type|transform|filter|will-change):/);
 });
 
 // ------------------------------------------------------------ Status, description

@@ -209,7 +209,7 @@ Chart colours come from `--chart-1` to `--chart-6`; the first series reads as St
 | `StatePanel` | `state` `loading`, `empty`, `error`, `stale`, `offline`, `success`; `title`, `description`, `actions`; `align` `start` (default) or `center`; `size="sm"` (16 px, for embedded regions), `variant="inline"` (no border or tint, for overlays), `fill` (fills a region with a height and centres) |
 | `SettingsSection` | A settings row: `title`, `description`, `status`, controls as children; two columns from 36rem of its OWN width (`layout="stacked"` opts out), so it is right in a sheet, a dialog and a page; `headingLevel`, `headingRef`, `headingProps` |
 | `SuggestionCard`, `SuggestionGrid` | Prompts in an empty chat or workspace (grid on wide screens, a scroll row on narrow) |
-| `AuthLayout` | Sign-in: `brand`, `title`, `description`, form as children, `footer`, `aside`, `actions` (a corner control after the card in the DOM), `align` (`auto`: the card anchors to the start beside an aside, centres without one) |
+| `AuthLayout` | Sign-in, and the page's `<main>` (0.9): `brand`, `title`, `description`, form as children, `footer`, `aside`, `actions` (a corner control after the card in the DOM), `align` (`auto`: the card anchors to the start beside an aside, centres without one), `as="div"` where the host already has a `<main>`, other props (`id`, `aria-*`) on the landmark |
 
 ```tsx
 <PageHeader

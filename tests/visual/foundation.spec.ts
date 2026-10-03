@@ -16,6 +16,21 @@ async function audit(page: Page) {
   throw new Error("Accessibility audit did not finish");
 }
 
+// The WCAG tags above do not include landmark structure (those rules are best practices). A sign-in page is a whole page: it must
+// have exactly one main, nothing outside a landmark, and its aside at the top level.
+async function auditLandmarks(page: Page) {
+  return new AxeBuilder({ page })
+    .withRules([
+      "landmark-one-main",
+      "region",
+      "landmark-main-is-top-level",
+      "landmark-no-duplicate-main",
+      "landmark-complementary-is-top-level",
+      "landmark-unique",
+    ])
+    .analyze();
+}
+
 const stories: Record<string, string> = {
   controls: "fabrials-foundation--controls",
   accounts: "fabrials-foundation--accounts",
@@ -98,6 +113,7 @@ for (const theme of ["light", "dark"]) {
         ).toBe(true);
         const result = await audit(page);
         expect(result.violations).toEqual([]);
+        if (story.startsWith("auth-")) expect((await auditLandmarks(page)).violations).toEqual([]);
         await expect(page).toHaveScreenshot(`${story}-${theme}-${width}.png`, {
           fullPage: true,
         });
