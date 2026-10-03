@@ -141,6 +141,9 @@ Every pattern covers its normal, loading, empty, error and long-content cases; t
 
 Focus is a visible 2 px outline with an offset, in Stormlight. Base UI keeps keyboard traversal, Escape and focus return; do not break them when composing. Check both themes at 390, 768 and 1440 px and at 200 % text size. The visual suite runs axe on its stories in both themes and three widths; it does not replace using the screen with a keyboard.
 
+- **Forced colors** (Windows high contrast) repaint every background in Canvas and drop every shadow, so a state is never only a fill or a `box-shadow`: the packages carry one block that gives meters, switches, badges, legend keys and pressed segments a form in system colors (`Highlight`, `CanvasText`). A pressed or active item is a bar under its label: not an outline (that is the focus ring's shape) and not a `Highlight` fill behind the text (Chromium paints a Canvas backplate behind text over an author background).
+- **A page is a landmark.** `AuthLayout` is the sign-in page's `<main>`; a host that already renders one passes `as="div"`.
+
 ## Using the system in a product
 
 Import once, in this order, and set the theme and gem on the root element:

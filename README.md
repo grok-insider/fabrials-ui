@@ -1,6 +1,6 @@
 # Fabrials UI
 
-The Fabrials design system, version 0.7 "Highstorm": the interface every Fabrials product shares, and the shadcn registry at [ui.fabrials.com](https://ui.fabrials.com) that lets any React app use it.
+The Fabrials design system, 0.9, the "Highstorm" line: the interface every Fabrials product shares, and the shadcn registry at [ui.fabrials.com](https://ui.fabrials.com) that lets any React app use it.
 
 Read [DESIGN.md](DESIGN.md) before changing anything visible.
 
@@ -56,12 +56,9 @@ bun run registry:sync          # re-snapshot the third-party libraries (network)
 | Product | Version |
 | --- | --- |
 | ui.fabrials.com (this repository) | workspace |
-| X Tracker, Radiant | 0.6.2 |
-| AI Relay, Spanreed desktop | 0.4.0 |
-| fabrials.com | 0.4.0 (0.7.0 on its `feat/highstorm` branch) |
-| admin.fabrials.com, Open Mail, Ditox | 0.3.0 |
+| fabrials.com, admin.fabrials.com, X Tracker, Radiant, AI Relay, Open Email, Spanreed desktop, Ditox | 0.8.2 |
 
-Upgrading a product is that product's decision; read [docs/migration-0.8.md](docs/migration-0.8.md) (and 0.7 before it) first. The 0.3 delivery record is [docs/delivery-0.3.md](docs/delivery-0.3.md).
+Upgrading a product is that product's decision; read [docs/migration-0.9.md](docs/migration-0.9.md) first (it lists the hosts that must change a line), then [0.8](docs/migration-0.8.md) and 0.7 if the product is older. The 0.3 delivery record is [docs/delivery-0.3.md](docs/delivery-0.3.md).
 
 ## Licenses
 

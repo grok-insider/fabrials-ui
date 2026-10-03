@@ -117,7 +117,7 @@ import { ChatMessage, ChatComposer } from "@fabrials/ai-ui";         // needs @f
 | `StatusPopover` | A one-sentence status in a header or toolbar (an icon, or an icon and a word, with `attention` `warning` or `danger`) that opens a popover with what to do about it; `compact` hides the word and keeps it in the name |
 | `HoverCard` (`HoverCardTrigger`, `HoverCardContent`) | A preview whose content is also reachable by keyboard |
 | `Command`, `CommandDialog` (`CommandInput`, `CommandList`, `CommandEmpty`, `CommandGroup`, `CommandItem`, `CommandShortcut`, `CommandSeparator`) | The Ctrl/Cmd K palette over real destinations (put a `Command` inside `CommandDialog`; 6 px corners, the selected row has the 2 px bar) |
-| `CommandTrigger` (`keys={["mod", "K"]}`, `compact`, `variant`: `outline` for a launcher that looks like a field), `CommandOptionList`, `CommandOption` (`active`, `disabled`, `detail`, `group`, `reason`, `keys`) | The launcher of a palette (icon-only in the header's command slot under 12rem) and the rows of a palette you drive yourself with `aria-activedescendant`; a disabled row stays selectable so it can say why |
+| `CommandTrigger` (`keys={["mod", "K"]}`, `compact`, `fit` for the width of its content in a group of automatic width (the actions of `SiteHeader` do it by themselves, icon only under 40rem), `variant`: `outline` for a launcher that looks like a field), `CommandOptionList`, `CommandOption` (`active`, `disabled`, `detail`, `group`, `reason`, `keys`) | The launcher of a palette (icon-only in the header's command slot under 12rem) and the rows of a palette you drive yourself with `aria-activedescendant`; a disabled row stays selectable so it can say why |
 
 Triggers take `render` to become a Fabrials button: `<DialogTrigger render={<Button variant="outline" />}>Rename</DialogTrigger>`.
 
@@ -179,7 +179,7 @@ Triggers take `render` to become a Fabrials button: `<DialogTrigger render={<But
 | Component | Use for |
 | --- | --- |
 | `Stat`, `StatGroup` | A number with `unit`, `delta`, `trend`, `deltaTone`, `hint`, optional `sparkline`, `loading` |
-| `SeriesChart` | Bar or line charts over one series contract, with a legend and an accessible table (`caption` required) |
+| `SeriesChart` | Bar or line charts over one series contract, with a legend and an accessible table (`caption` required, and the plot's accessible name); the plot is a tab stop with a visible 2 px ring and the arrows move the tooltip |
 | `Sparkline` | Shape only, next to its number |
 | `Meter` | A level that stays (quota, budget); warns at 75 % and 90 % by default |
 | `StatusDot` | A state as a dot and a word; `pulse` only while something is live or in progress |
