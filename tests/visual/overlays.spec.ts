@@ -165,6 +165,38 @@ test("the launcher is icon-only in a command container under 12rem and labelled 
   expect(height).toBeGreaterThanOrEqual(44);
 });
 
+test("the launcher in a site header is the width of its content and the header stays one row from 390 to 2560 px; fit does it elsewhere", async ({ page }) => {
+  const read = () =>
+    page.evaluate(() => {
+      const trigger = document.querySelector<HTMLElement>(".fui-site-header .fui-command-trigger")!;
+      return {
+        header: Math.round(document.querySelector(".fui-site-header")!.getBoundingClientRect().height),
+        width: Math.round(trigger.getBoundingClientRect().width),
+        height: Math.round(trigger.getBoundingClientRect().height),
+        label: getComputedStyle(trigger.querySelector(".fui-command-trigger-label")!).display,
+        sideways: document.documentElement.scrollWidth > innerWidth,
+      };
+    });
+  // A phone: brand, launcher, appearance and menu on one row; the launcher is its icon, a 44 px target.
+  await open(page, "fabrials-commands--in-the-site-header", 390);
+  const phone = await read();
+  expect(phone).toEqual({ header: 61, width: 44, height: 44, label: "none", sideways: false });
+  // A wide screen: the same markup shows its label and keys, in the width of its content, still one row.
+  await open(page, "fabrials-commands--in-the-site-header", 2560, 1315);
+  const wide = await read();
+  expect(wide.header).toBe(61);
+  expect(wide.label).not.toBe("none");
+  expect(wide.width).toBeGreaterThan(120);
+  expect(wide.width).toBeLessThan(260);
+  expect(wide.sideways).toBe(false);
+  // Elsewhere the launcher fills its container (the default) and `fit` is the width of its content.
+  const widths = await page.evaluate(() => [...document.querySelectorAll<HTMLElement>("main .fui-command-trigger")].map((button) => Math.round(button.getBoundingClientRect().width)));
+  expect(widths).toHaveLength(2);
+  expect(widths[0]).toBeGreaterThan(400);
+  expect(widths[1]).toBeGreaterThan(120);
+  expect(widths[1]).toBeLessThan(300);
+});
+
 test("command rows: the active row has the 2 px bar and the fill, a disabled row keeps its pointer", async ({ page }) => {
   await open(page, "fabrials-commands--options");
   const active = page.locator('[role="option"][data-active]').first();

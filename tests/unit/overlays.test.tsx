@@ -129,8 +129,21 @@ test("the launcher goes icon-only inside a container named command, and hides th
   const narrow = container("command (max-width: 11.99rem)");
   assert.match(narrow, /\.fui-command-trigger-label/);
   assert.match(narrow, /display: none/);
-  assert.match(rule(".fui-button.fui-command-trigger {"), /--fui-button-border: var\(--fui-control-border\)/);
+  // At the start of a line: `.fui-site-actions .fui-button.fui-command-trigger {` (the header's phone rule) ends with the same text.
+  assert.match(rule("\n  .fui-button.fui-command-trigger {"), /--fui-button-border: var\(--fui-control-border\)/);
   assert.match(styles, /@media \(pointer: coarse\) \{\s*\.fui-command-trigger-keys \{\s*display: none/);
+});
+
+test("CommandTrigger fit: data-fit sets the width of its content, and the actions of SiteHeader do it without the prop, icon only on a phone", () => {
+  assert.match(renderToStaticMarkup(<CommandTrigger label="Search" fit />), /data-fit="true"/);
+  assert.doesNotMatch(renderToStaticMarkup(<CommandTrigger label="Search" />), /data-fit/);
+  // The launcher's own `inline-size: 100%` is cyclic inside a group of automatic width; both selectors outrank it (three classes).
+  assert.match(styles, /\.fui-button\.fui-command-trigger\[data-fit\],\n\s*\.fui-site-actions \.fui-button\.fui-command-trigger \{\n\s*inline-size: auto;/);
+  const phone = styles.indexOf("@media (max-width: 39.99rem) {\n    .fui-site-actions .fui-button.fui-command-trigger {");
+  assert.ok(phone >= 0, "the site header's launcher has a phone rule");
+  const body = styles.slice(phone, styles.indexOf("\n  }\n", phone));
+  assert.match(body, /justify-content: center;\s*padding-inline: 0;/);
+  assert.match(body, /\.fui-site-actions \.fui-command-trigger :is\(\.fui-command-trigger-label, \.fui-command-trigger-keys\) \{\s*display: none;/);
 });
 
 test("CommandOption: role, selection, disabled and the slots", () => {

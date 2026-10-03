@@ -3710,6 +3710,16 @@
   .fui-site-mobile-menu {
     display: none;
   }
+  /* A phone's header has the brand, the actions and the menu on one row: the launcher there is its icon (the name stays). */
+  @media (max-width: 39.99rem) {
+    .fui-site-actions .fui-button.fui-command-trigger {
+      justify-content: center;
+      padding-inline: 0;
+    }
+    .fui-site-actions .fui-command-trigger :is(.fui-command-trigger-label, .fui-command-trigger-keys) {
+      display: none;
+    }
+  }
 
   /* ---------------------------------------------------- application header (0.8)
      One row of 56 px with a hairline below, no blur, spanning the window, its content on the page gutter. Modes are container
@@ -4745,6 +4755,13 @@
     .fui-command-trigger-keys {
       display: none;
     }
+  }
+  /* fit: the width of its content. The launcher's 100% is cyclic in a group of automatic width (a flex row that sizes itself from
+     its children): the header of fabrials.com went from 57 to 105 px wide. The actions of SiteHeader are such a group, so the
+     launcher there is fit without the prop. */
+  .fui-button.fui-command-trigger[data-fit],
+  .fui-site-actions .fui-button.fui-command-trigger {
+    inline-size: auto;
   }
   /* Icon only: forced with compact, or by the command slot of AppHeader (a container named "command") when it is under 12rem. */
   .fui-button.fui-command-trigger[data-compact] {

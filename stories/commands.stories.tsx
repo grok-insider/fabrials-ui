@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Archive, Bell, ContactRound, Ellipsis, Folder, Inbox, Mail, MailOpen, PenLine, Search, Star, Trash2, Wrench } from "lucide-react";
+import { Archive, Bell, ContactRound, Ellipsis, Folder, Inbox, Mail, MailOpen, Menu, PenLine, Search, Star, Trash2, Wrench } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -33,12 +33,16 @@ import {
   NativeCheckbox,
   NativeSelect,
   PageHeader,
+  ProductLockup,
   SectionHeader,
+  SiteHeader,
   Textarea,
+  ThemeSwitcher,
   Toolbar,
   ToolbarButton,
   TooltipProvider,
   placeholderText,
+  type ThemePreference,
 } from "@fabrials/ui";
 
 const meta = {
@@ -176,6 +180,55 @@ function LauncherVariantsPage() {
         </Frame>
       </Block>
     </Page>
+  );
+}
+
+// ------------------------------------------------------------ In a site header
+
+function SiteHeaderPage() {
+  const [theme, setTheme] = useState<ThemePreference>("system");
+  return (
+    <>
+      {/* Full width, like the header of a site: it must stay one row from 390 px to 2560 px. */}
+      <SiteHeader
+        sticky={false}
+        brand={<ProductLockup product="Fabrials" gem="heliodor" />}
+        navigation={
+          <nav aria-label="Primary" className="catalogue-site-nav">
+            <a href="#launcher-header" aria-current="page">
+              Products
+            </a>
+            <a href="#launcher-header">Learn</a>
+          </nav>
+        }
+        actions={
+          <>
+            <CommandTrigger label="Search" keys={["mod", "K"]} />
+            <ThemeSwitcher value={theme} onValueChange={setTheme} />
+          </>
+        }
+        mobileMenu={
+          <Button variant="ghost" size="icon" aria-label="Open menu">
+            <Menu aria-hidden />
+          </Button>
+        }
+      />
+      <Page
+        title="Launcher in a site header"
+        description="The actions of a SiteHeader are a group of automatic width, so the launcher there takes the width of its content, and is icon only under 40rem."
+      >
+        <Block title="fit" description="Anywhere else a launcher fills its container; fit makes it the width of its content.">
+          <Frame width={480}>
+            <div style={{ display: "grid", gap: "var(--fui-space-3)" }}>
+              <CommandTrigger label="Search or run a command" keys={["mod", "K"]} />
+              <div style={{ display: "flex" }}>
+                <CommandTrigger fit label="Search or run a command" keys={["mod", "K"]} />
+              </div>
+            </div>
+          </Frame>
+        </Block>
+      </Page>
+    </>
   );
 }
 
@@ -474,6 +527,7 @@ function BulkPartsPage() {
 
 export const Launcher: Story = { render: () => <LauncherPage /> };
 export const LauncherOutline: Story = { render: () => <LauncherVariantsPage /> };
+export const InTheSiteHeader: Story = { render: () => <SiteHeaderPage /> };
 export const Options: Story = { render: () => <OptionsPage /> };
 export const PaletteDialog: Story = { render: () => <CommandDialogPage /> };
 export const Tools: Story = { render: () => <ToolsPage /> };

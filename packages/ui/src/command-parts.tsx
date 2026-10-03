@@ -34,6 +34,7 @@ export function CommandTrigger({
   separator = "then",
   shortcut,
   compact = false,
+  fit = false,
   variant = "secondary",
   className,
   ...props
@@ -53,6 +54,12 @@ export function CommandTrigger({
   shortcut?: string | false;
   /** Icon only, whatever the container's width. */
   compact?: boolean;
+  /**
+   * The width of its content instead of the width of its container. The launcher fills its container by default (it looks like
+   * the field it opens), which is wrong in a group of automatic width: a percentage of a width that depends on the child is
+   * cyclic. The actions of `SiteHeader` are such a group and already size it this way; use `fit` anywhere else.
+   */
+  fit?: boolean;
   /** The button's look (`secondary`, a grey fill, by default). `outline` is the card fill and hairline of a launcher that looks like a field. */
   variant?: ComponentProps<typeof Button>["variant"];
 }) {
@@ -63,6 +70,7 @@ export function CommandTrigger({
       size="lg"
       className={classes("fui-command-trigger", className)}
       data-compact={compact || undefined}
+      data-fit={fit || undefined}
       aria-label={name ?? (typeof label === "string" ? label : undefined)}
       aria-keyshortcuts={derived}
       {...props}

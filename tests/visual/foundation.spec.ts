@@ -64,6 +64,7 @@ const stories: Record<string, string> = {
   "overlays-status-popovers": "fabrials-overlays--status-popovers",
   "commands-launcher": "fabrials-commands--launcher",
   "commands-launcher-outline": "fabrials-commands--launcher-outline",
+  "commands-site-header": "fabrials-commands--in-the-site-header",
   "commands-options": "fabrials-commands--options",
   "commands-palette": "fabrials-commands--palette-dialog",
   "commands-tools": "fabrials-commands--tools",
