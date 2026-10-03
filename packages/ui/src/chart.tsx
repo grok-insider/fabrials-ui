@@ -127,47 +127,56 @@ export function SeriesChart({
     <div ref={frameRef} className={classes("fui-chart", className)}>
       <div className="fui-chart-frame" style={{ height }}>
         {frameWidth > 0 ? (
-        <ResponsiveContainer
-          width={frameWidth}
-          height={height}
-          initialDimension={{ width: frameWidth, height }}
-        >
-          {kind === "line" ? (
-            <LineChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-              {axes}
-              {visible.map((item) => (
-                <Line
-                  key={item.key}
-                  type={lineType === "step" ? "stepAfter" : "monotone"}
-                  dataKey={item.key}
-                  name={item.label}
-                  stroke={item.color}
-                  strokeWidth={2}
-                  strokeDasharray={item.dashed ? "5 4" : undefined}
-                  dot={false}
-                  connectNulls
-                  isAnimationActive={false}
-                />
-              ))}
-            </LineChart>
-          ) : (
-            <BarChart data={data} margin={{ top: 8, right: 4, left: 0, bottom: 0 }} barCategoryGap="22%">
-              {axes}
-              {visible.map((item) => (
-                <Bar
-                  key={item.key}
-                  dataKey={item.key}
-                  name={item.label}
-                  fill={item.color}
-                  stackId={stacked ? "series" : undefined}
-                  radius={stacked ? undefined : [4, 4, 0, 0]}
-                  maxBarSize={48}
-                  isAnimationActive={false}
-                />
-              ))}
-            </BarChart>
-          )}
-        </ResponsiveContainer>
+          <ResponsiveContainer
+            width={frameWidth}
+            height={height}
+            initialDimension={{ width: frameWidth, height }}
+          >
+            {kind === "line" ? (
+              <LineChart
+                data={data}
+                margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+                aria-label={caption}
+              >
+                {axes}
+                {visible.map((item) => (
+                  <Line
+                    key={item.key}
+                    type={lineType === "step" ? "stepAfter" : "monotone"}
+                    dataKey={item.key}
+                    name={item.label}
+                    stroke={item.color}
+                    strokeWidth={2}
+                    strokeDasharray={item.dashed ? "5 4" : undefined}
+                    dot={false}
+                    connectNulls
+                    isAnimationActive={false}
+                  />
+                ))}
+              </LineChart>
+            ) : (
+              <BarChart
+                data={data}
+                margin={{ top: 8, right: 4, left: 0, bottom: 0 }}
+                barCategoryGap="22%"
+                aria-label={caption}
+              >
+                {axes}
+                {visible.map((item) => (
+                  <Bar
+                    key={item.key}
+                    dataKey={item.key}
+                    name={item.label}
+                    fill={item.color}
+                    stackId={stacked ? "series" : undefined}
+                    radius={stacked ? undefined : [4, 4, 0, 0]}
+                    maxBarSize={48}
+                    isAnimationActive={false}
+                  />
+                ))}
+              </BarChart>
+            )}
+          </ResponsiveContainer>
         ) : null}
       </div>
       <table className="fui-sr-only">
@@ -182,7 +191,8 @@ export function SeriesChart({
         </thead>
         <tbody>
           {data.map((row, index) => (
-            <tr key={`${String(row[xKey] ?? index)}`}>
+            // By position: two rows can share a label (two weeks, a repeated date) and a duplicate key makes React reuse the wrong row.
+            <tr key={index}>
               <th>{String(titleKey ? row[titleKey] ?? row[xKey] : row[xKey] ?? "")}</th>
               {painted.map((item) => (
                 <td key={item.key}>{yFormat(numeric(row[item.key]))}</td>
@@ -261,8 +271,9 @@ function SeriesTooltip({
       <p className="fui-chart-tip-title">{String(title ?? "")}</p>
       {rows.length ? (
         <ul className="fui-chart-tip-list">
-          {rows.map((item) => (
-            <li className="fui-chart-tip-row" key={String(item.name)}>
+          {rows.map((item, index) => (
+            // By position: two series may carry the same label.
+            <li className="fui-chart-tip-row" key={index}>
               <span className="fui-chart-tip-name">
                 <span aria-hidden className="fui-chart-swatch" style={{ background: item.color }} />
                 <span>{String(item.name ?? "")}</span>

@@ -209,3 +209,54 @@ function CatalogueGallery() {
 }
 
 export const Gallery: Story = { render: () => <CatalogueGallery /> };
+
+// Two weeks share the axis labels ("Mon", "Tue"), which is what `titleKey` is for: the plot's rows must not be keyed by that label.
+const twoWeeks = [
+  { day: "Mon", date: "Mon 1 Jun", requests: 420, errors: 12 },
+  { day: "Tue", date: "Tue 2 Jun", requests: 610, errors: 9 },
+  { day: "Mon", date: "Mon 8 Jun", requests: 540, errors: 17 },
+  { day: "Tue", date: "Tue 9 Jun", requests: 480, errors: 6 },
+];
+
+function ChartsGallery() {
+  return (
+    <main className="catalogue">
+      <PageHeader
+        title="Charts"
+        description="Both chart kinds take keyboard focus and say what they plot. Synthetic data only."
+      />
+      <section className="catalogue-stack" aria-label="Bars">
+        <SectionHeader title="Stacked bars" />
+        <SeriesChart
+          data={twoWeeks}
+          xKey="day"
+          titleKey="date"
+          stacked
+          series={[
+            { key: "requests", label: "Requests" },
+            { key: "errors", label: "Errors" },
+          ]}
+          caption="Synthetic requests and errors over two weeks"
+          height={200}
+        />
+      </section>
+      <section className="catalogue-stack" aria-label="Lines">
+        <SectionHeader title="Lines" />
+        <SeriesChart
+          kind="line"
+          data={twoWeeks}
+          xKey="day"
+          titleKey="date"
+          series={[
+            { key: "requests", label: "Requests" },
+            { key: "errors", label: "Errors", dashed: true },
+          ]}
+          caption="Synthetic requests and errors per day"
+          height={200}
+        />
+      </section>
+    </main>
+  );
+}
+
+export const Charts: Story = { render: () => <ChartsGallery /> };

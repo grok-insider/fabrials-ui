@@ -5230,8 +5230,15 @@
     width: 100%;
     min-width: 0;
   }
-  .fui-chart-frame :is(.recharts-surface, .recharts-wrapper):focus {
+  /* Recharts 3 paints the plot as an svg with role="application" and tabindex="0" (its keyboard layer: the arrows move the
+     tooltip). A mouse click focuses it too, and there the ring is noise; for the keyboard it is the only sign of where focus is.
+     The ring is inset because the panels that hold a chart clip their overflow. */
+  .fui-chart-frame :is(.recharts-surface, .recharts-wrapper):focus:not(:focus-visible) {
     outline: none;
+  }
+  .fui-chart-frame :is(.recharts-surface, .recharts-wrapper):focus-visible {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: -2px;
   }
   .fui-chart-legend {
     display: flex;
