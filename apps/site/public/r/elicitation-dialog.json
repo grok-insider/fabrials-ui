@@ -6,7 +6,7 @@
   "description": "Answer the server when a tool needs another piece of information.",
   "author": "Fabrials <admin@grokinsider.net>",
   "dependencies": [
-    "@fabrials/ui@^0.8.2",
+    "@fabrials/ui@^0.9.0",
     "@modelcontextprotocol/client@2.0.0",
     "ajv-formats@^3.0.1",
     "ajv@^8.20.0"

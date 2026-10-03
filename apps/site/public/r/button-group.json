@@ -6,7 +6,7 @@
   "description": "shadcn's button-group, backed by @fabrials/ui. Related actions that belong to one choice.",
   "author": "Fabrials <admin@grokinsider.net>",
   "dependencies": [
-    "@fabrials/ui@^0.8.2"
+    "@fabrials/ui@^0.9.0"
   ],
   "registryDependencies": [
     "https://ui.fabrials.com/r/styles.json"

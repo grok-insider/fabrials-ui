@@ -6,7 +6,7 @@
   "description": "shadcn's hover-card, backed by @fabrials/ui. A preview of a person, file or citation.",
   "author": "Fabrials <admin@grokinsider.net>",
   "dependencies": [
-    "@fabrials/ui@^0.8.2"
+    "@fabrials/ui@^0.9.0"
   ],
   "registryDependencies": [
     "https://ui.fabrials.com/r/styles.json"

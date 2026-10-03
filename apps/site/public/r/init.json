@@ -5,7 +5,7 @@
   "title": "Fabrials UI",
   "description": "Sets a shadcn app up for Fabrials UI: Base UI primitives, the @fabrials registry, the styles, IBM Plex and the Highstorm palette in light and dark.",
   "dependencies": [
-    "@fabrials/ui@^0.8.2"
+    "@fabrials/ui@^0.9.0"
   ],
   "registryDependencies": [
     "https://ui.fabrials.com/r/styles.json",

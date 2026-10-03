@@ -442,7 +442,7 @@ const demos: Record<string, () => ReactNode> = {
       </div>
       <div className="flex flex-wrap gap-2">
         <Badge variant="outline">MIT</Badge>
-        <Badge variant="outline">v0.8.2</Badge>
+        <Badge variant="outline">v0.9.0</Badge>
         <Badge variant="solid" tone="info">New</Badge>
         <Badge variant="solid">12</Badge>
       </div>
