@@ -6630,4 +6630,146 @@
       background: transparent;
     }
   }
+
+  /* --------------------------------------------------- forced colors (0.9)
+     Windows high contrast repaints every background in Canvas and drops every box-shadow, so whatever these parts draw with a
+     fill or a hairline disappears: a switch's thumb, a meter, a badge's edge, a legend key. A colour that is a system colour in the
+     author value (Highlight, CanvasText) is kept, which is what every rule here uses. Four groups; the render of each is asserted
+     in tests/visual/forced-colors.spec.ts.
+     SVG fill and stroke are not repainted (the UA gives svg forced-color-adjust: preserve-parent-color), so a chart's series keep
+     their colours: only the HTML marks that label them needed a rule. Skeletons are out of scope; they have their own suite. */
+  @media (forced-colors: active) {
+    /* 1. Marks whose colour is the information: they keep it, with an edge that shows on any Canvas. */
+    .fui-chart-swatch,
+    .fui-badge-dot,
+    .fui-status-dot,
+    .fui-timeline-dot {
+      forced-color-adjust: none;
+      outline: 1px solid CanvasText;
+      outline-offset: -1px;
+    }
+    .fui-status-dot {
+      box-shadow: none;
+    }
+    /* The plot's text is SVG paint, which is not repainted either: it keeps the theme's muted ink, unreadable on a Canvas that is
+       not the theme's (a light page under a dark high-contrast palette). */
+    .fui-chart-frame .recharts-surface text {
+      fill: CanvasText;
+    }
+    .fui-timeline-dot {
+      /* The dot paints with currentColor, and the marker around it has its color forced; the dot's own is its tone. */
+      color: var(--fui-timeline-color);
+    }
+
+    /* 2. Fills that say a state or an amount: Highlight, on an edged track. */
+    .fui-meter-track,
+    .fui-progress {
+      border: 1px solid CanvasText;
+    }
+    .fui-meter-indicator {
+      background: Highlight;
+    }
+    .fui-progress::-webkit-progress-value {
+      background: Highlight;
+    }
+    .fui-progress::-moz-progress-bar {
+      background: Highlight;
+    }
+    /* The thumb is a fill: CanvasText when off (a dot at the start), HighlightText on a Highlight track when on. */
+    .fui-switch-thumb {
+      background: CanvasText;
+    }
+    .fui-switch[data-checked] {
+      border-color: Highlight;
+      background: Highlight;
+    }
+    .fui-switch[data-checked] .fui-switch-thumb {
+      background: HighlightText;
+    }
+    .fui-checkbox[data-checked],
+    .fui-checkbox[data-indeterminate],
+    .fui-radio[data-checked] {
+      border-color: Highlight;
+    }
+    .fui-checkbox[data-checked],
+    .fui-checkbox[data-indeterminate] {
+      background: Highlight;
+      color: HighlightText;
+    }
+    .fui-radio-indicator {
+      background: Highlight;
+    }
+    /* The tabs' underline, and the bar of a vertical list (whose own rule has three classes of specificity). */
+    .fui-tabs-list .fui-tabs-indicator.fui-tabs-indicator {
+      background: Highlight;
+    }
+    .fui-tabs-list:not([data-variant="segmented"]):not(:has(.fui-tabs-indicator)) .fui-tab[data-active]::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0;
+      inset-block-end: 0;
+      block-size: 2px;
+      background: Highlight;
+    }
+    /* An activity cell is a step of Highlight over Canvas, with an edge so an empty one still shows. */
+    .fui-activity-cell {
+      forced-color-adjust: none;
+      border: 1px solid GrayText;
+      background: Canvas;
+    }
+    .fui-activity-cell[data-level]:not([data-level="0"]) {
+      border-color: CanvasText;
+    }
+    .fui-activity-cell[data-level="1"] {
+      background: color-mix(in srgb, Highlight 25%, Canvas);
+    }
+    .fui-activity-cell[data-level="2"] {
+      background: color-mix(in srgb, Highlight 45%, Canvas);
+    }
+    .fui-activity-cell[data-level="3"] {
+      background: color-mix(in srgb, Highlight 70%, Canvas);
+    }
+    .fui-activity-cell[data-level="4"] {
+      background: Highlight;
+    }
+
+    /* 3. Hairlines that were a box-shadow become an outline; pressed and active become a Highlight bar under the label, drawn
+       on a pseudo-element like the current item of a list. Not an outline: that is the focus ring's own shape, and a focused
+       pressed segment must still be told from an unpressed one. Not a Highlight fill behind the label either: Chromium paints
+       a Canvas backplate behind text over any author background unless the element opts out of forcing, so the label would be
+       HighlightText on a white box. */
+    .fui-badge,
+    .fui-avatar,
+    .fui-timeline-marker,
+    .fui-toggle-group,
+    .fui-tabs-list[data-variant="segmented"] {
+      outline: 1px solid CanvasText;
+      outline-offset: -1px;
+    }
+    .fui-toggle[data-pressed],
+    .fui-tabs-list[data-variant="segmented"] .fui-tab[data-active],
+    .fui-tabs-list:not([data-variant="segmented"]):not(:has(.fui-tabs-indicator)) .fui-tab[data-active] {
+      position: relative;
+    }
+    .fui-toggle[data-pressed]::after,
+    .fui-tabs-list[data-variant="segmented"] .fui-tab[data-active]::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0.25rem;
+      inset-block-end: 2px;
+      block-size: 3px;
+      background: Highlight;
+    }
+
+    /* 4. Focus that was only a box-shadow (the control inside draws no ring of its own): the ring every other control gets in
+       forced colors, Highlight. */
+    .fui-input-group:has(.fui-input-group-control:focus-visible) {
+      outline: 2px solid Highlight;
+      outline-offset: 2px;
+    }
+    .fui-command-input-wrapper:focus-within {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+  }
 }

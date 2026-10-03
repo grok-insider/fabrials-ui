@@ -98,6 +98,8 @@ function MonitoringGallery() {
             @old_fixture → @fixture
           </TimelineItem>
           <TimelineItem icon={<UserPlus aria-hidden />} tone="success" title="@fixture followed @someone" time={<RelativeTime date={ago(60 * 30)} />} />
+          {/* No icon: the marker is the tone's dot. */}
+          <TimelineItem tone="success" title="Backfill finished" time={<RelativeTime date={ago(60 * 40)} />} />
         </Timeline>
       </section>
       <section className="catalogue-stack" aria-label="Navigation tabs">
