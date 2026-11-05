@@ -67,8 +67,17 @@ test("a readout settles on its new value and assistive technology only ever read
 test("under reduced motion a readout changes at once and the busy mark holds still", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto(pieces);
+  // Every text the visible readout shows on its way, recorded: under reduced motion there is none between the two values
+  // (reading the text right after the click raced React's render and failed under load).
+  await page.locator('.fui-readout [aria-hidden="true"]').first().evaluate((node) => {
+    const seen: string[] = [node.textContent ?? ""];
+    (window as unknown as { readoutTexts: string[] }).readoutTexts = seen;
+    new MutationObserver(() => seen.push(node.textContent ?? "")).observe(node, { childList: true, characterData: true, subtree: true });
+  });
   await page.getByRole("button", { name: "Sync now" }).click();
-  expect(await page.locator('.fui-readout [aria-hidden="true"]').first().textContent()).toBe("14:47 UTC");
+  await expect(page.locator('.fui-readout [aria-hidden="true"]').first()).toHaveText("14:47 UTC");
+  const texts = await page.evaluate(() => (window as unknown as { readoutTexts: string[] }).readoutTexts);
+  expect([...new Set(texts)]).toEqual(["14:32 UTC", "14:47 UTC"]);
   const spinner = page.locator('.fui-spinner[aria-label="Reading INBOX"]');
   expect(await spinner.locator("rect").first().evaluate((rect) => getComputedStyle(rect).animationName)).toBe("none");
   expect(await page.locator(".fui-toggle-group[data-indicator]").evaluate((group) => getComputedStyle(group, "::before").transitionDuration)).toMatch(/^0s/);

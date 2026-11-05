@@ -568,20 +568,6 @@ h3.docs-heading {
   position: relative;
   width: min(100%, 24rem);
 }
-.docs-index-search svg {
-  position: absolute;
-  left: var(--fui-space-3);
-  top: 50%;
-  width: 1rem;
-  height: 1rem;
-  color: var(--muted-foreground);
-  transform: translateY(-50%);
-  pointer-events: none;
-}
-.docs-index-search .fui-input {
-  width: 100%;
-  padding-left: 2.25rem;
-}
 .docs-index-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));

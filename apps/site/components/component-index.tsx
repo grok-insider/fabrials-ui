@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Search } from "lucide-react";
-import { Button, Input, StatePanel } from "@fabrials/ui";
+import { Button, SearchInput, StatePanel } from "@fabrials/ui";
 import { componentSections } from "@/lib/docs-nav";
 
 export function ComponentIndex() {
@@ -22,14 +21,7 @@ export function ComponentIndex() {
     <>
       <div className="docs-index-toolbar">
         <div className="docs-index-search">
-          <Search aria-hidden="true" />
-          <Input
-            type="search"
-            aria-label="Search components"
-            placeholder="Search components…"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-          />
+          <SearchInput aria-label="Search components" placeholder="Search components…" value={query} onValueChange={setQuery} />
         </div>
         <p role="status" className="fui-description docs-index-count">
           {count} {count === 1 ? "component" : "components"}
