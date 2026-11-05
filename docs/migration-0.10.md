@@ -66,6 +66,7 @@ The pieces products kept rebuilding by hand, added with stories, keyboard tests 
 
 - **Inputs:** `SearchInput` (clear button, Escape, key hint, loading), `PasswordInput` (reveal toggle, Caps Lock warning, hidden again on submit), `NumberField` (Base UI, steppers, units), `Slider` (Base UI, ranges, ruler marks; the `slider` shim), `InputOTP` with `InputOTPGroup`, `InputOTPSlot` and `InputOTPSeparator` (Base UI's OTP field; the `input-otp` shim), and `Textarea autoResize minRows maxRows`.
 - **Dates:** `Calendar` with `CalendarDayButton` (written for this system with react-day-picker's prop names, so the `calendar` shim replaces the site's react-day-picker copy), `DatePicker`, `DateRangePicker`, and the helpers `toISODate`, `parseISODate`, `matchesDate`, `isSameDay` and `firstDayOfWeek`. Pass `locale` when the page is rendered on the server.
+- **Lists and panels:** `ListBox` (single or multiple choice with the keyboard, type-ahead, `onAction`, and `virtual` to draw only the rows on screen), `VirtualList` (a plain list of measured rows), `SidePanel` with its header, title, description, close, body and footer (docked and resizable, a sheet on a phone), `ContextMenu` with every shadcn part (the `context-menu` shim), and `Dropzone` with `acceptsFile` and `sortFiles` (it replaces the Kibo UI dropzone the registry used to offer).
 
 ## What a host may need to change
 

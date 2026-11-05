@@ -64,6 +64,8 @@ const stories: Record<string, string> = {
   "inputs-codes": "fabrials-inputs--codes",
   "dates-calendars": "fabrials-dates--calendars",
   "dates-pickers": "fabrials-dates--pickers",
+  "collections-lists": "fabrials-collections--lists",
+  "collections-panels": "fabrials-collections--panels",
   "feedback-state-panels": "fabrials-feedback--state-panels",
   "feedback-confirmations": "fabrials-feedback--confirmations",
   "feedback-times": "fabrials-feedback--times",

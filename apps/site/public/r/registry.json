@@ -1091,6 +1091,31 @@
       ]
     },
     {
+      "name": "context-menu",
+      "type": "registry:ui",
+      "title": "Context menu",
+      "description": "shadcn's context-menu, backed by @fabrials/ui. The actions of a row or an object, at the pointer.",
+      "author": "Fabrials <admin@grokinsider.net>",
+      "dependencies": [
+        "@fabrials/ui@^0.10.0"
+      ],
+      "registryDependencies": [
+        "https://ui.fabrials.com/r/styles.json"
+      ],
+      "meta": {
+        "source": "shim",
+        "license": "MIT",
+        "category": "Shims",
+        "shadcn": "context-menu"
+      },
+      "files": [
+        {
+          "path": "registry/shims/context-menu.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "dialog",
       "type": "registry:ui",
       "title": "Dialog",

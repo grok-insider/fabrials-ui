@@ -54,6 +54,11 @@ import { ChatMessage, ChatComposer } from "@fabrials/ai-ui";         // needs @f
 | A reply or prompt that grows with its text | `Textarea autoResize minRows maxRows` | A script that sets the height on every key |
 | A date or a date range in a form | `DatePicker`, `DateRangePicker` (`name` posts `yyyy-mm-dd`) | `type="date"` (its popup cannot be styled or translated), a hand-made calendar |
 | A month on show, to pick from in place | `Calendar` (`mode`, `selected`, `onSelect`, `disabled`) | A grid of buttons with its own keyboard |
+| Rows people choose from (senders, accounts, files), one or several | `ListBox` (`selectionMode`, `onAction`, `getTextValue`; `virtual` for thousands) | Clickable `div`s, a `Table` with a click handler, a checkbox per row for a single choice |
+| A long feed or log that would be thousands of DOM rows | `VirtualList` (rows of any height) or `ListBox virtual` | Rendering everything, an infinite scroll that never frees rows |
+| The detail of the chosen row beside the list | `SidePanel` (resizable, a sheet below `sheetBelow`) | A `Card` in a grid column, a dialog for a detail that should stay visible |
+| The actions of a row at the pointer | `ContextMenu` + the same actions in a visible menu or toolbar | A right-click as the only way to reach an action |
+| Files dropped or chosen | `Dropzone` (`accept`, `maxSize`, `onFilesRejected`) | `react-dropzone`, a `div` that only listens to drops |
 | A form with subsections | `FieldSet` + `FieldLegend` + `FieldGroup` | A bordered box per subsection, a `div` with a bold label |
 | Show or hide detail in place, with no state | `Disclosure` (native `details`) | A hand-styled `details`, an `Accordion` for one block |
 | A destructive confirmation | `AlertDialog`, or `ConfirmDialog` for an async action, or `useConfirm()` to `await` one | `window.confirm` in a flow that can wait (a guard that must answer synchronously keeps it) |
@@ -86,6 +91,7 @@ import { ChatMessage, ChatComposer } from "@fabrials/ai-ui";         // needs @f
 | `Slider` (`aria-label` or `thumbLabels`, `marks`, `showValue`, `orientation`) | A value or a range: sunken track, Stormlight fill, raised fader cap, ruler marks |
 | `InputOTP` (`length`, `validationType`, `onValueComplete`; `InputOTPGroup`, `InputOTPSlot`, `InputOTPSeparator`) | One-time codes on Base UI's OTP field: paste and autofill fill every slot |
 | `Textarea` (`autoResize`, `minRows`, `maxRows`) | Multi-line text; `autoResize` grows with the text, then scrolls |
+| `Dropzone` (`accept`, `multiple`, `maxSize`, `maxFiles`, `onFilesChange`, `onFilesRejected`, `error`; `acceptsFile`, `sortFiles`) | Dropped or chosen files; the file input sits in the button inside the well, refusals carry type, size or count |
 | `Calendar` (`mode` single or range, `selected`, `onSelect`, `disabled` matchers, `numberOfMonths`, `locale`, `today`) | A six-week grid with react-day-picker's prop names; arrows, Home, End and Page keys; today a Stormlight tick |
 | `DatePicker`, `DateRangePicker` (`value`, `onValueChange`, `disabledDates`, `format`, `name`, `clearable`) | A field-like trigger that opens the calendar; `toISODate` and `parseISODate` convert local days |
 | `FieldSet`, `FieldLegend`, `FieldGroup` | Grouped fields on a real fieldset; a legend styled as a subsection title with a hairline above; `layout="columns"` reflows by container |
@@ -144,6 +150,10 @@ Triggers take `render` to become a Fabrials button: `<DialogTrigger render={<But
 | Component | Use for |
 | --- | --- |
 | `Table` (`TableHeader`, `TableBody`, `TableFooter`, `TableRow`, `TableHead`, `TableCell`, `TableCaption`) | Records. `aria-label` names the scroll region; `numeric` right-aligns figures; `stickyHeader` for long tables |
+| `ListBox` (`items`, `getKey`, `renderItem`, `selectionMode`, `selected`, `onAction`, `getTextValue`, `isDisabled`, `virtual`, `height`, `empty`) | Rows people choose from: one tab stop, arrows, Home, End, Page keys, type-ahead; rows are Item rows; `virtual` draws only what is on screen |
+| `VirtualList` (`items`, `getKey`, `renderItem`, `estimateSize`, `height`) | A plain list of thousands of rows of any height, measured as they appear |
+| `ContextMenu` (`ContextMenuTrigger`, `ContextMenuContent`, `ContextMenuItem` and the rest of shadcn's parts) | A row's actions at the pointer, the Menu key or Shift+F10; never the only way to an action |
+| `SidePanel` (`SidePanelHeader`, `SidePanelTitle`, `SidePanelClose`, `SidePanelBody`, `SidePanelFooter`; `width`, `minWidth`, `maxWidth`, `sheetBelow`) | The detail beside a list: docked, resizable from its edge, a modal sheet on a phone |
 | `Tabs` (`TabsList`, `TabsTrigger`, `TabsContent`) | Peer panels on one page; not steps. `orientation="vertical"` is a rail (sidebar surface, 2 px Stormlight bar); `TabsList scrollable` (`true`, or `"narrow"` below 48rem) is one line that scrolls, snaps and keeps the selected tab in view |
 | `ItemGroup`, `Item` (`stretch`, `current`, `selected`, `unread`), `ItemLink`, `ItemMedia`, `ItemContent`, `ItemTitle`, `ItemDescription`, `ItemActions`, `ItemControl`, `ItemCheck`, `ItemUnread`, `ItemHeader`, `ItemFooter`, `ItemSeparator` | Records as rows: one stretched target, controls above it, a soft Stormlight fill and 2 px bar for the open record, the focus ring inside the row, the actions wrapping under the text in a narrow list |
 | `Badge` | A short status or fact as a 3 px tag: `tone` `neutral`, `info`, `success`, `warning`, `danger`; `variant` `soft`, `outline` (facts such as a license or version), `solid`; `dot` (`"hollow"` for an archived item), `dotColor`, `truncate`; `--fui-badge-solid` (tint, hairline, dot) and `--fui-badge-ink` (text) are public properties for a tag coloured by data, set on the badge itself (a class or `style`) |

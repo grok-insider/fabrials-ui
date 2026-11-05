@@ -117,6 +117,36 @@ function aiUi(
 
 export const uiCatalog: UiCatalogItem[] = [
   ui(
+    "list-box",
+    "List box",
+    "Collections",
+    "A list people choose from with the keyboard: senders, accounts, files.",
+    ["ListBox"],
+    [
+      ["items / getKey / renderItem", "T[]", "The rows; renderItem returns Item slots (ItemMedia, ItemContent, ItemTitle, ItemDescription), never a control."],
+      ["selectionMode", "single | multiple", "Single follows the arrows by default (selectionFollowsFocus); multiple adds Shift, Ctrl or ⌘ and Ctrl+A."],
+      ["selected / defaultSelected / onSelectedChange", "string[]", "Keys of the chosen rows."],
+      ["onAction", "(key, item) => void", "Enter or a double click: open the row."],
+      ["getTextValue", "(item) => string", "What type-ahead matches."],
+      ["virtual / height", "{ estimateSize, overscan }", "Draw only the rows on screen, measured as they appear; the list needs a height."],
+      ["isDisabled / empty", "", "Rows that cannot be chosen; what shows when there are none."],
+    ],
+    "One tab stop with aria-activedescendant, so a virtual list of thousands keeps its keyboard. The chosen row is the soft Stormlight fill (and the bar for a single choice); the keyboard's row an inset ring. Put actions in a ContextMenu or a toolbar, not inside rows.",
+  ),
+  ui(
+    "virtual-list",
+    "Virtual list",
+    "Collections",
+    "A long list of anything that draws only the rows on screen.",
+    ["VirtualList"],
+    [
+      ["items / getKey / renderItem", "T[]", "Rows of any height; they are measured as they appear."],
+      ["estimateSize / overscan", "number", "A row's height before it is drawn, and how many to draw past each edge."],
+      ["height / aria-label", "", "The scroller's height and the list's name."],
+    ],
+    "A plain list (role list): links and buttons inside rows keep working, and Tab moves through what is drawn. Use ListBox when people choose rows.",
+  ),
+  ui(
     "button",
     "Button",
     "Controls",
@@ -250,6 +280,32 @@ export const uiCatalog: UiCatalogItem[] = [
     "A sunken track, a Stormlight fill and a raised fader cap. Arrows step, Shift and Page keys step large, Home and End go to the ends. shadcn's name, so the slider shim is this.",
   ),
   ui(
+    "context-menu",
+    "Context menu",
+    "Overlays",
+    "The actions of a row or an object, at the pointer.",
+    ["ContextMenu", "ContextMenuTrigger", "ContextMenuContent", "ContextMenuItem", "ContextMenuCheckboxItem", "ContextMenuRadioGroup", "ContextMenuRadioItem", "ContextMenuLabel", "ContextMenuSeparator", "ContextMenuShortcut", "ContextMenuGroup", "ContextMenuPortal", "ContextMenuSub", "ContextMenuSubTrigger", "ContextMenuSubContent"],
+    [
+      ["ContextMenuTrigger", "Base UI trigger", "The area that answers a right-click, a long press, the Menu key or Shift+F10."],
+      ["ContextMenuItem variant", "default | destructive", "The dropdown menu's items and classes."],
+    ],
+    "On Base UI's context menu, under shadcn's names (the context-menu shim). Nobody finds a context menu by looking: put the same actions somewhere visible too.",
+  ),
+  ui(
+    "side-panel",
+    "Side panel",
+    "Navigation",
+    "A detail pane beside a list: docked and resizable, a sheet on a phone.",
+    ["SidePanel", "SidePanelHeader", "SidePanelTitle", "SidePanelDescription", "SidePanelClose", "SidePanelBody", "SidePanelFooter"],
+    [
+      ["open / onOpenChange", "boolean", "Closed, nothing is drawn; the close button and Escape inside call onOpenChange(false)."],
+      ["side", "start | end", "The edge of the row it sits on; the resize handle goes on the other side."],
+      ["width / defaultWidth / minWidth / maxWidth / onWidthChange", "number", "Resized by dragging its edge or with the arrows on the handle (Home and End to the limits)."],
+      ["sheetBelow", "number | false", "Below this window width it is a modal sheet from the same edge; 768 by default."],
+    ],
+    "An aside named by its title, with its own scroll. The same parts work in both forms: the title names the sheet when it is one.",
+  ),
+  ui(
     "calendar",
     "Calendar",
     "Controls",
@@ -278,6 +334,20 @@ export const uiCatalog: UiCatalogItem[] = [
       ["clearable / clearLabel", "boolean / string", "A clear button while something is chosen."],
     ],
     "The trigger is a button styled as a field. The calendar opens on the chosen day; choosing a day (or the end of a range) closes it and returns focus. Validation and typed dates stay with the host.",
+  ),
+  ui(
+    "dropzone",
+    "Dropzone",
+    "Controls",
+    "Where files are dropped or chosen, with the reasons a file is refused.",
+    ["Dropzone", "acceptsFile", "sortFiles"],
+    [
+      ["accept / multiple / maxSize / maxFiles", "", "What it keeps; anything else goes to onFilesRejected with reason type, size or count."],
+      ["onFilesChange / onFilesRejected", "(files) => void", "Accepted files, and the refusals to say in error."],
+      ["label / buttonLabel / dropLabel / description / error", "ReactNode", "The words, in the interface's language."],
+      ["children", "ReactNode", "The host's list of chosen files under the zone."],
+    ],
+    "No dependency: the browser's file input sits in the button inside the zone, so the keyboard and forms are the browser's. While files are dragged over, the well lights in Stormlight.",
   ),
   ui(
     "input-otp",

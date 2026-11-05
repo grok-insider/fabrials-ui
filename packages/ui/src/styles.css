@@ -7934,3 +7934,245 @@
     }
   }
 }
+
+/* 0.10 lists and panels: a listbox of Item rows (selection is the soft Stormlight fill, the keyboard's row an inset
+   ring), virtual lists, the docked side panel with its resize handle, and the dropzone well. */
+@layer components {
+  .fui-context-menu-trigger {
+    -webkit-touch-callout: none;
+  }
+
+  .fui-virtual-list:focus-visible {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: 2px;
+  }
+  .fui-listbox,
+  .fui-virtual-list {
+    position: relative;
+    min-height: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+    outline: none;
+  }
+  .fui-listbox {
+    border-block-start: 1px solid var(--border);
+  }
+  .fui-listbox-canvas {
+    position: relative;
+    width: 100%;
+  }
+  .fui-listbox[data-virtual] .fui-listbox-option,
+  .fui-virtual-row {
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    transform: translateY(var(--fui-row-offset));
+  }
+  .fui-listbox-option {
+    cursor: default;
+    user-select: none;
+  }
+  .fui-listbox-option:hover:not([data-disabled], [data-selected]) {
+    background: var(--accent);
+  }
+  .fui-listbox-option[data-selected] {
+    background: var(--brand-soft);
+  }
+  .fui-listbox-option[data-current]::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    inline-size: var(--fui-bar);
+    background: var(--brand-ink);
+    pointer-events: none;
+  }
+  .fui-listbox:focus-visible .fui-listbox-option[data-active] {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: -2px;
+  }
+  .fui-listbox:focus-visible:not(:has([data-active])) {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: -2px;
+  }
+  .fui-listbox-option[data-disabled] {
+    color: var(--muted-foreground);
+    cursor: not-allowed;
+  }
+  .fui-listbox-mono {
+    font-family: var(--fui-font-mono);
+    font-size: var(--fui-text-xs);
+    font-variant-numeric: tabular-nums;
+    white-space: pre;
+  }
+  .fui-listbox[data-virtual] .fui-listbox-option:not(:has(> :is(.fui-item-media, .fui-item-content, .fui-item-actions))) {
+    display: flex;
+    align-items: center;
+    padding-inline: var(--fui-space-4);
+  }
+  .fui-listbox-empty {
+    padding: var(--fui-space-6) var(--fui-space-4);
+  }
+
+  .fui-side-panel {
+    position: relative;
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    width: var(--fui-side-panel-width, 22.5rem);
+    max-width: 100%;
+    min-height: 0;
+    background: var(--card);
+    border-inline-start: 1px solid var(--border);
+  }
+  .fui-side-panel[data-side="start"] {
+    border-inline-start: 0;
+    border-inline-end: 1px solid var(--border);
+  }
+  .fui-side-panel-handle {
+    position: absolute;
+    z-index: 2;
+    inset-block: 0;
+    inset-inline-start: -0.25rem;
+    width: 0.5rem;
+    cursor: col-resize;
+    touch-action: none;
+    outline: none;
+  }
+  .fui-side-panel[data-side="start"] .fui-side-panel-handle {
+    inset-inline: auto -0.25rem;
+  }
+  .fui-side-panel-handle::after {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    left: calc(50% - 1px);
+    width: 2px;
+    background: transparent;
+    transition: background-color var(--fui-duration) var(--fui-ease);
+  }
+  .fui-side-panel-handle:hover::after,
+  .fui-side-panel-handle:active::after {
+    background: var(--fui-control-border);
+  }
+  .fui-side-panel-handle:focus-visible::after {
+    background: var(--fui-focus);
+  }
+  .fui-side-panel-header {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--fui-space-2);
+    min-height: var(--fui-header-height, 3.5rem);
+    padding: var(--fui-space-2) var(--fui-space-2) var(--fui-space-2) var(--fui-space-4);
+    border-block-end: 1px solid var(--border);
+  }
+  .fui-side-panel-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    font-size: var(--fui-text-md, 1rem);
+    font-weight: var(--fui-weight-semibold);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .fui-side-panel-close {
+    flex: none;
+  }
+  .fui-side-panel-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: var(--fui-space-4);
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+  .fui-side-panel-footer {
+    display: flex;
+    flex: none;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--fui-space-2);
+    padding: var(--fui-space-3) var(--fui-space-4);
+    border-block-start: 1px solid var(--border);
+  }
+  .fui-side-panel-sheet {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+  }
+
+  .fui-dropzone-field {
+    display: grid;
+    gap: var(--fui-space-2);
+    min-width: 0;
+  }
+  .fui-dropzone {
+    display: grid;
+    justify-items: center;
+    gap: var(--fui-space-2);
+    padding: var(--fui-space-6) var(--fui-space-4);
+    border: 1px dashed var(--fui-control-border);
+    border-radius: var(--fui-radius-lg);
+    background: var(--muted);
+    box-shadow: var(--fui-shadow-well);
+    text-align: center;
+    transition:
+      border-color var(--fui-duration) var(--fui-ease),
+      background-color var(--fui-duration) var(--fui-ease);
+  }
+  .fui-dropzone[data-dragging] {
+    border-style: solid;
+    border-color: var(--brand);
+    background: var(--brand-soft);
+  }
+  .fui-dropzone[data-invalid] {
+    border-color: var(--fui-danger-ink);
+  }
+  .fui-dropzone[data-disabled] {
+    border-style: solid;
+    box-shadow: none;
+  }
+  .fui-dropzone-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--muted-foreground);
+  }
+  .fui-dropzone[data-dragging] .fui-dropzone-icon {
+    color: var(--brand-ink);
+  }
+  .fui-dropzone-label {
+    margin: 0;
+    font-weight: var(--fui-weight-medium);
+  }
+  .fui-dropzone-description {
+    margin: 0;
+  }
+  .fui-dropzone-button {
+    margin-block-start: var(--fui-space-1);
+    cursor: pointer;
+  }
+  .fui-dropzone-button:has(input:focus-visible) {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: 2px;
+  }
+  .fui-dropzone-button:has(input:disabled) {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  @media (forced-colors: active) {
+    .fui-listbox-option[data-selected] {
+      outline: 1px solid Highlight;
+      outline-offset: -1px;
+    }
+    .fui-listbox-option[data-current]::before,
+    .fui-side-panel-handle:focus-visible::after {
+      background: Highlight;
+    }
+    .fui-dropzone[data-dragging] {
+      border-color: Highlight;
+    }
+  }
+}

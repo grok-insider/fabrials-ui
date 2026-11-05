@@ -317,6 +317,9 @@ describe("Sheet", () => {
     const dialog = await screen.findByRole("dialog");
     expect(document.querySelector(".fui-backdrop")).toBeNull();
     expect(dialog.getAttribute("aria-modal")).not.toBe("true");
+    // Opening moves focus into the drawer a frame later; wait for it, or that move lands after the click below and takes
+    // the typing into the drawer (the test raced it and failed under load).
+    await waitFor(() => expect(dialog.contains(document.activeElement)).toBe(true));
     // The page is not inert: the field can be typed in while the drawer is open, and the drawer stays open.
     const field = screen.getByLabelText("Page field");
     await user.click(field);
