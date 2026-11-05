@@ -1,11 +1,11 @@
 ---
 name: fabrials-design-system
-description: Build, restyle or review React interfaces in the Fabrials house style (Fabrials UI 0.7 "Highstorm"), in Fabrials products that use @fabrials/ui or @fabrials/ai-ui and in apps that install from the ui.fabrials.com shadcn registry. Use for page layout, components, tokens, theming, on-screen copy and UI QA. Not for backend-only work, and not for a product whose own DESIGN.md or owner has chosen a different look.
+description: Build, restyle or review React interfaces in the Fabrials house style (Fabrials UI 0.10 "Instrument", the successor of 0.7 "Highstorm"), in Fabrials products that use @fabrials/ui or @fabrials/ai-ui and in apps that install from the ui.fabrials.com shadcn registry. Use for page layout, components, tokens, theming, on-screen copy and UI QA. Not for backend-only work, and not for a product whose own DESIGN.md or owner has chosen a different look.
 ---
 
 # Fabrials design system
 
-Fabrials UI 0.7 "Highstorm" is one house style for every Fabrials product and for apps that install from ui.fabrials.com. Reproduce it; do not invent a style per screen. This file is the operating guide; the detail lives in `references/`.
+Fabrials UI 0.10 "Instrument" (Highstorm's rules with a voice: deep Stormwall neutrals, square plates, corner marks, a mono label voice, dithered data) is one house style for every Fabrials product and for apps that install from ui.fabrials.com. Reproduce it; do not invent a style per screen. This file is the operating guide; the detail lives in `references/`.
 
 ## Sources of truth
 
@@ -17,9 +17,9 @@ Resolve this skill directory's real path (`readlink -f`, it is usually a symlink
 | Token values (oklch, both themes, density, breakpoints, reduced motion) | `packages/ui/src/tokens.css` |
 | Component source and exports | `packages/ui/src/*.tsx`, `packages/ui/src/index.ts`, `packages/ai-ui/src/index.tsx` |
 | Catalogue: what each component is for, its exports and notes | `apps/site/lib/ui-catalog.ts` (packages), `apps/site/lib/catalog.ts` (registry blocks) |
-| Reference layouts | `stories/highstorm.stories.tsx` + `highstorm.css`, `apps/site/app/page.tsx`, `apps/site/components/docs/` |
+| Reference layouts | `stories/instrument.stories.tsx` + `instrument.css` (0.10 landing, product overview, pieces), `stories/highstorm.stories.tsx` + `highstorm.css`, `apps/site/app/page.tsx`, `apps/site/components/docs/` |
 | Component usage in context | Storybook (`bun run storybook`, port 6041), `apps/site/components/ui-demos*.tsx` |
-| Upgrading or adopting 0.7, 0.8, 0.8.1, 0.8.2 or 0.9 | `docs/migration-0.7.md`, `docs/migration-0.8.md`, `docs/migration-0.9.md` |
+| Upgrading or adopting 0.7, 0.8, 0.8.1, 0.8.2, 0.9 or 0.10 | `docs/migration-0.7.md`, `docs/migration-0.8.md`, `docs/migration-0.9.md`, `docs/migration-0.10.md` (why 0.10 looks as it does: `docs/identity-proposals.md`) |
 | Registry, shims, other libraries, the license gate | `docs/registry.md` |
 
 The Patterns stories (`stories/patterns.stories.tsx`: PublicSite, Settings, Console, SignIn) follow the 0.7 layout rules and are safe references for page composition.
@@ -28,29 +28,30 @@ Precedence: the user's explicit instruction, then the product's own `AGENTS.md` 
 
 Without a local checkout (an outside app), the repository is public at https://github.com/grok-insider/fabrials-ui (same paths as above); also read https://ui.fabrials.com/docs/design (the same `DESIGN.md`), https://ui.fabrials.com/llms.txt and https://ui.fabrials.com/r/registry.json. Registry entries install `@fabrials/ui` from npm.
 
-## Highstorm in operational rules
+## Instrument in operational rules
 
 1. **One interaction colour.** Stormlight (`--brand-ink`, `--ring`, `--brand`) marks focus, links, checked controls, the current navigation item and the first data series. Nothing else is blue. Primary buttons are ink (`variant="default"`); `variant="accent"` only when one action must stand out.
 2. **Light is dithered, never glowing.** Brand light comes only from `DitherScene`, `DitherBand` and `DitherGem` (canvas, 8x8 Bayer). No gradients, glows, blurred blobs or gradient text.
 3. **Nothing is centred on the page.** Headers span the window; content anchors to the left gutter (`--fui-page-padding`) with a reading max-width and no `margin-inline: auto`. Wide screens keep the free space on the right or give it to panels. Centring is only for small things inside a component.
 4. **Indexes, not card grids.** Lists of products or features are rows: mark, name, one line, a link. One panel with hairline dividers beats cards inside cards.
-5. **Crisp and dense.** Radii 3/4/5/6/8 px (tags, small parts, controls, containers and menus, dialogs). Controls 40 px, body 14 px, metadata 12 px. Hairlines (`--border`) separate; shadows belong to overlays.
+5. **Square plates, crisp parts, dense.** Plates (`Card`, `Stat`, `StatGroup`, `Table`) are square with a hairline and no shadow; tags 3, small parts 4, controls 5, menus 6, dialogs 8 px. Controls 40 px, body 14 px, metadata 12 px. Shadows belong to overlays.
 6. **Tags, not pills.** `Badge` is a 3 px tag with a square dot. Counts and chips are tags too. A pill only for one passive label that must stand out.
-7. **Sentence case, plain words.** No tracked uppercase eyebrows, no word of a headline in another colour, no `→` or arrow icons appended to buttons or links. Plex Sans Condensed 600 is for hero headlines, page titles, marketing section titles and the wordmark only.
+7. **Sentence case, plain words.** No tracked uppercase eyebrows, no word of a headline in another colour, no `→` or arrow icons appended to buttons or links. Plex Sans Condensed 600 is for hero headlines, page titles, marketing section titles, figures and the wordmark only.
 8. **Gems sign marks only.** Each product has one gem (`data-gem` on the root, `DitherGem`/`FabrialsGem`/`ProductLockup`). A gem never colours a status, button or link.
 9. **Motion answers a person.** 100/150/240 ms, zero under reduced motion. One orchestrated moment per page at most (a `DitherScene` or large `DitherGem` `reveal`). Continuous motion only for real loading indicators.
 10. **Say what happened.** Stale is not fresh, configured is not reachable. Errors say what went wrong and what to do; empty states offer the next action; every pattern covers loading, empty, error and long content.
 11. **Accessible by default.** Every control has a name, a visible 2 px Stormlight focus and a keyboard path; colour always travels with a word or symbol; AA contrast in both themes.
-12. **Both themes are designed.** Light (`#eceeeb` page) and dark (Stormwall `#161a21`) are each checked; no literal colours, only tokens.
+12. **Both themes are designed.** Light (`#f6f7f8` page, white plates) and dark (Deep Stormwall `#08090b`, plates `#0e1014`) are each checked; no literal colours, only tokens.
+13. **Built like an instrument.** The three or four plates that carry a page sit in `CornerMarks`; figures end in a `CardCaption`; a share or level gets a ruler (`Stat meter`, `Meter variant="ruler"`); a landing hero draws its grid (`GridGuides`). Labels and readings speak in the label voice (Plex Mono 11 px, muted); a value and its label never share a face. Charts are dithered.
 
 The full list with checks: [references/style-rules.md](references/style-rules.md).
 
 ## Decision flow for a UI task
 
-1. **Read the context.** The product's `AGENTS.md` and `DESIGN.md`; the installed version (`vendor/fabrials-ui-<version>` in a Fabrials product, `package.json` elsewhere). An older version is not permission to migrate; migrating is the product's decision and follows `docs/migration-0.7.md` and `docs/migration-0.8.md`. Until then the product follows the `DESIGN.md` shipped inside its vendored copy.
+1. **Read the context.** The product's `AGENTS.md` and `DESIGN.md`; the installed version (`vendor/fabrials-ui-<version>` in a Fabrials product, `package.json` elsewhere). An older version is not permission to migrate; migrating is the product's decision and follows the migration notes from its version up (`docs/migration-0.7.md` to `docs/migration-0.10.md`). Until then the product follows the `DESIGN.md` shipped inside its vendored copy.
 2. **Name the surface.** Landing, product index, docs, app workspace, settings, sign-in, or a state (empty, loading, error). Each has a recipe in [references/layout.md](references/layout.md); start from it instead of a blank page.
 3. **Pick components before writing markup.** Patterns first (`PageHeader`, `SectionHeader`, `CollectionToolbar`, `Table`, `BulkActions`, `StatePanel`, `SettingsSection`), then controls. See [references/components.md](references/components.md). Do not rebuild a control the package has; do not add a universal component with many flags.
-4. **Compose with tokens.** Spacing on the 4 px grid (`--fui-space-*`), radii from `--fui-radius-*`, colours from roles. In Tailwind hosts use the bridge (`bg-card`, `text-muted-foreground`, `text-brand-ink`, `font-display`, `rounded-md`, `px-(--fui-page-padding)`).
+4. **Compose with tokens.** Spacing on the 4 px grid (`--fui-space-*`), radii from `--fui-radius-*`, colours from roles. In Tailwind hosts use the bridge (`bg-card`, `text-muted-foreground`, `text-brand-ink`, `font-display`, `font-label`, `rounded-md`, `rounded-plate`, `px-(--fui-page-padding)`).
 5. **Write the copy.** Sentence case, names people recognise, an action keeps its name through the flow ("Revoke key", then "Key revoked"). English unless the product decides otherwise.
 6. **Cover the states.** Loading (a first load is the real view inside `<Loading when label>` with placeholder data; a refresh keeps the last value), empty, error, stale, offline, long content, narrow screen.
 7. **Verify** with [references/checklist.md](references/checklist.md). Report what you did not test.

@@ -85,8 +85,10 @@ import {
   CodeTabs,
   DitherBand,
   DitherCanvas,
+  CornerMarks,
   DitherGem,
   DitherScene,
+  GridGuides,
   File,
   Files,
   Folder,
@@ -158,8 +160,8 @@ const random = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
 const days = Array.from({ length: 60 }, (_, i) => ({ label: `Day ${i + 1}`, value: Math.round(random() * random() * 14) }));
 
 const TELEMETRY_RAMP = {
-  dark: ["background", "#1c2129", "#252b35", "#3a4351", "#6f7d92", "#9cc4ff"],
-  light: ["background", "#dcdfe0", "#b9c0c8", "#8e98a5", "#5f6a79", "#2a63c4"],
+  dark: ["background", "#11141a", "#1b2029", "#3a4351", "#6f7d92", "#9cc4ff"],
+  light: ["background", "#e2e5e8", "#b9c0c8", "#8e98a5", "#5f6a79", "#2a63c4"],
 };
 
 function FileInputDemo() {
@@ -445,6 +447,25 @@ export const moreDemos: Record<string, () => ReactNode> = {
       <div className="grid gap-1 p-4">
         <p className="font-display text-2xl font-semibold">Usage AI</p>
         <p className="text-sm text-muted-foreground">Anonymous weekly totals from Spanreed users who share a snapshot.</p>
+      </div>
+    </div>
+  ),
+  "corner-marks": () => (
+    <Frame>
+      <CornerMarks className="w-full max-w-md">
+        <div className="border bg-card p-5">
+          <p className="font-display text-2xl font-semibold">Mail received per day</p>
+          <p className="mt-1 text-sm text-muted-foreground">A plate with its registration marks.</p>
+        </div>
+      </CornerMarks>
+    </Frame>
+  ),
+  "grid-guides": () => (
+    <div className="relative isolate min-h-56 w-full overflow-hidden border bg-background p-8 [--fui-page-padding:2rem]">
+      <GridGuides />
+      <div className="relative z-10 max-w-[18rem]">
+        <p className="font-display text-3xl leading-none font-semibold">Tools for people who work beside AI agents.</p>
+        <p className="mt-3 text-sm text-muted-foreground">The grid the page is built on, drawn behind it.</p>
       </div>
     </div>
   ),

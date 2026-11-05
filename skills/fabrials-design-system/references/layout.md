@@ -8,7 +8,8 @@ Page anatomy for the surfaces Fabrials builds. Each recipe names the components,
 - **No centred page column.** Never `mx-auto`, `margin-inline: auto`, `justify-content: center` or `text-center` on a page container, hero or section. A reading limit is a `max-width` on the text block (`max-w-[38rem]`, `max-width: 68ch`), anchored left.
 - **Wide screens get room, not an island.** At 1440 and 2560 px, tables, rows and panels grow; prose keeps its measure and the rest of the row stays free on the right or goes to a panel. Do not wrap the page in an 80rem centred box. `--fui-content` (80rem) is a cap for a text block or a form, never a centred container.
 - **Sections** are separated by a hairline and vertical space (`border-t py-14` on the site home), not by boxes.
-- **Headings.** Hero: display face 40 to 80 px, `leading-[0.98]`. Page title: `PageHeader` (display, 24 px). Marketing section title: display 28 px (`font-display text-[1.75rem] leading-tight font-semibold`). Subsections: 16 px semibold (`SectionHeader`).
+- **Headings.** Hero: display face 44 to 96 px, `leading-[0.94]`. Page title: `PageHeader` (display, 32 px, with a mono `eyebrow` for the period or source). Marketing section title: display 28 to 30 px (`font-display text-[1.875rem] leading-tight font-semibold`). Subsections: 16 px semibold (`SectionHeader`).
+- **Instrument details (0.10).** The plates that carry a page sit inside `CornerMarks`; figures end in a `CardCaption`; labels and readings use the label voice (`font-label text-[11px]`, `--fui-text-label`). See `DESIGN.md` › "Instrument details".
 - **Phones.** Single column, 16 px gutter, 44 px targets, nothing scrolls sideways except a labelled table region.
 
 Breakpoints that already exist in the code:
@@ -51,43 +52,44 @@ import { Menu } from "lucide-react";
 
 ## Landing hero
 
-Left-aligned and asymmetric: headline, one lead paragraph, one command or primary action and one quiet link on the left; the storm on the right. The hero is never centred and never a card.
+Left-aligned and asymmetric on the drawn grid: `GridGuides` behind the section, the headline, one lead, one command or primary action and one quiet link in columns 1 to 6; the storm as a captioned figure plate with corner marks in columns 8 to 12. The hero is never centred.
 
 ```tsx
-import { Button, DitherScene } from "@fabrials/ui";
+import { Button, Card, CardCaption, CornerMarks, DitherScene, GridGuides, Snippet } from "@fabrials/ui";
 
-<main id="main-content" className="w-full px-(--fui-page-padding)">
-  <section className="hero relative isolate -mx-(--fui-page-padding) px-(--fui-page-padding) pt-16 pb-24 lg:pt-24" aria-labelledby="hero-title">
-    <DitherScene className="hero-storm" />
-    <div className="relative z-10 max-w-[38rem]">
-      <h1 id="hero-title" className="font-display text-[clamp(2.5rem,6vw,4.75rem)] leading-[0.98] font-semibold tracking-[-0.015em] text-balance">
-        See what your coding subscriptions cost.
-      </h1>
-      <p className="mt-6 max-w-[46ch] text-lg leading-7 text-muted-foreground">One sentence that says who it is for and what it does.</p>
-      <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-        <Button size="lg">Install Spanreed</Button>
-        <a href="/docs" className="text-sm underline underline-offset-4">Read the docs</a>
-      </div>
+<section className="hero relative grid grid-cols-12 gap-x-6 border-b px-(--fui-page-padding) py-20" aria-labelledby="hero-title">
+  <GridGuides />
+  <div className="relative z-10 col-span-12 grid content-start gap-6 md:col-span-6">
+    <h1 id="hero-title" className="max-w-[11ch] font-display text-[clamp(2.75rem,6.6vw,6rem)] leading-[0.94] font-semibold tracking-[-0.02em] text-balance">
+      See what your coding subscriptions cost.
+    </h1>
+    <p className="max-w-[42ch] text-lg leading-7 text-muted-foreground">One sentence that says who it is for and what it does.</p>
+    <Snippet>curl -fsSL https://fabrials.com/install/spanreed.sh | sh</Snippet>
+    <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+      <Button size="lg">Install Spanreed</Button>
+      <a href="/docs" className="text-sm underline underline-offset-4">Read the docs</a>
     </div>
-  </section>
-</main>
+  </div>
+  <CornerMarks className="relative z-10 col-span-12 max-w-[46rem] self-start md:col-span-5 md:col-start-8">
+    <Card className="[--fui-dither-bg:var(--card)]">
+      <div className="relative isolate aspect-[4/3.4] overflow-hidden">
+        <DitherScene variant="full" />
+      </div>
+      <CardCaption>
+        <span>Fig. 1. A storm front, ordered dither, 3 px dots.</span>
+        <span>8×8 Bayer</span>
+      </CardCaption>
+    </Card>
+  </CornerMarks>
+</section>
 ```
 
-```css
-/* The storm covers the right of the hero and fades into the page. */
-.hero-storm.fui-dither-scene { left: 40%; }
-@media (max-width: 767px) {
-  .hero-storm.fui-dither-scene { left: 0; top: auto; height: 12rem; }
-  .hero { padding-bottom: 14rem; }
-}
-```
-
-- `DitherScene` is absolute: the parent needs `position: relative` (and `isolation: isolate` if other layers sit around it). `variant="hero"` puts the dense front on the right; text stays on the calm left or on a solid surface.
+- `GridGuides` is the section's first child; the section must be positioned. It follows `--fui-page-padding` and hides under 768 px.
+- The scene inside the plate is absolute: its box needs `position: relative; isolation: isolate`. `variant="hero"` across the whole section (the front entering from the right, `left: 40%`) is still allowed where a plate does not fit; text stays on the calm side.
 - The scene's `reveal` (1200 ms by default, skipped under reduced motion) is the page's one orchestrated moment. Nothing else on the page animates on load.
-- On phones the storm moves below the text, it never sits behind it.
+- On phones the plate moves below the text, full width. On very wide screens it stops at 46rem, anchored to its column.
 - A command can replace the button (`PackageInstall` or `Snippet`), as on ui.fabrials.com.
-- A large `DitherGem` (40 px) may stand beside the headline. Only one of them reveals: `DitherGem` has no reveal unless you pass one, `DitherScene` reveals unless you pass `reveal={0}`.
-- References: `apps/site/app/page.tsx` with `apps/site/app/globals.css` (`.home-storm`), `stories/highstorm.stories.tsx` › Landing with `stories/highstorm.css`.
+- References: `stories/instrument.stories.tsx` › Landing with `stories/instrument.css`; the 0.7 composition in `stories/highstorm.stories.tsx`.
 
 ## Product or feature index
 
@@ -202,12 +204,13 @@ import { Users } from "lucide-react";
 - **Page header.** One `PageHeader` per page: title, one-line description, the primary action. Status of the whole page goes in `actions` as a `StatusDot` with a word.
 - **Collection.** `CollectionToolbar` directly above the collection: search on the left, filters (`ToggleGroup` for views and ranges, `Select`/`MultiSelect`/`NativeSelect` for fields, `FilterChip` for active filters) and collection actions on the right. `BulkActions` appears above the table only once rows are selected.
 - **Records are rows.** `Table` with `numeric` columns right-aligned in tabular figures; the table scrolls inside its own labelled region. Row actions: a `DropdownMenu` from a button that names the record. Do not render records as cards.
-- **Summary numbers.** `StatGroup` of `Stat` above the collection when the page has totals; `SeriesChart` or `Sparkline` for trends; `Meter` for quotas.
-- **Panels.** Group a chart or a secondary table in one panel (`border`, `rounded-lg`, `bg-card`) with a title row and hairline dividers inside. Never a card inside a card.
+- **Summary numbers.** One `StatGroup` of `Stat` above the collection when the page has totals, inside `CornerMarks`; a `Stat` that is a share or a level carries `meter={{ value, max, label }}` (a ruler). `SeriesChart` (dithered by default) or `Sparkline` for trends; `Meter variant="ruler"` for quotas.
+- **Plates.** A chart or a secondary table is one `Card` (square, hairline, no shadow) with a `CardHeader` title row, hairline dividers inside and a `CardCaption` saying what it shows and one reading ("Last 14 days, local time." / "Peak 244 on Nov 4"). The totals, the main chart and the main table each sit in `CornerMarks`; three or four marked plates per screen at most. Never a card inside a card.
+- **Readings.** Sync state, time zone, units and identifiers are set in the label voice (mono 11 px, muted): "Synced 14:32 UTC", an address under a name, an id in a cell.
 - **Actions on one record.** A `Toolbar variant="bar" sticky` under the title: one tab stop, `ToolbarGroup`s named for what they hold, a `ToolbarSeparator` between them. The primary action is `variant="secondary"` with `reveal="early"` so its label appears once there is room; low-priority actions are `tier="low"` and reappear as items of a `DropdownMenu` whose trigger is a `tier="overflow"` `ToolbarButton`. The toolbar measures its own width, so it works in a 358 px pane and a 62 rem column alike.
 - **Detail.** A record opens on its own URL with `NavTabs` for its sections, or in a `Sheet` (`side="right"`) for a quick look. Properties use `DescriptionList`; history uses `Timeline`.
 - **Density.** `data-density="compact"` on a container tightens its controls to 32 px and its rows; it is a composition choice for dense tables, not a user preference.
-- References: `stories/patterns.stories.tsx` › Console (sidebar shell), `stories/foundation.stories.tsx` › Accounts (`WorkspaceShell`), `stories/monitoring.stories.tsx`.
+- References: `stories/instrument.stories.tsx` › Workspace (the 0.10 product overview), `stories/patterns.stories.tsx` › Console (sidebar shell), `stories/foundation.stories.tsx` › Accounts (`WorkspaceShell`), `stories/monitoring.stories.tsx`.
 
 ## Settings
 

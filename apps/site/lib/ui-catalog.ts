@@ -402,11 +402,12 @@ export const uiCatalog: UiCatalogItem[] = [
     "Card",
     "Collections",
     "A bounded summary of one subject.",
-    ["Card", "CardHeader", "CardTitle", "CardDescription", "CardContent", "CardFooter"],
+    ["Card", "CardHeader", "CardTitle", "CardDescription", "CardContent", "CardFooter", "CardCaption"],
     [
       ["children", "ReactNode", "Header, content and optional footer."],
+      ["CardCaption", "component", "A caption strip along the bottom edge in the label voice: what the figure shows, then a reading."],
     ],
-    "A card is a section, not a clickable surface, unless the host adds one action.",
+    "A card is a plate: square, flat, one hairline. It is a section, not a clickable surface, unless the host adds one action. Wrap a card that carries the brand in CornerMarks.",
   ),
   ui(
     "alert",
@@ -1021,6 +1022,28 @@ export const uiCatalog: UiCatalogItem[] = [
     "Decorative (aria-hidden). Always pair it with the product name.",
   ),
   ui(
+    "corner-marks",
+    "Corner marks",
+    "Brand",
+    "Registration crosses on the corners of a plate, like a technical drawing.",
+    ["CornerMarks"],
+    [
+      ["children", "ReactNode", "The plate: a Card, a StatGroup, a Table or a chart."],
+    ],
+    "Decorative (aria-hidden) and never focusable. Use it on the plates that carry a page, not on every box.",
+  ),
+  ui(
+    "grid-guides",
+    "Grid guides",
+    "Brand",
+    "The layout grid drawn as dashed column guides behind a hero.",
+    ["GridGuides"],
+    [
+      ["columns", "number", "Columns to draw (12). They follow --fui-page-padding; --fui-guide-gap sets the gutter."],
+    ],
+    "Decorative. Put it first inside a positioned section; it hides under 768 px, in forced colors and in print.",
+  ),
+  ui(
     "dither-canvas",
     "Dither canvas",
     "Brand",
@@ -1295,6 +1318,8 @@ export const uiCatalog: UiCatalogItem[] = [
       ["value / min / max", "number", "The measurement."],
       ["label / hint", "ReactNode", "What it measures and when it resets."],
       ["warnAt / dangerAt", "number", "Percent thresholds for the warning and danger inks."],
+      ["variant", '"bar" | "ruler"', "A filled track, or a scale of ticks inked up to the value with a Stormlight mark."],
+      ["ticks", "number", "Ticks on the ruler (40)."],
     ],
     "Use Progress for a task that finishes; Meter for a level that stays.",
   ),

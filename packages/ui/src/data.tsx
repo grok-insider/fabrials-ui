@@ -19,6 +19,8 @@ export type StatProps = Omit<ComponentProps<"div">, "children"> & {
   deltaTone?: "positive" | "negative" | "neutral";
   hint?: ReactNode;
   sparkline?: ReadonlyArray<number>;
+  /** A ruler under the value: where it sits in its range (a share of a total, a quota). `label` names it for assistive technology. */
+  meter?: { value: number; max?: number; label: string };
   loading?: boolean;
 };
 
@@ -31,6 +33,7 @@ export function Stat({
   deltaTone,
   hint,
   sparkline,
+  meter,
   loading = false,
   className,
   ...props
@@ -66,6 +69,18 @@ export function Stat({
           ) : null}
           {hint ? <span className="fui-stat-hint">{hint}</span> : null}
         </p>
+      ) : null}
+      {meter && !loading ? (
+        <Meter
+          variant="ruler"
+          value={meter.value}
+          max={meter.max ?? 100}
+          showValue={false}
+          warnAt={101}
+          dangerAt={101}
+          aria-label={meter.label}
+          className="fui-stat-meter"
+        />
       ) : null}
       {sparkline && sparkline.length > 1 && !loading ? (
         <Sparkline data={sparkline} className="fui-stat-sparkline" />
@@ -140,6 +155,10 @@ export type MeterProps = Omit<BaseMeter.Root.Props, "className" | "children"> & 
   warnAt?: number;
   dangerAt?: number;
   showValue?: boolean;
+  /** `bar` is a filled track; `ruler` is a scale of ticks, inked up to the value, with a Stormlight mark at the value. */
+  variant?: "bar" | "ruler";
+  /** Ticks on the ruler. */
+  ticks?: number;
 };
 
 export function Meter({
@@ -150,12 +169,15 @@ export function Meter({
   warnAt = 75,
   dangerAt = 90,
   showValue = true,
+  variant = "bar",
+  ticks = 40,
   value,
   min = 0,
   max = 100,
   ...props
 }: MeterProps) {
   const percent = ((value - min) / (max - min || 1)) * 100;
+  const filled = Math.round((Math.min(100, Math.max(0, percent)) / 100) * ticks);
   const resolved: Tone =
     tone ?? (percent >= dangerAt ? "danger" : percent >= warnAt ? "warning" : "neutral");
   return (
@@ -164,6 +186,7 @@ export function Meter({
       min={min}
       max={max}
       data-tone={resolved}
+      data-variant={variant === "ruler" ? "ruler" : undefined}
       className={classes("fui-meter", className)}
       {...props}
     >
@@ -177,9 +200,31 @@ export function Meter({
           {showValue ? <BaseMeter.Value className="fui-meter-value" /> : null}
         </div>
       ) : null}
-      <BaseMeter.Track className="fui-meter-track">
-        <BaseMeter.Indicator className="fui-meter-indicator" />
-      </BaseMeter.Track>
+      {variant === "ruler" ? (
+        <BaseMeter.Track className="fui-meter-ruler">
+          <svg viewBox={`0 0 ${ticks * 4 + 2} 10`} preserveAspectRatio="none" aria-hidden focusable="false">
+            {Array.from({ length: ticks + 1 }, (_, index) => {
+              const major = index % 10 === 0;
+              const mid = !major && index % 5 === 0;
+              return (
+                <rect
+                  key={index}
+                  x={index * 4}
+                  y={major ? 0 : mid ? 3 : 5}
+                  width={1}
+                  height={major ? 10 : mid ? 7 : 5}
+                  className={index <= filled && filled > 0 ? "fui-meter-tick-on" : "fui-meter-tick"}
+                />
+              );
+            })}
+            <rect x={Math.min(filled * 4, ticks * 4)} y={0} width={2} height={10} className="fui-meter-mark" />
+          </svg>
+        </BaseMeter.Track>
+      ) : (
+        <BaseMeter.Track className="fui-meter-track">
+          <BaseMeter.Indicator className="fui-meter-indicator" />
+        </BaseMeter.Track>
+      )}
       {hint ? <p className="fui-meter-hint">{hint}</p> : null}
     </BaseMeter.Root>
   );

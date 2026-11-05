@@ -58,8 +58,10 @@
   --font-mono: var(--fui-font-mono);
   --font-serif: var(--fui-font-serif);
   --font-display: var(--fui-font-display);
+  --font-label: var(--fui-font-label);
   --font-heading: var(--fui-font-sans);
 
+  --radius-plate: var(--fui-radius-plate);
   --radius-xs: var(--fui-radius-xs);
   --radius-sm: var(--fui-radius-sm);
   --radius-md: var(--fui-radius-md);

@@ -236,7 +236,10 @@ for (const scheme of ["light", "dark"] as const) {
       const keys = await page.evaluate(() =>
         [...document.querySelectorAll(".fui-chart-legend .fui-chart-swatch")].map((swatch) => {
           const computed = getComputedStyle(swatch);
-          return { fca: computed.forcedColorAdjust, bg: computed.backgroundColor, edge: `${computed.outlineStyle} ${computed.outlineWidth} ${computed.outlineColor}` };
+          // A dithered series key is an SVG square painted with the series pattern (0.10); a solid one is a background.
+          const rect = swatch.querySelector("rect");
+          const paint = rect ? `${rect.getAttribute("fill")}` : computed.backgroundColor;
+          return { fca: computed.forcedColorAdjust, bg: computed.backgroundColor, paint, edge: `${computed.outlineStyle} ${computed.outlineWidth} ${computed.outlineColor}` };
         }),
       );
       expect(keys).toHaveLength(4);
@@ -245,7 +248,7 @@ for (const scheme of ["light", "dark"] as const) {
         expect(key.edge).toBe(`solid 1px ${system.CanvasText}`);
         expect(key.bg).not.toBe(system.Canvas);
       }
-      expect(keys[0].bg).not.toBe(keys[1].bg);
+      expect(keys[0].paint).not.toBe(keys[1].paint);
       // The series themselves: SVG paint is not repainted, so two series stay two colours without any rule.
       const bars = await page.evaluate(() => [...document.querySelectorAll(".recharts-bar")].map((bar) => getComputedStyle(bar.querySelector("path")!).fill));
       const lines = await page.evaluate(() => [...document.querySelectorAll("path.recharts-line-curve")].map((line) => getComputedStyle(line).stroke));

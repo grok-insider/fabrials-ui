@@ -29,7 +29,9 @@ import { ChatMessage, ChatComposer } from "@fabrials/ai-ui";         // needs @f
 | Empty, error, stale, offline | `StatePanel` | A bare spinner in the middle of the page |
 | A status | `Badge` (tag) or `StatusDot` (dot and word) | A coloured pill, colour without text |
 | A number and its change | `Stat` in a `StatGroup` | A big number in a card with a gradient |
-| A quota or budget | `Meter` | `Progress` (that is for a task that finishes) |
+| A quota or budget | `Meter` (`variant="ruler"` under a figure) | `Progress` (that is for a task that finishes) |
+| A plate that carries the page (totals, main chart, main table, hero figure) | `CornerMarks` around it, `CardCaption` as its last row | Corner marks on every box, a shadow, a coloured border |
+| The grid behind a landing hero | `GridGuides` | A background image of lines, a gradient grid |
 | A settings row | `SettingsSection` | A `Card` per setting |
 | A choice that applies now | `Switch` | A checkbox that saves immediately |
 | A view or range switch next to what it changes | `ToggleGroup` | Tabs, a select |
@@ -130,7 +132,7 @@ Triggers take `render` to become a Fabrials button: `<DialogTrigger render={<But
 | `ItemGroup`, `Item` (`stretch`, `current`, `selected`, `unread`), `ItemLink`, `ItemMedia`, `ItemContent`, `ItemTitle`, `ItemDescription`, `ItemActions`, `ItemControl`, `ItemCheck`, `ItemUnread`, `ItemHeader`, `ItemFooter`, `ItemSeparator` | Records as rows: one stretched target, controls above it, a soft Stormlight fill and 2 px bar for the open record, the focus ring inside the row, the actions wrapping under the text in a narrow list |
 | `Badge` | A short status or fact as a 3 px tag: `tone` `neutral`, `info`, `success`, `warning`, `danger`; `variant` `soft`, `outline` (facts such as a license or version), `solid`; `dot` (`"hollow"` for an archived item), `dotColor`, `truncate`; `--fui-badge-solid` (tint, hairline, dot) and `--fui-badge-ink` (text) are public properties for a tag coloured by data, set on the badge itself (a class or `style`) |
 | `Alert` (`AlertTitle`, `AlertDescription`, `AlertAction`) | A status that stays on the page: `variant` `default`, `info`, `success`, `warning`, `destructive`; `layout="inline"` for a one-line notice from 48rem of its own width (fills its container; not for status that refreshes) |
-| `Card` (`CardHeader`, `CardTitle`, `CardDescription`, `CardAction`, `CardContent`, `CardFooter`) | One bounded summary; a panel around a chart. Not for lists of peers, not nested |
+| `Card` (`CardHeader`, `CardTitle`, `CardDescription`, `CardAction`, `CardContent`, `CardFooter`, `CardCaption`) | A plate: one bounded summary, a panel around a chart (square, hairline, no shadow). `CardCaption` is the mono caption strip at its foot. Not for lists of peers, not nested |
 | `DescriptionList` (`DescriptionItem`, `DescriptionTerm`, `DescriptionDetails`) | A record's properties; `layout="auto"` stacks under 30rem of its own width |
 | `Disclosure`, `DisclosureSummary` (`count`, `chevron`, `size`), `DisclosurePanel` | A native `details`: 44 px summary, count in its name, panel always mounted, opens itself on an invalid field, no JavaScript |
 | `Accordion`, `Collapsible` | Short answers in place; reasoning, sources or long detail behind a named trigger. `Accordion variant="rows"` with `AccordionTrigger` `icon`, `aside` (tags outside the trigger), `headingLevel`, `headingRef` is a stack of independent tools whose bodies stay mounted |
@@ -178,10 +180,10 @@ Triggers take `render` to become a Fabrials button: `<DialogTrigger render={<But
 
 | Component | Use for |
 | --- | --- |
-| `Stat`, `StatGroup` | A number with `unit`, `delta`, `trend`, `deltaTone`, `hint`, optional `sparkline`, `loading` |
-| `SeriesChart` | Bar or line charts over one series contract, with a legend and an accessible table (`caption` required, and the plot's accessible name); the plot is a tab stop with a visible 2 px ring and the arrows move the tooltip |
+| `Stat`, `StatGroup` | A figure (40 px condensed, label in mono) with `unit`, `delta`, `trend`, `deltaTone`, `hint`, optional `sparkline`, `meter={{ value, max, label }}` (a ruler under it), `loading` |
+| `SeriesChart` | Bar or line charts over one series contract, with a legend and an accessible table (`caption` required, and the plot's accessible name); the plot is a tab stop with a visible 2 px ring and the arrows move the tooltip. Bars are dithered by default (Stormlight, then ink at half and a quarter); `color` on a series or `texture="solid"` keeps hues |
 | `Sparkline` | Shape only, next to its number |
-| `Meter` | A level that stays (quota, budget); warns at 75 % and 90 % by default |
+| `Meter` | A level that stays (quota, budget); warns at 75 % and 90 % by default. `variant="ruler"`: a scale of ticks inked to the value with a Stormlight mark (`ticks`, 40) |
 | `StatusDot` | A state as a dot and a word; `pulse` only while something is live or in progress |
 | `ActivityStrip`, `activityLevel` | Intensity cells (posts per day or hour) |
 | `Timeline`, `TimelineItem` | An event feed, newest first; `fresh` highlights a new item once |
@@ -254,7 +256,9 @@ Chart colours come from `--chart-1` to `--chart-6`; the first series reads as St
 
 | Component | Where | Rules |
 | --- | --- | --- |
-| `DitherScene` | Landing hero (`variant="hero"`), sign-in (`variant="full"` or inside `AuthLayout` `aside`) | Absolute: the parent is positioned. Text on the calm side or a solid surface. `reveal` once (default 1200 ms), `reveal={0}` turns it off. `seed`, `cell` |
+| `DitherScene` | Landing hero (`variant="full"` inside a captioned plate with `CornerMarks`, or `variant="hero"` across the section), sign-in (`variant="full"` or inside `AuthLayout` `aside`) | Absolute: the parent is positioned. Text on the calm side or a solid surface. `reveal` once (default 1200 ms), `reveal={0}` turns it off. `seed`, `cell` |
+| `CornerMarks` | Around the three or four plates that carry a page | Wraps one child; decorative crosses on its corners, never focusable |
+| `GridGuides` | Behind a landing hero | First child of a positioned section; 12 dashed column guides on `--fui-page-padding`; hidden under 768 px, in forced colors and print |
 | `DitherBand` | Above one heading that carries the brand | One per view; height from `--fui-band-height` (4.5rem); on a card set `--fui-dither-bg: var(--card)` |
 | `DitherGem` | Product mark in navigation, index rows, empty states; large beside a hero | `gem`, `size` 16, 20, 28 or 40; decorative, always next to the product name |
 | `ProductLockup` | Product name with its gem in headers, sidebars, sign-in | `product`, `tagline`, `gem`, `size` `sm`, `md`, `lg`, `mark` |

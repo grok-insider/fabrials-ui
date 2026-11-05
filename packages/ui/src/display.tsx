@@ -134,6 +134,20 @@ export function CardFooter({ className, ...props }: ComponentProps<"div">) {
   );
 }
 
+/**
+ * A caption strip along the bottom edge of a card: what the figure shows on the start side, a reading (a total, a
+ * peak, a source) on the end side. Set in the label voice (Plex Mono). Put it last in the card.
+ */
+export function CardCaption({ className, ...props }: ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="card-caption"
+      className={classes("fui-card-caption", className)}
+      {...props}
+    />
+  );
+}
+
 export function Alert({
   className,
   variant = "default",

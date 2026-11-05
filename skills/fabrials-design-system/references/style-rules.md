@@ -6,15 +6,16 @@ Values live in `packages/ui/src/tokens.css`; the reasons in `DESIGN.md`. This fi
 
 | Role | Token [Tailwind] | Light | Dark |
 | --- | --- | --- | --- |
-| Page | `--background` [`bg-background`] | `#eceeeb` | Stormwall `#161a21` |
-| Surface: panels, cards, tables | `--card` [`bg-card`] | `#f7f8f6` | `#1e232c` |
-| Overlay: menus, dialogs | `--popover` [`bg-popover`] | `#fbfbfa` | `#232932` |
-| Sunken: code, wells | `--muted`, `--fui-code` [`bg-muted`] | `#e1e4e1` | `#252b35`, `#1b2029` |
-| Hover | `--accent` [`bg-accent`] | `#dde1de` | `#2b313b` |
-| Hairline | `--border` [`border-border`] | `#cdd1cf` | `#2d333d` |
-| Control boundary | `--fui-control-border` [`border-control-border`] | `#868d96` | `#5b6470` |
-| Ink, primary button | `--foreground`, `--primary` [`text-foreground`, `bg-primary`] | `#161a21` | Cold bone `#e6e8e4` |
-| Secondary ink | `--muted-foreground` [`text-muted-foreground`] | `#545b64` | `#a0a7af` |
+| Page | `--background` [`bg-background`] | `#f6f7f8` | Deep Stormwall `#08090b` |
+| Surface: plates (cards, stats, tables), panels | `--card` [`bg-card`] | `#ffffff` | `#0e1014` |
+| Overlay: menus, dialogs | `--popover` [`bg-popover`] | `#ffffff` | `#14171c` |
+| Sunken: code, wells | `--muted`, `--fui-code` [`bg-muted`] | `#eef0f2`, `#f0f2f4` | `#15181e`, `#0b0d10` |
+| Hover | `--accent` [`bg-accent`] | `#e9ecef` | `#191d24` |
+| Hairline | `--border` [`border-border`] | `#e0e3e7` | `#1d2128` |
+| Control boundary | `--fui-control-border` [`border-control-border`] | `#858d98` | `#5e6672` |
+| Corner marks, grid guides | `--fui-mark`, `--fui-guide` | ink at half; hairline at 75 % | the same |
+| Ink, primary button | `--foreground`, `--primary` [`text-foreground`, `bg-primary`] | `#0e1116` | Cold bone `#e8eae6` |
+| Secondary ink | `--muted-foreground` [`text-muted-foreground`] | `#565d68` | `#9399a2` |
 | Stormlight ink: links, focus, current item | `--brand-ink`, `--ring` [`text-brand-ink`] | `#2459b3` | `#9cc4ff` |
 | Stormlight fill: checked controls, accent button | `--brand` [`bg-brand`] | `#2a63c4` | `#8fb8f5` |
 | Selection and quiet Stormlight tints | `--brand-soft` [`bg-brand-soft`] | 10 % brand on card | 16 % brand on card |
@@ -55,12 +56,15 @@ IBM Plex, served locally by `fonts.css`.
 
 | Face | Token [Tailwind] | Use |
 | --- | --- | --- |
-| Plex Sans Condensed 600 | `--fui-font-display` [`font-display`] | Hero headlines 40 to 80 px (line height 0.98, tracking -0.015em), page titles 24 px (documentation articles 36 px, 44 px from 1800 px), marketing section titles 28 px, index row names 22 px, the wordmark |
+| Plex Sans Condensed 600 | `--fui-font-display` [`font-display`] | Hero headlines 40 to 96 px (line height 0.94 to 0.98, tracking -0.02em), page titles 32 px (`--fui-text-page`; documentation articles 36 px, 44 px from 1800 px), marketing section titles 28 to 30 px, figures 40 px (`--fui-text-figure`), index row names 22 px, the wordmark |
 | Plex Sans | `--fui-font-sans` [`font-sans`] | Body and controls 14 px, metadata 12 px, subsections 16 px semibold |
-| Plex Mono | `--fui-font-mono` [`font-mono`] | Code, commands, keys, identifiers. Not labels |
+| Plex Mono, label voice | `--fui-font-label` [`font-label`] at `--fui-text-label` 11 px | Labels of figures, table heads, numeric cells, description terms, eyebrows, sidebar group labels, axes, legends, captions, units, identifiers, readings. Muted ink, sentence case |
+| Plex Mono | `--fui-font-mono` [`font-mono`] | Code, commands, keys |
 | Plex Serif | `--fui-font-serif` [`font-serif`] | Quotations only |
 
-Scale tokens: `--fui-text-xs` 12, `sm` 14, `md` 16, `lg` 18, `xl` 20, `title` 24, `2xl` 30, `3xl` 36, `display` 48, `display-lg` 60 px. Weights 400, 500, 600.
+Scale tokens: `--fui-text-label` 11, `xs` 12, `sm` 14, `md` 16, `lg` 18, `xl` 20, `title` 24, `2xl` 30, `page` 32, `3xl` 36, `figure` 40, `display` 48, `display-lg` 60 px. Weights 400, 500, 600.
+
+- A value and its label never share a face: the label is mono 11 px, the value condensed (figures) or sans (cells hold mono numerals).
 
 - Numbers use tabular figures (shared components already do; add `tabular-nums` to hand-made figures).
 - Headings use `text-wrap: balance` (`text-balance`).
@@ -82,7 +86,8 @@ Scale tokens: `--fui-text-xs` 12, `sm` 14, `md` 16, `lg` 18, `xl` 20, `title` 24
 | 3 px | `--fui-radius-xs` [`rounded-xs`] | Keys, badges, counts, tags, inline code |
 | 4 px | `--fui-radius-sm` [`rounded-sm`] | Small parts: filter chips, menu items, tooltips |
 | 5 px | `--fui-radius-md` [`rounded-md`] | Controls: buttons, inputs, selects |
-| 6 px | `--fui-radius-lg` [`rounded-lg`], `--radius` | Containers: panels, cards, tables, alerts, state panels; also dropdown menus, popovers and the command palette |
+| 0 | `--fui-radius-plate` [`rounded-plate`] | Plates: `Card`, `Stat`, `StatGroup`, `Table` and host panels that hold figures |
+| 6 px | `--fui-radius-lg` [`rounded-lg`], `--radius` | Alerts, state panels, dropdown menus, popovers and the command palette |
 | 8 px | `--fui-radius-xl` [`rounded-xl`] | Large overlays: dialogs, sheets, toasts, the sign-in card |
 
 - Round (`--fui-radius-full`) only what is round by nature: radio, switch, avatar, status dot, progress and meter tracks, timeline dots, scrollbar thumbs.
@@ -91,7 +96,7 @@ Scale tokens: `--fui-text-xs` 12, `sm` 14, `md` 16, `lg` 18, `xl` 20, `title` 24
 ## Surfaces and elevation
 
 - Separate with space and hairlines (`border-border`, 1 px) before adding a border around anything. One panel with dividers, not cards inside cards.
-- Shadows belong to overlays (`--fui-shadow-overlay`). The package's own cards carry a faint `--fui-shadow-sm`; do not add larger shadows to page content.
+- Shadows belong to overlays (`--fui-shadow-overlay`). Plates carry none; do not add shadows to page content.
 - Do not box every label and control. A form is fields on a surface, not a card per field.
 
 ## Motion
@@ -108,6 +113,14 @@ Scale tokens: `--fui-text-xs` 12, `sm` 14, `md` 16, `lg` 18, `xl` 20, `title` 24
 - `DitherScene` on the landing hero and sign-in only; `DitherBand` at most once per view; `DitherGem` for product marks at 16, 20, 28 or 40 px.
 - Text sits on the calm side of a scene or on a solid surface, never on dense dither. Dithering stays off controls and body text.
 - A canvas repaints only on resize, theme change or new data. It never loops.
+- Data is dithered: `SeriesChart` paints the first series in Stormlight dither and the next two in ink dither. Pass `color` only when the colour means something (a provider's brand, a status).
+
+## Instrument details
+
+- `CornerMarks` around the plates that carry a page (totals, main chart, main table, hero figure). Check: three or four per screen at most, never around controls, never nested.
+- `GridGuides` only behind a landing hero, first child of a positioned section. Check: no text or control sits under a guide without its own surface or enough contrast.
+- `CardCaption` on a plate that shows a figure: what it shows, then a reading. Check: the reading is a fact ("Peak 244 on Nov 4"), not a slogan.
+- `Meter variant="ruler"` or `Stat meter` under a figure that is a share or a level. Check: the ruler has an accessible name.
 
 ## Copy
 
@@ -123,10 +136,10 @@ The owner rejects the generic AI-generated look. Each rule has a check.
 2. **No pill clutter.** Badges, counts and chips are 3 to 4 px tags; a badge dot is square. Check: no `rounded-full` badge or chip; at most one pill per view, only for a passive label that must stand out; not every row carries a badge.
 3. **No card grid of identical cards.** Products and features are index rows (mark, name, one line, link). Check: no `grid-cols-3` of cards with an icon, title, blurb and "Learn more"; no bento layouts.
 4. **No cards in cards.** Check: a `Card` or bordered box never contains another bordered box; group with hairlines inside one panel.
-5. **No eyebrow ALL-CAPS labels.** Check: no `uppercase`, no `tracking-wide`/`wider`/`widest`, no small coloured label above a heading. `PageHeader` `eyebrow` is sentence-case context in secondary ink (a breadcrumb).
+5. **No eyebrow ALL-CAPS labels.** Check: no `uppercase`, no `tracking-wide`/`wider`/`widest`, no small coloured label above a heading. `PageHeader` `eyebrow` is sentence-case context (a period, a source, a breadcrumb) in the label voice and secondary ink.
 6. **No `→` appended to buttons or links.** Check: no `→`, `↗`, `»` or trailing `ArrowRight`/`ArrowUpRight`/`ChevronRight` icons in button or link labels; the label names the destination. Arrows that carry meaning are fine: previous/next pager, back to top, a trend in `Stat`, a disclosure chevron.
 7. **No gradient or glow decoration.** Check: no `bg-gradient-*`, `linear-gradient`/`radial-gradient` backgrounds, gradient text (`bg-clip-text text-transparent`), blurred colour blobs, coloured `drop-shadow` or neon borders. Light appears only as dither. (Skeleton shimmer is a loading indicator, not decoration.)
-8. **Hairline panels.** Check: dividers are 1 px `--border`; containers are `rounded-lg` with a hairline; no thick or coloured borders on content.
+8. **Hairline plates.** Check: dividers are 1 px `--border`; plates are square (`--fui-radius-plate`) with a hairline and no shadow; no thick or coloured borders on content.
 9. **One orchestrated motion per page.** Check: at most one `reveal`; no stagger-in lists, hover lifts, floating elements, parallax or looping marquees.
 10. **Reduced motion respected.** Check: with `prefers-reduced-motion: reduce` nothing moves except state changes; every custom animation has a reduced-motion path.
 11. **Both themes designed.** Check: screenshots of light and dark both read well; no literal `#hex`, `rgb()`, `hsl()` or Tailwind palette colours (`bg-slate-900`, `text-blue-600`) in product code.

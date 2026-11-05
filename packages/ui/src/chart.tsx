@@ -1,7 +1,7 @@
 "use client";
 // Origin: shadcn/ui chart (Recharts), adapted 2026-09-22 for Fabrials metric series. Restyled with fui- classes in 0.4.
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -24,6 +24,17 @@ const PALETTE = [
   "var(--chart-6)",
 ];
 
+/**
+ * The 0.10 series material. Bars are 2 px ordered dither: the first series dense in Stormlight, the second and third
+ * in ink at half and a quarter, so the chart reads in greyscale and print; from the fourth on, the chart hues. Lines
+ * follow the same order (Stormlight, ink, dashed ink). A series with its own `color` is always solid.
+ */
+const DITHER = [
+  { id: "a", color: "var(--brand)", cells: [[0, 0], [2, 0], [2, 2]] },
+  { id: "b", color: "var(--foreground)", cells: [[0, 0], [2, 2]] },
+  { id: "c", color: "var(--foreground)", cells: [[0, 0]] },
+] as const;
+
 export type ChartSeries = {
   key: string;
   label?: string;
@@ -42,6 +53,8 @@ export type SeriesChartProps = {
   titleKey?: string;
   caption: string;
   height?: number;
+  /** `dither` (default) draws the Fabrials series material; `solid` fills with the chart hues. */
+  texture?: "dither" | "solid";
   className?: string;
 };
 
@@ -56,8 +69,10 @@ export function SeriesChart({
   titleKey,
   caption,
   height = 288,
+  texture = "dither",
   className,
 }: SeriesChartProps) {
+  const uid = useId().replace(/[^a-zA-Z0-9_-]/g, "");
   const frameRef = useRef<HTMLDivElement>(null);
   const [frameWidth, setFrameWidth] = useState(0);
   useEffect(() => {
@@ -72,12 +87,17 @@ export function SeriesChart({
   const [hidden, setHidden] = useState<ReadonlySet<string>>(new Set());
   const painted = useMemo(
     () =>
-      series.map((item, index) => ({
-        ...item,
-        label: item.label ?? item.key,
-        color: item.color ?? PALETTE[index % PALETTE.length],
-      })),
-    [series],
+      series.map((item, index) => {
+        const material = texture === "dither" && !item.color ? DITHER[index] : undefined;
+        return {
+          ...item,
+          label: item.label ?? item.key,
+          dashed: item.dashed ?? (texture === "dither" && !item.color && index === 2),
+          color: item.color ?? material?.color ?? PALETTE[index % PALETTE.length],
+          fill: material ? `url(#fui-dither-${uid}-${material.id})` : item.color ?? PALETTE[index % PALETTE.length],
+        };
+      }),
+    [series, texture, uid],
   );
   const visible = painted.filter((item) => !hidden.has(item.key));
 
@@ -93,19 +113,20 @@ export function SeriesChart({
 
   const axes = (
     <>
-      <CartesianGrid vertical={false} stroke="var(--border)" />
+      <CartesianGrid vertical={false} stroke="var(--border)" strokeDasharray="2 3" />
       <XAxis
         dataKey={xKey}
-        axisLine={false}
+        axisLine={{ stroke: "var(--fui-mark)" }}
         tickLine={false}
         interval="preserveStartEnd"
-        tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+        minTickGap={16}
+        tick={{ fill: "var(--muted-foreground)", fontSize: 11, fontFamily: "var(--fui-font-label)" }}
       />
       <YAxis
         axisLine={false}
         tickLine={false}
         width={72}
-        tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+        tick={{ fill: "var(--muted-foreground)", fontSize: 11, fontFamily: "var(--fui-font-label)" }}
         tickFormatter={(value: number) => yFormat(value)}
       />
       <Tooltip
@@ -115,6 +136,7 @@ export function SeriesChart({
             active={props.active}
             label={props.label}
             payload={props.payload}
+            paints={new Map(painted.map((item) => [item.label, kind === "bar" ? item.fill : item.color]))}
             titleKey={titleKey}
             yFormat={yFormat}
           />
@@ -162,14 +184,14 @@ export function SeriesChart({
                 aria-label={caption}
               >
                 {axes}
+                <DitherPatterns uid={uid} />
                 {visible.map((item) => (
                   <Bar
                     key={item.key}
                     dataKey={item.key}
                     name={item.label}
-                    fill={item.color}
+                    fill={item.fill}
                     stackId={stacked ? "series" : undefined}
-                    radius={stacked ? undefined : [4, 4, 0, 0]}
                     maxBarSize={48}
                     isAnimationActive={false}
                   />
@@ -214,7 +236,7 @@ export function SeriesChart({
                   className="fui-chart-legend-toggle"
                   onClick={() => toggle(item.key)}
                 >
-                  <span aria-hidden className="fui-chart-swatch" style={{ background: item.color }} />
+                  <Swatch paint={kind === "bar" ? item.fill : item.color} />
                   <span data-hidden={shown ? undefined : ""}>{item.label}</span>
                 </button>
                 <button
@@ -243,13 +265,41 @@ export function SeriesChart({
   );
 }
 
+function DitherPatterns({ uid }: { uid: string }) {
+  return (
+    <defs>
+      {DITHER.map((material) => (
+        <pattern key={material.id} id={`fui-dither-${uid}-${material.id}`} width={4} height={4} patternUnits="userSpaceOnUse">
+          {material.cells.map(([x, y]) => (
+            <rect key={`${x}-${y}`} x={x} y={y} width={2} height={2} fill={material.color} />
+          ))}
+        </pattern>
+      ))}
+    </defs>
+  );
+}
+
+/** A legend or tooltip key: a solid square, or a square of the series' dither when its paint is a pattern. */
+function Swatch({ paint }: { paint?: string }) {
+  if (paint?.startsWith("url(")) {
+    return (
+      <svg aria-hidden focusable="false" className="fui-chart-swatch" viewBox="0 0 10 10" shapeRendering="crispEdges">
+        <rect width={10} height={10} fill={paint} />
+      </svg>
+    );
+  }
+  return <span aria-hidden className="fui-chart-swatch" style={{ background: paint }} />;
+}
+
 function SeriesTooltip({
   active,
   payload,
   label,
+  paints,
   titleKey,
   yFormat,
 }: {
+  paints: ReadonlyMap<string, string>;
   active?: boolean;
   label?: unknown;
   titleKey?: string;
@@ -275,7 +325,7 @@ function SeriesTooltip({
             // By position: two series may carry the same label.
             <li className="fui-chart-tip-row" key={index}>
               <span className="fui-chart-tip-name">
-                <span aria-hidden className="fui-chart-swatch" style={{ background: item.color }} />
+                <Swatch paint={paints.get(String(item.name ?? "")) ?? item.color} />
                 <span>{String(item.name ?? "")}</span>
               </span>
               <span className="fui-chart-tip-value">{yFormat(numeric(item.value))}</span>

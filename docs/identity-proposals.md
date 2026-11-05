@@ -1,5 +1,7 @@
 # Identity proposals (0.10)
 
+**Decision (5 November 2026):** the owner chose **A. Instrument** with the **Deep Stormwall** palette. It ships as 0.10 "Instrument"; see `docs/migration-0.10.md`. The rest of this note is the record of how it was chosen.
+
 Highstorm (0.7 to 0.9) fixed sober rules: one interaction colour, light only as dither, small radii, indexes instead of card grids, nothing centred. The rules removed the slop. They did not add a voice: a page built with Fabrials UI today reads as a tidy, neutral dashboard that could belong to anyone. This note records the diagnosis, the references studied and three directions, each with a mock in Storybook under **Identity proposals**. Nothing here ships until the owner picks a direction.
 
 Mocks: `stories/identity/` (`instrument`, `folio`, `facet`), each with the same two screens, the fabrials.com landing and a product overview (Palanaeum), in both themes and at 390 px. Data is synthetic.
@@ -70,3 +72,15 @@ Changes: radii tokens gain `--fui-cut` and `--fui-cut-sm`, gem tokens are allowe
 ## Combining
 
 The directions are not exclusive. A and C share the dither-as-material idea and differ in shape; B's sentence-numbers and margin notes can live inside A. The choice is which one leads.
+
+## Palette studies for A
+
+After choosing A the owner asked for darker colours, looking at vercel.com, opencode.ai and Hex (anoma.ly/hex). Measured on 5 November 2026 in an isolated browser:
+
+| Site | Page | Surface | Hairline | Ink | Secondary |
+| --- | --- | --- | --- | --- | --- |
+| Vercel | `#000000` | `#0a0a0a` | `#2e2e2e` | `#ededed` | `#a1a1a1` |
+| OpenCode | `#131010` | `#1b1818` | `#3d3838` | `#f2eded` | `#b8b2b2` |
+| Hex | `#070707` | white at 2 to 4 % | white at 7 to 14 % | `#f2f2ef` | `#9b9da3` |
+
+All three use a near-black page, surfaces barely above it (the hairline does the separating), one bright ink, one grey and one accent; their light themes are near-white, not grey. Three palettes were mocked (`stories/identity/palettes.css`): Obsidian (neutral, after Vercel), Ember ink (warm, after OpenCode) and Deep Stormwall (our cold slate taken almost to black, after Hex). Deep Stormwall was chosen: it is as dark as the references and keeps Highstorm's cold hue, so the dither ramps and Stormlight still belong to it.

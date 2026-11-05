@@ -1,6 +1,6 @@
 # Fabrials design system
 
-Fabrials UI 0.7 "Highstorm" is the shared interface of the Fabrials products and the registry at ui.fabrials.com. This document is the brief: what the system looks like, why, and the rules a screen follows. Code is the source of truth for values (`packages/ui/src/tokens.css`); this file explains them. Explicit product decisions, recorded in that product's own `DESIGN.md`, win over it.
+Fabrials UI 0.10 "Instrument" is the shared interface of the Fabrials products and the registry at ui.fabrials.com. This document is the brief: what the system looks like, why, and the rules a screen follows. Code is the source of truth for values (`packages/ui/src/tokens.css`); this file explains them. Explicit product decisions, recorded in that product's own `DESIGN.md`, win over it.
 
 ## Principles
 
@@ -10,23 +10,25 @@ Fabrials UI 0.7 "Highstorm" is the shared interface of the Fabrials products and
 4. **Say what happened.** A stale value is not a fresh one; a configured connection is not a reachable one. Errors say what went wrong and what to do; empty states invite the next action.
 5. **Accessible by default.** Every control has a name, a visible focus and a keyboard path. Colour always travels with text or a symbol.
 6. **Small pieces, owned by the host.** Shared components present; products own routing, requests, authentication and storage. Compose small components instead of adding a universal one with dozens of flags.
-7. **Synthetic data in public.** Stories, docs and previews never show real mail, credentials or account records.
+7. **Built like an instrument.** A screen reads like a calibrated device: square plates, registration marks on the plates that matter, a scale under a figure, captions that say what a figure shows. The construction is shown, quietly; it is what makes a Fabrials page recognisable.
+8. **Synthetic data in public.** Stories, docs and previews never show real mail, credentials or account records.
 
 ## Colour
 
-Cold slate neutrals carry the screen; the palette is the same in every product. Values below are the Highstorm references; the tokens hold them in oklch.
+Deep Stormwall: cold slate taken almost to black in the dark theme and almost to white in the light one, so the content and Stormlight carry the contrast. The palette is the same in every product. Values below are the references; the tokens hold them in oklch. (0.7 to 0.9 used the lighter Stormwall `#161a21` and a grey `#eceeeb` page.)
 
 | Role | Token | Light | Dark |
 | --- | --- | --- | --- |
-| Page | `--background` | `#eceeeb` | Stormwall `#161a21` |
-| Surface (cards, panels) | `--card` | `#f7f8f6` | `#1e232c` |
-| Overlay (menus, dialogs) | `--popover` | `#fbfbfa` | `#232932` |
-| Sunken (code, wells) | `--muted`, `--fui-code` | `#e1e4e1` | `#252b35`, `#1b2029` |
-| Hover | `--accent` | `#dde1de` | `#2b313b` |
-| Hairline | `--border` | `#cdd1cf` | `#2d333d` |
-| Control boundary | `--fui-control-border` | `#868d96` | `#5b6470` |
-| Ink | `--foreground`, `--primary` | Stormwall `#161a21` | Cold bone `#e6e8e4` |
-| Secondary ink | `--muted-foreground` | `#545b64` | `#a0a7af` |
+| Page | `--background` | `#f6f7f8` | Deep Stormwall `#08090b` |
+| Surface (plates, panels) | `--card` | `#ffffff` | `#0e1014` |
+| Overlay (menus, dialogs) | `--popover` | `#ffffff` | `#14171c` |
+| Sunken (code, wells) | `--muted`, `--fui-code` | `#eef0f2`, `#f0f2f4` | `#15181e`, `#0b0d10` |
+| Hover | `--accent` | `#e9ecef` | `#191d24` |
+| Hairline | `--border` | `#e0e3e7` | `#1d2128` |
+| Control boundary | `--fui-control-border` | `#858d98` | `#5e6672` |
+| Marks and guides | `--fui-mark`, `--fui-guide` | ink at half, hairline at 75 % | the same |
+| Ink | `--foreground`, `--primary` | `#0e1116` | Cold bone `#e8eae6` |
+| Secondary ink | `--muted-foreground` | `#565d68` | `#9399a2` |
 | Stormlight ink (text, focus) | `--brand-ink`, `--ring` | `#2459b3` | `#9cc4ff` |
 | Stormlight fill | `--brand` | `#2a63c4` | `#8fb8f5` |
 
@@ -56,9 +58,10 @@ The IBM Plex superfamily, served locally by `fonts.css` in Latin, Latin Extended
 
 | Role | Face | Use |
 | --- | --- | --- |
-| Display | Plex Sans Condensed 600 (`--fui-font-display`) | Hero headlines (40 to 80 px, line height 0.98), page titles (24 px in apps; 36 px, 44 px from 1800 px, for documentation articles), marketing section titles (28 px), the wordmark |
+| Display | Plex Sans Condensed 600 (`--fui-font-display`) | Hero headlines (40 to 96 px, line height 0.94 to 0.98), page titles (32 px in apps, `--fui-text-page`; 36 px, 44 px from 1800 px, for documentation articles), marketing section titles (28 to 30 px), figures (40 px, `--fui-text-figure`), the wordmark |
 | Interface | Plex Sans | Body and controls 14 px, metadata 12 px, subsections 16 px |
-| Code | Plex Mono | Code, commands, keys and identifiers. Not for labels |
+| Label (readings) | Plex Mono 11 px (`--fui-font-label`, `--fui-text-label`) | The second voice: labels of figures, table heads, numeric cells, description terms, eyebrows, sidebar group labels, axes, legends, captions, units, identifiers and readings ("Synced 14:32 UTC"). Sentence case, never tracked uppercase |
+| Code | Plex Mono | Code, commands and keys |
 | Editorial | Plex Serif | Quotations only |
 
 Numbers use tabular figures. Headings wrap with `text-wrap: balance`. Copy is sentence case; no tracked uppercase eyebrows, no single word in a headline set in another colour, no arrows appended to link or button text. Arrows that show a direction (a pager's Previous and Next, a disclosure) are fine. Do not lower the contrast of essential text to make hierarchy.
@@ -67,9 +70,21 @@ Numbers use tabular figures. Headings wrap with `text-wrap: balance`. Copy is se
 
 - Spacing follows a 4 px grid (`--fui-space-*`).
 - Controls are 40 px (`--fui-control-height`); small 32, extra small 28, large 44. `data-density="compact"` tightens controls to 32 px and collection rows, as a composition choice, not a stored preference. Narrow screens and coarse pointers keep 44 px targets.
-- Corners are crisp: 3 px for keys and badges, 4 px for small parts and tooltips, 5 px for controls, 6 px for containers, menus, popovers and the command palette, 8 px for dialogs, sheets, toasts and the sign-in card (`--fui-radius-xs` to `--fui-radius-xl`). Tailwind's `rounded-2xl` and larger are not part of the system. Badges, counts and chips are tags with those 3 to 4 px corners, and a badge's status dot is square, like one pixel of the dither; `StatusDot` stays a round light. Pills are only for a passive label that must stand out.
-- Separate with space and hairlines before borders; shadows belong to overlays, and a card carries at most the small shadow. Do not box every label and control.
+- **Plates are square.** Cards, stats, stat groups and tables are plates: a hairline, the surface, no corner radius (`--fui-radius-plate: 0`) and no resting shadow. Everything else keeps crisp corners: 3 px for keys and badges, 4 px for small parts and tooltips, 5 px for controls, 6 px for menus, popovers and the command palette, 8 px for dialogs, sheets, toasts and the sign-in card (`--fui-radius-xs` to `--fui-radius-xl`). Tailwind's `rounded-2xl` and larger are not part of the system. Badges, counts and chips are tags with those 3 to 4 px corners, and a badge's status dot is square, like one pixel of the dither; `StatusDot` stays a round light. Pills are only for a passive label that must stand out.
+- Separate with space and hairlines before borders; shadows belong to overlays; plates carry none. Do not box every label and control.
 - Tables scroll inside their labelled region; the page never scrolls sideways.
+
+## Instrument details
+
+The small marks that make a screen look built rather than generated. Each has one job; none is decoration for its own sake.
+
+| Piece | Where | Rules |
+| --- | --- | --- |
+| `CornerMarks` | Around the plates that carry a page: the totals, the main chart, the main table, a hero figure | A 9 px cross on each corner in `--fui-mark`. Not on every box: three or four per screen at most |
+| `GridGuides` | Behind a landing hero | The 12-column grid as dashed guides in `--fui-guide`, aligned to `--fui-page-padding`. Off under 768 px, in forced colors and in print. Text and controls sit above them |
+| `CardCaption` | The last row of a plate that shows a figure or a chart | What the figure shows on the start side ("Last 14 days, local time."), a reading on the end side ("Peak 244 on Nov 4"). "Fig. 1." numbering only where a page shows several figures |
+| `Meter variant="ruler"` and `Stat meter` | Under a figure that is a share or a level (unread of total, quota, disk) | Ticks every unit, taller every 5 and 10; inked up to the value; one Stormlight mark at the value; warning and danger tones colour the mark |
+| The label voice | Everywhere a value is labelled or read | Plex Mono 11 px, muted ink. A value and its label never share a face |
 
 ## Dithering is the brand
 
@@ -79,7 +94,7 @@ Three pieces use it, and every product uses them in these places:
 
 | Piece | Where | Rules |
 | --- | --- | --- |
-| `DitherScene` | Landing hero (`variant="hero"`, the front enters from the right) and sign-in (`variant="full"`, or inside the `AuthLayout` aside) | Text sits on the calm side or on a solid surface, never on dense dither |
+| `DitherScene` | Landing hero: `variant="full"` inside a captioned plate with `CornerMarks` on the right (or `variant="hero"`, the front entering from the right); sign-in (`variant="full"`, or inside the `AuthLayout` aside) | Text sits on the calm side or on a solid surface, never on dense dither |
 | `DitherBand` | Above a page or section heading that carries the brand (a public stats page, a product overview) | At most one per view |
 | `DitherGem` | Product marks in navigation, index rows, empty states; large beside a hero | Sized 16, 20, 28 or 40 px; the gem is the product's |
 
@@ -87,6 +102,7 @@ Three pieces use it, and every product uses them in these places:
 - `STORM_RAMP`, `gemRamp`, `stormField`, `stormBandField` and `gemField` are the official ramps and fields. A product may add its own field (X Tracker's telemetry, Radiant's night sky) on the same engine.
 - A canvas paints once and repaints only on resize, theme change or new data. It never loops.
 - Dots are 2 to 4 CSS pixels. Dithering stays off controls and body text.
+- **Data is dithered too.** `SeriesChart` paints bars in 2 px ordered patterns: the first series dense in Stormlight, the second and third in ink at half and a quarter. A chart reads in greyscale and in print, and the data carries the same material as the brand. Series whose colour means something pass `color` and stay solid.
 
 ## Motion
 
@@ -111,10 +127,10 @@ A loading view is the finished view painted as its own skeleton. Wrap the real c
 
 ## Layout and composition
 
-- **Product screens** use `WorkspaceShell` with navigation and header slots when they need a shell; hosts own routing, active state, authentication, theme storage and native window chrome. Mail keeps its resizable panes; desktop keeps native window behaviour.
+- **Product screens** read as an instrument panel: a `PageHeader` with a mono eyebrow (the period or source), then the totals as one `StatGroup` with rulers, the main chart and the main table as plates, each of those three inside `CornerMarks`, captions on figures. They use `WorkspaceShell` with navigation and header slots when they need a shell; hosts own routing, active state, authentication, theme storage and native window chrome. Mail keeps its resizable panes; desktop keeps native window behaviour.
 - **Page patterns** come first: `PageHeader`, `SectionHeader`, `CollectionToolbar`, `Table`, `BulkActions`, `StatePanel`. Bulk actions appear once selection begins. Filters live next to their collection; primary actions next to their task.
 - **Nothing is centred on the page.** Headers span the window; content anchors to the same left gutter (`--fui-page-padding`), with a maximum width for reading but no `margin-inline: auto`. On a wide screen the free space stays on the right. Centring is for small things inside a component (an empty state, a toast on a phone), never for a page column. Two frames are the exceptions: documentation uses three columns (a sidebar panel reaching the left edge, the article, the page index) whose outer columns share the extra width, and a sign-in `AuthLayout` without an aside centres its card; with the storm aside the card anchors left.
-- **Landings** are left-aligned and asymmetric: the headline and one command or action on the left, the storm on the right. Lists of products or features are indexes (rows with a mark, a name, one line and a link), not grids of identical cards. Numbered markers only for real sequences. Marketing compositions stay in the host and may use tokens and controls; they never become a `WorkspaceShell`.
+- **Landings** are left-aligned and asymmetric: `GridGuides` behind the hero, the headline and one command or action on the left (columns 1 to 6), the storm as a captioned plate with corner marks on the right (columns 8 to 12). Lists of products or features are indexes (rows with a mark, a name, one line and a link), not grids of identical cards. Numbered markers only for real sequences. Marketing compositions stay in the host and may use tokens and controls; they never become a `WorkspaceShell`.
 - **Navigation** that will grow groups its items: fabrials.com's Products menu groups tools by how people use them (install, hosted, developers, open data), each with its gem.
 
 ## Content and voice
@@ -128,9 +144,9 @@ The catalogue lives in Storybook (`bun run storybook`, port 6041) and at ui.fabr
 - **Controls:** Button (`default`, `accent`, `outline`, `secondary`, `ghost`, `destructive`, `link`; sizes `xs` to `lg` and `icon-*`; `loading`), Input, Textarea, Field, Label, Checkbox, Switch, Select, RadioGroup, NativeRadioGroup, ToggleGroup, ThemeSwitcher, MultiSelect, Combobox, IconButton, FileInput, Toolbar, FieldSet.
 - **Overlays:** Dialog, AlertDialog, Sheet, DropdownMenu (with submenus), Tooltip, Popover, StatusPopover, HoverCard, Command (with CommandTrigger), ConfirmDialog (and `useConfirm` for a confirm you can await). They render from `fui-` styles without Tailwind.
 - **Collections:** Table, Tabs (vertical rail, scrolling strip), NavTabs, Item (records as rows), Badge, Progress, Skeleton, Card, Accordion (rows for a stack of tools), Disclosure, Breadcrumb, Pagination, DescriptionList, Kbd and KbdGroup.
-- **Data:** Stat, StatGroup, Sparkline, Meter, StatusDot, NumberTicker, SeriesChart, ActivityStrip, Timeline, RelativeTime.
+- **Data:** Stat (with `meter`), StatGroup, Sparkline, Meter (`variant="ruler"`), StatusDot, NumberTicker, SeriesChart, ActivityStrip, Timeline, RelativeTime.
 - **Docs pieces:** CodePanel, CodeTabs, PackageInstall, Files/Folder/File and RepoInfo. Syntax uses the muted `--fui-syntax-*` inks, never Stormlight.
-- **Brand and chrome:** DitherScene, DitherBand, DitherGem, DitherCanvas, ProductLockup, FabrialsGem, Avatar, Snippet, CopyButton, SiteHeader, AuthLayout, MoonPhase, Starfield.
+- **Brand and chrome:** CornerMarks, GridGuides, CardCaption, DitherScene, DitherBand, DitherGem, DitherCanvas, ProductLockup, FabrialsGem, Avatar, Snippet, CopyButton, SiteHeader, AuthLayout, MoonPhase, Starfield.
 - **Patterns:** WorkspaceShell, AppHeader, Sidebar (menu rows work without a shell), NavSwitcher, ResizablePanelGroup, PageHeader, SectionHeader, CollectionToolbar, BulkActions, StatePanel, SettingsSection, FilterChip, FileThumb, SuggestionCard, TruncatedText, ShimmerText.
 - **Loading:** `Loading` with `placeholderText`, `placeholderList` and `useLoading` (see Loading states).
 - **`@fabrials/ai-ui`:** provider, quota, history and migration presentation, and the chat pieces (ChatMessage, ChatComposer, CodeBlock with `.fui-markdown`, citations, activity, attachments, VoiceInputButton).
