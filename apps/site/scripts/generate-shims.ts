@@ -9,8 +9,8 @@ import { coveredPrimitives, shimSource } from "../lib/shims";
 
 const check = process.argv.includes("--check");
 const shims = coveredPrimitives(Object.keys(ui));
-// Real shadcn components the site keeps because Fabrials has no equivalent.
-const keep = new Set(["calendar.tsx"]);
+// Real shadcn components the site keeps because Fabrials has no equivalent (none today).
+const keep = new Set<string>();
 const stale: string[] = [];
 
 async function sync(path: string, content: string) {

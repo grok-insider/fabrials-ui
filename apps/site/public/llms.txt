@@ -58,6 +58,7 @@ Namespace: add "registries": { "@fabrials": "https://ui.fabrials.com/r/{name}.js
 - breadcrumb: npx shadcn@latest add https://ui.fabrials.com/r/breadcrumb.json
 - button: npx shadcn@latest add https://ui.fabrials.com/r/button.json
 - button-group: npx shadcn@latest add https://ui.fabrials.com/r/button-group.json
+- calendar: npx shadcn@latest add https://ui.fabrials.com/r/calendar.json
 - card: npx shadcn@latest add https://ui.fabrials.com/r/card.json
 - carousel: npx shadcn@latest add https://ui.fabrials.com/r/carousel.json
 - checkbox: npx shadcn@latest add https://ui.fabrials.com/r/checkbox.json

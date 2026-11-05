@@ -52,6 +52,8 @@ import { ChatMessage, ChatComposer } from "@fabrials/ai-ui";         // needs @f
 | A value or range picked by feel (volume, price, quality) | `Slider` (`marks`, `showValue`; an array for a range) | `type="range"`, a `NumberField` when the exact number matters |
 | A verification code | `InputOTP` (or its shadcn parts) | Six separate `Input`s with hand-written focus moves |
 | A reply or prompt that grows with its text | `Textarea autoResize minRows maxRows` | A script that sets the height on every key |
+| A date or a date range in a form | `DatePicker`, `DateRangePicker` (`name` posts `yyyy-mm-dd`) | `type="date"` (its popup cannot be styled or translated), a hand-made calendar |
+| A month on show, to pick from in place | `Calendar` (`mode`, `selected`, `onSelect`, `disabled`) | A grid of buttons with its own keyboard |
 | A form with subsections | `FieldSet` + `FieldLegend` + `FieldGroup` | A bordered box per subsection, a `div` with a bold label |
 | Show or hide detail in place, with no state | `Disclosure` (native `details`) | A hand-styled `details`, an `Accordion` for one block |
 | A destructive confirmation | `AlertDialog`, or `ConfirmDialog` for an async action, or `useConfirm()` to `await` one | `window.confirm` in a flow that can wait (a guard that must answer synchronously keeps it) |
@@ -84,6 +86,8 @@ import { ChatMessage, ChatComposer } from "@fabrials/ai-ui";         // needs @f
 | `Slider` (`aria-label` or `thumbLabels`, `marks`, `showValue`, `orientation`) | A value or a range: sunken track, Stormlight fill, raised fader cap, ruler marks |
 | `InputOTP` (`length`, `validationType`, `onValueComplete`; `InputOTPGroup`, `InputOTPSlot`, `InputOTPSeparator`) | One-time codes on Base UI's OTP field: paste and autofill fill every slot |
 | `Textarea` (`autoResize`, `minRows`, `maxRows`) | Multi-line text; `autoResize` grows with the text, then scrolls |
+| `Calendar` (`mode` single or range, `selected`, `onSelect`, `disabled` matchers, `numberOfMonths`, `locale`, `today`) | A six-week grid with react-day-picker's prop names; arrows, Home, End and Page keys; today a Stormlight tick |
+| `DatePicker`, `DateRangePicker` (`value`, `onValueChange`, `disabledDates`, `format`, `name`, `clearable`) | A field-like trigger that opens the calendar; `toISODate` and `parseISODate` convert local days |
 | `FieldSet`, `FieldLegend`, `FieldGroup` | Grouped fields on a real fieldset; a legend styled as a subsection title with a hairline above; `layout="columns"` reflows by container |
 | `RadioGroup` + `RadioGroupItem` (or `Radio`) | One visible choice inside a form |
 | `ToggleGroup` + `ToggleGroupItem` (`size` `sm`, `default`, `lg`) | A segmented view or range next to what it changes; 44 px hit area on touch (`size="lg"` paints the whole height). A single-choice group slides one indicator to the pressed item |

@@ -19,7 +19,7 @@ The Fabrials design system and ui.fabrials.com. Independent git repository; `mas
 
 - React 19 and Base UI. Keep keyboard operation, visible focus and human use without WebMCP.
 - A new public export needs a story, a keyboard test and a visual reference; use shadcn's name for a part when shadcn has one (that is what lets a shim cover it). Bump the version and write the migration note when a public contract changes.
-- Generated files are never edited by hand: `public/r`, `public/registry.json`, `public/llms.txt`, `registry/shims/*.tsx`, `components/ui/*` (except `calendar.tsx`), `lib/*.generated.ts`. Regenerate with `bun run registry:build`; tests fail when they are stale.
+- Generated files are never edited by hand: `public/r`, `public/registry.json`, `public/llms.txt`, `registry/shims/*.tsx`, `components/ui/*`, `lib/*.generated.ts`. Regenerate with `bun run registry:build`; tests fail when they are stale.
 - The registry publishes only Fabrials components and shims, never another library's components. When a product needs a component another library offers, adopt it: rewrite it into the packages in the Fabrials style, with a story, a keyboard test and a visual reference. Code or recipes adapted from a permissively licensed project (MIT, Apache-2.0, ISC, BSD) keep their copyright and license notice beside the adapted code and a row in `THIRD_PARTY.md`; nothing under extra terms (Commons Clause and the like) is adapted, only learnt from.
 - MCP target 2026-07-28 with the official SDK v2; keep legacy compatibility isolated and never replay tool mutations silently. Browser tokens are memory-only; never log credentials, arguments or tool results on the server. The Node connector uses operator-configured destinations and never becomes an open proxy.
 

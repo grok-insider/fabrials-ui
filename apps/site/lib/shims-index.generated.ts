@@ -64,6 +64,13 @@ export const shimIndex: { name: string; exports: string[] }[] = [
     ]
   },
   {
+    "name": "calendar",
+    "exports": [
+      "Calendar",
+      "CalendarDayButton"
+    ]
+  },
+  {
     "name": "card",
     "exports": [
       "Card",

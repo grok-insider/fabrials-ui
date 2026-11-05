@@ -3,7 +3,11 @@
 // Previews for the components added in 0.10 "Instrument". Synthetic data only.
 import { useState, type ReactNode } from "react";
 import {
+  Calendar,
+  DatePicker,
+  DateRangePicker,
   Field,
+  type DateRange,
   InputOTP,
   InputOTPGroup,
   InputOTPSeparator,
@@ -54,7 +58,32 @@ function SliderDemo() {
   );
 }
 
+function CalendarDemo() {
+  const [day, setDay] = useState<Date | undefined>(() => new Date());
+  return (
+    <Frame>
+      <Calendar mode="single" selected={day} onSelect={setDay} required />
+      <p className="fui-description" role="status">
+        {day ? `Chosen: ${day.toDateString()}` : "No day chosen."}
+      </p>
+    </Frame>
+  );
+}
+
+function DatePickerDemo() {
+  const [due, setDue] = useState<Date | null>(null);
+  const [trip, setTrip] = useState<DateRange | null>(null);
+  return (
+    <Frame>
+      <Field label="Due date">{(control) => <DatePicker {...control} value={due} onValueChange={setDue} clearable />}</Field>
+      <Field label="Trip">{(control) => <DateRangePicker {...control} value={trip} onValueChange={setTrip} clearable />}</Field>
+    </Frame>
+  );
+}
+
 export const instrumentDemos: Record<string, () => ReactNode> = {
+  calendar: () => <CalendarDemo />,
+  "date-picker": () => <DatePickerDemo />,
   "search-input": () => <SearchDemo />,
   "password-input": () => (
     <Frame>

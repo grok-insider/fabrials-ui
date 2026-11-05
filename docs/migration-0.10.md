@@ -65,6 +65,7 @@ ui.fabrials.com stops republishing Kibo UI and Magic UI (`kibo-*`, `magicui-*` r
 The pieces products kept rebuilding by hand, added with stories, keyboard tests and visual references. Nothing existing changes.
 
 - **Inputs:** `SearchInput` (clear button, Escape, key hint, loading), `PasswordInput` (reveal toggle, Caps Lock warning, hidden again on submit), `NumberField` (Base UI, steppers, units), `Slider` (Base UI, ranges, ruler marks; the `slider` shim), `InputOTP` with `InputOTPGroup`, `InputOTPSlot` and `InputOTPSeparator` (Base UI's OTP field; the `input-otp` shim), and `Textarea autoResize minRows maxRows`.
+- **Dates:** `Calendar` with `CalendarDayButton` (written for this system with react-day-picker's prop names, so the `calendar` shim replaces the site's react-day-picker copy), `DatePicker`, `DateRangePicker`, and the helpers `toISODate`, `parseISODate`, `matchesDate`, `isSameDay` and `firstDayOfWeek`. Pass `locale` when the page is rendered on the server.
 
 ## What a host may need to change
 

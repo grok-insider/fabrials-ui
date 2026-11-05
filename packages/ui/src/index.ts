@@ -20,6 +20,7 @@ export * from "./input-group";
 export * from "./inputs";
 export * from "./slider";
 export * from "./input-otp";
+export * from "./calendar";
 export * from "./command";
 export * from "./command-parts";
 export * from "./carousel";
