@@ -27,6 +27,10 @@
       "types": "./dist/dither.d.ts",
       "import": "./dist/dither.js"
     },
+    "./spreadsheet": {
+      "types": "./dist/spreadsheet-read.d.ts",
+      "import": "./dist/spreadsheet-read.js"
+    },
     "./button-variants": {
       "types": "./dist/button-variants.d.ts",
       "import": "./dist/button-variants.js"

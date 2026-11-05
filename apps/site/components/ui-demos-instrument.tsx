@@ -33,6 +33,7 @@ import {
   SidePanelClose,
   SidePanelHeader,
   SidePanelTitle,
+  Spreadsheet,
   VirtualList,
   DatePicker,
   DateRangePicker,
@@ -215,7 +216,28 @@ function GalleryDemo({ count }: { count: number }) {
   );
 }
 
+const LEDGER = {
+  sheets: [
+    {
+      name: "Usage",
+      frozen: { rows: 1 },
+      columnWidths: [160, 96, 96, 72],
+      rows: [
+        ["Account", "Requests", "Cost", "Active"],
+        ...PEOPLE.map((person, index) => [person.name, { value: 1200 * (index + 2), text: (1200 * (index + 2)).toLocaleString("en-GB") }, { value: 36 * (index + 2), text: `€${36 * (index + 2)}.00` }, index % 2 === 0]),
+        ["Total", { value: 16800, text: "16,800", formula: "SUM(B2:B5)" }, { value: 504, text: "€504.00", formula: "SUM(C2:C5)" }],
+      ],
+    },
+    { name: "Notes", rows: [["Synthetic data."]] },
+  ],
+};
+
 export const instrumentDemos: Record<string, () => ReactNode> = {
+  spreadsheet: () => (
+    <Frame>
+      <Spreadsheet workbook={LEDGER} aria-label="Usage export" height={240} locale="en-GB" />
+    </Frame>
+  ),
   "video-player": () => (
     <Frame>
       <VideoPlayer src="/media/harbour.webm" label="The harbour at dusk" poster={SCENES[0]!.src} width={640} height={360} tracks={[{ src: "/media/harbour.en.vtt", srcLang: "en", label: "English" }]} />

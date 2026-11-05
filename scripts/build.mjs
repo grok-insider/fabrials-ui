@@ -35,7 +35,11 @@ for (const name of ["ui", "ai-ui"]) {
         // or tree-shaking drops what the index does not use.
         entry:
           name === "ui"
-            ? { index: resolve(directory, "src/index.ts"), dither: resolve(directory, "src/dither.ts") }
+            ? {
+                index: resolve(directory, "src/index.ts"),
+                dither: resolve(directory, "src/dither.ts"),
+                "spreadsheet-read": resolve(directory, "src/spreadsheet-read.ts"),
+              }
             : resolve(directory, "src/index.tsx"),
         formats: ["es"],
       },
@@ -51,7 +55,7 @@ for (const name of ["ui", "ai-ui"]) {
           // Every component module is its own client boundary. The index barrels
           // stay directive-free: a "use client" barrel makes bundlers keep every
           // export (charts included) wherever one component is imported.
-          banner: chunk => /(?:button-variants|shared|moon-math|dither|dither-presets|syntax|index)\.[jt]sx?$/.test(chunk.facadeModuleId ?? "") ? "" : '"use client";',
+          banner: chunk => /(?:button-variants|shared|moon-math|dither|dither-presets|syntax|index|spreadsheet-data|spreadsheet-read|media-logic)\.[jt]sx?$/.test(chunk.facadeModuleId ?? "") ? "" : '"use client";',
         },
       },
     },

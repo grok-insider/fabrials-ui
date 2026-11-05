@@ -71,6 +71,7 @@ const stories: Record<string, string> = {
   "media-viewer": "fabrials-media--viewer",
   "players-video": "fabrials-players--video",
   "players-sound": "fabrials-players--sound-and-animation",
+  "documents-sheets": "fabrials-documents--sheets",
   "feedback-state-panels": "fabrials-feedback--state-panels",
   "feedback-confirmations": "fabrials-feedback--confirmations",
   "feedback-times": "fabrials-feedback--times",

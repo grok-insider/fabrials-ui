@@ -29,6 +29,8 @@ export * from "./media-logic";
 export * from "./image";
 export * from "./image-viewer";
 export * from "./media-player";
+export * from "./spreadsheet-data";
+export * from "./spreadsheet";
 export * from "./command";
 export * from "./command-parts";
 export * from "./carousel";

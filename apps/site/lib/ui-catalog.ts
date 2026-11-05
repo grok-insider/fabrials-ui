@@ -402,6 +402,20 @@ export const uiCatalog: UiCatalogItem[] = [
     "It moves while at least half of it is on screen, the tab is in front and motion is allowed (WCAG 2.2.2 pause, stop, hide). Under reduced motion it starts still; pressing play keeps it moving until it leaves the screen.",
   ),
   ui(
+    "spreadsheet",
+    "Spreadsheet",
+    "Collections",
+    "A read-only workbook: letters and row numbers that stay in view, frozen panes, merged cells, sheet tabs.",
+    ["Spreadsheet", "cellText", "cellAddress", "columnName"],
+    [
+      ["workbook", "{ sheets: { name, rows, columnWidths?, merges?, frozen? }[] }", "Rows of cells; a cell is a value or { value, text?, formula?, error? }."],
+      ["sheet / defaultSheet / onSheetChange", "number", "The sheet on show."],
+      ["height / rowHeight / columnWidth / locale", "", "The grid's size and how unformatted numbers and dates are written."],
+      ["readSpreadsheet (from @fabrials/ui/spreadsheet)", "(file) => Promise<Workbook>", "Reads CSV, TSV and .xlsx in the browser with no dependency; an old .xls is refused with a SpreadsheetError."],
+    ],
+    "One tab stop: the arrows move the active cell, Home and End go to the row's ends (with Ctrl, the sheet's), Page keys move a screen, Ctrl+C copies the cell. The bar says the address and the contents (the formula when there is one). Only the cells on screen are drawn. The reader keeps formulas' last results; it does not recalculate.",
+  ),
+  ui(
     "calendar",
     "Calendar",
     "Controls",
