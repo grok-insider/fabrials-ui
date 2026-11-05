@@ -323,17 +323,17 @@ test("headings: a level, a ref target and attributes on PageHeader and SectionHe
   assert.match(rule(":is(.fui-page-title, .fui-section-title, .fui-settings-section-title):focus-visible"), /outline: 2px solid var\(--fui-focus\)/);
 });
 
-test("SectionHeader aside: beside the title, outside the heading; without it the markup is the 0.8.0 markup", () => {
+test("SectionHeader aside: beside the title, outside the heading; without it the markup is the 0.8.0 markup (plus the 0.10 heading class)", () => {
   // Captured from 0.8.0 before the change.
   assert.equal(
     renderToStaticMarkup(<SectionHeader title="Runs" description="d" actions={<i>a</i>} />),
-    '<header class="fui-section-header"><div><h2 class="fui-section-title">Runs</h2><p class="fui-description">d</p></div><div class="fui-actions"><i>a</i></div></header>',
+    '<header class="fui-section-header"><div class="fui-section-heading"><h2 class="fui-section-title">Runs</h2><p class="fui-description">d</p></div><div class="fui-actions"><i>a</i></div></header>',
   );
-  assert.equal(renderToStaticMarkup(<SectionHeader title="Runs" />), '<header class="fui-section-header"><div><h2 class="fui-section-title">Runs</h2></div></header>');
+  assert.equal(renderToStaticMarkup(<SectionHeader title="Runs" />), '<header class="fui-section-header"><div class="fui-section-heading"><h2 class="fui-section-title">Runs</h2></div></header>');
   const html = renderToStaticMarkup(<SectionHeader title="Mailboxes" aside={<b>3 of 10</b>} description="d" actions={<i>a</i>} headingLevel={3} headingProps={{ id: "h" }} />);
   assert.equal(
     html,
-    '<header class="fui-section-header"><div><div class="fui-section-heading-row"><h3 id="h" class="fui-section-title">Mailboxes</h3><span class="fui-section-aside"><b>3 of 10</b></span></div><p class="fui-description">d</p></div><div class="fui-actions"><i>a</i></div></header>',
+    '<header class="fui-section-header"><div class="fui-section-heading"><div class="fui-section-heading-row"><h3 id="h" class="fui-section-title">Mailboxes</h3><span class="fui-section-aside"><b>3 of 10</b></span></div><p class="fui-description">d</p></div><div class="fui-actions"><i>a</i></div></header>',
   );
   // The heading's accessible name is the title: the tag is a sibling, never inside it.
   assert.doesNotMatch(html, /<h3[^>]*>[^<]*<[^/]/);
@@ -346,7 +346,7 @@ test("SectionHeader aside: beside the title, outside the heading; without it the
 });
 
 test("SectionHeader aside: a count of 0 is content (a tag), while false, null and an empty string mean no aside", () => {
-  const bare = '<header class="fui-section-header"><div><h2 class="fui-section-title">Runs</h2></div></header>';
+  const bare = '<header class="fui-section-header"><div class="fui-section-heading"><h2 class="fui-section-title">Runs</h2></div></header>';
   for (const nothing of [undefined, null, false, ""]) assert.equal(renderToStaticMarkup(<SectionHeader title="Runs" aside={nothing} />), bare);
   assert.match(renderToStaticMarkup(<SectionHeader title="Runs" aside={0} />), /<span class="fui-section-aside">0<\/span>/);
 });

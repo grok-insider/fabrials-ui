@@ -1,24 +1,79 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useCallback, useEffect, useRef, type ReactNode, type Ref } from "react";
 import { Toggle as BaseToggle } from "@base-ui/react/toggle";
 import { ToggleGroup as BaseToggleGroup } from "@base-ui/react/toggle-group";
 import { Monitor, Moon, Sun } from "lucide-react";
 import { classes, type StyledProps } from "./shared";
 
+/**
+ * Keeps one indicator under the pressed item of a single-choice group and lets it slide when the choice changes (0.10). It
+ * sets `--fui-toggle-x/y/w/h` on the group; with two or more pressed items (a multiple group) there is no indicator and each
+ * pressed item paints its own fill, as before. The first placement does not animate.
+ */
+function useSlidingIndicator(ref?: Ref<HTMLDivElement>) {
+  const node = useRef<HTMLDivElement | null>(null);
+  const setNode = useCallback(
+    (element: HTMLDivElement | null) => {
+      node.current = element;
+      if (typeof ref === "function") ref(element);
+      else if (ref) ref.current = element;
+    },
+    [ref],
+  );
+  useEffect(() => {
+    const group = node.current;
+    if (!group) return;
+    let frame = 0;
+    const place = () => {
+      const pressed = group.querySelectorAll<HTMLElement>(":scope > [data-pressed]");
+      if (pressed.length !== 1) {
+        delete group.dataset.indicator;
+        return;
+      }
+      const item = pressed[0]!;
+      group.style.setProperty("--fui-toggle-x", `${item.offsetLeft}px`);
+      group.style.setProperty("--fui-toggle-y", `${item.offsetTop}px`);
+      group.style.setProperty("--fui-toggle-w", `${item.offsetWidth}px`);
+      group.style.setProperty("--fui-toggle-h", `${item.offsetHeight}px`);
+      if (group.dataset.indicator === undefined) {
+        group.dataset.indicator = "";
+        frame = requestAnimationFrame(() => {
+          group.dataset.indicator = "ready";
+        });
+      }
+    };
+    place();
+    const mutations = new MutationObserver(place);
+    mutations.observe(group, { subtree: true, attributes: true, attributeFilter: ["data-pressed"], childList: true });
+    const sizes = new ResizeObserver(place);
+    sizes.observe(group);
+    return () => {
+      cancelAnimationFrame(frame);
+      mutations.disconnect();
+      sizes.disconnect();
+    };
+  }, []);
+  return setNode;
+}
+
 export function ToggleGroup({
   className,
   size = "default",
+  ref,
   ...props
 }: StyledProps<BaseToggleGroup.Props> & {
   /** `sm` 26 px, `default` 34 px, `lg` 44 px painted on every pointer (the large control height); `sm` and `default` are 44 px on touch and narrow screens. */
   size?: "default" | "sm" | "lg";
+  ref?: Ref<HTMLDivElement>;
 }) {
+  const setNode = useSlidingIndicator(ref);
   return (
     <BaseToggleGroup
       data-slot="toggle-group"
       data-size={size}
       className={classes("fui-toggle-group", className)}
+      ref={setNode}
       {...props}
     />
   );

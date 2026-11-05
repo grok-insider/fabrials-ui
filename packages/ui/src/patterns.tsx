@@ -6,9 +6,9 @@ import {
   CheckCircle2,
   Clock3,
   Inbox,
-  LoaderCircle,
   WifiOff,
 } from "lucide-react";
+import { PixelSpinner } from "./pixel-spinner";
 import { classes } from "./shared";
 
 export type HeadingLevel = 1 | 2 | 3 | 4;
@@ -226,7 +226,7 @@ export function BulkActionsContent({ className, children, hidden = false, ...pro
 }
 
 const stateIcons = {
-  loading: LoaderCircle,
+  loading: Inbox,
   empty: Inbox,
   error: AlertCircle,
   stale: Clock3,
@@ -283,11 +283,11 @@ export function StatePanel({
           {icon}
         </span>
       ) : (
-        <Icon
-          aria-hidden
-          size={20}
-          className={classes("fui-state-icon", state === "loading" && "fui-spin")}
-        />
+        state === "loading" ? (
+          <PixelSpinner aria-hidden className="fui-state-icon" />
+        ) : (
+          <Icon aria-hidden size={20} className="fui-state-icon" />
+        )
       )}
       <div className="fui-state-text">
         <Heading>{title}</Heading>

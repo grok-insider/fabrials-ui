@@ -6937,3 +6937,142 @@
     }
   }
 }
+
+/* 0.10: Instrument motion. Every movement answers what a person did or what data did; nothing moves on its own except the
+   busy mark. All of it stops under reduced motion, where the same states show at once. */
+@layer components {
+  /* The busy mark: a ring of eight square cells, one lit at a time. */
+  .fui-pixel-spinner {
+    display: inline-block;
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+    color: currentColor;
+  }
+  .fui-pixel-spinner rect {
+    fill: currentColor;
+    opacity: 0.22;
+  }
+  .fui-pixel-spinner rect:first-child {
+    opacity: 1;
+  }
+  .fui-state-icon.fui-pixel-spinner {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  .fui-button .fui-pixel-spinner {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+
+  /* One indicator under the pressed item of a single-choice group. */
+  .fui-toggle-group[data-indicator] {
+    position: relative;
+    isolation: isolate;
+  }
+  .fui-toggle-group[data-indicator]::before {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    top: 0;
+    left: 0;
+    width: var(--fui-toggle-w);
+    height: var(--fui-toggle-h);
+    translate: var(--fui-toggle-x) var(--fui-toggle-y);
+    border-radius: calc(var(--fui-radius-md) - 2px);
+    background: var(--fui-segment);
+    box-shadow:
+      var(--fui-shadow-xs),
+      0 0 0 1px color-mix(in oklab, var(--foreground) 8%, transparent);
+    pointer-events: none;
+  }
+  .fui-toggle-group[data-indicator] > .fui-toggle {
+    position: relative;
+    z-index: 1;
+  }
+  @media (forced-colors: none) {
+    .fui-toggle-group[data-indicator] > .fui-toggle[data-pressed] {
+      background: transparent;
+      box-shadow: none;
+    }
+  }
+  @media (forced-colors: active) {
+    .fui-toggle-group[data-indicator]::before {
+      display: none;
+    }
+  }
+
+  /* Data and images arriving: the dither as a dissolve, in four 2 px steps (TR, then the checkerboard, then three quarters). */
+  @keyframes fui-dither-in {
+    0% {
+      mask-image: linear-gradient(transparent, transparent);
+    }
+    25% {
+      mask-image: conic-gradient(var(--foreground) 0 25%, transparent 0);
+    }
+    50% {
+      mask-image: conic-gradient(var(--foreground) 0 25%, transparent 0 50%, var(--foreground) 0 75%, transparent 0);
+    }
+    75% {
+      mask-image: conic-gradient(var(--foreground) 0 75%, transparent 0);
+    }
+    100% {
+      mask-image: linear-gradient(var(--foreground), var(--foreground));
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes fui-pixel {
+      0%,
+      12% {
+        opacity: 1;
+      }
+      40%,
+      100% {
+        opacity: 0.22;
+      }
+    }
+    .fui-pixel-spinner rect,
+    .fui-pixel-spinner rect:first-child {
+      animation: fui-pixel 800ms steps(1, end) infinite;
+      animation-timing-function: linear;
+    }
+
+    /* A key goes down when it is pressed. */
+    .fui-button:active:not(:disabled, [aria-disabled="true"], [data-loading]) {
+      transform: translateY(1px);
+    }
+
+    .fui-toggle-group[data-indicator="ready"]::before {
+      transition:
+        translate var(--fui-duration-slow) var(--fui-ease),
+        width var(--fui-duration-slow) var(--fui-ease),
+        height var(--fui-duration-slow) var(--fui-ease);
+    }
+
+    /* The check is drawn, not switched on. */
+    .fui-checkbox .fui-control-indicator svg path {
+      stroke-dasharray: 24;
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset var(--fui-duration) var(--fui-ease);
+    }
+    @starting-style {
+      .fui-checkbox .fui-control-indicator svg path {
+        stroke-dashoffset: 24;
+      }
+    }
+
+    /* A ruler inks its ticks in order and its mark travels to the new value. */
+    .fui-meter-ruler rect:is(.fui-meter-tick, .fui-meter-tick-on) {
+      transition: fill var(--fui-duration-fast) var(--fui-ease) calc(var(--i, 0) * 6ms);
+    }
+    .fui-meter-mark {
+      transition: transform var(--fui-duration-slow) var(--fui-ease);
+    }
+
+    [data-fui-reveal="in"] {
+      mask-size: 4px 4px;
+      animation: fui-dither-in var(--fui-duration-slow) steps(1, end) both;
+    }
+  }
+}

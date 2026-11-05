@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Inbox, LayoutDashboard, ListFilter, Sparkles, Users } from "lucide-react";
 import {
@@ -8,6 +9,7 @@ import {
   BreadcrumbPage,
   Button,
   Card,
+  Checkbox,
   CardAction,
   CardCaption,
   CardContent,
@@ -21,6 +23,7 @@ import {
   Meter,
   PageHeader,
   ProductLockup,
+  Readout,
   SeriesChart,
   Sidebar,
   SidebarContent,
@@ -38,6 +41,7 @@ import {
   SidebarTrigger,
   SiteHeader,
   Snippet,
+  Spinner,
   Stat,
   StatGroup,
   StatusDot,
@@ -47,6 +51,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  ToggleGroup,
+  ToggleGroupItem,
   type GemName,
 } from "@fabrials/ui";
 import "./instrument.css";
@@ -363,10 +369,45 @@ function Workspace() {
   );
 }
 
+const readings = ["14:32 UTC", "14:47 UTC", "15:02 UTC"];
+
+function Motion() {
+  const [step, setStep] = useState(0);
+  const [range, setRange] = useState("7d");
+  const level = [21, 64, 88][step % 3]!;
+  return (
+    <section aria-labelledby="ins-p0" className="ins-motion">
+      <h2 id="ins-p0">Motion that answers</h2>
+      <div className="ins-motion-row">
+        <Button variant="outline" size="sm" onClick={() => setStep((n) => n + 1)}>
+          Sync now
+        </Button>
+        <span className="ins-label">
+          Last sync <Readout value={readings[step % 3]!} />
+        </span>
+      </div>
+      <Meter variant="ruler" label="Quota" value={level} />
+      <ToggleGroup aria-label="Range" value={[range]} onValueChange={(next) => next[0] && setRange(String(next[0]))}>
+        <ToggleGroupItem value="24h">24 h</ToggleGroupItem>
+        <ToggleGroupItem value="7d">7 days</ToggleGroupItem>
+        <ToggleGroupItem value="30d">30 days</ToggleGroupItem>
+      </ToggleGroup>
+      <div className="ins-motion-row">
+        <label className="ins-check">
+          <Checkbox defaultChecked /> Synchronize history
+        </label>
+        <Spinner label="Reading INBOX" />
+        <Button loading>Saving</Button>
+      </div>
+    </section>
+  );
+}
+
 function Pieces() {
   return (
     <div className="ins-pieces">
       <h1>Instrument pieces</h1>
+      <Motion />
       <section aria-labelledby="ins-p1">
         <h2 id="ins-p1">CornerMarks and CardCaption</h2>
         <CornerMarks>

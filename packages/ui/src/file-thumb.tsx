@@ -35,6 +35,8 @@ export function FileThumb({
   const checkLoaded = useCallback(
     (img: HTMLImageElement | null) => {
       if (img && src && img.complete && img.naturalWidth === 0) setFailedSrc(src);
+      // An image still on its way when it mounts appears through the dither once it arrives; a cached one just shows.
+      if (img && src && !img.complete) img.dataset.fuiReveal = "pending";
     },
     [src],
   );
@@ -53,6 +55,9 @@ export function FileThumb({
         className={classes("fui-file-thumb", "fui-file-thumb-image", className)}
         style={style}
         onError={() => setFailedSrc(src)}
+        onLoad={(event) => {
+          if (event.currentTarget.dataset.fuiReveal === "pending") event.currentTarget.dataset.fuiReveal = "in";
+        }}
         ref={checkLoaded}
       />
     );

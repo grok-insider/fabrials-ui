@@ -6,6 +6,7 @@ export * from "./dialog";
 export * from "./menu";
 export * from "./display";
 export * from "./instrument";
+export * from "./readout";
 export * from "./patterns";
 export * from "./combobox";
 export * from "./collapsible";

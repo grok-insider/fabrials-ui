@@ -4,7 +4,8 @@ import { useEffect, useRef, type ComponentProps, type ReactNode, type Ref } from
 import { Button as BaseButton } from "@base-ui/react/button";
 import { Checkbox as BaseCheckbox } from "@base-ui/react/checkbox";
 import { Switch as BaseSwitch } from "@base-ui/react/switch";
-import { Check, LoaderCircle, Minus } from "lucide-react";
+import { Check, Minus } from "lucide-react";
+import { PixelSpinner } from "./pixel-spinner";
 import { classes, type StyledProps } from "./shared";
 
 export { buttonVariants } from "./button-variants";
@@ -39,7 +40,7 @@ export function Button({
       {...props}
     >
       {loading ? (
-        <LoaderCircle aria-hidden className="fui-button-spinner fui-spin" />
+        <PixelSpinner aria-hidden className="fui-button-spinner" />
       ) : null}
       {children}
     </BaseButton>

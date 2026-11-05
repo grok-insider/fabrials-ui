@@ -1,6 +1,6 @@
 "use client";
 
-import type { ComponentProps, ReactNode } from "react";
+import type { CSSProperties, ComponentProps, ReactNode } from "react";
 import { Meter as BaseMeter } from "@base-ui/react/meter";
 import { ArrowDownRight, ArrowUpRight, Minus } from "lucide-react";
 import { classes } from "./shared";
@@ -213,11 +213,19 @@ export function Meter({
                   y={major ? 0 : mid ? 3 : 5}
                   width={1}
                   height={major ? 10 : mid ? 7 : 5}
+                  style={{ "--i": index } as CSSProperties}
                   className={index <= filled && filled > 0 ? "fui-meter-tick-on" : "fui-meter-tick"}
                 />
               );
             })}
-            <rect x={Math.min(filled * 4, ticks * 4)} y={0} width={2} height={10} className="fui-meter-mark" />
+            <rect
+              x={0}
+              y={0}
+              width={2}
+              height={10}
+              className="fui-meter-mark"
+              style={{ transform: `translateX(${Math.min(filled * 4, ticks * 4)}px)` }}
+            />
           </svg>
         </BaseMeter.Track>
       ) : (

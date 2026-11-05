@@ -262,3 +262,23 @@
     display: none;
   }
 }
+
+.ins-motion {
+  display: grid;
+  gap: var(--fui-space-5);
+  max-width: 28rem;
+}
+.ins-motion-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--fui-space-4);
+}
+.ins-check {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--fui-space-2);
+}
+.ins-motion > .fui-toggle-group {
+  justify-self: start;
+}

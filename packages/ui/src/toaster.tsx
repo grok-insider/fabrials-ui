@@ -2,12 +2,12 @@
 // Origin: shadcn/ui sonner wrapper, copied 2026-09-22. Restyled with fui- tokens in 0.4.
 
 import { useSyncExternalStore, type CSSProperties } from "react";
+import { PixelSpinner } from "./pixel-spinner";
 import { documentTheme, subscribeDocumentTheme } from "./theme";
 import { Toaster as Sonner, type ToasterProps } from "sonner";
 import {
   CircleCheckIcon,
   InfoIcon,
-  LoaderCircle,
   OctagonXIcon,
   TriangleAlertIcon,
 } from "lucide-react";
@@ -40,7 +40,7 @@ export function Toaster({
         info: <InfoIcon aria-hidden className="fui-toast-icon" data-tone="info" />,
         warning: <TriangleAlertIcon aria-hidden className="fui-toast-icon" data-tone="warning" />,
         error: <OctagonXIcon aria-hidden className="fui-toast-icon" data-tone="danger" />,
-        loading: <LoaderCircle aria-hidden className="fui-toast-icon fui-spin" />,
+        loading: <PixelSpinner aria-hidden className="fui-toast-icon" />,
       }}
       style={
         {
