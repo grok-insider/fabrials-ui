@@ -155,15 +155,21 @@
   --fui-tooltip: oklch(0.204 0.011 261);
   --fui-tooltip-foreground: oklch(0.975 0.004 250);
   --fui-scrim: oklch(0.2 0.015 255 / 40%);
-  --fui-highlight: inset 0 1px 0 oklch(1 0 0 / 0%);
-  --fui-shadow-xs: 0 1px 2px oklch(0.2 0.015 255 / 6%);
-  --fui-shadow-sm:
-    0 1px 2px oklch(0.2 0.015 255 / 5%), 0 1px 3px oklch(0.2 0.015 255 / 6%);
-  --fui-shadow-md:
-    0 2px 4px oklch(0.2 0.015 255 / 5%), 0 8px 16px -4px oklch(0.2 0.015 255 / 12%);
-  --fui-shadow-lg:
-    0 4px 8px oklch(0.2 0.015 255 / 6%), 0 24px 48px -12px oklch(0.2 0.015 255 / 24%);
+  --fui-highlight: inset 0 1px 0 oklch(1 0 0 / 70%);
+  --fui-shadow-xs: 0 0 0 0.5px oklch(0.2 0.02 258 / 6%), 0 1px 1px oklch(0.2 0.02 258 / 5%), 0 2px 1px -1px oklch(0.2 0.02 258 / 5%), 0 1px 3px oklch(0.2 0.02 258 / 6%);
+  --fui-shadow-sm: 0 1px 1px oklch(0.2 0.02 258 / 4%), 0 2px 3px -2px oklch(0.2 0.02 258 / 8%), 0 3px 12px -4px oklch(0.2 0.02 258 / 7%);
+  --fui-shadow-md: 0 2px 3px -2px oklch(0.2 0.02 258 / 10%), 0 3px 12px -4px oklch(0.2 0.02 258 / 12%), 0 4px 16px -8px oklch(0.2 0.02 258 / 14%), 0 12px 32px -16px oklch(0.2 0.02 258 / 12%);
+  --fui-shadow-lg: 0 2px 6px -2px oklch(0.2 0.02 258 / 8%), 0 12px 60px oklch(0.2 0.02 258 / 14%), 0 12px 32px -16px oklch(0.2 0.02 258 / 20%);
   --fui-shadow-overlay: var(--fui-shadow-md);
+
+  /* 0.10 material: sunken fields, a bevel and a sheen on solid fills. Depth recipes adapted from Radix Themes (MIT). */
+  --fui-shadow-well: inset 0 1.5px 2px 0 oklch(0.2 0.02 258 / 7%), inset 0 0.5px 1px oklch(0.2 0.02 258 / 6%);
+  --fui-bevel: inset 0 1px 0 oklch(1 0 0 / 16%), inset 0 -1px 0 oklch(0 0 0 / 24%);
+  --fui-sheen: linear-gradient(to bottom, oklch(1 0 0 / 10%), oklch(1 0 0 / 0%) 55%, oklch(0 0 0 / 6%));
+  --fui-sheen-soft: linear-gradient(to bottom, oklch(1 0 0 / 0%) 40%, oklch(0.2 0.02 258 / 3%));
+  --fui-pressed: inset 0 2px 3px oklch(0 0 0 / 22%), inset 0 1px 1px oklch(0 0 0 / 14%);
+  --fui-focus-halo: 0 0 0 1px var(--fui-focus), 0 0 0 4px color-mix(in oklab, var(--fui-focus) 22%, transparent);
+  --fui-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
   /* Syntax: muted gem inks, never Stormlight (that stays the interaction colour). */
   --fui-syntax-keyword: oklch(0.46 0.17 305);
@@ -247,13 +253,11 @@
   --fui-tooltip: oklch(0.928 0.006 129);
   --fui-tooltip-foreground: oklch(0.139 0.006 262);
   --fui-scrim: oklch(0.1 0.01 255 / 64%);
-  --fui-highlight: inset 0 1px 0 oklch(1 0 0 / 5%);
-  --fui-shadow-xs: 0 1px 2px oklch(0 0 0 / 30%);
-  --fui-shadow-sm: 0 1px 2px oklch(0 0 0 / 30%), 0 1px 3px oklch(0 0 0 / 20%);
-  --fui-shadow-md:
-    0 2px 4px oklch(0 0 0 / 30%), 0 12px 24px -6px oklch(0 0 0 / 45%);
-  --fui-shadow-lg:
-    0 4px 8px oklch(0 0 0 / 35%), 0 28px 56px -12px oklch(0 0 0 / 60%);
+  --fui-highlight: inset 0 1px 0 oklch(1 0 0 / 6%);
+  --fui-shadow-xs: 0 0 0 0.5px oklch(0 0 0 / 40%), 0 1px 1px oklch(0 0 0 / 45%), 0 2px 1px -1px oklch(0 0 0 / 40%), 0 1px 3px oklch(0 0 0 / 35%);
+  --fui-shadow-sm: 0 1px 2px oklch(0 0 0 / 40%), 0 3px 8px -2px oklch(0 0 0 / 45%), 0 4px 16px -6px oklch(0 0 0 / 50%);
+  --fui-shadow-md: 0 2px 3px -2px oklch(0 0 0 / 40%), 0 3px 8px -2px oklch(0 0 0 / 55%), 0 8px 24px -6px oklch(0 0 0 / 60%);
+  --fui-shadow-lg: 0 0 0 1px oklch(1 0 0 / 4%), 0 12px 60px oklch(0 0 0 / 50%), 0 12px 32px -16px oklch(0 0 0 / 70%);
   --fui-shadow-overlay: var(--fui-shadow-md);
 
   --fui-syntax-keyword: oklch(0.78 0.12 305);
@@ -265,6 +269,11 @@
 
   --fui-skeleton: color-mix(in oklab, var(--foreground) 14%, var(--card));
   --fui-skeleton-surface: color-mix(in oklab, var(--foreground) 8%, var(--card));
+  --fui-shadow-well: inset 0 3px 4px 0 oklch(0 0 0 / 34%), inset 0 -1px 1px 0 oklch(1 0 0 / 4%);
+  --fui-bevel: inset 0 1px 0 oklch(1 0 0 / 50%), inset 0 -1px 0 oklch(0 0 0 / 16%);
+  --fui-sheen: linear-gradient(to bottom, oklch(1 0 0 / 16%), oklch(1 0 0 / 0%) 55%, oklch(0 0 0 / 8%));
+  --fui-sheen-soft: linear-gradient(to bottom, oklch(1 0 0 / 4%), oklch(1 0 0 / 0%) 60%);
+  --fui-pressed: inset 0 2px 3px oklch(0 0 0 / 40%), inset 0 1px 1px oklch(0 0 0 / 30%);
 }
 
 /* data-theme="system" follows the operating system with no script, so a page served before any JavaScript runs paints the
@@ -333,13 +342,11 @@
     --fui-tooltip: oklch(0.928 0.006 129);
     --fui-tooltip-foreground: oklch(0.139 0.006 262);
     --fui-scrim: oklch(0.1 0.01 255 / 64%);
-    --fui-highlight: inset 0 1px 0 oklch(1 0 0 / 5%);
-    --fui-shadow-xs: 0 1px 2px oklch(0 0 0 / 30%);
-    --fui-shadow-sm: 0 1px 2px oklch(0 0 0 / 30%), 0 1px 3px oklch(0 0 0 / 20%);
-    --fui-shadow-md:
-      0 2px 4px oklch(0 0 0 / 30%), 0 12px 24px -6px oklch(0 0 0 / 45%);
-    --fui-shadow-lg:
-      0 4px 8px oklch(0 0 0 / 35%), 0 28px 56px -12px oklch(0 0 0 / 60%);
+    --fui-highlight: inset 0 1px 0 oklch(1 0 0 / 6%);
+    --fui-shadow-xs: 0 0 0 0.5px oklch(0 0 0 / 40%), 0 1px 1px oklch(0 0 0 / 45%), 0 2px 1px -1px oklch(0 0 0 / 40%), 0 1px 3px oklch(0 0 0 / 35%);
+    --fui-shadow-sm: 0 1px 2px oklch(0 0 0 / 40%), 0 3px 8px -2px oklch(0 0 0 / 45%), 0 4px 16px -6px oklch(0 0 0 / 50%);
+    --fui-shadow-md: 0 2px 3px -2px oklch(0 0 0 / 40%), 0 3px 8px -2px oklch(0 0 0 / 55%), 0 8px 24px -6px oklch(0 0 0 / 60%);
+    --fui-shadow-lg: 0 0 0 1px oklch(1 0 0 / 4%), 0 12px 60px oklch(0 0 0 / 50%), 0 12px 32px -16px oklch(0 0 0 / 70%);
     --fui-shadow-overlay: var(--fui-shadow-md);
 
     --fui-syntax-keyword: oklch(0.78 0.12 305);
@@ -351,6 +358,11 @@
 
     --fui-skeleton: color-mix(in oklab, var(--foreground) 14%, var(--card));
     --fui-skeleton-surface: color-mix(in oklab, var(--foreground) 8%, var(--card));
+    --fui-shadow-well: inset 0 3px 4px 0 oklch(0 0 0 / 34%), inset 0 -1px 1px 0 oklch(1 0 0 / 4%);
+    --fui-bevel: inset 0 1px 0 oklch(1 0 0 / 50%), inset 0 -1px 0 oklch(0 0 0 / 16%);
+    --fui-sheen: linear-gradient(to bottom, oklch(1 0 0 / 16%), oklch(1 0 0 / 0%) 55%, oklch(0 0 0 / 8%));
+    --fui-sheen-soft: linear-gradient(to bottom, oklch(1 0 0 / 4%), oklch(1 0 0 / 0%) 60%);
+    --fui-pressed: inset 0 2px 3px oklch(0 0 0 / 40%), inset 0 1px 1px oklch(0 0 0 / 30%);
   }
 }
 

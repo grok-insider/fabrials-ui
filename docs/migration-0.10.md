@@ -52,6 +52,10 @@ The reference pages are the **Fabrials/Instrument** stories (Landing, Workspace,
 - Status and chart colours come from the gems: verdigris success, brass warning, garnet danger, with chart hues Stormlight, verdigris, brass, garnet, amethyst and steel. Contrast: status inks 6.1:1 or more on a light plate and 8.3:1 or more on a dark one; chart hues 3.4:1 or more on their plate.
 - A `ToggleGroup` is as wide as its items in any parent (it stretched in a grid column); a card with a header or content is a flex column and keeps its `CardFooter` or `CardCaption` on its bottom edge; `CardFooter` has no tinted band.
 
+## Material (later on 0.10)
+
+Components are no longer flat (`DESIGN.md` › Material; recipes adapted from Radix Themes, MIT): solid buttons and ticked checks are keys with a bevel and a sheen, outline buttons and the chosen segment are raised, fields and segmented groups are wells, plates rest on `--fui-shadow-sm`, overlays have deeper layered shadows and arrive from their trigger's side on `--fui-ease-out`, a held switch thumb stretches. New tokens: `--fui-shadow-well`, `--fui-bevel`, `--fui-sheen`, `--fui-sheen-soft`, `--fui-pressed`, `--fui-focus-halo`, `--fui-ease-out`; `--fui-shadow-xs/sm/md/lg` and `--fui-highlight` have new values. A host that set `box-shadow` or `background-image` on a package control replaces what the package paints; prefer the tokens.
+
 ## What a host may need to change
 
 - **A host that boxed things itself.** A product CSS rule that gave a `Card` or `Table` its own radius or shadow now fights the plates; delete it.

@@ -71,8 +71,24 @@ Numbers use tabular figures. Headings wrap with `text-wrap: balance`. Copy is se
 
 - Spacing follows a 4 px grid (`--fui-space-*`).
 - Controls are 40 px (`--fui-control-height`); small 32, extra small 28, large 44. `data-density="compact"` tightens controls to 32 px and collection rows, as a composition choice, not a stored preference. Narrow screens and coarse pointers keep 44 px targets.
-- **Plates are square.** Cards, stats, stat groups and tables are plates: a hairline, the surface, no corner radius (`--fui-radius-plate: 0`) and no resting shadow. Everything else keeps crisp corners: 3 px for keys and badges, 4 px for small parts and tooltips, 5 px for controls, 6 px for menus, popovers and the command palette, 8 px for dialogs, sheets, toasts and the sign-in card (`--fui-radius-xs` to `--fui-radius-xl`). Tailwind's `rounded-2xl` and larger are not part of the system. Badges, counts and chips are tags with those 3 to 4 px corners, and a badge's status dot is square, like one pixel of the dither; `StatusDot` stays a round light. Pills are only for a passive label that must stand out.
-- Separate with space and hairlines before borders; shadows belong to overlays; plates carry none. Do not box every label and control.
+- **Plates are square.** Cards, stats, stat groups and tables are plates: a hairline, the surface, no corner radius (`--fui-radius-plate: 0`) and a soft resting elevation (`--fui-shadow-sm`). Everything else keeps crisp corners: 3 px for keys and badges, 4 px for small parts and tooltips, 5 px for controls, 6 px for menus, popovers and the command palette, 8 px for dialogs, sheets, toasts and the sign-in card (`--fui-radius-xs` to `--fui-radius-xl`). Tailwind's `rounded-2xl` and larger are not part of the system. Badges, counts and chips are tags with those 3 to 4 px corners, and a badge's status dot is square, like one pixel of the dither; `StatusDot` stays a round light. Pills are only for a passive label that must stand out.
+- Separate with space and hairlines before borders. Do not box every label and control.
+
+## Material
+
+Components are not flat: they read as physical parts of an instrument. Depth comes only from a few shared recipes in `tokens.css` (adapted from Radix Themes, MIT):
+
+| Recipe | Token | On |
+| --- | --- | --- |
+| Elevation | `--fui-shadow-xs` (controls), `-sm` (plates), `-md` (menus, popovers, toasts), `-lg` (dialogs, sheets) | Layered: a contact shadow, a short drop and a long soft one, darker in the dark theme |
+| Key | `--fui-bevel` and `--fui-sheen` | Solid fills: primary and accent buttons, ticked checks and radios, a switch that is on. A light top edge, a dark bottom edge, a 10 to 16 % tonal sheen |
+| Raised plate | `--fui-shadow-xs` and `--fui-highlight`, `--fui-sheen-soft` | Outline and destructive buttons, the chosen segment, a switch thumb, keycaps |
+| Well | `--fui-shadow-well` | Fields, selects, unticked checks, a switch track, a segmented group: a soft inner shadow from the top |
+| Pressed | `--fui-pressed` | A key while held: the bevel becomes an inner shadow and the key goes down 1 px |
+| Focus | `--fui-focus-halo` | A field in focus: a Stormlight edge and a 3 px halo at 22 % |
+
+- These tokens are the only gradients and the only shadows in the system. No glow, no coloured shadow, no gradient as decoration or text, no glass blur.
+- Forced colors drop every sheen and shadow; states keep their system-colour forms.
 - Tables scroll inside their labelled region; the page never scrolls sideways.
 
 ## Instrument details
@@ -121,7 +137,9 @@ The vocabulary (0.10, "living instrument"), each tied to one cause:
 | A reading changes | The characters cycle for 240 ms and settle left to right | `Readout` |
 | Media or data arrives after the view is shown | It appears through a 2 px dither in four steps | `FileThumb`; any host element with `data-fui-reveal="in"` |
 | Busy | A ring of square cells lights in turn (the only motion that loops) | `Spinner`, `Button loading`, `StatePanel` loading, loading toasts |
-| Opening and closing | Overlays fade and scale from their trigger; panels grow to their height | Menus, popovers, dialogs, sheets, accordions |
+| Opening and closing | Overlays fade, scale and slide 4 px from their trigger's side on a quick-out curve (`--fui-ease-out`, 240 ms) and leave faster (100 ms); dialogs grow from 96 %; panels grow to their height | Menus, popovers, tooltips, dialogs, sheets, accordions |
+| Holding a switch | The thumb stretches while held and springs across | `Switch` |
+| A tick | The check or dot pops in from 60 % | `Checkbox`, `Radio` |
 
 - Continuous motion is reserved for genuine loading indicators, and for a `StatusDot` with `pulse` while something is live or in progress.
 - A page may have one orchestrated moment: `DitherScene` and a large `DitherGem` accept `reveal`, so the storm rolls in or the gem fills with light once on first paint. Never again, and not under reduced motion.

@@ -54,12 +54,14 @@ test("the card caption is a slot in the label voice", () => {
   assert.match(styles, /\.fui-card-caption \{[^}]*font-family: var\(--fui-font-label\)/);
 });
 
-test("plates are square and flat: cards, stats and tables use the plate radius and no resting shadow", () => {
+test("plates are square and rest on the plate elevation, which only the material block paints", () => {
   for (const selector of [".fui-card", ".fui-stat", ".fui-stat-group", ".fui-table-scroll"]) {
     const block = styles.match(new RegExp(`\\n  ${selector.replace(".", "\\.")} \\{([^}]*)\\}`))?.[1] ?? "";
     assert.match(block, /border-radius: var\(--fui-radius-plate\)/, selector);
     assert.doesNotMatch(block, /box-shadow/, selector);
   }
+  const material = styles.slice(styles.indexOf("/* 0.10 material."));
+  assert.match(material, /\.fui-card,\n  \.fui-stat,\n  \.fui-stat-group,\n  \.fui-table-scroll,\n  \.fui-code-panel \{\n    box-shadow: var\(--fui-shadow-sm\), var\(--fui-highlight\);/);
   assert.match(tokens, /--fui-radius-plate: 0;/);
   assert.match(tokens, /--fui-font-label: var\(--fui-font-mono\);/);
 });
@@ -108,4 +110,15 @@ test("data-theme=system carries exactly the dark tokens under prefers-color-sche
   const system = decls(block(tokens.indexOf('  [data-theme="system"] {')));
   assert.ok(dark.length > 60);
   assert.deepEqual(system, dark);
+});
+
+test("material: gradients exist only as the sheen tokens, and every theme defines the recipes", () => {
+  const outsideTokens = styles.replace(/var\(--fui-sheen(-soft)?\)/g, "");
+  const material = styles.slice(styles.indexOf("/* 0.10 material."));
+  assert.doesNotMatch(material.replace(/var\(--fui-sheen(-soft)?\)/g, ""), /gradient\(/);
+  assert.ok(outsideTokens.length > 0);
+  for (const token of ["--fui-shadow-well", "--fui-bevel", "--fui-sheen", "--fui-sheen-soft", "--fui-pressed"]) {
+    assert.ok((tokens.match(new RegExp(`${token}:`, "g")) ?? []).length >= 3, token);
+  }
+  assert.match(tokens, /--fui-focus-halo:/);
 });

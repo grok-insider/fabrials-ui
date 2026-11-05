@@ -97,7 +97,7 @@ Scale tokens: `--fui-text-label` 11, `xs` 12, `sm` 14, `md` 16, `lg` 18, `xl` 20
 ## Surfaces and elevation
 
 - Separate with space and hairlines (`border-border`, 1 px) before adding a border around anything. One panel with dividers, not cards inside cards.
-- Shadows belong to overlays (`--fui-shadow-overlay`). Plates carry none; do not add shadows to page content.
+- Depth comes from the material tokens only (`DESIGN.md` › Material): elevation `--fui-shadow-xs/sm/md/lg`, keys `--fui-bevel` + `--fui-sheen`, raised parts `--fui-highlight` + `--fui-sheen-soft`, wells `--fui-shadow-well`, `--fui-pressed`, `--fui-focus-halo`. Plates rest on `--fui-shadow-sm`; overlays on `-md` and `-lg`. Check: no hand-made `box-shadow` or gradient in product code.
 - Do not box every label and control. A form is fields on a surface, not a card per field.
 
 ## Motion
@@ -139,8 +139,8 @@ The owner rejects the generic AI-generated look. Each rule has a check.
 4. **No cards in cards.** Check: a `Card` or bordered box never contains another bordered box; group with hairlines inside one panel.
 5. **No eyebrow ALL-CAPS labels.** Check: no `uppercase`, no `tracking-wide`/`wider`/`widest`, no small coloured label above a heading. `PageHeader` `eyebrow` is sentence-case context (a period, a source, a breadcrumb) in the label voice and secondary ink.
 6. **No `→` appended to buttons or links.** Check: no `→`, `↗`, `»` or trailing `ArrowRight`/`ArrowUpRight`/`ChevronRight` icons in button or link labels; the label names the destination. Arrows that carry meaning are fine: previous/next pager, back to top, a trend in `Stat`, a disclosure chevron.
-7. **No gradient or glow decoration.** Check: no `bg-gradient-*`, `linear-gradient`/`radial-gradient` backgrounds, gradient text (`bg-clip-text text-transparent`), blurred colour blobs, coloured `drop-shadow` or neon borders. Light appears only as dither. (Skeleton shimmer is a loading indicator, not decoration.)
-8. **Hairline plates.** Check: dividers are 1 px `--border`; plates are square (`--fui-radius-plate`) with a hairline and no shadow; no thick or coloured borders on content.
+7. **No gradient or glow decoration.** Check: no `bg-gradient-*`, `linear-gradient`/`radial-gradient` backgrounds, gradient text (`bg-clip-text text-transparent`), blurred colour blobs, coloured `drop-shadow` or neon borders. Light appears only as dither. The exceptions are the package's material tokens (`--fui-sheen`, `--fui-sheen-soft`) inside controls, and the skeleton shimmer.
+8. **Hairline plates.** Check: dividers are 1 px `--border`; plates are square (`--fui-radius-plate`) with a hairline and the plate elevation; no thick or coloured borders on content.
 9. **One orchestrated motion per page.** Check: at most one `reveal`; no stagger-in lists, hover lifts, floating elements, parallax, looping marquees or text that animates itself. Effects copied from animation libraries (React Bits and similar) are refused: their licences rarely allow a library to redistribute them, and their defaults break these rules; take the idea, write it with the motion tokens.
 10. **Reduced motion respected.** Check: with `prefers-reduced-motion: reduce` nothing moves except state changes; every custom animation has a reduced-motion path.
 11. **Both themes designed.** Check: screenshots of light and dark both read well; no literal `#hex`, `rgb()`, `hsl()` or Tailwind palette colours (`bg-slate-900`, `text-blue-600`) in product code.
