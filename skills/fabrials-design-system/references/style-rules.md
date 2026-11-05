@@ -30,7 +30,8 @@ Rules:
 
 - **Stormlight is the only interaction colour.** It marks focus, links, checked controls, the current navigation item (a 2 px `--fui-bar` bar on the inline-start edge, or on the header hairline for the current link of `AppHeader`) and the first data series. Check: no blue (`--brand*`, `text-blue-*`, `#2…b3`-style literals) on decorative text, icons, headings, backgrounds, borders or illustrations.
 - **Primary is ink.** `Button variant="default"` is ink on paper (paper on ink in dark). `variant="accent"` (Stormlight fill) at most once per view, only when one action must stand out.
-- **Status travels with a word or icon** and uses the status inks, not the gem or Stormlight.
+- **Status travels with a word or icon** and uses the status inks (verdigris, brass, garnet), not the gem or Stormlight.
+- **60, 30, 10.** Page about 60 %, storm-slate layer (plates, sidebar, hover, hairlines) about 30 %, meaningful colour (Stormlight and status) at most 10 %. Check: no stock palette colours (`#22c55e`, `#ef4444`, `#f59e0b` and their Tailwind names) anywhere; status colour never outweighs Stormlight on a screen.
 - **Crem** `#5a5247` exists only inside the storm's dither ramp. Check: it never appears in CSS or components.
 - **Contrast.** Body and control text meet WCAG AA on the real surface in both themes. Hierarchy comes from size, weight and `--muted-foreground`, never from fading essential text further.
 - **Both themes are designed.** Dark is not inverted light: the tokens differ per theme. A product that retints (Radiant's night sky) does it in its global CSS for both themes and records it in its `DESIGN.md`.

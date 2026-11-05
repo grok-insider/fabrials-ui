@@ -46,6 +46,12 @@ The reference pages are the **Fabrials/Instrument** stories (Landing, Workspace,
 - Fixes asked by products: a table region is positioned (hidden cells no longer widen a phone page); a native select in `CollectionToolbar` filters sizes to its options; a `SectionHeader` title is as wide as its text; a non-modal sheet carries `data-modal="false"`; `SectionHeader`'s heading block has the class `fui-section-heading`.
 - `data-theme="system"` on the root follows the operating system with no script (tokens, dither canvases, toasts, the AI syntax inks). `DESIGN.md` has the Tailwind dark variant that covers it.
 
+## Colour family and layout fixes (later on 0.10)
+
+- The storm-slate layer: dark plates `#0d1219`, overlays and wells `#131921`, hairline `#1e252f`, sidebar `#040609`; light page `#f5f7f9`, wells `#ebf0f5`, hairline `#dae0e7`. A cool blue slate one step above the page, after the 60-30-10 split.
+- Status and chart colours come from the gems: verdigris success, brass warning, garnet danger, with chart hues Stormlight, verdigris, brass, garnet, amethyst and steel. Contrast: status inks 6.1:1 or more on a light plate and 8.3:1 or more on a dark one; chart hues 3.4:1 or more on their plate.
+- A `ToggleGroup` is as wide as its items in any parent (it stretched in a grid column); a card with a header or content is a flex column and keeps its `CardFooter` or `CardCaption` on its bottom edge; `CardFooter` has no tinted band.
+
 ## What a host may need to change
 
 - **A host that boxed things itself.** A product CSS rule that gave a `Card` or `Table` its own radius or shadow now fights the plates; delete it.

@@ -1841,8 +1841,14 @@
   }
   .fui-card:has(> [data-slot="card-header"]),
   .fui-card:has(> [data-slot="card-content"]) {
+    display: flex;
+    flex-direction: column;
     padding: 0;
     overflow: hidden;
+  }
+  /* A card stretched by its row (two cards side by side) keeps its footer and caption on its bottom edge. */
+  .fui-card > :is(.fui-card-footer, .fui-card-caption):not(:is(.fui-card-footer, .fui-card-caption) ~ *) {
+    margin-top: auto;
   }
   .fui-card[data-interactive] {
     position: relative;
@@ -1897,7 +1903,6 @@
     min-width: 0;
     padding: var(--fui-space-3) var(--fui-space-5);
     border-top: 1px solid var(--border);
-    background: color-mix(in oklab, var(--muted) 55%, var(--card));
   }
 
   /* ----------------------------------------------------------------- alert */
@@ -2278,6 +2283,9 @@
   }
   .fui-tabs-list[data-variant="segmented"],
   .fui-toggle-group {
+    /* As wide as its items in any parent (a grid or flex column would stretch it and leave an empty track on the right). */
+    inline-size: fit-content;
+    max-inline-size: 100%;
     display: inline-flex;
     flex-wrap: wrap;
     align-items: center;

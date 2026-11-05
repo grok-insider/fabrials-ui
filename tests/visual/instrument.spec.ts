@@ -94,9 +94,9 @@ test("data-theme=system follows the operating system with no class: tokens and t
     document.documentElement.dataset.theme = "system";
   });
   const background = () => page.evaluate(() => getComputedStyle(document.body).getPropertyValue("--background").trim());
-  expect(await background()).toBe("oklch(0.139 0.005 263)");
+  expect(await background()).toBe("oklch(0.139 0.006 262)");
   await page.emulateMedia({ colorScheme: "light" });
-  expect(await background()).toBe("oklch(0.976 0.002 248)");
+  expect(await background()).toBe("oklch(0.975 0.004 250)");
 });
 
 test("a non-modal sheet says so on its popup, and a modal one does not", async ({ page }) => {
@@ -104,4 +104,26 @@ test("a non-modal sheet says so on its popup, and a modal one does not", async (
   await expect(page.getByRole("dialog", { name: "Tools" })).toHaveAttribute("data-modal", "false");
   await page.goto("/iframe.html?id=fabrials-overlays--modal-sheet&viewMode=story&globals=theme:light");
   await expect(page.locator('.fui-dialog[data-modal="false"]')).toHaveCount(0);
+});
+
+test("a toggle group is as wide as its items in a grid column, and a stretched card keeps its footer on its bottom edge", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 960 });
+  await page.goto("/iframe.html?id=fabrials-components--gallery&viewMode=story&globals=theme:dark");
+  for (const name of ["Range", "Theme with labels"]) {
+    const group = page.getByRole("group", { name, exact: true });
+    const widths = await group.evaluate((element) => {
+      const items = [...element.children].filter((child) => child.classList.contains("fui-toggle"));
+      const last = items.at(-1)!.getBoundingClientRect();
+      return { group: element.getBoundingClientRect().right, last: last.right, parent: element.parentElement!.getBoundingClientRect().right };
+    });
+    expect(widths.group - widths.last).toBeLessThan(8);
+    expect(widths.group).toBeLessThan(widths.parent - 40);
+  }
+  const edges = await page.locator(".fui-card-footer", { hasText: "Save routing" }).evaluate((footer) => ({
+    footer: footer.getBoundingClientRect().bottom,
+    card: footer.closest(".fui-card")!.getBoundingClientRect().bottom,
+    background: getComputedStyle(footer).backgroundColor,
+  }));
+  expect(Math.abs(edges.card - edges.footer)).toBeLessThan(2);
+  expect(edges.background).toBe("rgba(0, 0, 0, 0)");
 });

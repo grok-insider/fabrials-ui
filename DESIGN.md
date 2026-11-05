@@ -33,7 +33,8 @@ Deep Stormwall: cold slate taken almost to black in the dark theme and almost to
 | Stormlight fill | `--brand` | `#2a63c4` | `#8fb8f5` |
 
 - **Primary actions are ink**: ink on paper in light mode, paper on ink in dark. Stormlight fills a button only when one action must stand out (`variant="accent"`).
-- **Status has its own inks**: success, warning and danger (`--fui-success-ink`, `--fui-warning-ink`, `--fui-danger-ink`), each with a word or icon beside it.
+- **60, 30, 10.** About 60 % of a screen is the Stormwall page; about 30 % is the storm-slate layer (plates, sidebar, hover, hairlines, secondary ink), a cool blue slate one step above the page; at most 10 % is colour that means something: Stormlight for interaction and the status inks. A screen that is mostly accent, or where status colours outnumber Stormlight, is wrong.
+- **Status inks come from the gems, not the stock palette**: verdigris for success (oxidised emerald, hue 168), heliodor brass for warning (hue 70 to 82), garnet for danger (ruby, hue 24), each at a similar lightness and a restrained chroma, and each with a word or icon beside it (`--fui-success-ink`, `--fui-warning-ink`, `--fui-danger-ink`; fills `--success`, `--warning`, `--destructive`). No Tailwind green, amber or red. Chart hues follow the same family: Stormlight, verdigris, brass, garnet, amethyst, steel.
 - **Crem** `#5a5247`, a warm stone, exists only inside the storm's dither ramp.
 - Contrast is checked on the real surfaces: body and control text meet WCAG AA in both themes.
 
