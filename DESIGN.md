@@ -106,13 +106,28 @@ Three pieces use it, and every product uses them in these places:
 
 ## Motion
 
-Motion answers what a person did: opening, expanding, confirming. Durations are 100, 150 and 240 ms (`--fui-duration-fast`, `--fui-duration`, `--fui-duration-slow`) with a quick-out ease, and all drop to 0 under reduced motion.
+Motion answers what a person did or what the data did, like an instrument responding to its controls: opening, expanding, choosing, confirming, a value arriving. Durations are 100, 150 and 240 ms (`--fui-duration-fast`, `--fui-duration`, `--fui-duration-slow`) with a quick-out ease, and all drop to 0 under reduced motion, where every state still shows at once.
+
+The vocabulary (0.10, "living instrument"), each tied to one cause:
+
+| Cause | Motion | Where |
+| --- | --- | --- |
+| A choice in a single-choice group | The indicator slides to the new item | `ToggleGroup`, `ThemeSwitcher`; the `Tabs` underline |
+| A press | The key goes down 1 px while held | `Button` |
+| A check | The tick is drawn | `Checkbox` |
+| A level changes | The ruler inks its ticks in order and its mark travels | `Meter variant="ruler"`, `Stat meter` |
+| A number changes | The digits roll like an odometer | `NumberTicker` |
+| A reading changes | The characters cycle for 240 ms and settle left to right | `Readout` |
+| Media or data arrives after the view is shown | It appears through a 2 px dither in four steps | `FileThumb`; any host element with `data-fui-reveal="in"` |
+| Busy | A ring of square cells lights in turn (the only motion that loops) | `Spinner`, `Button loading`, `StatePanel` loading, loading toasts |
+| Opening and closing | Overlays fade and scale from their trigger; panels grow to their height | Menus, popovers, dialogs, sheets, accordions |
 
 - Continuous motion is reserved for genuine loading indicators, and for a `StatusDot` with `pulse` while something is live or in progress.
 - A page may have one orchestrated moment: `DitherScene` and a large `DitherGem` accept `reveal`, so the storm rolls in or the gem fills with light once on first paint. Never again, and not under reduced motion.
 - A `TimelineItem` marked `fresh` highlights once when a live item arrives.
 - `MoonPhase` and `Starfield` are the sign-in exception inherited from Radiant; they stop under reduced motion.
-- No enter animations on navigation people repeat all day.
+- Nothing moves on its own, nothing enters in a cascade on load, nothing reacts to scroll, nothing lifts on hover. No enter animations on navigation people repeat all day; a cached image or a value present at first render shows at once.
+- Effects from animation libraries (React Bits and the like) are ideas, not code: their licences rarely allow redistribution in a library, and their defaults (perpetual motion, glow, stagger) break these rules.
 
 ## Loading states
 
@@ -144,7 +159,7 @@ The catalogue lives in Storybook (`bun run storybook`, port 6041) and at ui.fabr
 - **Controls:** Button (`default`, `accent`, `outline`, `secondary`, `ghost`, `destructive`, `link`; sizes `xs` to `lg` and `icon-*`; `loading`), Input, Textarea, Field, Label, Checkbox, Switch, Select, RadioGroup, NativeRadioGroup, ToggleGroup, ThemeSwitcher, MultiSelect, Combobox, IconButton, FileInput, Toolbar, FieldSet.
 - **Overlays:** Dialog, AlertDialog, Sheet, DropdownMenu (with submenus), Tooltip, Popover, StatusPopover, HoverCard, Command (with CommandTrigger), ConfirmDialog (and `useConfirm` for a confirm you can await). They render from `fui-` styles without Tailwind.
 - **Collections:** Table, Tabs (vertical rail, scrolling strip), NavTabs, Item (records as rows), Badge, Progress, Skeleton, Card, Accordion (rows for a stack of tools), Disclosure, Breadcrumb, Pagination, DescriptionList, Kbd and KbdGroup.
-- **Data:** Stat (with `meter`), StatGroup, Sparkline, Meter (`variant="ruler"`), StatusDot, NumberTicker, SeriesChart, ActivityStrip, Timeline, RelativeTime.
+- **Data:** Stat (with `meter`), StatGroup, Sparkline (scanline fill), Meter (`variant="ruler"`; threshold notches on the bar), StatusDot, Readout, NumberTicker, SeriesChart, ActivityStrip, Timeline, RelativeTime.
 - **Docs pieces:** CodePanel, CodeTabs, PackageInstall, Files/Folder/File and RepoInfo. Syntax uses the muted `--fui-syntax-*` inks, never Stormlight.
 - **Brand and chrome:** CornerMarks, GridGuides, CardCaption, DitherScene, DitherBand, DitherGem, DitherCanvas, ProductLockup, FabrialsGem, Avatar, Snippet, CopyButton, SiteHeader, AuthLayout, MoonPhase, Starfield.
 - **Patterns:** WorkspaceShell, AppHeader, Sidebar (menu rows work without a shell), NavSwitcher, ResizablePanelGroup, PageHeader, SectionHeader, CollectionToolbar, BulkActions, StatePanel, SettingsSection, FilterChip, FileThumb, SuggestionCard, TruncatedText, ShimmerText.
@@ -179,6 +194,19 @@ Import once, in this order, and set the theme and gem on the root element:
 Shared styles use the `fui-` prefix in the `components` cascade layer and work without Tailwind. Host overrides come after them and express a documented product requirement, not a restyle of an equivalent control. A product that retints tokens (Radiant's night sky) does it in its global CSS for both themes and records it in its own `DESIGN.md`. Do not read `localStorage` or browser globals while rendering shared components.
 
 Fabrials products consume a verified copy (`bun run vendor <product> --write`), never edited by hand. Other apps install from the registry.
+
+Serve `fonts.css` and the font files as files. A bundler that inlines small assets (Bun 1.4 inlines anything under 128 KB as base64) puts all 39 faces into the stylesheet and defeats `unicode-range`; copy `dist/fonts` and link `fonts.css` instead (Palanaeum does).
+
+For a system theme with no script, set `data-theme="system"` on the root (and no `.dark` class): tokens, dither canvases and toasts follow `prefers-color-scheme`. A Tailwind host covers it in its dark variant:
+
+```css
+@custom-variant dark {
+  &:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) { @slot; }
+  @media (prefers-color-scheme: dark) {
+    &:where([data-theme="system"], [data-theme="system"] *) { @slot; }
+  }
+}
+```
 
 ## The registry and other libraries
 

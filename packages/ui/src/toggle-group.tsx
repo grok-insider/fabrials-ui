@@ -38,20 +38,23 @@ function useSlidingIndicator(ref?: Ref<HTMLDivElement>) {
       group.style.setProperty("--fui-toggle-h", `${item.offsetHeight}px`);
       if (group.dataset.indicator === undefined) {
         group.dataset.indicator = "";
-        frame = requestAnimationFrame(() => {
+        const ready = () => {
           group.dataset.indicator = "ready";
-        });
+        };
+        if (typeof requestAnimationFrame === "function") frame = requestAnimationFrame(ready);
+        else ready();
       }
     };
     place();
     const mutations = new MutationObserver(place);
     mutations.observe(group, { subtree: true, attributes: true, attributeFilter: ["data-pressed"], childList: true });
-    const sizes = new ResizeObserver(place);
-    sizes.observe(group);
+    // Test environments (jsdom) and old engines have no ResizeObserver: the indicator then follows choices, not resizes.
+    const sizes = typeof ResizeObserver === "function" ? new ResizeObserver(place) : null;
+    sizes?.observe(group);
     return () => {
-      cancelAnimationFrame(frame);
+      if (frame) cancelAnimationFrame(frame);
       mutations.disconnect();
-      sizes.disconnect();
+      sizes?.disconnect();
     };
   }, []);
   return setNode;

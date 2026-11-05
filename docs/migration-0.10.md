@@ -33,12 +33,26 @@ All text keeps WCAG AA in both themes: body 16.5:1 dark and 17.6:1 light, second
 
 The reference pages are the **Fabrials/Instrument** stories (Landing, Workspace, Pieces).
 
+## Motion, details and fixes
+
+0.10 also gives the components a living-instrument motion and a detail pass (see `DESIGN.md` › Motion):
+
+- `Spinner`, `Button loading`, the `StatePanel` loading icon and loading toasts draw a ring of square cells (it was a rotating arc). `Spinner` keeps its props and `role="status"`.
+- A single-choice `ToggleGroup` (and `ThemeSwitcher`) keeps one indicator that slides to the pressed item; it sets `--fui-toggle-x/y/w/h` on the group. A multiple group keeps per-item fills.
+- `Checkbox` draws its check; a ruler `Meter` inks its ticks in order; `Button` goes down 1 px while pressed.
+- `Readout` (new): a mono reading that settles when its value changes; assistive technology reads the final text.
+- A `FileThumb` image that arrives after mount appears through a 2 px dither. Hosts can do the same on their own media with `data-fui-reveal="pending"` at mount and `"in"` on load.
+- Details: square meter and progress tracks with threshold notches on an automatic meter; scanline sparklines; alerts and toasts are neutral plates with a 2 px tone bar; keycaps in mono; page numbers in mono with a Stormlight underline; a mono slash between breadcrumbs (pass `children` to `BreadcrumbSeparator` for the old chevron); square timeline markers, tab indicator, code panels, state panels, carousel controls and scroll thumbs.
+- Fixes asked by products: a table region is positioned (hidden cells no longer widen a phone page); a native select in `CollectionToolbar` filters sizes to its options; a `SectionHeader` title is as wide as its text; a non-modal sheet carries `data-modal="false"`; `SectionHeader`'s heading block has the class `fui-section-heading`.
+- `data-theme="system"` on the root follows the operating system with no script (tokens, dither canvases, toasts, the AI syntax inks). `DESIGN.md` has the Tailwind dark variant that covers it.
+
 ## What a host may need to change
 
 - **A host that boxed things itself.** A product CSS rule that gave a `Card` or `Table` its own radius or shadow now fights the plates; delete it.
 - **A chart whose colours mean something.** Pass `color` on those series (they stay solid), or `texture="solid"` to keep 0.9's hues for the whole chart.
 - **A product that retints the neutrals** (Radiant's night sky) keeps its own values; check its dark theme against the new card and hairline, which are darker.
 - **Literal Stormwall colours in a host** (`#161a21`, `#1e232c`, `#eceeeb`), usually in a dither ramp or an `<meta name="theme-color">`, should move to `#08090b`, `#0e1014` and `#f6f7f8`.
+- **Hosts that worked around the fixed gaps** can delete their rules: Palanaeum's `.fui-filters > .fui-native-select` and `.fui-table-scroll { position: relative }`, Open Email's `inline-size: fit-content` on section titles and its class check for non-modal sheets (`[data-modal="false"]`).
 - **Visual references** of every screen with cards, stats, tables or charts change; review them, they are expected.
 
 ## Going back

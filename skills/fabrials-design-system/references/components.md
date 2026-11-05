@@ -74,7 +74,7 @@ import { ChatMessage, ChatComposer } from "@fabrials/ai-ui";         // needs @f
 | `FileInput` (`label`, `onFilesChange`, `fileName`, `onClear`, `description`, `error`) | A file picker that is a button; the browser's "Choose File" is never shown |
 | `FieldSet`, `FieldLegend`, `FieldGroup` | Grouped fields on a real fieldset; a legend styled as a subsection title with a hairline above; `layout="columns"` reflows by container |
 | `RadioGroup` + `RadioGroupItem` (or `Radio`) | One visible choice inside a form |
-| `ToggleGroup` + `ToggleGroupItem` (`size` `sm`, `default`, `lg`) | A segmented view or range next to what it changes; 44 px hit area on touch (`size="lg"` paints the whole height) |
+| `ToggleGroup` + `ToggleGroupItem` (`size` `sm`, `default`, `lg`) | A segmented view or range next to what it changes; 44 px hit area on touch (`size="lg"` paints the whole height). A single-choice group slides one indicator to the pressed item |
 | `ThemeSwitcher` (`size`) | System, light or dark; the host stores the choice and sets the root class |
 | `MultiSelect` | Several values, for filters |
 | `Combobox` | A text field filtering known values |
@@ -170,7 +170,7 @@ Triggers take `render` to become a Fabrials button: `<DialogTrigger render={<But
 
 | Component | Use for |
 | --- | --- |
-| `Spinner` | An indeterminate wait, with text saying what is happening |
+| `Spinner` | An indeterminate wait, with text saying what is happening; drawn as a ring of square cells that light in turn |
 | `ShimmerText` | A short pending label (plain text under reduced motion) |
 | `Toaster`, `toast` | A completed action; mount `Toaster` once |
 | `Snippet`, `CopyButton` | Commands with copy; long lines wrap with a hanging indent |
@@ -184,6 +184,7 @@ Triggers take `render` to become a Fabrials button: `<DialogTrigger render={<But
 | `SeriesChart` | Bar or line charts over one series contract, with a legend and an accessible table (`caption` required, and the plot's accessible name); the plot is a tab stop with a visible 2 px ring and the arrows move the tooltip. Bars are dithered by default (Stormlight, then ink at half and a quarter); `color` on a series or `texture="solid"` keeps hues |
 | `Sparkline` | Shape only, next to its number |
 | `Meter` | A level that stays (quota, budget); warns at 75 % and 90 % by default. `variant="ruler"`: a scale of ticks inked to the value with a Stormlight mark (`ticks`, 40) |
+| `Readout` | A reading in the label voice (sync time, version, peak, id) that settles when its `value` changes; reads the final text to assistive technology |
 | `StatusDot` | A state as a dot and a word; `pulse` only while something is live or in progress |
 | `ActivityStrip`, `activityLevel` | Intensity cells (posts per day or hour) |
 | `Timeline`, `TimelineItem` | An event feed, newest first; `fresh` highlights a new item once |

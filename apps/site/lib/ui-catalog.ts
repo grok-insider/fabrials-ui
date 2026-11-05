@@ -1309,6 +1309,17 @@ export const uiCatalog: UiCatalogItem[] = [
     "Shape only; put the number next to it.",
   ),
   ui(
+    "readout",
+    "Readout",
+    "Metrics",
+    "A reading in the label voice that settles when it changes.",
+    ["Readout"],
+    [
+      ["value", "string", "The reading: a sync time, a version, a peak, an identifier."],
+    ],
+    "The characters cycle for 240 ms and settle left to right when value changes; the first render and reduced motion show it at once. Assistive technology reads the final text; it is not a live region.",
+  ),
+  ui(
     "meter",
     "Meter",
     "Metrics",
@@ -1317,7 +1328,7 @@ export const uiCatalog: UiCatalogItem[] = [
     [
       ["value / min / max", "number", "The measurement."],
       ["label / hint", "ReactNode", "What it measures and when it resets."],
-      ["warnAt / dangerAt", "number", "Percent thresholds for the warning and danger inks."],
+      ["warnAt / dangerAt", "number", "Percent thresholds for the warning and danger inks; an automatic bar shows them as notches."],
       ["variant", '"bar" | "ruler"', "A filled track, or a scale of ticks inked up to the value with a Stormlight mark."],
       ["ticks", "number", "Ticks on the ruler (40)."],
     ],

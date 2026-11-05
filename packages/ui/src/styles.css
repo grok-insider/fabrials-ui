@@ -1643,8 +1643,6 @@
     padding: var(--fui-space-4) var(--fui-space-5);
     overflow-y: auto;
     overscroll-behavior: contain;
-    /* A focused field scrolls into view with room above and below it (WebKit reveals the text line, not the box). */
-    scroll-padding-block: var(--fui-space-6);
   }
   /* A body that scrolls and is a tab stop draws its ring inside: the dialog clips whatever is outside it. */
   .fui-dialog-body:focus-visible {

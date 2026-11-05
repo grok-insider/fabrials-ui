@@ -102,9 +102,9 @@ Scale tokens: `--fui-text-label` 11, `xs` 12, `sm` 14, `md` 16, `lg` 18, `xl` 20
 ## Motion
 
 - Durations `--fui-duration-fast` 100 ms, `--fui-duration` 150 ms, `--fui-duration-slow` 240 ms; ease `--fui-ease`. All become 0 under `prefers-reduced-motion: reduce`.
-- Motion answers what a person did: opening, expanding, confirming. No enter animations on navigation people repeat all day; no scroll-triggered reveals.
+- Motion answers what a person did or what the data did: opening, expanding, choosing (a sliding segment), pressing (1 px down), checking (a drawn tick), a level or number or reading changing (a sweeping ruler, rolling digits, a settling `Readout`), media arriving after the view (`data-fui-reveal`). No enter animations on navigation people repeat all day; no scroll-triggered reveals, no stagger, no hover lifts.
 - One orchestrated moment per page at most: `DitherScene` `reveal` (on by default) or a large `DitherGem` `reveal`. Painted once; never again on that page.
-- Continuous motion only for real loading: `Spinner`, the `Loading` pulse, `Skeleton` shimmer, `ShimmerText`, `Button loading`. `StatusDot pulse` only while something is live or in progress. `MoonPhase` and `Starfield` only on sign-in and landing.
+- Continuous motion only for real loading: `Spinner` (the pixel ring), the `Loading` pulse, `Skeleton` shimmer, `ShimmerText`, `Button loading`. `StatusDot pulse` only while something is live or in progress. `MoonPhase` and `Starfield` only on sign-in and landing.
 - Custom keyframes sit inside `@media (prefers-reduced-motion: no-preference)` or stop under `reduce`.
 
 ## Dithering
@@ -140,7 +140,7 @@ The owner rejects the generic AI-generated look. Each rule has a check.
 6. **No `→` appended to buttons or links.** Check: no `→`, `↗`, `»` or trailing `ArrowRight`/`ArrowUpRight`/`ChevronRight` icons in button or link labels; the label names the destination. Arrows that carry meaning are fine: previous/next pager, back to top, a trend in `Stat`, a disclosure chevron.
 7. **No gradient or glow decoration.** Check: no `bg-gradient-*`, `linear-gradient`/`radial-gradient` backgrounds, gradient text (`bg-clip-text text-transparent`), blurred colour blobs, coloured `drop-shadow` or neon borders. Light appears only as dither. (Skeleton shimmer is a loading indicator, not decoration.)
 8. **Hairline plates.** Check: dividers are 1 px `--border`; plates are square (`--fui-radius-plate`) with a hairline and no shadow; no thick or coloured borders on content.
-9. **One orchestrated motion per page.** Check: at most one `reveal`; no stagger-in lists, hover lifts, floating elements, parallax or looping marquees.
+9. **One orchestrated motion per page.** Check: at most one `reveal`; no stagger-in lists, hover lifts, floating elements, parallax, looping marquees or text that animates itself. Effects copied from animation libraries (React Bits and similar) are refused: their licences rarely allow a library to redistribute them, and their defaults break these rules; take the idea, write it with the motion tokens.
 10. **Reduced motion respected.** Check: with `prefers-reduced-motion: reduce` nothing moves except state changes; every custom animation has a reduced-motion path.
 11. **Both themes designed.** Check: screenshots of light and dark both read well; no literal `#hex`, `rgb()`, `hsl()` or Tailwind palette colours (`bg-slate-900`, `text-blue-600`) in product code.
 12. **Crisp corners.** Check: radii only from the table above.

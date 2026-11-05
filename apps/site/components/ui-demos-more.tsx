@@ -86,6 +86,7 @@ import {
   DitherBand,
   DitherCanvas,
   CornerMarks,
+  Readout,
   DitherGem,
   DitherScene,
   GridGuides,
@@ -371,6 +372,23 @@ function LoadingDemo() {
   );
 }
 
+function ReadoutDemo() {
+  const times = ["14:32 UTC", "14:47 UTC", "15:02 UTC"];
+  const [step, setStep] = useState(0);
+  return (
+    <Frame>
+      <div className="flex flex-wrap items-center gap-4">
+        <Button variant="outline" size="sm" onClick={() => setStep((n) => n + 1)}>
+          Sync now
+        </Button>
+        <span className="font-label text-[11px] text-muted-foreground">
+          Last sync <Readout value={times[step % times.length]!} />
+        </span>
+      </div>
+    </Frame>
+  );
+}
+
 export const moreDemos: Record<string, () => ReactNode> = {
   loading: () => <LoadingDemo />,
   "code-panel": () => (
@@ -450,6 +468,7 @@ export const moreDemos: Record<string, () => ReactNode> = {
       </div>
     </div>
   ),
+  readout: () => <ReadoutDemo />,
   "corner-marks": () => (
     <Frame>
       <CornerMarks className="w-full max-w-md">

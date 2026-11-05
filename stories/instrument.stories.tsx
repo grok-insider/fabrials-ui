@@ -386,7 +386,7 @@ function Motion() {
           Last sync <Readout value={readings[step % 3]!} />
         </span>
       </div>
-      <Meter variant="ruler" label="Quota" value={level} />
+      <Meter variant="ruler" label="Weekly quota" value={level} />
       <ToggleGroup aria-label="Range" value={[range]} onValueChange={(next) => next[0] && setRange(String(next[0]))}>
         <ToggleGroupItem value="24h">24 h</ToggleGroupItem>
         <ToggleGroupItem value="7d">7 days</ToggleGroupItem>
