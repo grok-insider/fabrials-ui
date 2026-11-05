@@ -444,3 +444,12 @@ select {
   padding: 0;
   list-style: none;
 }
+.catalogue-aspect {
+  display: grid;
+  place-items: center;
+  border-radius: var(--fui-radius-md);
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-family: var(--fui-font-label);
+  font-size: var(--fui-text-label);
+}

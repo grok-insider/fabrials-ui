@@ -3,8 +3,14 @@
 // Previews for the components added in 0.10 "Instrument". Synthetic data only.
 import { useState, type ReactNode } from "react";
 import {
+  AspectRatio,
   Avatar,
+  AvatarBadge,
   AvatarFallback,
+  AvatarGroup,
+  Image,
+  ImageViewer,
+  MediaGrid,
   avatarInitials,
   Button,
   Calendar,
@@ -180,7 +186,61 @@ function DropzoneDemo() {
   );
 }
 
+// Synthetic pictures: SVG scenes, so the previews need no network and their size is what the viewer zooms to.
+function scene(width: number, height: number, top: string, bottom: string, sun: string) {
+  const horizon = Math.round(height * 0.62);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><defs><linearGradient id="s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${top}"/><stop offset="1" stop-color="${bottom}"/></linearGradient></defs><rect width="${width}" height="${height}" fill="url(#s)"/><circle cx="${width * 0.72}" cy="${height * 0.3}" r="${Math.min(width, height) * 0.09}" fill="${sun}"/><path d="M0 ${horizon} C ${width * 0.3} ${horizon - 50} ${width * 0.6} ${horizon + 40} ${width} ${horizon - 10} V ${height} H 0 Z" fill="${top}"/></svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}
+
+const SCENES = [
+  { src: scene(2400, 1500, "#0d1b2e", "#3d6e9c", "#e9d8a6"), alt: "A harbour at dusk" },
+  { src: scene(1200, 1800, "#1b2a22", "#6f9a7c", "#f1e6c8"), alt: "Orchard terraces" },
+  { src: scene(1600, 1600, "#2a1b26", "#9c6f86", "#f4d8c4"), alt: "A quarry lake" },
+  { src: scene(3000, 1000, "#121826", "#5a6b8a", "#dfe6f2"), alt: "The field office" },
+  { src: scene(2000, 1300, "#1e1a12", "#a08a5a", "#f6ecd2"), alt: "The yard at first light" },
+];
+
+function GalleryDemo({ count }: { count: number }) {
+  const [index, setIndex] = useState<number | null>(null);
+  const items = SCENES.slice(0, count);
+  return (
+    <Frame>
+      <MediaGrid items={items} onOpen={setIndex} />
+      <ImageViewer items={items} index={index} onIndexChange={setIndex} onClose={() => setIndex(null)} label="Photos" />
+    </Frame>
+  );
+}
+
 export const instrumentDemos: Record<string, () => ReactNode> = {
+  "avatar-group": () => (
+    <Frame>
+      <div className="flex flex-wrap items-center gap-6">
+        <AvatarGroup max={3}>
+          {PEOPLE.map((person) => (
+            <Avatar key={person.id}>
+              <AvatarFallback>{avatarInitials(person.name)}</AvatarFallback>
+            </Avatar>
+          ))}
+        </AvatarGroup>
+        <Avatar size="lg">
+          <AvatarFallback>KN</AvatarFallback>
+          <AvatarBadge tone="success" label="Online" />
+        </Avatar>
+        <span className="text-sm">Kai Nakamura · Online</span>
+      </div>
+    </Frame>
+  ),
+  image: () => (
+    <Frame>
+      <Image src={SCENES[0]!.src} alt={SCENES[0]!.alt} ratio="16 / 9" caption="The harbour at dusk. Synthetic." />
+      <AspectRatio ratio={3} className="grid place-items-center rounded-md bg-muted font-mono text-xs text-muted-foreground">
+        3 / 1
+      </AspectRatio>
+    </Frame>
+  ),
+  "media-grid": () => <GalleryDemo count={5} />,
+  "image-viewer": () => <GalleryDemo count={3} />,
   "list-box": () => <ListBoxDemo />,
   "virtual-list": () => (
     <Frame>

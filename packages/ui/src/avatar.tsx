@@ -1,13 +1,16 @@
 "use client";
 
+import { Children, isValidElement, type ComponentProps, type ReactElement, type ReactNode } from "react";
 import { Avatar as BaseAvatar } from "@base-ui/react/avatar";
 import { classes, type StyledProps } from "./shared";
+
+export type AvatarSize = "xs" | "sm" | "md" | "lg" | "xl";
 
 export function Avatar({
   className,
   size = "md",
   ...props
-}: StyledProps<BaseAvatar.Root.Props> & { size?: "sm" | "md" | "lg" }) {
+}: StyledProps<BaseAvatar.Root.Props> & { size?: AvatarSize }) {
   return (
     <BaseAvatar.Root
       data-slot="avatar"
@@ -66,4 +69,60 @@ export function avatarInitials(value: string, fallback = "?", locale?: string): 
       ? [firstGrapheme(words[0]), firstGrapheme(words[words.length - 1])]
       : [firstGrapheme(words[0])];
   return letters.join("").toLocaleUpperCase(locale) || fallback;
+}
+
+/**
+ * A dot on the avatar's edge: presence, or a small count. `tone` picks the status ink; `label` says it to assistive
+ * technology (a dot alone is never the only signal: write the status next to the name too).
+ */
+export function AvatarBadge({
+  tone = "success",
+  label,
+  className,
+  children,
+  ...props
+}: ComponentProps<"span"> & { tone?: "success" | "warning" | "danger" | "neutral" | "info"; label?: string }) {
+  return (
+    <span
+      data-slot="avatar-badge"
+      data-tone={tone}
+      className={classes("fui-avatar-badge", className)}
+      {...(label ? { role: "img", "aria-label": label } : { "aria-hidden": children ? undefined : true })}
+      {...props}
+    >
+      {children}
+    </span>
+  );
+}
+
+/** "+3" at the end of a group: the people not drawn. */
+export function AvatarGroupCount({ className, ...props }: ComponentProps<"span">) {
+  return <span data-slot="avatar-group-count" className={classes("fui-avatar", "fui-avatar-group-count", className)} {...props} />;
+}
+
+/**
+ * Avatars that overlap, each ringed in the page colour. With `max`, the rest become a count ("+3", named in full by
+ * `countLabel`). Put the names somewhere readable: a group of faces is not a list of people.
+ */
+export function AvatarGroup({
+  max,
+  size,
+  countLabel = (hidden) => `${hidden} more`,
+  className,
+  children,
+  ...props
+}: ComponentProps<"div"> & { max?: number; size?: AvatarSize; countLabel?: (hidden: number) => string }) {
+  const all = Children.toArray(children).filter((child): child is ReactElement => isValidElement(child));
+  const shown = max !== undefined && all.length > max ? all.slice(0, Math.max(1, max)) : all;
+  const hidden = all.length - shown.length;
+  return (
+    <div data-slot="avatar-group" data-size={size} className={classes("fui-avatar-group", className)} {...props}>
+      {shown as ReactNode}
+      {hidden > 0 ? (
+        <AvatarGroupCount data-size={size} aria-label={countLabel(hidden)} role="img">
+          +{hidden}
+        </AvatarGroupCount>
+      ) : null}
+    </div>
+  );
 }

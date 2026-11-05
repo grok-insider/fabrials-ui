@@ -36,6 +36,23 @@ export const shimIndex: { name: string; exports: string[] }[] = [
     ]
   },
   {
+    "name": "aspect-ratio",
+    "exports": [
+      "AspectRatio"
+    ]
+  },
+  {
+    "name": "avatar",
+    "exports": [
+      "Avatar",
+      "AvatarBadge",
+      "AvatarFallback",
+      "AvatarGroup",
+      "AvatarGroupCount",
+      "AvatarImage"
+    ]
+  },
+  {
     "name": "breadcrumb",
     "exports": [
       "Breadcrumb",

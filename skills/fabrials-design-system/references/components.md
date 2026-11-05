@@ -59,6 +59,9 @@ import { ChatMessage, ChatComposer } from "@fabrials/ai-ui";         // needs @f
 | The detail of the chosen row beside the list | `SidePanel` (resizable, a sheet below `sheetBelow`) | A `Card` in a grid column, a dialog for a detail that should stay visible |
 | The actions of a row at the pointer | `ContextMenu` + the same actions in a visible menu or toolbar | A right-click as the only way to reach an action |
 | Files dropped or chosen | `Dropzone` (`accept`, `maxSize`, `onFilesRejected`) | `react-dropzone`, a `div` that only listens to drops |
+| A picture in the page | `Image` (`ratio`, `fit`, `caption`) or `AspectRatio` for other content | A bare `img` that jumps when it loads and leaves a broken icon |
+| The pictures of a post or a message | `MediaGrid` + `ImageViewer` | A grid of identical cards, a lightbox library |
+| People on a record | `AvatarGroup max` (+N), `AvatarBadge` for presence, the names beside it | A row of faces with no names, a coloured ring as the only status |
 | A form with subsections | `FieldSet` + `FieldLegend` + `FieldGroup` | A bordered box per subsection, a `div` with a bold label |
 | Show or hide detail in place, with no state | `Disclosure` (native `details`) | A hand-styled `details`, an `Accordion` for one block |
 | A destructive confirmation | `AlertDialog`, or `ConfirmDialog` for an async action, or `useConfirm()` to `await` one | `window.confirm` in a flow that can wait (a guard that must answer synchronously keeps it) |

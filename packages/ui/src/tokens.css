@@ -162,6 +162,11 @@
   --fui-shadow-lg: 0 2px 6px -2px oklch(0.2 0.02 258 / 8%), 0 12px 60px oklch(0.2 0.02 258 / 14%), 0 12px 32px -16px oklch(0.2 0.02 258 / 20%);
   --fui-shadow-overlay: var(--fui-shadow-md);
 
+  /* Media: scrims over photos and the viewer's backdrop. Photos do not change with the theme, so neither do these. */
+  --fui-media-scrim: oklch(0.13 0.01 260 / 62%);
+  --fui-media-scrim-strong: oklch(0.13 0.01 260 / 74%);
+  --fui-media-ink: oklch(0.985 0.002 250);
+  --fui-viewer-backdrop: oklch(0.11 0.006 262 / 94%);
   /* 0.10 material: sunken fields, a bevel and a sheen on solid fills. Depth recipes adapted from Radix Themes (MIT). */
   --fui-shadow-well: inset 0 1.5px 2px 0 oklch(0.2 0.02 258 / 7%), inset 0 0.5px 1px oklch(0.2 0.02 258 / 6%);
   --fui-bevel: inset 0 1px 0 oklch(1 0 0 / 16%), inset 0 -1px 0 oklch(0 0 0 / 24%);
