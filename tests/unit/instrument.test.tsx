@@ -92,3 +92,20 @@ test("chart series default to dither: Stormlight first, then ink, and solid hues
   assert.doesNotMatch(solid, /fui-dither-/);
   assert.match(solid, /background:var\(--chart-1\)/);
 });
+
+test("data-theme=system carries exactly the dark tokens under prefers-color-scheme: dark (L6)", () => {
+  const block = (from: number) => {
+    const open = tokens.indexOf("{", from);
+    let depth = 0;
+    for (let i = open; i < tokens.length; i++) {
+      if (tokens[i] === "{") depth++;
+      else if (tokens[i] === "}" && --depth === 0) return tokens.slice(open + 1, i);
+    }
+    return "";
+  };
+  const decls = (body: string) => body.split("\n").map((line) => line.trim()).filter((line) => line.startsWith("--") || line.startsWith("color-scheme"));
+  const dark = decls(block(tokens.indexOf('.dark,\n[data-theme="dark"]')));
+  const system = decls(block(tokens.indexOf('  [data-theme="system"] {')));
+  assert.ok(dark.length > 60);
+  assert.deepEqual(system, dark);
+});

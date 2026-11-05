@@ -390,6 +390,7 @@ export function SheetContent({
       {...props}
       ref={setPopup}
       data-side={side}
+      data-modal={sheet?.modal === false ? "false" : undefined}
       backdrop={sheet?.modal ?? true}
       placement={side === "left" || side === "start" ? "start" : "end"}
     />

@@ -4,6 +4,7 @@ import { useEffect, useRef, useSyncExternalStore, type CSSProperties } from "rea
 import { hexToRgb, paintField, paintRampField, seeded, type BrightnessField, type Rgb } from "./dither";
 import { DITHER_BACKGROUND } from "./dither-presets";
 import { classes } from "./shared";
+import { documentTheme, subscribeDocumentTheme, themeOf } from "./theme";
 
 export type DitherTheme = "light" | "dark";
 
@@ -46,16 +47,6 @@ export type DitherCanvasProps = {
   style?: CSSProperties;
 };
 
-function readTheme(): DitherTheme {
-  const root = document.documentElement;
-  return root.classList.contains("dark") || root.dataset.theme === "dark" ? "dark" : "light";
-}
-
-/** The theme where the canvas sits: a `.dark` subtree (e.g. an always-dark sign-in scene) wins over the root. */
-function themeOf(element: Element): DitherTheme {
-  return element.closest('.dark, [data-theme="dark"]') ? "dark" : element.closest('[data-theme="light"]') ? "light" : readTheme();
-}
-
 /** Any CSS colour (oklch, var-substituted) as RGB, read back from a 1×1 canvas. */
 function cssColor(value: string): Rgb | undefined {
   const probe = document.createElement("canvas").getContext("2d", { willReadFrequently: true });
@@ -76,16 +67,11 @@ function resolveRamp(canvas: HTMLCanvasElement, colors: string[]): Rgb[] {
   });
 }
 
-function subscribeTheme(onChange: () => void) {
-  const observer = new MutationObserver(onChange);
-  observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class", "data-theme"] });
-  return () => observer.disconnect();
-}
-
 /**
  * A decorative ordered-dither background painted on a canvas: the host
  * supplies a brightness field and a colour ramp per theme (the nearest
- * `.dark`/`data-theme` ancestor decides, then the document root). Painted
+ * `.dark`, `.light` or `data-theme` ancestor decides; `data-theme="system"`
+ * follows the operating system). Painted
  * once, and again only when its size, the theme or `paintKey` change. There
  * is no animation loop. The parent must be positioned and isolated
  * (`position: relative; isolation: isolate`) unless `fixed` is set.
@@ -93,7 +79,7 @@ function subscribeTheme(onChange: () => void) {
 export function DitherCanvas({ ramp, field, cell = 2, order = "brightness", reveal, stars, fixed = false, paintKey, className, style }: DitherCanvasProps) {
   const ref = useRef<HTMLCanvasElement>(null);
   const fieldRef = useRef(field);
-  const theme = useSyncExternalStore(subscribeTheme, readTheme, () => "dark" as DitherTheme);
+  const theme = useSyncExternalStore(subscribeDocumentTheme, documentTheme, () => "dark" as DitherTheme);
   const rampKey = JSON.stringify(ramp);
   const starsKey = JSON.stringify(stars ?? null);
 

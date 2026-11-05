@@ -81,7 +81,7 @@ export function SectionHeader({
   const Heading = `h${headingLevel}` as "h2";
   return (
     <header className={classes("fui-section-header", className)}>
-      <div>
+      <div className="fui-section-heading">
         {aside || aside === 0 ? (
           <div className="fui-section-heading-row">
             <Heading {...headingProps} ref={headingRef} className="fui-section-title">

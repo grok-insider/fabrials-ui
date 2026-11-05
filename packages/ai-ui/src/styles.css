@@ -317,6 +317,15 @@
     --fui-syntax-function: oklch(0.8 0.1 245);
     --fui-syntax-type: oklch(0.8 0.08 200);
   }
+  @media (prefers-color-scheme: dark) {
+    [data-theme="system"] :where(.fui-markdown, .fui-code-block) {
+      --fui-syntax-keyword: oklch(0.78 0.12 305);
+      --fui-syntax-string: oklch(0.8 0.12 150);
+      --fui-syntax-number: oklch(0.8 0.12 60);
+      --fui-syntax-function: oklch(0.8 0.1 245);
+      --fui-syntax-type: oklch(0.8 0.08 200);
+    }
+  }
 
   .fui-markdown {
     min-width: 0;
@@ -605,6 +614,11 @@
   }
   :is(.dark, [data-theme="dark"]) .fui-markdown [data-streamdown="code-block-body"] code > span > span {
     color: var(--shiki-dark, var(--sdm-c, inherit));
+  }
+  @media (prefers-color-scheme: dark) {
+    [data-theme="system"] .fui-markdown [data-streamdown="code-block-body"] code > span > span {
+      color: var(--shiki-dark, var(--sdm-c, inherit));
+    }
   }
   .fui-code-block[data-line-numbers] code > span::before {
     content: counter(fui-code-line);

@@ -1,7 +1,8 @@
 "use client";
 // Origin: shadcn/ui sonner wrapper, copied 2026-09-22. Restyled with fui- tokens in 0.4.
 
-import { useEffect, useState, type CSSProperties } from "react";
+import { useSyncExternalStore, type CSSProperties } from "react";
+import { documentTheme, subscribeDocumentTheme } from "./theme";
 import { Toaster as Sonner, type ToasterProps } from "sonner";
 import {
   CircleCheckIcon,
@@ -12,24 +13,7 @@ import {
 } from "lucide-react";
 
 function useDocumentTheme(): "light" | "dark" {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
-  useEffect(() => {
-    const root = document.documentElement;
-    const read = () =>
-      setTheme(
-        root.classList.contains("dark") || root.dataset.theme === "dark"
-          ? "dark"
-          : "light",
-      );
-    read();
-    const observer = new MutationObserver(read);
-    observer.observe(root, {
-      attributes: true,
-      attributeFilter: ["class", "data-theme"],
-    });
-    return () => observer.disconnect();
-  }, []);
-  return theme;
+  return useSyncExternalStore(subscribeDocumentTheme, documentTheme, () => "light");
 }
 
 export function Toaster({
