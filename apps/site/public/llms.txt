@@ -68,6 +68,7 @@ Namespace: add "registries": { "@fabrials": "https://ui.fabrials.com/r/{name}.js
 - hover-card: npx shadcn@latest add https://ui.fabrials.com/r/hover-card.json
 - input: npx shadcn@latest add https://ui.fabrials.com/r/input.json
 - input-group: npx shadcn@latest add https://ui.fabrials.com/r/input-group.json
+- input-otp: npx shadcn@latest add https://ui.fabrials.com/r/input-otp.json
 - item: npx shadcn@latest add https://ui.fabrials.com/r/item.json
 - kbd: npx shadcn@latest add https://ui.fabrials.com/r/kbd.json
 - label: npx shadcn@latest add https://ui.fabrials.com/r/label.json
@@ -83,6 +84,7 @@ Namespace: add "registries": { "@fabrials": "https://ui.fabrials.com/r/{name}.js
 - sheet: npx shadcn@latest add https://ui.fabrials.com/r/sheet.json
 - sidebar: npx shadcn@latest add https://ui.fabrials.com/r/sidebar.json
 - skeleton: npx shadcn@latest add https://ui.fabrials.com/r/skeleton.json
+- slider: npx shadcn@latest add https://ui.fabrials.com/r/slider.json
 - sonner: npx shadcn@latest add https://ui.fabrials.com/r/sonner.json
 - spinner: npx shadcn@latest add https://ui.fabrials.com/r/spinner.json
 - switch: npx shadcn@latest add https://ui.fabrials.com/r/switch.json

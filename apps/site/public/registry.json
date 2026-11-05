@@ -1195,6 +1195,31 @@
       ]
     },
     {
+      "name": "input-otp",
+      "type": "registry:ui",
+      "title": "One-time code",
+      "description": "shadcn's input-otp, backed by @fabrials/ui. A verification code in separate slots.",
+      "author": "Fabrials <admin@grokinsider.net>",
+      "dependencies": [
+        "@fabrials/ui@^0.10.0"
+      ],
+      "registryDependencies": [
+        "https://ui.fabrials.com/r/styles.json"
+      ],
+      "meta": {
+        "source": "shim",
+        "license": "MIT",
+        "category": "Shims",
+        "shadcn": "input-otp"
+      },
+      "files": [
+        {
+          "path": "registry/shims/input-otp.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "item",
       "type": "registry:ui",
       "title": "Item",
@@ -1565,6 +1590,31 @@
       "files": [
         {
           "path": "registry/shims/skeleton.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "slider",
+      "type": "registry:ui",
+      "title": "Slider",
+      "description": "shadcn's slider, backed by @fabrials/ui. A value or a range on a track, with ruler marks.",
+      "author": "Fabrials <admin@grokinsider.net>",
+      "dependencies": [
+        "@fabrials/ui@^0.10.0"
+      ],
+      "registryDependencies": [
+        "https://ui.fabrials.com/r/styles.json"
+      ],
+      "meta": {
+        "source": "shim",
+        "license": "MIT",
+        "category": "Shims",
+        "shadcn": "slider"
+      },
+      "files": [
+        {
+          "path": "registry/shims/slider.tsx",
           "type": "registry:ui"
         }
       ]

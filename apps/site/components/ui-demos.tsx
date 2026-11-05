@@ -2,6 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 import { moreDemos } from "@/components/ui-demos-more";
+import { instrumentDemos } from "@/components/ui-demos-instrument";
 import {
   BookOpen,
   ChevronDown,
@@ -213,7 +214,7 @@ const demos: Record<string, () => ReactNode> = {
   textarea: () => (
     <Frame>
       <Label htmlFor="note">Note</Label>
-      <Textarea id="note" name="note" rows={3} placeholder="What should the operator know?" />
+      <Textarea id="note" name="note" autoResize minRows={2} maxRows={8} placeholder="What should the operator know?" />
     </Frame>
   ),
   label: () => (
@@ -1325,7 +1326,7 @@ function VoiceDemo() {
 }
 
 export function UiDemo({ slug }: { slug: string }) {
-  const Demo = demos[slug] ?? moreDemos[slug];
+  const Demo = demos[slug] ?? moreDemos[slug] ?? instrumentDemos[slug];
   if (!Demo) return <p className="text-sm">This preview is not available.</p>;
   return <Demo />;
 }

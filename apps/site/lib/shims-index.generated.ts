@@ -175,6 +175,15 @@ export const shimIndex: { name: string; exports: string[] }[] = [
     ]
   },
   {
+    "name": "input-otp",
+    "exports": [
+      "InputOTP",
+      "InputOTPGroup",
+      "InputOTPSeparator",
+      "InputOTPSlot"
+    ]
+  },
+  {
     "name": "item",
     "exports": [
       "Item",
@@ -336,6 +345,12 @@ export const shimIndex: { name: string; exports: string[] }[] = [
     "name": "skeleton",
     "exports": [
       "Skeleton"
+    ]
+  },
+  {
+    "name": "slider",
+    "exports": [
+      "Slider"
     ]
   },
   {

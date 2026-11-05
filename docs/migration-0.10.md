@@ -60,6 +60,12 @@ Components are no longer flat (`DESIGN.md` › Material; recipes adapted from Ra
 
 ui.fabrials.com stops republishing Kibo UI and Magic UI (`kibo-*`, `magicui-*` registry items, the `/libraries` pages, the upstream sync and the license gate). No Fabrials product used them. An app that installed one keeps its copied source; it just gets no updates from this registry. The Fabrials pieces that cover them: `Files` (file tree), `ActivityStrip` (contribution graph), `Timeline` (event list) and `Dropzone` (dropped files). From now on a component a product needs from another library is adopted into the packages in the Fabrials style (`docs/registry.md`).
 
+## New components (later on 0.10)
+
+The pieces products kept rebuilding by hand, added with stories, keyboard tests and visual references. Nothing existing changes.
+
+- **Inputs:** `SearchInput` (clear button, Escape, key hint, loading), `PasswordInput` (reveal toggle, Caps Lock warning, hidden again on submit), `NumberField` (Base UI, steppers, units), `Slider` (Base UI, ranges, ruler marks; the `slider` shim), `InputOTP` with `InputOTPGroup`, `InputOTPSlot` and `InputOTPSeparator` (Base UI's OTP field; the `input-otp` shim), and `Textarea autoResize minRows maxRows`.
+
 ## What a host may need to change
 
 - **A host that boxed things itself.** A product CSS rule that gave a `Card` or `Table` its own radius or shadow now fights the plates; delete it.

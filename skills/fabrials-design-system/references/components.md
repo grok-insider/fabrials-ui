@@ -46,6 +46,12 @@ import { ChatMessage, ChatComposer } from "@fabrials/ai-ui";         // needs @f
 | Panes the person can resize | `ResizablePanelGroup` + `ResizableHandle label` | A hand-made drag handle, a library used directly |
 | A settings dialog with a section rail, or many tabs on a phone | `Tabs orientation="vertical"`, `TabsList scrollable` | Wrapping tabs on two rows, a custom scroller |
 | A file picker | `FileInput` | A bare `<input type="file">` showing the browser's own text |
+| A search box | `SearchInput` (clear button, Escape, `shortcut`, `loading`) | An `Input` with a hand-placed icon and the browser's cancel button |
+| A password | `PasswordInput` (reveal toggle, Caps Lock warning) | `type="password"` with a hand-made eye that changes its name |
+| A number people step or type | `NumberField` (`min`, `max`, `step`, `format`, `unit`) | `type="number"` and its spinners |
+| A value or range picked by feel (volume, price, quality) | `Slider` (`marks`, `showValue`; an array for a range) | `type="range"`, a `NumberField` when the exact number matters |
+| A verification code | `InputOTP` (or its shadcn parts) | Six separate `Input`s with hand-written focus moves |
+| A reply or prompt that grows with its text | `Textarea autoResize minRows maxRows` | A script that sets the height on every key |
 | A form with subsections | `FieldSet` + `FieldLegend` + `FieldGroup` | A bordered box per subsection, a `div` with a bold label |
 | Show or hide detail in place, with no state | `Disclosure` (native `details`) | A hand-styled `details`, an `Accordion` for one block |
 | A destructive confirmation | `AlertDialog`, or `ConfirmDialog` for an async action, or `useConfirm()` to `await` one | `window.confirm` in a flow that can wait (a guard that must answer synchronously keeps it) |
@@ -72,6 +78,12 @@ import { ChatMessage, ChatComposer } from "@fabrials/ai-ui";         // needs @f
 | `IconButton` (`label`, `tooltip`, `shortcut`, `textName`) | An icon-only button: 44 px, named, with a tooltip; a Base UI trigger can `render` it |
 | `Toolbar`, `ToolbarGroup`, `ToolbarSeparator`, `ToolbarButton` (`reveal`, `tier`) | One tab stop for a row of buttons; arrows, Home and End; labels appear and low-priority actions fold into a menu as the toolbar narrows |
 | `FileInput` (`label`, `onFilesChange`, `fileName`, `onClear`, `description`, `error`) | A file picker that is a button; the browser's "Choose File" is never shown |
+| `SearchInput` (`onValueChange`, `onClear`, `clearLabel`, `shortcut`, `loading`, `size`) | Search: a magnifier, a clear button with text; Escape clears first, then belongs to the page |
+| `PasswordInput` (`showLabel`, `capsLockLabel`, `autoComplete`, `size`) | Passwords: a reveal toggle with a fixed name (`aria-pressed`), a Caps Lock warning, hidden again on submit |
+| `NumberField` (`min`, `max`, `step`, `largeStep`, `format`, `locale`, `unit`) | Numbers on Base UI: steppers set into the well, tabular mono value, Home and End to the limits |
+| `Slider` (`aria-label` or `thumbLabels`, `marks`, `showValue`, `orientation`) | A value or a range: sunken track, Stormlight fill, raised fader cap, ruler marks |
+| `InputOTP` (`length`, `validationType`, `onValueComplete`; `InputOTPGroup`, `InputOTPSlot`, `InputOTPSeparator`) | One-time codes on Base UI's OTP field: paste and autofill fill every slot |
+| `Textarea` (`autoResize`, `minRows`, `maxRows`) | Multi-line text; `autoResize` grows with the text, then scrolls |
 | `FieldSet`, `FieldLegend`, `FieldGroup` | Grouped fields on a real fieldset; a legend styled as a subsection title with a hairline above; `layout="columns"` reflows by container |
 | `RadioGroup` + `RadioGroupItem` (or `Radio`) | One visible choice inside a form |
 | `ToggleGroup` + `ToggleGroupItem` (`size` `sm`, `default`, `lg`) | A segmented view or range next to what it changes; 44 px hit area on touch (`size="lg"` paints the whole height). A single-choice group slides one indicator to the pressed item |

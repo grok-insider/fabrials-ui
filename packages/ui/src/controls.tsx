@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type ComponentProps, type ReactNode, type Ref } from "react";
+import { useEffect, useRef, type ComponentProps, type CSSProperties, type ReactNode, type Ref } from "react";
 import { Button as BaseButton } from "@base-ui/react/button";
 import { Checkbox as BaseCheckbox } from "@base-ui/react/checkbox";
 import { Switch as BaseSwitch } from "@base-ui/react/switch";
@@ -51,10 +51,43 @@ export function Input({ className, ...props }: ComponentProps<"input">) {
   return <input className={classes("fui-input", className)} {...props} />;
 }
 
-export function Textarea({ className, ...props }: ComponentProps<"textarea">) {
+export type TextareaProps = ComponentProps<"textarea"> & {
+  /** Grow with the text, between `minRows` and `maxRows`, then scroll. CSS \`field-sizing\` where the browser has it; a
+   * measured height elsewhere. */
+  autoResize?: boolean;
+  minRows?: number;
+  maxRows?: number;
+};
+
+const fieldSizing = typeof CSS !== "undefined" && typeof CSS.supports === "function" && CSS.supports("field-sizing", "content");
+
+export function Textarea({ className, autoResize = false, minRows, maxRows, style, ref, onInput, ...props }: TextareaProps) {
+  const own = useRef<HTMLTextAreaElement | null>(null);
+  const measure = () => {
+    const node = own.current;
+    if (!autoResize || fieldSizing || !node) return;
+    node.style.height = "auto";
+    node.style.height = `${node.scrollHeight + node.offsetHeight - node.clientHeight}px`;
+  };
+  useEffect(measure);
   return (
     <textarea
       className={classes("fui-input", "fui-textarea", className)}
+      data-autoresize={autoResize ? "" : undefined}
+      style={
+        autoResize
+          ? ({ ...style, "--fui-textarea-min-rows": minRows ?? 2, "--fui-textarea-max-rows": maxRows ?? 12 } as CSSProperties)
+          : style
+      }
+      ref={(node) => {
+        own.current = node;
+        if (typeof ref === "function") return ref(node);
+        if (ref) ref.current = node;
+      }}
+      onInput={(event) => {
+        measure();
+        onInput?.(event);
+      }}
       {...props}
     />
   );

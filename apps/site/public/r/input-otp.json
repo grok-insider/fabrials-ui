@@ -1,0 +1,27 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "input-otp",
+  "type": "registry:ui",
+  "title": "One-time code",
+  "description": "shadcn's input-otp, backed by @fabrials/ui. A verification code in separate slots.",
+  "author": "Fabrials <admin@grokinsider.net>",
+  "dependencies": [
+    "@fabrials/ui@^0.10.0"
+  ],
+  "registryDependencies": [
+    "https://ui.fabrials.com/r/styles.json"
+  ],
+  "files": [
+    {
+      "path": "registry/shims/input-otp.tsx",
+      "type": "registry:ui",
+      "content": "export { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from \"@fabrials/ui\";\n\n// Fabrials UI shim for shadcn's input-otp: https://ui.fabrials.com/docs/shims\n// The names match shadcn; the control is @fabrials/ui's. Import from\n// \"@fabrials/ui\" directly in new code.\n"
+    }
+  ],
+  "meta": {
+    "source": "shim",
+    "license": "MIT",
+    "category": "Shims",
+    "shadcn": "input-otp"
+  }
+}
