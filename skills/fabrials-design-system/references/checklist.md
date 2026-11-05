@@ -79,7 +79,7 @@ In the design-system repository:
 bun install --frozen-lockfile
 bun run check                  # types, lint, unit tests, package build, site checks and tests
 bun run test:visual:container  # visual and accessibility suite; update snapshots only for intended changes
-bun run registry:build         # when registry sources, shims or upstream snapshots changed (tests fail if stale)
+bun run registry:build         # when registry sources, shims, the catalogue, the version or tokens changed (tests fail if stale)
 ```
 
 In a product, run its own checks from its `AGENTS.md`, and `bun run vendor <product> --check` (from the design-system repo) when the vendored copy should match the build.

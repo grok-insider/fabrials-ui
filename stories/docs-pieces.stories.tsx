@@ -52,7 +52,7 @@ function Pieces() {
             <File name="components.json" />
           </Files>
           <RepoInfo owner="grok-insider" repo="fabrials-ui" stars={1284} forks={37} />
-          <RepoInfo owner="magicuidesign" repo="magicui" description="Animated components for landing pages." stars={19400} />
+          <RepoInfo owner="example" repo="instrument-kit" description="Gauges and readouts for dashboards." stars={19400} />
         </div>
       </section>
     </main>

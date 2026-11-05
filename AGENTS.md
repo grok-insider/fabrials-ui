@@ -12,15 +12,15 @@ The Fabrials design system and ui.fabrials.com. Independent git repository; `mas
 
 - `packages/ui`, `packages/ai-ui`: the packages. Change them here, build with `bun run build`, and hand products a verified copy with `bun run vendor <product> --write`. Never edit a product's `vendor/` copy.
 - `apps/site`: ui.fabrials.com (Next.js, Tailwind 4, fumadocs). Docs and demos import registry sources directly; never duplicate a component.
-- `apps/site/registry`: Fabrials blocks (`components`, `webmcp`, `mcp`, `server`), generated shims, and third-party snapshots under `external/`. See `docs/registry.md`.
+- `apps/site/registry`: Fabrials blocks (`components`, `webmcp`, `mcp`, `server`) and generated shims. See `docs/registry.md`.
 - `skills/fabrials-design-system`: the agent skill (`SKILL.md` and `references/`). Agents' skill folders link to it by that name, so keep the folder where it is.
 
 ## Rules
 
 - React 19 and Base UI. Keep keyboard operation, visible focus and human use without WebMCP.
 - A new public export needs a story, a keyboard test and a visual reference; use shadcn's name for a part when shadcn has one (that is what lets a shim cover it). Bump the version and write the migration note when a public contract changes.
-- Generated files are never edited by hand: `public/r`, `public/registry.json`, `public/llms.txt`, `registry/shims/*.tsx`, `components/ui/*` (except `calendar.tsx`), `components/external/**`, `app/external.css`, `lib/*.generated.ts`. Regenerate with `bun run registry:build`; tests fail when they are stale.
-- Third-party components come in only through `upstreams/*.json` and `bun run registry:sync`, which enforces the license gate. Do not copy their code by hand, do not weaken the gate, and keep the license notice that follows the imports of every file.
+- Generated files are never edited by hand: `public/r`, `public/registry.json`, `public/llms.txt`, `registry/shims/*.tsx`, `components/ui/*` (except `calendar.tsx`), `lib/*.generated.ts`. Regenerate with `bun run registry:build`; tests fail when they are stale.
+- The registry publishes only Fabrials components and shims, never another library's components. When a product needs a component another library offers, adopt it: rewrite it into the packages in the Fabrials style, with a story, a keyboard test and a visual reference. Code or recipes adapted from a permissively licensed project (MIT, Apache-2.0, ISC, BSD) keep their copyright and license notice beside the adapted code and a row in `THIRD_PARTY.md`; nothing under extra terms (Commons Clause and the like) is adapted, only learnt from.
 - MCP target 2026-07-28 with the official SDK v2; keep legacy compatibility isolated and never replay tool mutations silently. Browser tokens are memory-only; never log credentials, arguments or tool results on the server. The Node connector uses operator-configured destinations and never becomes an open proxy.
 
 ## UI work

@@ -14,7 +14,6 @@
       "registryDependencies": [],
       "meta": {
         "source": "fabrials",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Setup"
       },
@@ -41,7 +40,6 @@
       },
       "meta": {
         "source": "fabrials",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Setup"
       },
@@ -57,7 +55,6 @@
       "registryDependencies": [],
       "meta": {
         "source": "fabrials",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Interaction"
       },
@@ -82,7 +79,6 @@
       "registryDependencies": [],
       "meta": {
         "source": "fabrials",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "WebMCP"
       },
@@ -119,7 +115,6 @@
       "registryDependencies": [],
       "meta": {
         "source": "fabrials",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "WebMCP"
       },
@@ -150,7 +145,6 @@
       ],
       "meta": {
         "source": "fabrials",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "WebMCP"
       },
@@ -182,7 +176,6 @@
       ],
       "meta": {
         "source": "fabrials",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Interaction"
       },
@@ -215,7 +208,6 @@
       ],
       "meta": {
         "source": "fabrials",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Interaction"
       },
@@ -252,7 +244,6 @@
       ],
       "meta": {
         "source": "fabrials",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Interaction"
       },
@@ -284,7 +275,6 @@
       ],
       "meta": {
         "source": "fabrials",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Interaction"
       },
@@ -310,7 +300,6 @@
       ],
       "meta": {
         "source": "fabrials",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Interaction"
       },
@@ -341,7 +330,6 @@
       ],
       "meta": {
         "source": "fabrials",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Interaction"
       },
@@ -370,7 +358,6 @@
       "registryDependencies": [],
       "meta": {
         "source": "fabrials",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Foundation"
       },
@@ -413,7 +400,6 @@
       ],
       "meta": {
         "source": "fabrials",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "MCP"
       },
@@ -453,7 +439,6 @@
       ],
       "meta": {
         "source": "fabrials",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "MCP"
       },
@@ -498,7 +483,6 @@
       ],
       "meta": {
         "source": "fabrials",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "MCP"
       },
@@ -540,7 +524,6 @@
       ],
       "meta": {
         "source": "fabrials",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "MCP"
       },
@@ -568,7 +551,6 @@
       ],
       "meta": {
         "source": "fabrials",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "MCP"
       },
@@ -608,7 +590,6 @@
       ],
       "meta": {
         "source": "fabrials",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "MCP"
       },
@@ -668,7 +649,6 @@
       ],
       "meta": {
         "source": "fabrials",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "MCP"
       },
@@ -719,7 +699,6 @@
       ],
       "meta": {
         "source": "fabrials",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "MCP"
       },
@@ -804,7 +783,6 @@
       "registryDependencies": [],
       "meta": {
         "source": "fabrials",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Foundation"
       },
@@ -830,7 +808,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "accordion"
@@ -856,7 +833,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "alert"
@@ -882,7 +858,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "alert-dialog"
@@ -908,7 +883,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "breadcrumb"
@@ -934,7 +908,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "button"
@@ -960,7 +933,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "button-group"
@@ -986,7 +958,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "card"
@@ -1012,7 +983,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "carousel"
@@ -1038,7 +1008,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "checkbox"
@@ -1064,7 +1033,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "collapsible"
@@ -1090,7 +1058,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "command"
@@ -1116,7 +1083,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "dialog"
@@ -1142,7 +1108,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "dropdown-menu"
@@ -1168,7 +1133,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "hover-card"
@@ -1194,7 +1158,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "input"
@@ -1220,7 +1183,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "input-group"
@@ -1246,7 +1208,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "item"
@@ -1272,7 +1233,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "kbd"
@@ -1298,7 +1258,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "label"
@@ -1324,7 +1283,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "native-select"
@@ -1350,7 +1308,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "navigation-menu"
@@ -1376,7 +1333,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "pagination"
@@ -1402,7 +1358,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "popover"
@@ -1428,7 +1383,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "radio-group"
@@ -1454,7 +1408,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "resizable"
@@ -1480,7 +1433,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "scroll-area"
@@ -1506,7 +1458,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "select"
@@ -1532,7 +1483,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "separator"
@@ -1558,7 +1508,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "sheet"
@@ -1584,7 +1533,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "sidebar"
@@ -1610,7 +1558,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "skeleton"
@@ -1636,7 +1583,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "sonner"
@@ -1662,7 +1608,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "spinner"
@@ -1688,7 +1633,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "switch"
@@ -1714,7 +1658,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "table"
@@ -1740,7 +1683,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "textarea"
@@ -1766,7 +1708,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "toggle-group"
@@ -1792,7 +1733,6 @@
       ],
       "meta": {
         "source": "shim",
-        "tier": "fabrials",
         "license": "MIT",
         "category": "Shims",
         "shadcn": "tooltip"
@@ -1800,298 +1740,6 @@
       "files": [
         {
           "path": "registry/shims/tooltip.tsx",
-          "type": "registry:ui"
-        }
-      ]
-    },
-    {
-      "name": "kibo-contribution-graph",
-      "type": "registry:ui",
-      "title": "Contribution Graph",
-      "description": "A GitHub-style contribution graph component that displays activity levels over time.",
-      "author": "Kibo UI (https://github.com/haydenbleasel/kibo)",
-      "dependencies": [
-        "date-fns@^4.4.0"
-      ],
-      "registryDependencies": [],
-      "meta": {
-        "source": "external",
-        "tier": "community",
-        "library": "kibo",
-        "libraryTitle": "Kibo UI",
-        "license": "MIT",
-        "upstream": "https://www.kibo-ui.com/r/contribution-graph.json",
-        "repository": "https://github.com/haydenbleasel/kibo",
-        "commit": "3d63cdb15b79d972e3dc38a10997987672f9b263",
-        "sha256": "95402cab69895dc4db94be5d6fc5d63a9dc4b666421908edcd8a8ebd1fa5b353",
-        "conformance": []
-      },
-      "files": [
-        {
-          "path": "index.tsx",
-          "type": "registry:ui",
-          "target": "components/kibo-ui/contribution-graph/index.tsx"
-        }
-      ]
-    },
-    {
-      "name": "kibo-dropzone",
-      "type": "registry:ui",
-      "title": "Dropzone",
-      "description": "Allows users to drag-and-drop files into a container to upload or process them.",
-      "author": "Kibo UI (https://github.com/haydenbleasel/kibo)",
-      "dependencies": [
-        "lucide-react@^1.48.0",
-        "react-dropzone@^20.1.2"
-      ],
-      "registryDependencies": [
-        "https://ui.fabrials.com/r/button.json"
-      ],
-      "meta": {
-        "source": "external",
-        "tier": "community",
-        "library": "kibo",
-        "libraryTitle": "Kibo UI",
-        "license": "MIT",
-        "upstream": "https://www.kibo-ui.com/r/dropzone.json",
-        "repository": "https://github.com/haydenbleasel/kibo",
-        "commit": "3d63cdb15b79d972e3dc38a10997987672f9b263",
-        "sha256": "4bcd4ffadc9f8d88bf2d6168721ba108c26933656287cadf531d1aeef5b68fc5",
-        "conformance": []
-      },
-      "files": [
-        {
-          "path": "index.tsx",
-          "type": "registry:ui",
-          "target": "components/kibo-ui/dropzone/index.tsx"
-        }
-      ]
-    },
-    {
-      "name": "kibo-kanban",
-      "type": "registry:ui",
-      "title": "Kanban",
-      "description": "A kanban board is a visual tool that helps you manage and visualize your work. It is a board with columns, and each column represents a status, e.g. \"Backlog\", \"In Progress\", \"Done\".",
-      "author": "Kibo UI (https://github.com/haydenbleasel/kibo)",
-      "dependencies": [
-        "@dnd-kit/core@^6.3.1",
-        "@dnd-kit/sortable@^10.0.0",
-        "@dnd-kit/utilities@^3.2.2",
-        "tunnel-rat@^0.1.2"
-      ],
-      "registryDependencies": [
-        "https://ui.fabrials.com/r/card.json",
-        "https://ui.fabrials.com/r/scroll-area.json"
-      ],
-      "meta": {
-        "source": "external",
-        "tier": "community",
-        "library": "kibo",
-        "libraryTitle": "Kibo UI",
-        "license": "MIT",
-        "upstream": "https://www.kibo-ui.com/r/kanban.json",
-        "repository": "https://github.com/haydenbleasel/kibo",
-        "commit": "3d63cdb15b79d972e3dc38a10997987672f9b263",
-        "sha256": "346d0ba69230146ac42a8eb6440ebc28db268c29b88a21894314620512420bd9",
-        "conformance": []
-      },
-      "files": [
-        {
-          "path": "index.tsx",
-          "type": "registry:ui",
-          "target": "components/kibo-ui/kanban/index.tsx"
-        }
-      ]
-    },
-    {
-      "name": "kibo-rating",
-      "type": "registry:ui",
-      "title": "Rating",
-      "description": "A star rating component with keyboard navigation and hover effects.",
-      "author": "Kibo UI (https://github.com/haydenbleasel/kibo)",
-      "dependencies": [
-        "@radix-ui/react-use-controllable-state@^1.2.6",
-        "lucide-react@^1.48.0"
-      ],
-      "registryDependencies": [],
-      "meta": {
-        "source": "external",
-        "tier": "community",
-        "library": "kibo",
-        "libraryTitle": "Kibo UI",
-        "license": "MIT",
-        "upstream": "https://www.kibo-ui.com/r/rating.json",
-        "repository": "https://github.com/haydenbleasel/kibo",
-        "commit": "3d63cdb15b79d972e3dc38a10997987672f9b263",
-        "sha256": "5c40bd735d83ee461c7ce9602cae1a41c7f735ffd3cf0a6f180a79b41509cf9f",
-        "conformance": []
-      },
-      "files": [
-        {
-          "path": "index.tsx",
-          "type": "registry:ui",
-          "target": "components/kibo-ui/rating/index.tsx"
-        }
-      ]
-    },
-    {
-      "name": "magicui-animated-list",
-      "type": "registry:ui",
-      "title": "Animated List",
-      "description": "A list that animates each item in sequence with a delay. Used to showcase notifications or events on your landing page.",
-      "author": "Magic UI (https://github.com/magicuidesign/magicui)",
-      "dependencies": [
-        "motion@^13.4.4"
-      ],
-      "registryDependencies": [],
-      "meta": {
-        "source": "external",
-        "tier": "community",
-        "library": "magicui",
-        "libraryTitle": "Magic UI",
-        "license": "MIT",
-        "upstream": "https://magicui.design/r/animated-list.json",
-        "repository": "https://github.com/magicuidesign/magicui",
-        "commit": "d7207e5692d14c00dceafa8488d6d01f197fa0e4",
-        "sha256": "a95ae266e0eda12b8230724c690818a434d22bad0a2093a8197417cc997d298b",
-        "conformance": [
-          "ignores-reduced-motion"
-        ]
-      },
-      "files": [
-        {
-          "path": "registry/magicui/animated-list.tsx",
-          "type": "registry:ui"
-        }
-      ]
-    },
-    {
-      "name": "magicui-dot-pattern",
-      "type": "registry:ui",
-      "title": "Dot Pattern",
-      "description": "A background dot pattern made with SVGs, fully customizable using Tailwind CSS.",
-      "author": "Magic UI (https://github.com/magicuidesign/magicui)",
-      "dependencies": [
-        "motion@^13.4.4"
-      ],
-      "registryDependencies": [],
-      "meta": {
-        "source": "external",
-        "tier": "community",
-        "library": "magicui",
-        "libraryTitle": "Magic UI",
-        "license": "MIT",
-        "upstream": "https://magicui.design/r/dot-pattern.json",
-        "repository": "https://github.com/magicuidesign/magicui",
-        "commit": "d7207e5692d14c00dceafa8488d6d01f197fa0e4",
-        "sha256": "ff4f9d159cc8e681b74c94f2a673c47faa411e59c7e9424e4987ba08f61e9757",
-        "conformance": [
-          "literal-colours",
-          "continuous-motion",
-          "ignores-reduced-motion"
-        ]
-      },
-      "files": [
-        {
-          "path": "registry/magicui/dot-pattern.tsx",
-          "type": "registry:ui"
-        }
-      ]
-    },
-    {
-      "name": "magicui-file-tree",
-      "type": "registry:ui",
-      "title": "File Tree",
-      "description": "A component used to showcase the folder and file structure of a directory.",
-      "author": "Magic UI (https://github.com/magicuidesign/magicui)",
-      "dependencies": [
-        "@radix-ui/react-accordion@^1.2.20",
-        "lucide-react@^1.48.0"
-      ],
-      "registryDependencies": [
-        "https://ui.fabrials.com/r/button.json",
-        "https://ui.fabrials.com/r/scroll-area.json"
-      ],
-      "meta": {
-        "source": "external",
-        "tier": "community",
-        "library": "magicui",
-        "libraryTitle": "Magic UI",
-        "license": "MIT",
-        "upstream": "https://magicui.design/r/file-tree.json",
-        "repository": "https://github.com/magicuidesign/magicui",
-        "commit": "d7207e5692d14c00dceafa8488d6d01f197fa0e4",
-        "sha256": "a4b8c998d7a3d7f42db01976970b4b52cc7526edd5de466e6a202b3a767ac5b5",
-        "conformance": [
-          "literal-colours",
-          "ignores-reduced-motion"
-        ]
-      },
-      "files": [
-        {
-          "path": "registry/magicui/file-tree.tsx",
-          "type": "registry:ui"
-        }
-      ]
-    },
-    {
-      "name": "magicui-marquee",
-      "type": "registry:ui",
-      "title": "Marquee",
-      "description": "An infinite scrolling component that can be used to display text, images, or videos.",
-      "author": "Magic UI (https://github.com/magicuidesign/magicui)",
-      "dependencies": [],
-      "registryDependencies": [],
-      "meta": {
-        "source": "external",
-        "tier": "community",
-        "library": "magicui",
-        "libraryTitle": "Magic UI",
-        "license": "MIT",
-        "upstream": "https://magicui.design/r/marquee.json",
-        "repository": "https://github.com/magicuidesign/magicui",
-        "commit": "d7207e5692d14c00dceafa8488d6d01f197fa0e4",
-        "sha256": "6378d12f6ac7b383bcbe25cbfcd21ad567d4726ff9979bf07991598a7bdef1ce",
-        "conformance": [
-          "continuous-motion",
-          "ignores-reduced-motion"
-        ]
-      },
-      "files": [
-        {
-          "path": "registry/magicui/marquee.tsx",
-          "type": "registry:ui"
-        }
-      ]
-    },
-    {
-      "name": "magicui-terminal",
-      "type": "registry:ui",
-      "title": "Terminal",
-      "description": "A terminal component",
-      "author": "Magic UI (https://github.com/magicuidesign/magicui)",
-      "dependencies": [
-        "motion@^13.4.4"
-      ],
-      "registryDependencies": [],
-      "meta": {
-        "source": "external",
-        "tier": "community",
-        "library": "magicui",
-        "libraryTitle": "Magic UI",
-        "license": "MIT",
-        "upstream": "https://magicui.design/r/terminal.json",
-        "repository": "https://github.com/magicuidesign/magicui",
-        "commit": "d7207e5692d14c00dceafa8488d6d01f197fa0e4",
-        "sha256": "05f5c6ae595956464eee5b60e40f25dd2824413ca10bbb5ee0dcaf027758299d",
-        "conformance": [
-          "literal-colours",
-          "ignores-reduced-motion"
-        ]
-      },
-      "files": [
-        {
-          "path": "registry/magicui/terminal.tsx",
           "type": "registry:ui"
         }
       ]

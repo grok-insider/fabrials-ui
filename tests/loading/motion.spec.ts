@@ -9,7 +9,7 @@ import { openPreview, setLoading } from "./support";
  */
 test.use({ contextOptions: { reducedMotion: "no-preference" } });
 
-for (const slug of ["button", "table", "card", "chat-message", "magicui-marquee"])
+for (const slug of ["button", "table", "card", "chat-message"])
   test(`loading pulse without reduced motion ${slug}`, async ({ page }) => {
     await openPreview(page, slug);
     expect(await page.evaluate(() => window.__lqa.pulses())).toEqual({ running: 0, total: 0 });

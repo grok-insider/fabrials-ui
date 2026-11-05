@@ -1,5 +1,4 @@
 import { catalog, guides } from "@/lib/catalog";
-import { externalIndex } from "@/lib/external-index.generated";
 import { uiCatalog, uiGroups } from "@/lib/ui-catalog";
 
 export interface DocsNavPage {
@@ -10,12 +9,12 @@ export interface DocsNavPage {
 
 export interface DocsNavGroup {
   name: string;
-  section: "Guides" | "Components" | "Agents" | "Libraries";
+  section: "Guides" | "Components" | "Agents";
   pages: DocsNavPage[];
 }
 
 const guideDescriptions: Record<string, string> = {
-  introduction: "Fabrials components, shims and components from other libraries.",
+  introduction: "Fabrials components, and shims for shadcn primitives.",
   installation: "Set an app up, then add components by name.",
   design: "Palette, type, density, dithering and motion.",
   shims: "shadcn primitives backed by Fabrials controls.",
@@ -67,18 +66,6 @@ export const docsNav: DocsNavGroup[] = [
       .map((item) => ({ title: item.title, href: `/docs/${item.slug}`, description: item.description }))
       .sort(byTitle),
   })),
-  {
-    name: "Overview",
-    section: "Libraries" as const,
-    pages: [{ title: "All libraries", href: "/libraries", description: "Where they come from and how they get in." }],
-  },
-  ...externalIndex.map((library) => ({
-    name: library.title,
-    section: "Libraries" as const,
-    pages: library.items
-      .map((item) => ({ title: item.title, href: `/docs/${item.slug}`, description: item.description }))
-      .sort(byTitle),
-  })),
 ];
 
 export const docsPages = docsNav.flatMap((group) =>
@@ -86,15 +73,14 @@ export const docsPages = docsNav.flatMap((group) =>
 );
 
 /**
- * The documentation roots the sidebar switches between, like separate
- * libraries: the guides, Fabrials' own components, the agent blocks and one
- * root per aggregated library. The sidebar shows one root at a time.
+ * The documentation roots the sidebar switches between: the guides, Fabrials'
+ * own components and the agent blocks. The sidebar shows one root at a time.
  */
 export type DocsRoot = {
   id: string;
   title: string;
   description: string;
-  kind: "guides" | "fabrials" | "agents" | "libraries" | "library";
+  kind: "guides" | "fabrials" | "agents";
   href: string;
   /** The GitHub repository the sidebar links to (owner/name). */
   repository: string;
@@ -131,35 +117,14 @@ export const docsRoots: DocsRoot[] = [
     repository: FABRIALS_REPOSITORY,
     groups: docsNav.filter((group) => group.section === "Agents"),
   },
-  {
-    id: "libraries",
-    title: "All libraries",
-    description: `${externalIndex.length} libraries, ${externalIndex.reduce((n, library) => n + library.items.length, 0)} components`,
-    kind: "libraries",
-    href: "/libraries",
-    repository: FABRIALS_REPOSITORY,
-    groups: docsNav.filter((group) => group.section === "Libraries"),
-  },
-  ...externalIndex.map((library) => ({
-    id: library.name,
-    title: library.title,
-    description: `${library.items.length} components, ${library.license}, ${library.tier}`,
-    kind: "library" as const,
-    href: `/docs/${[...library.items].sort((a, b) => a.title.localeCompare(b.title))[0]!.slug}`,
-    repository: library.repository,
-    groups: docsNav.filter((group) => group.section === "Libraries" && (group.name === library.title || group.name === "Overview")),
-  })),
 ];
 
-/** Repositories the site shows stars for: its own and every aggregated library's. */
+/** Repositories the site shows stars for. */
 export const knownRepositories = new Set(docsRoots.map((root) => root.repository));
 
-/** The root a page belongs to; /libraries opens the overview of every library, anything unknown the guides. */
+/** The root a page belongs to; anything unknown opens the guides. */
 export function rootFor(path: string): DocsRoot {
-  if (path === "/libraries") return docsRoots.find((root) => root.kind === "libraries")!;
-  // A component page belongs to its own library, not to the overview that lists every library.
-  const specific = docsRoots.filter((root) => root.kind !== "libraries");
-  return specific.find((root) => root.groups.some((group) => group.pages.some((page) => page.href === path))) ?? docsRoots[0]!;
+  return docsRoots.find((root) => root.groups.some((group) => group.pages.some((page) => page.href === path))) ?? docsRoots[0]!;
 }
 
 export function docsNeighbours(href: string) {
@@ -191,15 +156,11 @@ const agentGroupDescriptions = [
   },
 ];
 
-export type ComponentSource = "fabrials" | "external";
-
 export type ComponentSection = {
   id: string;
   name: string;
   description: string;
-  source: ComponentSource;
-  license?: string;
-  items: { slug: string; title: string; description: string; notes?: number }[];
+  items: { slug: string; title: string; description: string }[];
 };
 
 export const componentSections: ComponentSection[] = [
@@ -207,7 +168,6 @@ export const componentSections: ComponentSection[] = [
     id: group.name.toLowerCase().replace(/\s+/g, "-"),
     name: group.name,
     description: group.description,
-    source: "fabrials" as const,
     items: uiCatalog
       .filter((item) => item.group === group.name)
       .map((item) => ({
@@ -220,7 +180,6 @@ export const componentSections: ComponentSection[] = [
     id: group.name.toLowerCase(),
     name: group.name,
     description: group.description,
-    source: "fabrials" as const,
     items: catalog
       .filter((item) => item.category === group.name)
       .map((item) => ({
@@ -228,18 +187,5 @@ export const componentSections: ComponentSection[] = [
         title: item.title,
         description: item.description,
       })),
-  })),
-  ...externalIndex.map((library) => ({
-    id: library.name,
-    name: library.title,
-    description: `${library.description} ${library.license}, ${library.tier === "community" ? "community tier" : "Fabrials tier"}.`,
-    source: "external" as const,
-    license: library.license,
-    items: library.items.map((item) => ({
-      slug: item.slug,
-      title: item.title,
-      description: item.description,
-      notes: item.conformance.length,
-    })),
   })),
 ];

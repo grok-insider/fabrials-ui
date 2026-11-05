@@ -305,13 +305,12 @@ function useRepoCounts(repository: string) {
 }
 
 function RepoInfoDemo() {
-  const magic = useRepoCounts("magicuidesign/magicui");
-  const kibo = useRepoCounts("haydenbleasel/kibo");
+  const fabrials = useRepoCounts("grok-insider/fabrials-ui");
   return (
     <div className="grid w-full max-w-md gap-3">
-      <RepoInfo owner="magicuidesign" repo="magicui" stars={magic.stars} forks={magic.forks} description="Magic UI, community tier" />
-      <RepoInfo owner="haydenbleasel" repo="kibo" stars={kibo.stars} forks={kibo.forks} />
-      <RepoInfo owner="grok-insider" repo="fabrials-ui" description="Counts not given: the link stays, the numbers are left out" />
+      <RepoInfo owner="grok-insider" repo="fabrials-ui" stars={fabrials.stars} forks={fabrials.forks} description="The Fabrials design system" />
+      <RepoInfo owner="example" repo="instrument-kit" stars={1840} forks={96} description="Counts given by the host" />
+      <RepoInfo owner="example" repo="field-notes" description="Counts not given: the link stays, the numbers are left out" />
     </div>
   );
 }
@@ -440,10 +439,8 @@ export const moreDemos: Record<string, () => ReactNode> = {
           <File name="button.tsx" />
           <File name="dialog.tsx" />
         </Folder>
-        <Folder name="kibo-ui">
-          <Folder name="kanban">
-            <File name="index.tsx" note="MIT" />
-          </Folder>
+        <Folder name="webmcp">
+          <File name="mcp-dashboard.tsx" />
         </Folder>
       </Folder>
       <File name="components.json" />

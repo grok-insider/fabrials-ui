@@ -1,7 +1,7 @@
 /**
  * Builds the public registry served at ui.fabrials.com/r/: Fabrials blocks,
- * the `styles` and `init` entries, the shims and the aggregated third-party
- * components, plus registry.json and llms.txt.
+ * the `styles` and `init` entries and the shims, plus registry.json and
+ * llms.txt.
  *
  *   bun run registry:build            write public/
  *   bun run registry:build --check    fail if public/ is stale
@@ -10,9 +10,7 @@
 import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { catalog, guides } from "../lib/catalog";
-import { loadExternal, visibleExternal } from "../lib/external";
 import { uiCatalog } from "../lib/ui-catalog";
-import { publishExternalItem } from "../lib/upstreams";
 
 const args = process.argv.slice(2);
 const check = args.includes("--check");
@@ -45,7 +43,7 @@ items.push({
     '@import "@fabrials/ui/styles.css"': {},
     '@import "@fabrials/ui/tailwind.css"': {},
   },
-  meta: { source: "fabrials", tier: "fabrials", license: "MIT", category: "Setup" },
+  meta: { source: "fabrials", license: "MIT", category: "Setup" },
 });
 
 // ---------------------------------------------------------------- init
@@ -95,7 +93,7 @@ items.push({
     dark: pick(darkTokens, lightTokens),
   },
   docs: "Fabrials UI is set up. Add components by name, for example: npx shadcn@latest add @fabrials/button @fabrials/mcp-dashboard",
-  meta: { source: "fabrials", tier: "fabrials", license: "MIT", category: "Setup" },
+  meta: { source: "fabrials", license: "MIT", category: "Setup" },
 });
 
 // ---------------------------------------------------------------- Fabrials blocks
@@ -172,7 +170,7 @@ for (const entry of catalog) {
     dependencies: [...deps].sort(),
     registryDependencies: [...registryDependencies].sort(),
     files,
-    meta: { source: "fabrials", tier: "fabrials", license: "MIT", category: entry.category },
+    meta: { source: "fabrials", license: "MIT", category: entry.category },
   });
 }
 
@@ -189,15 +187,9 @@ for (const name of [...shims].sort()) {
     dependencies: [fabrialsUi],
     registryDependencies: [url("styles")],
     files: [{ path: `registry/shims/${name}.tsx`, type: "registry:ui", content: await readFile(`registry/shims/${name}.tsx`, "utf8") }],
-    meta: { source: "shim", tier: "fabrials", license: "MIT", category: "Shims", shadcn: name },
+    meta: { source: "shim", license: "MIT", category: "Shims", shadcn: name },
   });
 }
-
-// ---------------------------------------------------------------- aggregated
-const libraries = loadExternal();
-for (const { snapshot, licenseText, items: entries } of libraries)
-  for (const { item, raw } of entries)
-    items.push(publishExternalItem(raw, item, snapshot, licenseText, { origin, shims }) as unknown as Item);
 
 // ---------------------------------------------------------------- outputs
 const output = new Map<string, string>();
@@ -215,13 +207,12 @@ const index = {
 output.set("registry.json", json(index));
 output.set("r/registry.json", json(index));
 
-const visible = visibleExternal(libraries);
 const line = (name: string, title: string, description: string) => `- [${title}](${origin}/docs/${name}): ${description}\n  Install: npx shadcn@latest add ${url(name)}`;
 output.set(
   "llms.txt",
   `# Fabrials UI
 
-The Fabrials design system as a shadcn registry: Fabrials' own components, shims that back shadcn primitives with @fabrials/ui, and components from other open-source libraries under permissive licenses, each labelled with its license and origin.
+The Fabrials design system as a shadcn registry: Fabrials' own components, and shims that back shadcn primitives with @fabrials/ui.
 React 19, Tailwind 4, Base UI. MCP target 2026-07-28; WebMCP is a browser proposal, distinct from remote MCP.
 
 ## Set up
@@ -236,20 +227,8 @@ ${catalog.map((entry) => line(entry.slug, entry.title, entry.description)).join(
 ## Shims (shadcn names, @fabrials/ui controls)
 ${[...shims].sort().map((name) => `- ${name}: npx shadcn@latest add ${url(name)}`).join("\n")}
 
-## From other libraries
-${libraries
-  .map(
-    ({ snapshot }) =>
-      `### ${snapshot.title} (${snapshot.license.spdx}, ${snapshot.tier}) ${snapshot.homepage}\n${visible
-        .filter((entry) => entry.library.name === snapshot.name)
-        .map((entry) => line(entry.slug, entry.item.title, entry.item.description))
-        .join("\n")}`,
-  )
-  .join("\n\n")}
-
 ## Guides
 ${guides.map((guide) => `- ${origin}/docs/${guide.slug}`).join("\n")}
-- ${origin}/libraries
 `,
 );
 
@@ -273,4 +252,4 @@ if (stale.length) {
   console.error(`The registry is out of date (run bun run registry:build):\n${stale.join("\n")}`);
   process.exit(1);
 }
-console.log(`${check ? "Checked" : "Built"} ${items.length} registry items (${shims.size} shims, ${visible.length} from ${libraries.length} libraries).`);
+console.log(`${check ? "Checked" : "Built"} ${items.length} registry items (${shims.size} shims).`);

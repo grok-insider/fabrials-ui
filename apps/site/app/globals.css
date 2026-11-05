@@ -6,7 +6,6 @@
 @import "@fabrials/ui/styles.css";
 @import "@fabrials/ai-ui/styles.css";
 @import "@fabrials/ui/tailwind.css";
-@import "./external.css";
 @custom-variant dark (&:is(.dark *));
 
 :root {

@@ -1,6 +1,6 @@
 # Third-party material
 
-Fabrials UI is MIT licensed (see `LICENSE`). It includes, or republishes, material from these projects under their own licenses.
+Fabrials UI is MIT licensed (see `LICENSE`). It includes material from these projects under their own licenses. The registry does not republish other libraries' components; a component a product needs from another library is rewritten into the packages, and anything adapted keeps its notice here and beside the code.
 
 ## In the packages
 
@@ -13,12 +13,4 @@ Fabrials UI is MIT licensed (see `LICENSE`). It includes, or republishes, materi
 | Spectrum UI number ticker | Apache-2.0 | `packages/ui/src/number-ticker.tsx` |
 | Vercel AI Elements (message, prompt input, code block, reasoning, sources, attachments, suggestion, shimmer) | Apache-2.0 | `packages/ai-ui`, `packages/ui` (see `docs/provenance.md`) |
 | Lucide icon paths | ISC | `packages/ai-ui/src/chat-icons.tsx` |
-
-## Republished by the registry
-
-Components from other libraries are stored in `apps/site/registry/external/<library>/` with the library's `LICENSE` and republished with that license at the top of every file. Their origin, license, commit and hashes are in each `upstream.json` and on ui.fabrials.com/libraries.
-
-| Library | License | Copyright |
-| --- | --- | --- |
-| Magic UI (`magicuidesign/magicui`) | MIT | Copyright (c) Magic UI |
-| Kibo UI (`haydenbleasel/kibo`) | MIT | Copyright (c) 2023 — Present shadcnblocks |
+| Radix Themes depth recipes (shadows, bevel, sheen, wells), Copyright (c) 2023 WorkOS | MIT | `packages/ui/src/tokens.css`, `packages/ui/src/styles.css` (0.10 material) |

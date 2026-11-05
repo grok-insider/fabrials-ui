@@ -335,5 +335,5 @@ Rules from the repository: human use works without WebMCP; one state serves the 
 
 ## Shims and other libraries
 
-- **Shims** (`button`, `dialog`, `select`, `table`, `sidebar`, … 36 in all; list in `apps/site/lib/shims-index.generated.ts`) install under shadcn's paths and re-export Fabrials controls.
-- **Other libraries** (today Kibo UI: `kibo-contribution-graph`, `kibo-dropzone`, `kibo-kanban`, `kibo-rating`; Magic UI: `magicui-animated-list`, `magicui-dot-pattern`, `magicui-file-tree`, `magicui-marquee`, `magicui-terminal`) are community tier: they keep their library's look and list design notes (literal colours, continuous motion, ignored reduced motion). Outside apps may use them. Fabrials products do not; use the Fabrials piece instead (`Files` for a file tree, `ActivityStrip` for a contribution graph, `Timeline` for an event list) or promote the component into the packages first.
+- **Shims** (`button`, `dialog`, `select`, `table`, `sidebar`, …; list in `apps/site/lib/shims-index.generated.ts`) install under shadcn's paths and re-export Fabrials controls.
+- **Other libraries** are not offered through the registry. Use the Fabrials piece (`Files` for a file tree, `ActivityStrip` for a contribution graph, `Timeline` for an event list, `Dropzone` for dropped files). When a product needs something only another library has, adopt it into the package first, in the Fabrials style; never install another library's styled components into a product.

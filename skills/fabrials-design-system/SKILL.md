@@ -20,7 +20,7 @@ Resolve this skill directory's real path (`readlink -f`, it is usually a symlink
 | Reference layouts | `stories/instrument.stories.tsx` + `instrument.css` (0.10 landing, product overview, pieces), `stories/highstorm.stories.tsx` + `highstorm.css`, `apps/site/app/page.tsx`, `apps/site/components/docs/` |
 | Component usage in context | Storybook (`bun run storybook`, port 6041), `apps/site/components/ui-demos*.tsx` |
 | Upgrading or adopting 0.7, 0.8, 0.8.1, 0.8.2, 0.9 or 0.10 | `docs/migration-0.7.md`, `docs/migration-0.8.md`, `docs/migration-0.9.md`, `docs/migration-0.10.md` (why 0.10 looks as it does: `docs/identity-proposals.md`) |
-| Registry, shims, other libraries, the license gate | `docs/registry.md` |
+| Registry, shims, adopting a component from another library | `docs/registry.md` |
 
 The Patterns stories (`stories/patterns.stories.tsx`: PublicSite, Settings, Console, SignIn) follow the 0.7 layout rules and are safe references for page composition.
 
@@ -61,7 +61,7 @@ The full list with checks: [references/style-rules.md](references/style-rules.md
 - Generic presentation: `@fabrials/ui`. Provider, quota, migration and chat presentation: `@fabrials/ai-ui`. Network clients, routing, authentication, theme storage, native window chrome and product policy: the host.
 - A Fabrials product consumes a verified copy made by `bun run vendor <product> --write` in the design-system repo. Never edit a `vendor/` copy; change the package, build it, re-vendor.
 - A missing generic piece is added to the package with a story, a keyboard test and a visual reference, using shadcn's part names where shadcn has them. A product-only exception is recorded in that product's `DESIGN.md`.
-- Third-party components enter only through `apps/site/upstreams/*.json` and `bun run registry:sync` (license gate). Fabrials products use Fabrials-tier components only; community items keep their library's look and list design notes.
+- Nothing is installed from another component library through the registry. When a product needs a component another library offers, adopt it into the package in the Fabrials style (story, keyboard test, visual reference); adapted code keeps its license notice beside it and in `THIRD_PARTY.md`.
 
 ## Setting an app up
 

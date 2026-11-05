@@ -1,22 +1,11 @@
 import Link from "next/link";
-import {
-  DitherScene,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@fabrials/ui";
+import { DitherScene } from "@fabrials/ui";
 import { buttonVariants } from "@fabrials/ui/button-variants";
 import { CodeBlock } from "@/components/code-block";
 import { HomeDemo } from "@/components/demo/home-demo";
 import { catalog } from "@/lib/catalog";
-import { externalIndex } from "@/lib/external-index.generated";
 import { shimIndex } from "@/lib/shims-index.generated";
 import { uiCatalog } from "@/lib/ui-catalog";
-
-const externalCount = externalIndex.reduce((sum, library) => sum + library.items.length, 0);
 
 const kinds = [
   {
@@ -33,13 +22,6 @@ const kinds = [
     href: "/docs/shims",
     label: "How shims work",
   },
-  {
-    count: externalCount,
-    title: "From other libraries",
-    text: `Components from ${externalIndex.map((library) => library.title).join(" and ")}, copied at a reviewed snapshot with their license checked and credited.`,
-    href: "/libraries",
-    label: "See the libraries",
-  },
 ];
 
 export default function Home() {
@@ -55,8 +37,7 @@ export default function Home() {
             The Fabrials design system, ready to install.
           </h1>
           <p className="mt-6 max-w-[46ch] text-lg leading-7 text-muted-foreground">
-            Fabrials components, shims that give shadcn primitives the Fabrials look, and open-source components from
-            other libraries with their license checked. One command sets an app up.
+            Fabrials components, and shims that give shadcn primitives the Fabrials look. One command sets an app up.
           </p>
           <div className="mt-8 max-w-[34rem]">
             <CodeBlock variant="command" code="npx shadcn@latest init https://ui.fabrials.com/r/init.json" label="Terminal" />
@@ -112,45 +93,6 @@ export default function Home() {
           </Link>
         </div>
         <HomeDemo />
-      </section>
-
-      <section className="border-t py-14" aria-labelledby="libraries-title">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h2 id="libraries-title" className="font-display text-[1.75rem] leading-tight font-semibold">
-              Components from other libraries
-            </h2>
-            <p className="mt-2 max-w-[64ch] text-muted-foreground">
-              Published unchanged with their license in every file. Each page says where the component departs from the
-              Fabrials principles.
-            </p>
-          </div>
-          <Link href="/libraries" className={buttonVariants({ variant: "outline", size: "sm" })}>
-            How a library gets in
-          </Link>
-        </div>
-        <Table aria-label="Libraries">
-          <TableHeader>
-            <TableRow>
-              <TableHead>Library</TableHead>
-              <TableHead>License</TableHead>
-              <TableHead>Components</TableHead>
-              <TableHead>Snapshot</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {externalIndex.map((library) => (
-              <TableRow key={library.name}>
-                <TableCell>
-                  <Link href={`/libraries#${library.name}`}>{library.title}</Link>
-                </TableCell>
-                <TableCell>{library.license}</TableCell>
-                <TableCell>{library.items.map((item) => item.title).join(", ")}</TableCell>
-                <TableCell className="tabular-nums">{library.fetchedAt}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
       </section>
 
       <section className="border-t py-12" aria-labelledby="start-title">

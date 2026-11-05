@@ -6,7 +6,6 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Menu } from "lucide-react";
 import { useTheme } from "next-themes";
 import { catalog, guides } from "@/lib/catalog";
-import { externalIndex } from "@/lib/external-index.generated";
 import { uiCatalog } from "@/lib/ui-catalog";
 import uiPackage from "../../../packages/ui/package.json";
 import {
@@ -52,9 +51,6 @@ export function SiteHeader() {
     path === "/components" ||
     catalog.some((item) => path === `/docs/${item.slug}`) ||
     uiCatalog.some((item) => path === `/docs/${item.slug}`);
-  const librariesActive =
-    path === "/libraries" ||
-    externalIndex.some((library) => library.items.some((item) => path === `/docs/${item.slug}`));
   const links = (
     <>
       <Link href="/docs/introduction" aria-current={docsActive ? "page" : undefined}>
@@ -62,9 +58,6 @@ export function SiteHeader() {
       </Link>
       <Link href="/components" aria-current={componentsActive ? "page" : undefined}>
         Components
-      </Link>
-      <Link href="/libraries" aria-current={librariesActive ? "page" : undefined}>
-        Libraries
       </Link>
       <Link href="/playground" aria-current={path.startsWith("/playground") ? "page" : undefined}>
         Playground
@@ -130,7 +123,7 @@ export function SiteFooter() {
           >
             Fabrials
           </a>
-          . Components from other libraries keep their own licenses.
+          .
         </p>
         <div className="flex flex-wrap gap-5">
           <a href="https://github.com/grok-insider/fabrials-ui">Source</a>

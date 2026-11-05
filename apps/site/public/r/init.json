@@ -96,7 +96,6 @@
   "docs": "Fabrials UI is set up. Add components by name, for example: npx shadcn@latest add @fabrials/button @fabrials/mcp-dashboard",
   "meta": {
     "source": "fabrials",
-    "tier": "fabrials",
     "license": "MIT",
     "category": "Setup"
   }

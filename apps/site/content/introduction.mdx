@@ -1,13 +1,14 @@
-Fabrials UI is the design system behind the Fabrials products, published as a shadcn registry. It gives an app three kinds of component, all installed as source you own:
+Fabrials UI is the design system behind the Fabrials products, published as a shadcn registry. It gives an app two kinds of component, both installed as source you own:
 
 - **Fabrials components.** The controls Fabrials products use (from `@fabrials/ui` and `@fabrials/ai-ui`) and the WebMCP and MCP blocks for interfaces people and agents share.
 - **Shims.** shadcn primitives such as `button`, `dialog` or `select`, backed by the Fabrials controls. Code written for shadcn keeps working and looks like the rest of the app.
-- **Components from other libraries.** Open-source components from libraries such as [Magic UI](/docs/magicui-marquee) and [Kibo UI](/docs/kibo-kanban), copied at a reviewed snapshot, with their license checked and their origin kept. See [how a library gets in](/libraries).
+
+When a Fabrials product needs a component that another library offers, the design system adopts it: the piece is rewritten into `@fabrials/ui` in the Fabrials style, with a story, a keyboard test and a visual reference. The registry does not republish other libraries.
 
 ## Start
 
 - [Set an app up](/docs/installation): one command gives a shadcn app the Fabrials palette, IBM Plex and the component styles.
-- [Browse the components](/components): filter by where they come from.
+- [Browse the components](/components): search them by name or purpose.
 - [Read the design principles](/docs/design): the palette, type, density, dithering and motion rules the components follow.
 
 ## Two protocols, one interface
@@ -25,4 +26,4 @@ These integrations have separate providers. Visual components accept props and c
 
 ## The foundation
 
-React 19, TypeScript, Tailwind CSS 4, Base UI and the official MCP TypeScript SDK v2. Fabrials components are MIT licensed; components from other libraries keep their own permissive license, printed at the top of every file. Nothing you install calls a Fabrials service.
+React 19, TypeScript, Tailwind CSS 4, Base UI and the official MCP TypeScript SDK v2. Fabrials components are MIT licensed. Nothing you install calls a Fabrials service.

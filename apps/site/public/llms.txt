@@ -1,6 +1,6 @@
 # Fabrials UI
 
-The Fabrials design system as a shadcn registry: Fabrials' own components, shims that back shadcn primitives with @fabrials/ui, and components from other open-source libraries under permissive licenses, each labelled with its license and origin.
+The Fabrials design system as a shadcn registry: Fabrials' own components, and shims that back shadcn primitives with @fabrials/ui.
 React 19, Tailwind 4, Base UI. MCP target 2026-07-28; WebMCP is a browser proposal, distinct from remote MCP.
 
 ## Set up
@@ -91,29 +91,6 @@ Namespace: add "registries": { "@fabrials": "https://ui.fabrials.com/r/{name}.js
 - toggle-group: npx shadcn@latest add https://ui.fabrials.com/r/toggle-group.json
 - tooltip: npx shadcn@latest add https://ui.fabrials.com/r/tooltip.json
 
-## From other libraries
-### Kibo UI (MIT, community) https://www.kibo-ui.com
-- [Contribution Graph](https://ui.fabrials.com/docs/kibo-contribution-graph): A GitHub-style contribution graph component that displays activity levels over time.
-  Install: npx shadcn@latest add https://ui.fabrials.com/r/kibo-contribution-graph.json
-- [Dropzone](https://ui.fabrials.com/docs/kibo-dropzone): Allows users to drag-and-drop files into a container to upload or process them.
-  Install: npx shadcn@latest add https://ui.fabrials.com/r/kibo-dropzone.json
-- [Kanban](https://ui.fabrials.com/docs/kibo-kanban): A kanban board is a visual tool that helps you manage and visualize your work. It is a board with columns, and each column represents a status, e.g. "Backlog", "In Progress", "Done".
-  Install: npx shadcn@latest add https://ui.fabrials.com/r/kibo-kanban.json
-- [Rating](https://ui.fabrials.com/docs/kibo-rating): A star rating component with keyboard navigation and hover effects.
-  Install: npx shadcn@latest add https://ui.fabrials.com/r/kibo-rating.json
-
-### Magic UI (MIT, community) https://magicui.design
-- [Animated List](https://ui.fabrials.com/docs/magicui-animated-list): A list that animates each item in sequence with a delay. Used to showcase notifications or events on your landing page.
-  Install: npx shadcn@latest add https://ui.fabrials.com/r/magicui-animated-list.json
-- [Dot Pattern](https://ui.fabrials.com/docs/magicui-dot-pattern): A background dot pattern made with SVGs, fully customizable using Tailwind CSS.
-  Install: npx shadcn@latest add https://ui.fabrials.com/r/magicui-dot-pattern.json
-- [File Tree](https://ui.fabrials.com/docs/magicui-file-tree): A component used to showcase the folder and file structure of a directory.
-  Install: npx shadcn@latest add https://ui.fabrials.com/r/magicui-file-tree.json
-- [Marquee](https://ui.fabrials.com/docs/magicui-marquee): An infinite scrolling component that can be used to display text, images, or videos.
-  Install: npx shadcn@latest add https://ui.fabrials.com/r/magicui-marquee.json
-- [Terminal](https://ui.fabrials.com/docs/magicui-terminal): A terminal component
-  Install: npx shadcn@latest add https://ui.fabrials.com/r/magicui-terminal.json
-
 ## Guides
 - https://ui.fabrials.com/docs/introduction
 - https://ui.fabrials.com/docs/installation
@@ -125,4 +102,3 @@ Namespace: add "registries": { "@fabrials": "https://ui.fabrials.com/r/{name}.js
 - https://ui.fabrials.com/docs/authentication
 - https://ui.fabrials.com/docs/server
 - https://ui.fabrials.com/docs/compatibility
-- https://ui.fabrials.com/libraries

@@ -20,7 +20,6 @@
   ],
   "meta": {
     "source": "shim",
-    "tier": "fabrials",
     "license": "MIT",
     "category": "Shims",
     "shadcn": "button-group"

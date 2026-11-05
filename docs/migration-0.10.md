@@ -56,6 +56,10 @@ The reference pages are the **Fabrials/Instrument** stories (Landing, Workspace,
 
 Components are no longer flat (`DESIGN.md` › Material; recipes adapted from Radix Themes, MIT): solid buttons and ticked checks are keys with a bevel and a sheen, outline buttons and the chosen segment are raised, fields and segmented groups are wells, plates rest on `--fui-shadow-sm`, overlays have deeper layered shadows and arrive from their trigger's side on `--fui-ease-out`, a held switch thumb stretches. New tokens: `--fui-shadow-well`, `--fui-bevel`, `--fui-sheen`, `--fui-sheen-soft`, `--fui-pressed`, `--fui-focus-halo`, `--fui-ease-out`; `--fui-shadow-xs/sm/md/lg` and `--fui-highlight` have new values. A host that set `box-shadow` or `background-image` on a package control replaces what the package paints; prefer the tokens.
 
+## The registry no longer offers other libraries (later on 0.10)
+
+ui.fabrials.com stops republishing Kibo UI and Magic UI (`kibo-*`, `magicui-*` registry items, the `/libraries` pages, the upstream sync and the license gate). No Fabrials product used them. An app that installed one keeps its copied source; it just gets no updates from this registry. The Fabrials pieces that cover them: `Files` (file tree), `ActivityStrip` (contribution graph), `Timeline` (event list) and `Dropzone` (dropped files). From now on a component a product needs from another library is adopted into the packages in the Fabrials style (`docs/registry.md`).
+
 ## What a host may need to change
 
 - **A host that boxed things itself.** A product CSS rule that gave a `Card` or `Table` its own radius or shadow now fights the plates; delete it.

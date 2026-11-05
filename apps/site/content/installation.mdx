@@ -37,14 +37,14 @@ npx shadcn@latest add https://ui.fabrials.com/r/styles.json
 Every component page shows its command, for example:
 
 ```bash
-npx shadcn@latest add @fabrials/mcp-dashboard @fabrials/kibo-kanban @fabrials/button
+npx shadcn@latest add @fabrials/mcp-dashboard @fabrials/select @fabrials/button
 ```
 
 The address works too: `https://ui.fabrials.com/r/<name>.json`.
 
 ## What gets installed
 
-For example, after `init` and `add @fabrials/button @fabrials/mcp-dashboard @fabrials/magicui-terminal`, a Next.js app has these new files:
+For example, after `init` and `add @fabrials/button @fabrials/mcp-dashboard`, a Next.js app has these new files:
 
 <Files>
   <File name="components.json" note="style and @fabrials registry" />
@@ -54,7 +54,6 @@ For example, after `init` and `add @fabrials/button @fabrials/mcp-dashboard @fab
   <Folder name="components" defaultOpen>
     <Folder name="ui" defaultOpen>
       <File name="button.tsx" note="shim" />
-      <File name="terminal.tsx" note="Magic UI, MIT notice on top" />
     </Folder>
     <Folder name="webmcp" note="8 files">
       <File name="arguments-form.tsx" />
@@ -82,7 +81,6 @@ For example, after `init` and `add @fabrials/button @fabrials/mcp-dashboard @fab
 | --- | --- |
 | A Fabrials control (`button`, `dialog`…) | A [shim](/docs/shims) in `components/ui/` that re-exports the `@fabrials/ui` control under shadcn's names |
 | A WebMCP or MCP block | Its source in `components/webmcp/` and helpers in `lib/mcp/` and `lib/webmcp/` |
-| A component from another library | Its source where that library puts it, with the library's license at the top of every file |
 
 Components import `@fabrials/ui` directly as well. Use the package in new code; use the shims where code expects shadcn's paths.
 
@@ -123,4 +121,4 @@ In Vite, render the provider in your root React tree. Configure `@/*` in TypeScr
 
 ## Updates
 
-The source belongs to you. Review registry updates before overwriting customised files; several entries share helpers, so keep related files in sync. Keep the license notices at the top of files that came from other libraries.
+The source belongs to you. Review registry updates before overwriting customised files; several entries share helpers, so keep related files in sync. Keep the notice at the top of every shim.

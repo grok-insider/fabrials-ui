@@ -11,8 +11,7 @@ Read [DESIGN.md](DESIGN.md) before changing anything visible.
 | `packages/ui` | `@fabrials/ui`: tokens, IBM Plex, controls, patterns, charts and the dithered brand pieces |
 | `packages/ai-ui` | `@fabrials/ai-ui`: provider, quota, history and chat presentation |
 | `apps/site` | ui.fabrials.com: the documentation, the playground and the registry |
-| `apps/site/registry` | Registry sources: Fabrials blocks, shims, and the snapshots of other libraries |
-| `apps/site/upstreams` | Which third-party components to aggregate, one manifest per library |
+| `apps/site/registry` | Registry sources: Fabrials blocks and shims |
 | `stories` | Storybook stories, all with synthetic data |
 | `tests` | Unit tests and the visual suite (Playwright in a container, with axe) |
 | `skills/fabrials-design-system` | The agent skill that points at this repository |
@@ -30,10 +29,10 @@ bun run vendor radiant --check   # fails if the copy differs from the build
 
 ```sh
 npx shadcn@latest init https://ui.fabrials.com/r/init.json
-npx shadcn@latest add @fabrials/mcp-dashboard @fabrials/button @fabrials/kibo-kanban
+npx shadcn@latest add @fabrials/mcp-dashboard @fabrials/button @fabrials/select
 ```
 
-The registry has Fabrials components, **shims** (shadcn primitives backed by `@fabrials/ui`) and **components from other libraries** that passed the license gate. See [docs/registry.md](docs/registry.md).
+The registry has Fabrials components and **shims** (shadcn primitives backed by `@fabrials/ui`). It does not republish other libraries: a component a product needs from one is adopted into the packages in the Fabrials style. See [docs/registry.md](docs/registry.md).
 
 ## Develop
 
@@ -45,8 +44,7 @@ bun run check                  # types, lint, unit tests, package build, site ch
 bun run storybook              # http://127.0.0.1:6041
 bun run dev:site               # http://127.0.0.1:3210
 bun run test:visual:container  # visual and accessibility suite
-bun run registry:build         # regenerate shims, external previews and public/r
-bun run registry:sync          # re-snapshot the third-party libraries (network)
+bun run registry:build         # regenerate the shims and public/r
 ```
 
 `bun run build:site` builds the packages and the site. The site's Docker image builds from the repository root: `docker build -f Dockerfile.site .`.
@@ -62,4 +60,4 @@ Upgrading a product is that product's decision; read [docs/migration-0.9.md](doc
 
 ## Licenses
 
-Fabrials UI is MIT. IBM Plex is under the SIL Open Font License. Components copied from other projects keep their licenses; see [THIRD_PARTY.md](THIRD_PARTY.md) and [docs/provenance.md](docs/provenance.md).
+Fabrials UI is MIT. IBM Plex is under the SIL Open Font License. Code and recipes adapted from other projects keep their notices; see [THIRD_PARTY.md](THIRD_PARTY.md) and [docs/provenance.md](docs/provenance.md).

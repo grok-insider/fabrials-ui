@@ -41,18 +41,10 @@ const names = [
   "dialog",
   "select",
   "dropdown-menu",
-  "magicui-file-tree",
-  "magicui-marquee",
-  "kibo-kanban",
-  "kibo-dropzone",
 ];
 run("npx", ["-y", "shadcn@latest", "add", ...names.map((name) => `@fabrials/${name}`), "--yes", "--overwrite"], app);
 
-for (const [file, notice] of [
-  ["components/ui/marquee.tsx", "Magic UI"],
-  ["components/kibo-ui/kanban/index.tsx", "Kibo UI"],
-  ["components/ui/button.tsx", "Fabrials UI shim"],
-])
+for (const [file, notice] of [["components/ui/button.tsx", "Fabrials UI shim"]])
   if (!(await readFile(join(app, file), "utf8")).includes(notice)) throw new Error(`${file} lost its notice on install`);
 
 await writeFile(
@@ -62,9 +54,6 @@ import { DitherGem } from "@fabrials/ui";
 import { Button } from "@/components/ui/button";
 import { Comparison } from "@/components/webmcp/comparison";
 import { MCPDashboard } from "@/components/webmcp/mcp-dashboard";
-import { Marquee } from "@/components/ui/marquee";
-import { Tree, Folder, File } from "@/components/ui/file-tree";
-import { Dropzone, DropzoneContent, DropzoneEmptyState } from "@/components/kibo-ui/dropzone";
 
 export default function Page() {
   return (
@@ -72,11 +61,6 @@ export default function Page() {
       <h1 className="font-display text-4xl font-semibold"><DitherGem gem="zircon" size={28} /> Registry smoke</h1>
       <Button>Primary</Button>
       <Comparison columns={[{ id: "a", title: "A" }]} rows={[]} caption="Compare" />
-      <Marquee><span>One</span><span>Two</span></Marquee>
-      <Tree elements={[{ id: "1", name: "src", children: [{ id: "2", name: "page.tsx" }] }]}>
-        <Folder element="src" value="1"><File value="2">page.tsx</File></Folder>
-      </Tree>
-      <Dropzone><DropzoneEmptyState /><DropzoneContent /></Dropzone>
       <MCPDashboard />
     </main>
   );

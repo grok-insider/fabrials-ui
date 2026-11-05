@@ -229,13 +229,11 @@ For a system theme with no script, set `data-theme="system"` on the root (and no
 
 ## The registry and other libraries
 
-ui.fabrials.com publishes a shadcn registry with three kinds of entry:
+ui.fabrials.com publishes a shadcn registry with two kinds of entry:
 
 - **Fabrials components:** the controls above, and the WebMCP and MCP blocks. `init` sets an app up with the palette; `styles` imports the CSS without changing the palette.
 - **Shims:** shadcn primitives backed by Fabrials controls, generated for every primitive `@fabrials/ui` covers completely, so code written for shadcn gets Fabrials controls.
-- **Components from other libraries:** copied from public shadcn registries at a reviewed snapshot. The repository's license (read at the synced commit) and every npm package a component imports must be MIT, Apache-2.0, ISC, BSD-2-Clause, BSD-3-Clause or 0BSD; anything else, or anything unclear, is refused. Files are republished unchanged with the license at the top, and a component must compile against the shims.
-
-Components from other libraries carry a tier. **Community** components keep their library's look and list their design notes: literal colours, continuous motion, ignored reduced motion, gradients, glow or theme overrides. **Fabrials** components have none. Fabrials products use Fabrials-tier components only; promoting one means adapting it to this document and moving it into the packages, with a story, a keyboard test and a visual reference.
+The registry does not republish other libraries. When a product needs a component another library offers, the system adopts it: the piece is rewritten into the packages to this document (tokens, material, motion, keyboard and both themes), with a story, a keyboard test and a visual reference, so every product gets one version that looks and behaves like the rest. A technique or recipe adapted from a permissively licensed project (MIT, Apache-2.0, ISC, BSD) keeps its notice beside the code and in `THIRD_PARTY.md`; a project under extra terms (Commons Clause and the like) is only studied, never copied.
 
 ## Extending the system
 
