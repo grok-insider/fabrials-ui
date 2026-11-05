@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { PageHeader, SectionHeader } from "@fabrials/ui";
+import { DirectionProvider, PageHeader, SectionHeader } from "@fabrials/ui";
 
 /** A catalogue page: the page title, then blocks. */
 export function Page({ title, description, wide = false, children }: { title: string; description: string; wide?: boolean; children: ReactNode }) {
@@ -11,7 +11,10 @@ export function Page({ title, description, wide = false, children }: { title: st
   );
 }
 
-/** A width the component is asked to live in: `358` is a phone pane, and the frame never grows past the window. */
+/**
+ * A width the component is asked to live in: `358` is a phone pane, and the frame never grows past the window. A
+ * right-to-left frame also tells Base UI the direction, as a right-to-left app does at its root.
+ */
 export function Frame({ width, dir, children }: { width?: number; dir?: "rtl"; children: ReactNode }) {
   return (
     <div
@@ -27,7 +30,7 @@ export function Frame({ width, dir, children }: { width?: number; dir?: "rtl"; c
         padding: "var(--fui-space-3)",
       }}
     >
-      {children}
+      {dir ? <DirectionProvider direction={dir}>{children}</DirectionProvider> : children}
     </div>
   );
 }

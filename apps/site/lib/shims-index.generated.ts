@@ -174,6 +174,13 @@ export const shimIndex: { name: string; exports: string[] }[] = [
     ]
   },
   {
+    "name": "direction",
+    "exports": [
+      "DirectionProvider",
+      "useDirection"
+    ]
+  },
+  {
     "name": "dropdown-menu",
     "exports": [
       "DropdownMenu",

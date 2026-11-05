@@ -244,7 +244,13 @@ function Transport({
       <span className="fui-player-clock" id={`${idPrefix}-clock`}>
         {formatClock(state.time)} / {formatClock(state.duration)}
       </span>
-      <IconButton size="icon-sm" label={state.muted || state.volume === 0 ? text.unmute : text.mute} tooltip={false} onClick={() => run({ type: "mute" })}>
+      <IconButton
+        size="icon-sm"
+        label={state.muted || state.volume === 0 ? text.unmute : text.mute}
+        tooltip={false}
+        className="fui-player-mute"
+        onClick={() => run({ type: "mute" })}
+      >
         {state.muted || state.volume === 0 ? <VolumeX aria-hidden="true" /> : <Volume2 aria-hidden="true" />}
       </IconButton>
       <span className="fui-player-volume">
@@ -266,7 +272,16 @@ function Transport({
         />
       </span>
       <DropdownMenu>
-        <DropdownMenuTrigger render={<IconButton size="icon-sm" label={`${text.speed}: ${state.rate === 1 ? text.normalSpeed : `${state.rate}×`}`} tooltip={false} />}>
+        <DropdownMenuTrigger
+          render={
+            <IconButton
+              size="icon-sm"
+              label={`${text.speed}: ${state.rate === 1 ? text.normalSpeed : `${state.rate}×`}`}
+              tooltip={false}
+              className="fui-player-speed"
+            />
+          }
+        >
           {state.rate === 1 ? <Gauge aria-hidden="true" /> : <span className="fui-player-rate">{state.rate}×</span>}
         </DropdownMenuTrigger>
         <DropdownMenuContent side="top" align="end" className="fui-player-menu">
@@ -427,6 +442,7 @@ export function VideoPlayer({ src, label, poster, tracks, autoPlay = false, labe
               size="icon-sm"
               label={text.pictureInPicture}
               tooltip={false}
+              className="fui-player-pip"
               onClick={() => {
                 const element = video.current;
                 if (!element) return;

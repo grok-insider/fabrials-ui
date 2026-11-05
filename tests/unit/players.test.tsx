@@ -54,4 +54,7 @@ test("the player bar rests as a solid scrim, never a gradient, and gives way und
   assert.match(block, /\.fui-video-player \.fui-player-bar \{[^}]*background: var\(--fui-media-scrim\);/);
   assert.doesNotMatch(block.replace(/var\(--fui-sheen(-soft)?\)/g, ""), /gradient\(/);
   assert.match(block, /@container \(max-width: 30rem\) \{\s+\.fui-player-volume \{\s+display: none;/);
+  // A narrow video breaks the bar into rows with a full-width pseudo-element, and shows only the play key before playing.
+  assert.match(block, /@container \(max-width: 36rem\) \{[\s\S]*?\.fui-video-player \.fui-player-bar::after \{[^}]*flex-basis: 100%;/);
+  assert.match(block, /\.fui-video-player\[data-state="idle"\] \.fui-player-bar \{\s+display: none;/);
 });

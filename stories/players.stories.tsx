@@ -37,7 +37,10 @@ function VideoPage() {
           <VideoPlayer src={HARBOUR} poster={POSTER} label="The harbour at dusk" width={640} height={360} tracks={[{ src: CAPTIONS, srcLang: "en", label: "English" }]} />
         </Frame>
       </Block>
-      <Block title="Narrow, and a file that does not play" description="Below 30 rem the volume slider goes; below 21 rem the clock. A failed file says why and offers the file itself.">
+      <Block
+        title="Narrow, and a file that does not play"
+        description="Below 36 rem the seek bar and the clock take the top row and the keys go under them; before the first play only the play key shows. A failed file says why and offers the file itself."
+      >
         <div className="catalogue-row" style={{ alignItems: "start" }}>
           <Frame width={320}>
             <VideoPlayer src={HARBOUR} poster={POSTER} label="The harbour, small" width={640} height={360} />

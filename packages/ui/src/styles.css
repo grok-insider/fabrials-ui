@@ -7558,7 +7558,7 @@
   }
   .fui-slider-mark {
     position: absolute;
-    left: var(--fui-slider-mark);
+    inset-inline-start: var(--fui-slider-mark);
     width: 1px;
     height: 0.3125rem;
     background: color-mix(in oklab, var(--muted-foreground) 70%, transparent);
@@ -7567,16 +7567,30 @@
     height: 0.4375rem;
     background: var(--muted-foreground);
   }
+  /* A label is centred on its tick, except at the ends of the track, where it turns inward so it never leaves the slider.
+     Logical like Base UI's thumbs, so a right-to-left slider mirrors its ruler. */
   .fui-slider-mark-label {
     position: absolute;
     top: 0.625rem;
-    left: 0;
+    inset-inline-start: 0;
     translate: -50% 0;
     color: var(--muted-foreground);
     font-family: var(--fui-font-label);
     font-size: var(--fui-text-label);
     letter-spacing: var(--fui-tracking-label);
     white-space: nowrap;
+  }
+  .fui-slider-mark-label:dir(rtl) {
+    translate: 50% 0;
+  }
+  .fui-slider-mark[data-edge="start"] .fui-slider-mark-label {
+    translate: 0 0;
+  }
+  .fui-slider-mark[data-edge="end"] .fui-slider-mark-label {
+    translate: -100% 0;
+  }
+  .fui-slider-mark[data-edge="end"] .fui-slider-mark-label:dir(rtl) {
+    translate: 100% 0;
   }
   .fui-slider-value {
     min-width: 3ch;
@@ -7732,6 +7746,8 @@
   .fui-calendar {
     position: relative;
     display: inline-grid;
+    inline-size: fit-content;
+    max-inline-size: 100%;
     padding: var(--fui-space-3);
     color: var(--foreground);
     font-size: var(--fui-text-sm);
@@ -8726,7 +8742,49 @@
     }
   }
   @container (max-width: 21rem) {
-    .fui-player-clock {
+    .fui-audio-player .fui-player-clock {
+      display: none;
+    }
+  }
+  /* A narrow video (a phone, a side panel) gives the seek bar and the clock the top row of the bar and puts the keys under
+     them: play and sound at the start, the rest at the end. A full-width pseudo-element breaks the row, so the break does
+     not depend on how wide the clock is. Before the first play only the play key shows. 36rem is where the 44 px touch
+     keys stop fitting in one row; picture in picture and then the speed menu (still on < and >) give way below that. */
+  @container (max-width: 36rem) {
+    .fui-video-player .fui-player-bar {
+      flex-wrap: wrap;
+      column-gap: 0;
+    }
+    .fui-video-player .fui-player-bar::after {
+      content: "";
+      order: -1;
+      flex-basis: 100%;
+      height: 0;
+    }
+    .fui-video-player :is(.fui-player-seek, .fui-player-clock) {
+      order: -2;
+    }
+    .fui-video-player .fui-player-seek {
+      flex: 1 1 0;
+      padding-inline-start: var(--fui-space-1);
+    }
+    .fui-video-player .fui-player-volume {
+      display: none;
+    }
+    .fui-video-player .fui-player-mute {
+      margin-inline-end: auto;
+    }
+    .fui-video-player[data-state="idle"] .fui-player-bar {
+      display: none;
+    }
+  }
+  @container (max-width: 18rem) {
+    .fui-video-player .fui-player-pip {
+      display: none;
+    }
+  }
+  @container (max-width: 15rem) {
+    .fui-video-player .fui-player-speed {
       display: none;
     }
   }

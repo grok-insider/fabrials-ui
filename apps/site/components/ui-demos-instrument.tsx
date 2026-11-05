@@ -1,7 +1,7 @@
 "use client";
 
 // Previews for the components added in 0.10 "Instrument". Synthetic data only.
-import { useState, type ReactNode } from "react";
+import { useLayoutEffect, useState, type ReactNode } from "react";
 import {
   AnimatedImage,
   AspectRatio,
@@ -21,6 +21,7 @@ import {
   ContextMenuItem,
   ContextMenuSeparator,
   ContextMenuTrigger,
+  DirectionProvider,
   Dropzone,
   ItemContent,
   ItemDescription,
@@ -147,7 +148,16 @@ function ListBoxDemo() {
 const LINES = Array.from({ length: 5000 }, (_, index) => ({ id: String(index), text: `Event ${index + 1}: mailbox synced in ${(index * 37) % 900} ms` }));
 
 function SidePanelDemo() {
-  const [open, setOpen] = useState(true);
+  // The preview follows the window: open where the panel docks, closed where it would be a modal sheet over the docs page
+  // (that one opens when asked). A layout effect, so it hears a resize before the panel does and no sheet flashes open.
+  const [open, setOpen] = useState(false);
+  useLayoutEffect(() => {
+    const docks = window.matchMedia("(min-width: 560px)");
+    const follow = () => setOpen(docks.matches);
+    follow();
+    docks.addEventListener("change", follow);
+    return () => docks.removeEventListener("change", follow);
+  }, []);
   return (
     <div className="flex min-h-72 w-full border">
       <div className="min-w-0 flex-1 p-4">
@@ -197,6 +207,8 @@ function scene(width: number, height: number, top: string, bottom: string, sun: 
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
 
+const POSTER = scene(1600, 900, "#0d1b2e", "#3d6e9c", "#e9d8a6");
+
 const SCENES = [
   { src: scene(2400, 1500, "#0d1b2e", "#3d6e9c", "#e9d8a6"), alt: "A harbour at dusk" },
   { src: scene(1200, 1800, "#1b2a22", "#6f9a7c", "#f1e6c8"), alt: "Orchard terraces" },
@@ -233,6 +245,16 @@ const LEDGER = {
 };
 
 export const instrumentDemos: Record<string, () => ReactNode> = {
+  direction: () => (
+    <Frame>
+      <div dir="rtl" lang="ar" className="grid gap-2">
+        <DirectionProvider direction="rtl">
+          <Label>مستوى الصوت</Label>
+          <Slider aria-label="مستوى الصوت" defaultValue={40} showValue />
+        </DirectionProvider>
+      </div>
+    </Frame>
+  ),
   spreadsheet: () => (
     <Frame>
       <Spreadsheet workbook={LEDGER} aria-label="Usage export" height={240} locale="en-GB" />
@@ -240,7 +262,7 @@ export const instrumentDemos: Record<string, () => ReactNode> = {
   ),
   "video-player": () => (
     <Frame>
-      <VideoPlayer src="/media/harbour.webm" label="The harbour at dusk" poster={SCENES[0]!.src} width={640} height={360} tracks={[{ src: "/media/harbour.en.vtt", srcLang: "en", label: "English" }]} />
+      <VideoPlayer src="/media/harbour.webm" label="The harbour at dusk" poster={POSTER} width={640} height={360} tracks={[{ src: "/media/harbour.en.vtt", srcLang: "en", label: "English" }]} />
     </Frame>
   ),
   "audio-player": () => (

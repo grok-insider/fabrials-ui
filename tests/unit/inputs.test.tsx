@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
-import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot, NumberField, PasswordInput, SearchInput, Slider, Textarea } from "@fabrials/ui";
+import { DirectionProvider, InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot, NumberField, PasswordInput, SearchInput, Slider, Textarea, useDirection } from "@fabrials/ui";
 
 const styles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
 
@@ -51,6 +51,10 @@ test("slider: one thumb per value, a range names each thumb, marks sit on the ru
   assert.match(range, /aria-label="Minimum"/);
   assert.match(range, /aria-label="Maximum"/);
   assert.match(range, /--fui-slider-mark:50%/);
+  // The ends of the ruler turn their labels inward; a vertical slider has no ruler.
+  assert.match(range, /data-edge="start" style="--fui-slider-mark:0%"/);
+  assert.match(range, /data-edge="end" style="--fui-slider-mark:100%"/);
+  assert.doesNotMatch(renderToStaticMarkup(<Slider aria-label="Gain" orientation="vertical" marks={[0, 50, 100]} />), /fui-slider-mark|data-marks/);
   assert.match(range, /<span class="fui-slider-mark-label">Half<\/span>/);
   assert.match(range, /data-marks=""/);
 });
@@ -82,6 +86,21 @@ test("one-time code: a slot per character, every slot after the first named by i
   assert.match(grouped, /Carácter 3 de 4/);
   assert.match(grouped, /fui-input-otp-separator/);
   assert.match(grouped, /data-invalid=""/);
+});
+
+test("the direction provider is Base UI's, under shadcn's names: inside it, Base UI reads right to left", () => {
+  function Reads() {
+    return <span>{useDirection()}</span>;
+  }
+  assert.equal(renderToStaticMarkup(<Reads />), "<span>ltr</span>");
+  assert.equal(
+    renderToStaticMarkup(
+      <DirectionProvider direction="rtl">
+        <Reads />
+      </DirectionProvider>,
+    ),
+    "<span>rtl</span>",
+  );
 });
 
 test("a growing textarea carries its row limits; a plain one is unchanged", () => {

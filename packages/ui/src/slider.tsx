@@ -15,7 +15,7 @@ export type SliderProps = StyledProps<BaseSlider.Root.Props> & {
   thumbLabels?: string[];
   /** What a screen reader says for a value ("3 of 5 stars"); the formatted value by default. */
   getAriaValueText?: (formattedValue: string, value: number, index: number) => string;
-  /** Ruler ticks under the track, each optionally labelled in the label voice. */
+  /** Ruler ticks under a horizontal track, each optionally labelled in the label voice. A vertical slider draws none. */
   marks?: SliderMark[];
   /** The formatted value at the end of the slider, in the label voice (a range reads "20 – 80"). */
   showValue?: boolean;
@@ -48,6 +48,7 @@ export function Slider({
 }: SliderProps) {
   const count = thumbCount(value, defaultValue);
   const span = max - min || 1;
+  const ruler = orientation === "horizontal" && !!marks?.length;
   return (
     <BaseSlider.Root
       {...props}
@@ -57,7 +58,7 @@ export function Slider({
       max={max}
       orientation={orientation}
       className={classes("fui-slider", className)}
-      data-marks={marks?.length ? "" : undefined}
+      data-marks={ruler ? "" : undefined}
     >
       <BaseSlider.Control className="fui-slider-control">
         <BaseSlider.Track className="fui-slider-track">
@@ -73,14 +74,20 @@ export function Slider({
             />
           ))}
         </BaseSlider.Track>
-        {marks?.length ? (
+        {ruler ? (
           <span className="fui-slider-marks" aria-hidden="true">
-            {marks.map((mark) => {
+            {marks!.map((mark) => {
               const at = typeof mark === "number" ? mark : mark.value;
               const label = typeof mark === "number" ? undefined : mark.label;
               const offset = `${((Math.min(max, Math.max(min, at)) - min) / span) * 100}%`;
               return (
-                <span key={at} className="fui-slider-mark" data-labelled={label !== undefined ? "" : undefined} style={{ "--fui-slider-mark": offset } as CSSProperties}>
+                <span
+                  key={at}
+                  className="fui-slider-mark"
+                  data-labelled={label !== undefined ? "" : undefined}
+                  data-edge={at <= min ? "start" : at >= max ? "end" : undefined}
+                  style={{ "--fui-slider-mark": offset } as CSSProperties}
+                >
                   {label !== undefined ? <span className="fui-slider-mark-label">{label}</span> : null}
                 </span>
               );

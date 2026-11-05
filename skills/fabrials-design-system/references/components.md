@@ -51,6 +51,7 @@ import { ChatMessage, ChatComposer } from "@fabrials/ai-ui";         // needs @f
 | A number people step or type | `NumberField` (`min`, `max`, `step`, `format`, `unit`) | `type="number"` and its spinners |
 | A value or range picked by feel (volume, price, quality) | `Slider` (`marks`, `showValue`; an array for a range) | `type="range"`, a `NumberField` when the exact number matters |
 | A verification code | `InputOTP` (or its shadcn parts) | Six separate `Input`s with hand-written focus moves |
+| A right-to-left interface (Arabic, Hebrew) | `dir="rtl"` on the root and `DirectionProvider direction="rtl"` around the app | Only `dir`, which leaves Base UI's sliders, menus and tabs reading left to right |
 | A reply or prompt that grows with its text | `Textarea autoResize minRows maxRows` | A script that sets the height on every key |
 | A date or a date range in a form | `DatePicker`, `DateRangePicker` (`name` posts `yyyy-mm-dd`) | `type="date"` (its popup cannot be styled or translated), a hand-made calendar |
 | A month on show, to pick from in place | `Calendar` (`mode`, `selected`, `onSelect`, `disabled`) | A grid of buttons with its own keyboard |

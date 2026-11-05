@@ -194,6 +194,7 @@ Focus is a visible 2 px outline with an offset, in Stormlight. Base UI keeps key
 
 - **Forced colors** (Windows high contrast) repaint every background in Canvas and drop every shadow, so a state is never only a fill or a `box-shadow`: the packages carry one block that gives meters, switches, badges, legend keys and pressed segments a form in system colors (`Highlight`, `CanvasText`). A pressed or active item is a bar under its label: not an outline (that is the focus ring's shape) and not a `Highlight` fill behind the text (Chromium paints a Canvas backplate behind text over an author background).
 - **A page is a landmark.** `AuthLayout` is the sign-in page's `<main>`; a host that already renders one passes `as="div"`.
+- **Right to left** takes two settings from the same value: `dir="rtl"` on the root turns the layout (the components use logical CSS), and `DirectionProvider direction="rtl"` turns Base UI's behaviour (slider thumbs and their arrow keys, menus, tabs, toolbars). With only the attribute, a slider draws its thumb a thumb's width off the end of its fill and its arrows run the wrong way.
 
 ## Using the system in a product
 

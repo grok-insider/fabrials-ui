@@ -105,6 +105,30 @@ test("slider: a thumb takes focus, arrows and End move it, a range names both th
   await expect(quality).toHaveAttribute("aria-valuenow", "4");
 });
 
+test("right to left, with the direction provider: Left raises the value and the thumb sits on the end of the fill", async ({ page }) => {
+  await open(page, "fabrials-inputs--numbers");
+  const slider = page.getByRole("slider", { name: "مستوى الصوت" });
+  await expect(slider).toHaveAttribute("aria-valuenow", "40");
+  const root = page.locator(".fui-slider").filter({ has: slider });
+  const geometry = async () =>
+    root.evaluate((element) => {
+      const fill = element.querySelector(".fui-slider-indicator")!.getBoundingClientRect();
+      const thumb = element.querySelector(".fui-slider-thumb")!.getBoundingClientRect();
+      return { fillStart: fill.left, fillEnd: fill.right, thumbCentre: thumb.left + thumb.width / 2 };
+    });
+  const before = await geometry();
+  expect(Math.abs(before.thumbCentre - before.fillStart)).toBeLessThan(1.5);
+  await slider.focus();
+  await page.keyboard.press("ArrowLeft");
+  await expect(slider).toHaveAttribute("aria-valuenow", "41");
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("ArrowRight");
+  await expect(slider).toHaveAttribute("aria-valuenow", "39");
+  const after = await geometry();
+  expect(after.fillEnd).toBeCloseTo(before.fillEnd, 0);
+  expect(Math.abs(after.thumbCentre - after.fillStart)).toBeLessThan(1.5);
+});
+
 test("one-time code: typing moves on, Backspace moves back, a paste fills every slot", async ({ page }) => {
   await open(page, "fabrials-inputs--codes");
   const first = page.getByRole("textbox", { name: "Verification code" });

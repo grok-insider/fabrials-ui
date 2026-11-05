@@ -374,7 +374,7 @@ export const uiCatalog: UiCatalogItem[] = [
       ["autoPlay", "boolean", "Start when it mounts (a viewer opened by a click), unless the person asked for less motion."],
       ["labels", "Partial<PlayerLabels>", "Every word on the controls and the failure messages."],
     ],
-    "Space or K, J and L, the arrows, M, F, C, < and >, Home, End and the digits work while it has focus; a slider or a menu keeps its own keys. One video plays at a time, the bar rests while it plays, and a file that fails says why and links to it. It carries the dark theme's tokens.",
+    "Space or K, J and L, the arrows, M, F, C, < and >, Home, End and the digits work while it has focus; a slider or a menu keeps its own keys. One video plays at a time, the bar rests while it plays, and a file that fails says why and links to it. Below 36 rem the seek bar takes its own row and only the play key shows before the first play. It carries the dark theme's tokens.",
   ),
   ui(
     "audio-player",
@@ -458,6 +458,18 @@ export const uiCatalog: UiCatalogItem[] = [
       ["children", "ReactNode", "The host's list of chosen files under the zone."],
     ],
     "No dependency: the browser's file input sits in the button inside the zone, so the keyboard and forms are the browser's. While files are dragged over, the well lights in Stormlight.",
+  ),
+  ui(
+    "direction",
+    "Direction",
+    "Composition",
+    "Tells Base UI the reading direction, for right-to-left interfaces.",
+    ["DirectionProvider", "useDirection"],
+    [
+      ["direction", "ltr | rtl", "Set it from the same value as the root's dir attribute."],
+      ["useDirection", "() => ltr | rtl", "The direction a component inside reads."],
+    ],
+    "Base UI's provider, under shadcn's names (the direction shim). dir turns the layout; the provider turns the behaviour: slider thumbs and their arrow keys, menus, tabs and toolbars. A right-to-left app needs both.",
   ),
   ui(
     "input-otp",

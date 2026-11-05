@@ -19,6 +19,7 @@ export * from "./button-group";
 export * from "./input-group";
 export * from "./inputs";
 export * from "./slider";
+export * from "./direction";
 export * from "./input-otp";
 export * from "./calendar";
 export * from "./context-menu";

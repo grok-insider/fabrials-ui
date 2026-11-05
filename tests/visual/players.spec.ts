@@ -64,6 +64,33 @@ test("a video in the viewer takes the keys while it has focus; Escape still clos
   await expect(page.getByRole("dialog")).toHaveCount(0);
 });
 
+test("a narrow video: only the play key before the first play, then the seek bar on its own row and every key inside", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(`/iframe.html?id=fabrials-players--video&viewMode=story&globals=theme:light`);
+  await expect(page.locator("#storybook-root h1").first()).toBeVisible();
+  const player = page.getByRole("group", { name: "The harbour at dusk" });
+  await expect.poll(() => prop(player, "duration")).toBeGreaterThan(5);
+  await expect(player.locator(".fui-player-bar")).toBeHidden();
+  await player.locator(".fui-player-start").click();
+  await expect(player).toHaveAttribute("data-playing", "");
+  await player.focus();
+  await page.keyboard.press("k");
+  await expect(player).not.toHaveAttribute("data-playing", "");
+  const frame = (await player.boundingBox())!;
+  const keys = await player.locator(".fui-player-bar button").evaluateAll((buttons) =>
+    buttons.filter((button) => button.getClientRects().length > 0).map((button) => button.getBoundingClientRect().toJSON() as DOMRect),
+  );
+  expect(keys.length).toBeGreaterThanOrEqual(4);
+  for (const key of keys) {
+    expect(key.left).toBeGreaterThanOrEqual(frame.x - 0.5);
+    expect(key.right).toBeLessThanOrEqual(frame.x + frame.width + 0.5);
+  }
+  const seek = (await player.locator(".fui-player-seek").boundingBox())!;
+  expect(seek.y + seek.height).toBeLessThanOrEqual(Math.min(...keys.map((key) => key.top)) + 0.5);
+  expect(seek.width).toBeGreaterThan(frame.width * 0.5);
+  await expect(player.locator(".fui-player-clock")).toBeVisible();
+});
+
 test("audio: Space plays from the frame, the seek bar speaks the time", async ({ page }) => {
   await open(page, "fabrials-players--sound-and-animation");
   const player = page.getByRole("group", { name: "Three-note chime" });
