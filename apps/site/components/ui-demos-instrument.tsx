@@ -3,7 +3,9 @@
 // Previews for the components added in 0.10 "Instrument". Synthetic data only.
 import { useState, type ReactNode } from "react";
 import {
+  AnimatedImage,
   AspectRatio,
+  AudioPlayer,
   Avatar,
   AvatarBadge,
   AvatarFallback,
@@ -25,6 +27,7 @@ import {
   ItemMedia,
   ItemTitle,
   ListBox,
+  VideoPlayer,
   SidePanel,
   SidePanelBody,
   SidePanelClose,
@@ -213,6 +216,24 @@ function GalleryDemo({ count }: { count: number }) {
 }
 
 export const instrumentDemos: Record<string, () => ReactNode> = {
+  "video-player": () => (
+    <Frame>
+      <VideoPlayer src="/media/harbour.webm" label="The harbour at dusk" poster={SCENES[0]!.src} width={640} height={360} tracks={[{ src: "/media/harbour.en.vtt", srcLang: "en", label: "English" }]} />
+    </Frame>
+  ),
+  "audio-player": () => (
+    <Frame>
+      <AudioPlayer src="/media/chime.webm" label="Three-note chime" title="Three-note chime · 0:05" />
+    </Frame>
+  ),
+  "animated-image": () => (
+    <Frame>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <AnimatedImage src="/media/loop.webm" alt="Colour drifting across a dusk sky" width={320} height={180} />
+        <AnimatedImage src="/media/loop.gif" alt="Green copper light rippling" type="image" width={240} height={135} />
+      </div>
+    </Frame>
+  ),
   "avatar-group": () => (
     <Frame>
       <div className="flex flex-wrap items-center gap-6">

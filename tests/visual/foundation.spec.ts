@@ -69,6 +69,8 @@ const stories: Record<string, string> = {
   "media-people": "fabrials-media--people",
   "media-images": "fabrials-media--images",
   "media-viewer": "fabrials-media--viewer",
+  "players-video": "fabrials-players--video",
+  "players-sound": "fabrials-players--sound-and-animation",
   "feedback-state-panels": "fabrials-feedback--state-panels",
   "feedback-confirmations": "fabrials-feedback--confirmations",
   "feedback-times": "fabrials-feedback--times",

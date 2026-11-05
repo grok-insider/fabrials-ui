@@ -186,3 +186,27 @@ export function keyAction(key: string, options: { seekStep?: number; audio?: boo
       return /^[0-9]$/.test(key) ? { type: "seekTo", percent: Number(key) * 10 } : null;
   }
 }
+
+/**
+ * An animation (a GIF, or a video without sound that loops) moves only while at least half of it is on screen, the tab is
+ * in front and the person has not asked the system for less motion. Otherwise it shows a still frame and waits to be played.
+ */
+export function mayAnimate(state: { visibleRatio: number; tabHidden: boolean; reducedMotion: boolean }): boolean {
+  return !state.reducedMotion && !state.tabHidden && state.visibleRatio >= 0.5;
+}
+
+/** Why a video did not play (`MediaError.code`: 1 aborted, 2 network, 3 decode, 4 source not supported), in the host's words. */
+export function playbackProblem(
+  code: number | undefined,
+  words = {
+    network: "The download of the video was cut.",
+    decode: "This browser cannot decode the video.",
+    source: "The video is gone or its format cannot be played here.",
+    other: "The video could not be played.",
+  },
+): string {
+  if (code === 2) return words.network;
+  if (code === 3) return words.decode;
+  if (code === 4) return words.source;
+  return words.other;
+}

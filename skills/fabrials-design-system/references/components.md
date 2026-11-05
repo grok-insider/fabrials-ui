@@ -62,6 +62,9 @@ import { ChatMessage, ChatComposer } from "@fabrials/ai-ui";         // needs @f
 | A picture in the page | `Image` (`ratio`, `fit`, `caption`) or `AspectRatio` for other content | A bare `img` that jumps when it loads and leaves a broken icon |
 | The pictures of a post or a message | `MediaGrid` + `ImageViewer` | A grid of identical cards, a lightbox library |
 | People on a record | `AvatarGroup max` (+N), `AvatarBadge` for presence, the names beside it | A row of faces with no names, a coloured ring as the only status |
+| A video | `VideoPlayer` (`label`, `poster`, `tracks`; inside `ImageViewer` through `renderMedia`) | `<video controls>` (its controls cannot be styled or translated), a player library |
+| A recording | `AudioPlayer` | `<audio controls>` |
+| A GIF or a short silent loop | `AnimatedImage` (`type="video"` for MP4 or WebM, `"image"` for a GIF) | An `img` of a GIF that moves forever and cannot be paused |
 | A form with subsections | `FieldSet` + `FieldLegend` + `FieldGroup` | A bordered box per subsection, a `div` with a bold label |
 | Show or hide detail in place, with no state | `Disclosure` (native `details`) | A hand-styled `details`, an `Accordion` for one block |
 | A destructive confirmation | `AlertDialog`, or `ConfirmDialog` for an async action, or `useConfirm()` to `await` one | `window.confirm` in a flow that can wait (a guard that must answer synchronously keeps it) |

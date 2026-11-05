@@ -233,7 +233,7 @@ export function ImageViewer({ items, index, onIndexChange, onClose, label = "Ima
           className="dark fui-viewer"
           data-theme="dark"
           data-zoomed={zoomed ? "" : undefined}
-          initialFocus={() => stage.current}
+          initialFocus={() => stage.current?.querySelector<HTMLElement>("[data-media-keys] [tabindex='0']") ?? stage.current}
           onKeyDown={keydown}
         >
           {current ? (
@@ -269,8 +269,8 @@ export function ImageViewer({ items, index, onIndexChange, onClose, label = "Ima
               <div
                 ref={stageRef}
                 tabIndex={-1}
-                aria-label={current.alt || label}
-                role="group"
+                aria-label={isImage ? current.alt || label : undefined}
+                role={isImage ? "group" : undefined}
                 className="fui-viewer-stage"
                 data-zoomable={isImage && canZoom ? "" : undefined}
                 onPointerDown={pointerDown}

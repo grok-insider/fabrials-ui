@@ -180,7 +180,7 @@ The catalogue lives in Storybook (`bun run storybook`, port 6041) and at ui.fabr
 - **Collections:** Table, Tabs (vertical rail, scrolling strip), NavTabs, Item (records as rows), ListBox (rows people choose from; `virtual` for thousands), VirtualList, Badge, Progress, Skeleton, Card, Accordion (rows for a stack of tools), Disclosure, Breadcrumb, Pagination, DescriptionList, Kbd and KbdGroup.
 - **Data:** Stat (with `meter`), StatGroup, Sparkline (scanline fill), Meter (`variant="ruler"`; threshold notches on the bar), StatusDot, Readout, NumberTicker, SeriesChart, ActivityStrip, Timeline, RelativeTime.
 - **Docs pieces:** CodePanel, CodeTabs, PackageInstall, Files/Folder/File and RepoInfo. Syntax uses the muted `--fui-syntax-*` inks, never Stormlight.
-- **Media:** Image, AspectRatio, MediaGrid, ImageViewer; Avatar sizes `xs` to `xl`, AvatarGroup with a count, AvatarBadge.
+- **Media:** Image, AspectRatio, MediaGrid, ImageViewer, VideoPlayer, AudioPlayer, AnimatedImage (a GIF or a silent loop that moves only on screen and can always be paused); Avatar sizes `xs` to `xl`, AvatarGroup with a count, AvatarBadge.
 - **Brand and chrome:** CornerMarks, GridGuides, CardCaption, DitherScene, DitherBand, DitherGem, DitherCanvas, ProductLockup, FabrialsGem, Avatar, Snippet, CopyButton, SiteHeader, AuthLayout, MoonPhase, Starfield.
 - **Patterns:** WorkspaceShell, AppHeader, Sidebar (menu rows work without a shell), SidePanel (a docked detail pane, a sheet on a phone), NavSwitcher, ResizablePanelGroup, PageHeader, SectionHeader, CollectionToolbar, BulkActions, StatePanel, SettingsSection, FilterChip, FileThumb, SuggestionCard, TruncatedText, ShimmerText.
 - **Loading:** `Loading` with `placeholderText`, `placeholderList` and `useLoading` (see Loading states).

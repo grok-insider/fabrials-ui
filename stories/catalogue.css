@@ -453,3 +453,7 @@ select {
   font-family: var(--fui-font-label);
   font-size: var(--fui-text-label);
 }
+.catalogue-viewer-video {
+  width: min(100%, 64rem);
+  max-height: 100%;
+}
