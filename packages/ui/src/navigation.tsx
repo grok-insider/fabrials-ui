@@ -63,7 +63,7 @@ export function BreadcrumbSeparator({
       className={classes("fui-breadcrumb-separator", className)}
       {...props}
     >
-      {children ?? <ChevronRight />}
+      {children ?? <span className="fui-breadcrumb-slash">/</span>}
     </li>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties, ComponentProps, ReactNode } from "react";
+import { useId, type CSSProperties, type ComponentProps, type ReactNode } from "react";
 import { Meter as BaseMeter } from "@base-ui/react/meter";
 import { ArrowDownRight, ArrowUpRight, Minus } from "lucide-react";
 import { classes } from "./shared";
@@ -125,6 +125,7 @@ export function Sparkline({
   const line = points
     .map(([x, y], index) => `${index ? "L" : "M"}${x.toFixed(2)} ${y.toFixed(2)}`)
     .join(" ");
+  const hatch = `fui-hatch-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   return (
     <svg
       viewBox={`0 0 ${width} ${height}`}
@@ -137,8 +138,14 @@ export function Sparkline({
       style={{ color }}
       {...props}
     >
+      <defs>
+        <pattern id={hatch} width={4} height={3} patternUnits="userSpaceOnUse">
+          <rect width={4} height={1} fill="currentColor" />
+        </pattern>
+      </defs>
       <path
-        className="fui-sparkline-area"
+        className="fui-sparkline-hatched"
+        fill={`url(#${hatch})`}
         d={`${line} L${width} ${height} L0 ${height} Z`}
       />
       <path className="fui-sparkline-line" d={line} vectorEffect="non-scaling-stroke" />
@@ -231,6 +238,11 @@ export function Meter({
       ) : (
         <BaseMeter.Track className="fui-meter-track">
           <BaseMeter.Indicator className="fui-meter-indicator" />
+          {tone
+            ? null
+            : [warnAt, dangerAt]
+                .filter((at) => at > 0 && at < 100)
+                .map((at) => <span key={at} aria-hidden className="fui-meter-notch" style={{ insetInlineStart: `${at}%` }} />)}
         </BaseMeter.Track>
       )}
       {hint ? <p className="fui-meter-hint">{hint}</p> : null}
