@@ -42,8 +42,8 @@ const url = process.env.URL ?? "http://127.0.0.1:3210/";
 ```sh
 docker run --rm --network host -e URL=http://127.0.0.1:3210/ \
   -v "$PWD/shots:/out" \
-  -v "<design-system repo>/node_modules/.bun/playwright-core@1.58.2:/pw:ro" \
-  mcr.microsoft.com/playwright:v1.58.2-noble@sha256:6446946a1d9fd62d9ae501312a2d76a43ee688542b21622056a372959b65d63d \
+  -v "<design-system repo>/node_modules/.bun/playwright-core@1.64.1:/pw:ro" \
+  mcr.microsoft.com/playwright:v1.64.1-noble@sha256:2f05f8a734509a7b3f26a912639488ee08f58a7b292d14d62271bcff9038768f \
   node /out/shoot.cjs
 ```
 

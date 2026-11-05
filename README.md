@@ -37,7 +37,7 @@ The registry has Fabrials components, **shims** (shadcn primitives backed by `@f
 
 ## Develop
 
-Bun manages dependencies; Node 22 builds. Container browser tests need Linux and Docker.
+Bun manages dependencies; Node 26 builds. Container browser tests need Linux and Docker.
 
 ```sh
 bun install --frozen-lockfile

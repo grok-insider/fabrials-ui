@@ -29,7 +29,22 @@
     "stage:publish": "node scripts/stage-publish.mjs"
   },
   "overrides": {
-    "axe-core": "4.14.0"
+    "axe-core": "4.14.0",
+    "@eslint/config-array": {
+      "minimatch": "^11.0.4"
+    },
+    "@joshwooding/vite-plugin-react-docgen-typescript": {
+      "glob": "^14.0.3"
+    },
+    "@ts-morph/common": {
+      "minimatch": "^11.0.4"
+    },
+    "@typescript-eslint/typescript-estree": {
+      "minimatch": "^11.0.4"
+    },
+    "eslint": {
+      "minimatch": "^11.0.4"
+    }
   },
   "devDependencies": {
     "@base-ui/react": "1.9.0",
@@ -38,7 +53,7 @@
     "@types/node": "^26",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@playwright/test": "1.58.2",
+    "@playwright/test": "1.64.1",
     "@axe-core/playwright": "4.14.0",
     "@storybook/react-vite": "10.6.5",
     "@storybook/addon-a11y": "10.6.5",
