@@ -2,6 +2,9 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Button, DitherGem, DitherScene, Kbd, Snippet } from "@fabrials/ui";
 import { accounts, daily, nav, products, senders, stats, week } from "./data";
 import "./instrument.css";
+import "./palettes.css";
+
+type Palette = "obsidian" | "ember" | "deep" | undefined;
 
 // Direction A, "Instrument": Fabrials as calibrated devices. Visible
 // construction (grid guides, corner marks, rulers), Plex Mono as a second
@@ -110,10 +113,10 @@ function Header() {
   );
 }
 
-function Landing() {
+function Landing({ palette }: { palette?: Palette }) {
   const peak = Math.max(...week.days);
   return (
-    <div className="in in-landing" id="top">
+    <div className="in in-landing" id="top" data-palette={palette}>
       <Header />
       <section className="in-hero" aria-labelledby="in-hero-title">
         <div className="in-guides" aria-hidden>
@@ -226,9 +229,9 @@ function Landing() {
   );
 }
 
-function Workspace() {
+function Workspace({ palette }: { palette?: Palette }) {
   return (
-    <div className="in in-app" data-gem="smokestone">
+    <div className="in in-app" data-gem="smokestone" data-palette={palette}>
       <aside className="in-side" aria-label="Palanaeum">
         <div className="in-side-lockup">
           <DitherGem gem="smokestone" size={28} />
@@ -373,3 +376,9 @@ function Workspace() {
 
 export const LandingPage: Story = { name: "Landing", render: () => <Landing /> };
 export const WorkspacePage: Story = { name: "Workspace", render: () => <Workspace /> };
+export const LandingObsidian: Story = { name: "Landing, Obsidian", render: () => <Landing palette="obsidian" /> };
+export const WorkspaceObsidian: Story = { name: "Workspace, Obsidian", render: () => <Workspace palette="obsidian" /> };
+export const LandingEmber: Story = { name: "Landing, Ember ink", render: () => <Landing palette="ember" /> };
+export const WorkspaceEmber: Story = { name: "Workspace, Ember ink", render: () => <Workspace palette="ember" /> };
+export const LandingDeep: Story = { name: "Landing, Deep Stormwall", render: () => <Landing palette="deep" /> };
+export const WorkspaceDeep: Story = { name: "Workspace, Deep Stormwall", render: () => <Workspace palette="deep" /> };

@@ -1,0 +1,140 @@
+/* Palette studies for direction A, measured against vercel.com, opencode.ai and anoma.ly/hex (5 Nov 2026).
+   Proposal only: scoped to .in[data-palette]. Each palette sets every role the mocks use, in both themes. */
+
+/* 1. Obsidian: neutral, no hue, like Geist (#000 / #0a0a0a / #2e2e2e / #ededed / #a1a1a1). */
+.in[data-palette="obsidian"] {
+  --background: #fafafa;
+  --card: #ffffff;
+  --popover: #ffffff;
+  --foreground: #111111;
+  --card-foreground: #111111;
+  --primary: #111111;
+  --primary-foreground: #fafafa;
+  --muted: #f1f1f1;
+  --secondary: #f1f1f1;
+  --accent: #ececec;
+  --muted-foreground: #5e5e5e;
+  --border: #e5e5e5;
+  --input: #e5e5e5;
+  --fui-control-border: #8f8f8f;
+  --fui-code: #f3f3f3;
+  --sidebar: #f5f5f5;
+  --sidebar-accent: #e9e9e9;
+  --brand: #1d63e0;
+  --brand-ink: #1a59cc;
+  --ring: #1a59cc;
+}
+.dark .in[data-palette="obsidian"] {
+  --background: #0a0a0a;
+  --card: #111111;
+  --popover: #161616;
+  --foreground: #ededed;
+  --card-foreground: #ededed;
+  --primary: #ededed;
+  --primary-foreground: #0a0a0a;
+  --muted: #1a1a1a;
+  --secondary: #1a1a1a;
+  --accent: #1f1f1f;
+  --muted-foreground: #a1a1a1;
+  --border: #262626;
+  --input: #2e2e2e;
+  --fui-control-border: #636363;
+  --fui-code: #0d0d0d;
+  --sidebar: #000000;
+  --sidebar-accent: #1a1a1a;
+  --brand: #7fb2ff;
+  --brand-ink: #8fbcff;
+  --ring: #8fbcff;
+}
+
+/* 2. Ember ink: warm near-black, like opencode.ai (#131010 / #1b1818 / #3d3838 / #f2eded / #b8b2b2). */
+.in[data-palette="ember"] {
+  --background: #fdfcfb;
+  --card: #ffffff;
+  --popover: #ffffff;
+  --foreground: #1e1a19;
+  --card-foreground: #1e1a19;
+  --primary: #1e1a19;
+  --primary-foreground: #fdfcfb;
+  --muted: #f4f1ef;
+  --secondary: #f4f1ef;
+  --accent: #efebe8;
+  --muted-foreground: #645e5c;
+  --border: #e8e3e0;
+  --input: #e8e3e0;
+  --fui-control-border: #948c88;
+  --fui-code: #f6f3f1;
+  --sidebar: #f8f6f4;
+  --sidebar-accent: #eeeae7;
+  --brand: #1f5fd6;
+  --brand-ink: #1b56c4;
+  --ring: #1b56c4;
+}
+.dark .in[data-palette="ember"] {
+  --background: #131010;
+  --card: #1a1717;
+  --popover: #201c1c;
+  --foreground: #f2eded;
+  --card-foreground: #f2eded;
+  --primary: #f2eded;
+  --primary-foreground: #131010;
+  --muted: #211d1d;
+  --secondary: #211d1d;
+  --accent: #262121;
+  --muted-foreground: #aaa3a1;
+  --border: #2e2928;
+  --input: #3d3838;
+  --fui-control-border: #6b6362;
+  --fui-code: #0f0d0d;
+  --sidebar: #0e0c0c;
+  --sidebar-accent: #221e1e;
+  --brand: #86b4f7;
+  --brand-ink: #96bff9;
+  --ring: #96bff9;
+}
+
+/* 3. Deep Stormwall: our cold slate, taken down to near-black like anoma.ly/hex (#070707, alpha surfaces, cool greys). */
+.in[data-palette="deep"] {
+  --background: #f6f7f8;
+  --card: #ffffff;
+  --popover: #ffffff;
+  --foreground: #0e1116;
+  --card-foreground: #0e1116;
+  --primary: #0e1116;
+  --primary-foreground: #f6f7f8;
+  --muted: #eef0f2;
+  --secondary: #eef0f2;
+  --accent: #e9ecef;
+  --muted-foreground: #565d68;
+  --border: #e0e3e7;
+  --input: #e0e3e7;
+  --fui-control-border: #858d98;
+  --fui-code: #f0f2f4;
+  --sidebar: #f1f3f5;
+  --sidebar-accent: #e6e9ed;
+  --brand: #2a63c4;
+  --brand-ink: #2459b3;
+  --ring: #2459b3;
+}
+.dark .in[data-palette="deep"] {
+  --background: #08090b;
+  --card: #0e1014;
+  --popover: #14171c;
+  --foreground: #e8eae6;
+  --card-foreground: #e8eae6;
+  --primary: #e8eae6;
+  --primary-foreground: #08090b;
+  --muted: #15181e;
+  --secondary: #15181e;
+  --accent: #191d24;
+  --muted-foreground: #9399a2;
+  --border: #1d2128;
+  --input: #2a2f38;
+  --fui-control-border: #5e6672;
+  --fui-code: #0b0d10;
+  --sidebar: #050608;
+  --sidebar-accent: #161a20;
+  --brand: #8fb8f5;
+  --brand-ink: #9cc4ff;
+  --ring: #9cc4ff;
+}
