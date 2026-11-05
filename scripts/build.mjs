@@ -60,7 +60,7 @@ for (const name of ["ui", "ai-ui"]) {
   execFileSync(
     process.execPath,
     [
-      resolve(root, "node_modules/typescript/bin/tsc"),
+      resolve(root, "node_modules/@typescript/native/bin/tsc"),
       "-p",
       resolve(directory, "tsconfig.build.json"),
       "--outDir",

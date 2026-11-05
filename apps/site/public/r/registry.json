@@ -175,7 +175,7 @@
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
         "@fabrials/ui@^0.9.0",
-        "lucide-react@^1.41.0"
+        "lucide-react@^1.68.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -245,7 +245,7 @@
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
         "@fabrials/ui@^0.9.0",
-        "lucide-react@^1.41.0"
+        "lucide-react@^1.68.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -271,11 +271,11 @@
       "description": "Native date fields and an accessible calendar, working in tandem.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@base-ui/react@^1.8.0",
+        "@base-ui/react@^1.9.0",
         "@fabrials/ui@^0.9.0",
         "class-variance-authority@^0.7.1",
         "clsx@^2.1.1",
-        "lucide-react@^1.41.0",
+        "lucide-react@^1.68.0",
         "tailwind-merge@^3.6.0"
       ],
       "registryDependencies": [
@@ -365,7 +365,7 @@
       "description": "Connect to the current protocol, with isolated legacy compatibility.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@modelcontextprotocol/client@2.0.0"
+        "@modelcontextprotocol/client@2.4.0"
       ],
       "registryDependencies": [],
       "meta": {
@@ -405,8 +405,8 @@
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
         "@fabrials/ui@^0.9.0",
-        "@modelcontextprotocol/client@2.0.0",
-        "lucide-react@^1.41.0"
+        "@modelcontextprotocol/client@2.4.0",
+        "lucide-react@^1.68.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -445,7 +445,7 @@
         "@fabrials/ui@^0.9.0",
         "ajv-formats@^3.0.1",
         "ajv@^8.20.0",
-        "lucide-react@^1.41.0"
+        "lucide-react@^1.68.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json",
@@ -490,7 +490,7 @@
         "@fabrials/ui@^0.9.0",
         "ajv-formats@^3.0.1",
         "ajv@^8.20.0",
-        "lucide-react@^1.41.0"
+        "lucide-react@^1.68.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json",
@@ -560,7 +560,7 @@
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
         "@fabrials/ui@^0.9.0",
-        "lucide-react@^1.41.0"
+        "lucide-react@^1.68.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json",
@@ -598,7 +598,7 @@
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
         "@fabrials/ui@^0.9.0",
-        "@modelcontextprotocol/client@2.0.0",
+        "@modelcontextprotocol/client@2.4.0",
         "ajv-formats@^3.0.1",
         "ajv@^8.20.0"
       ],
@@ -658,7 +658,7 @@
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
         "@fabrials/ui@^0.9.0",
-        "@modelcontextprotocol/client@2.0.0",
+        "@modelcontextprotocol/client@2.4.0",
         "ajv-formats@^3.0.1",
         "ajv@^8.20.0"
       ],
@@ -708,10 +708,10 @@
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
         "@fabrials/ui@^0.9.0",
-        "@modelcontextprotocol/client@2.0.0",
+        "@modelcontextprotocol/client@2.4.0",
         "ajv-formats@^3.0.1",
         "ajv@^8.20.0",
-        "lucide-react@^1.41.0"
+        "lucide-react@^1.68.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json",
@@ -799,7 +799,7 @@
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
         "ipaddr.js@^2.5.0",
-        "undici@^8.10.2"
+        "undici@^8.12.3"
       ],
       "registryDependencies": [],
       "meta": {

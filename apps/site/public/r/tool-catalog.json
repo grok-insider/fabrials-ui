@@ -9,7 +9,7 @@
     "@fabrials/ui@^0.9.0",
     "ajv-formats@^3.0.1",
     "ajv@^8.20.0",
-    "lucide-react@^1.41.0"
+    "lucide-react@^1.68.0"
   ],
   "registryDependencies": [
     "https://ui.fabrials.com/r/styles.json",

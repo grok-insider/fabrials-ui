@@ -7,7 +7,7 @@
   "author": "Fabrials <admin@grokinsider.net>",
   "dependencies": [
     "ipaddr.js@^2.5.0",
-    "undici@^8.10.2"
+    "undici@^8.12.3"
   ],
   "registryDependencies": [],
   "files": [
