@@ -110,7 +110,7 @@ test("items: the root carries only the row, the stretched target and the bar nev
   const root = rule(".fui-item {");
   for (const property of ["display", "padding", "gap", "flex", "grid"]) assert.doesNotMatch(root, new RegExp(`\\b${property}\\b`), `the row root must not set ${property}`);
   assert.match(root, /min-block-size: var\(--fui-control-height-lg\)/);
-  assert.match(root, /border-block-end: 1px solid var\(--border\)/);
+  assert.match(root, /border-block-end: 1px solid var\(--fui-separator\)/);
   // The bar is the ROW's ::before; the stretched target and its ring are the LINK's ::after.
   assert.match(rule(".fui-item[data-current]::before"), /inline-size: var\(--fui-bar\)/);
   assert.match(rule(".fui-item[data-current]::before"), /background: var\(--brand-ink\)/);
@@ -416,7 +416,7 @@ test("tabs: the root has a class, a strip is data-scrollable, a vertical rail ha
   const rail = rule('.fui-tabs-list[data-orientation="vertical"] {');
   assert.match(rail, /flex-direction: column/);
   assert.match(rail, /border-inline-end: 1px solid var\(--sidebar-border\)/);
-  assert.match(rule('.fui-tabs-list[data-orientation="vertical"] .fui-tab[data-active]'), /background: var\(--sidebar-accent\)/);
+  assert.match(rule('.fui-tabs-list[data-orientation="vertical"] .fui-tab[data-active]'), /background: var\(--fui-sidebar-active\)/);
   const indicator = rule('.fui-tabs-list[data-orientation="vertical"] .fui-tabs-indicator');
   assert.match(indicator, /inset-inline-start: 0/);
   assert.match(indicator, /width: var\(--fui-bar\)/);

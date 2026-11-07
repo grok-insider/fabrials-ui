@@ -50,7 +50,7 @@ test("rules: animations move only on screen, in front and with motion allowed; f
 });
 
 test("the player bar rests as a solid scrim, never a gradient, and gives way under narrow containers", () => {
-  const block = styles.slice(styles.indexOf("/* 0.10 players:"));
+  const block = styles.slice(styles.indexOf("/* 0.10 players:"), styles.indexOf("/* 0.10 spreadsheet:"));
   assert.match(block, /\.fui-video-player \.fui-player-bar \{[^}]*background: var\(--fui-media-scrim\);/);
   assert.doesNotMatch(block.replace(/var\(--fui-sheen(-soft)?\)/g, ""), /gradient\(/);
   assert.match(block, /@container \(max-width: 30rem\) \{\s+\.fui-player-volume \{\s+display: none;/);

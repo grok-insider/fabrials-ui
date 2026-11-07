@@ -67,9 +67,9 @@
   --radius-md: var(--fui-radius-md);
   --radius-lg: var(--fui-radius-lg);
   --radius-xl: var(--fui-radius-xl);
-  --radius-2xl: calc(var(--fui-radius-xl) + 0.25rem);
-  --radius-3xl: calc(var(--fui-radius-xl) + 0.5rem);
-  --radius-4xl: calc(var(--fui-radius-xl) + 1rem);
+  --radius-2xl: var(--fui-radius-2xl);
+  --radius-3xl: calc(var(--fui-radius-2xl) + 0.25rem);
+  --radius-4xl: calc(var(--fui-radius-2xl) + 0.5rem);
 
   --shadow-xs: var(--fui-shadow-xs);
   --shadow-sm: var(--fui-shadow-sm);

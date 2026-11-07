@@ -58,6 +58,7 @@ export * from "./settings-section";
 export * from "./filter-chip";
 export * from "./suggestion-card";
 export * from "./shimmer-text";
+export * from "./working-light";
 export * from "./recency";
 export * from "./file-thumb";
 export * from "./dither-canvas";

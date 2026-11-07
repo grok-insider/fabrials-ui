@@ -7,6 +7,9 @@ export type ShimmerTextProps = Omit<ComponentPropsWithoutRef<"span">, "children"
   as?: ElementType;
   duration?: number;
   spread?: number;
+  /** `ink` (default): a band of the foreground crosses the muted text. `light`: the band is the working light, for text that
+   * names an agent at work. Both stop under reduced motion, where the text is the muted ink. */
+  tone?: "ink" | "light";
 };
 
 export function ShimmerText({
@@ -15,12 +18,14 @@ export function ShimmerText({
   className,
   duration = 2,
   spread = 2,
+  tone = "ink",
   style,
   ...props
 }: ShimmerTextProps) {
   return (
     <Component
       className={classes("fui-shimmer-text", className)}
+      data-tone={tone === "light" ? "light" : undefined}
       style={
         {
           "--fui-shimmer-spread": `${children.length * spread}px`,

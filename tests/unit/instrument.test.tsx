@@ -54,16 +54,24 @@ test("the card caption is a slot in the label voice", () => {
   assert.match(styles, /\.fui-card-caption \{[^}]*font-family: var\(--fui-font-label\)/);
 });
 
-test("plates are square and rest on the plate elevation, which only the material block paints", () => {
+test("plates have 12 px corners and rest on the plate elevation, which only the material block paints", () => {
   for (const selector of [".fui-card", ".fui-stat", ".fui-stat-group", ".fui-table-scroll"]) {
     const block = styles.match(new RegExp(`\\n  ${selector.replace(".", "\\.")} \\{([^}]*)\\}`))?.[1] ?? "";
     assert.match(block, /border-radius: var\(--fui-radius-plate\)/, selector);
     assert.doesNotMatch(block, /box-shadow/, selector);
   }
   const material = styles.slice(styles.indexOf("/* 0.10 material."));
-  assert.match(material, /\.fui-card,\n  \.fui-stat,\n  \.fui-stat-group,\n  \.fui-table-scroll,\n  \.fui-code-panel \{\n    box-shadow: var\(--fui-shadow-sm\), var\(--fui-highlight\);/);
-  assert.match(tokens, /--fui-radius-plate: 0;/);
+  assert.match(material, /\.fui-card,\n  \.fui-stat,\n  \.fui-stat-group,\n  \.fui-table-scroll,\n  \.fui-code-panel \{\n    box-shadow: var\(--fui-shadow-xs\), var\(--fui-highlight\);/);
+  assert.match(tokens, /--fui-radius-plate: 0\.75rem;/);
   assert.match(tokens, /--fui-font-label: var\(--fui-font-mono\);/);
+});
+
+test("a stat group is one plate: the figures are divided by soft lines short of its edges, never by boxes", () => {
+  const inner = styles.match(/\n  \.fui-stat-group > \.fui-stat \{([^}]*)\}/)?.[1] ?? "";
+  assert.match(inner, /border: 0;/);
+  assert.match(inner, /background: transparent;/);
+  assert.match(styles, /\.fui-stat-group > \.fui-stat::before \{\s*inset-block: var\(--fui-space-4\);\s*inset-inline-start: -1px;\s*width: 1px;/);
+  assert.match(styles, /\.fui-stat-group > \.fui-stat::before,\n  \.fui-stat-group > \.fui-stat::after \{[^}]*background: var\(--fui-separator\);/);
 });
 
 test("labels, table heads and axis text use the label voice", () => {
@@ -113,12 +121,29 @@ test("data-theme=system carries exactly the dark tokens under prefers-color-sche
 });
 
 test("material: gradients exist only as the sheen tokens, and every theme defines the recipes", () => {
-  const outsideTokens = styles.replace(/var\(--fui-sheen(-soft)?\)/g, "");
-  const material = styles.slice(styles.indexOf("/* 0.10 material."));
+  const material = styles.slice(styles.indexOf("/* 0.10 material."), styles.indexOf('/* 0.11 "Instrument with life"'));
   assert.doesNotMatch(material.replace(/var\(--fui-sheen(-soft)?\)/g, ""), /gradient\(/);
-  assert.ok(outsideTokens.length > 0);
   for (const token of ["--fui-shadow-well", "--fui-bevel", "--fui-sheen", "--fui-sheen-soft", "--fui-pressed"]) {
     assert.ok((tokens.match(new RegExp(`${token}:`, "g")) ?? []).length >= 3, token);
   }
   assert.match(tokens, /--fui-focus-halo:/);
+});
+
+test("the working light is the only light: painted from the three light tokens, in its own rules, still under reduced motion", () => {
+  const life = styles.slice(styles.indexOf('/* 0.11 "Instrument with life"'));
+  // Every gradient of the block is either a mask (an opaque fill whose colour does not matter) or lives in a light rule.
+  const css = life.replace(/\/\*[\s\S]*?\*\//g, "");
+  for (const match of css.matchAll(/([^{}]+)\{([^{}]*gradient\([^{}]*)\}/g)) {
+    const selector = match[1]!.trim();
+    const body = match[2]!.replace(/linear-gradient\(var\(--foreground\) 0 0\)/g, "");
+    if (!/gradient\(/.test(body)) continue;
+    assert.match(selector, /\.fui-working-light(-bloom)?::before|\.fui-shimmer-text\[data-tone="light"\]/, selector);
+    for (const colour of body.match(/var\(--[a-z0-9-]+\)/g) ?? []) {
+      assert.match(colour, /--fui-light-[123]|--fui-light-angle|--fui-shimmer-spread|--muted-foreground/, `${selector}: ${colour}`);
+    }
+  }
+  assert.match(life, /@media \(prefers-reduced-motion: no-preference\) \{[\s\S]*?\.fui-working-light::before,\n    \.fui-working-light-bloom::before \{\n      animation: fui-light-turn/);
+  assert.match(life, /@media \(forced-colors: active\) \{\s*\.fui-working-light \{\s*display: none;/);
+  for (const scope of [":root", ".dark", '[data-theme="system"]']) assert.ok(tokens.includes(scope));
+  assert.match(tokens, /--fui-light-1: var\(--gem-stormlight\);/);
 });

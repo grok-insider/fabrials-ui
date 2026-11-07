@@ -1460,7 +1460,7 @@
     overscroll-behavior: contain;
     padding: var(--fui-space-6);
     border: 1px solid var(--border);
-    border-radius: var(--fui-radius-xl);
+    border-radius: var(--fui-radius-2xl);
     background: var(--popover);
     color: var(--popover-foreground);
     box-shadow: var(--fui-shadow-lg), var(--fui-highlight);
@@ -1725,19 +1725,19 @@
   }
 
   /* -------------------------------------------------------- badge, status */
-  /* A badge is a small tag, not a pill: 3 px corners, a quiet tint and a
-     hairline in its tone. The dot is a square, like one pixel of the dither. */
+  /* A badge is a soft tag: 6 px corners, a tint of its tone and the tone's ink, with no outline of its own (the outline variant
+     is the one with an edge). The dot is round. */
   .fui-badge {
-    --fui-badge-ink: color-mix(in oklab, var(--foreground) 82%, var(--muted-foreground));
+    --fui-badge-ink: color-mix(in oklab, var(--foreground) 80%, var(--muted-foreground));
     --fui-badge-solid: var(--muted-foreground);
     display: inline-flex;
     align-items: center;
     gap: 0.3125rem;
     min-height: 1.25rem;
-    padding: 0 0.375rem;
-    border-radius: var(--fui-radius-xs);
-    background: color-mix(in oklab, var(--fui-badge-solid) 9%, var(--card));
-    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--fui-badge-solid) 22%, transparent);
+    padding: 0 0.4375rem;
+    border-radius: var(--fui-radius-sm);
+    background: color-mix(in oklab, var(--fui-badge-solid) var(--fui-tint-strong), var(--card));
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--fui-badge-solid) 8%, transparent);
     color: var(--fui-badge-ink);
     font-size: var(--fui-text-xs);
     font-weight: var(--fui-weight-medium);
@@ -1763,8 +1763,7 @@
     --fui-badge-solid: var(--destructive);
   }
   .fui-badge[data-tone]:not([data-tone="neutral"]):not([data-variant="solid"]):not([data-variant="outline"]) {
-    background: color-mix(in oklab, var(--fui-badge-solid) 11%, var(--card));
-    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--fui-badge-solid) 30%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--fui-badge-solid) 14%, transparent);
   }
   .fui-badge[data-variant="outline"] {
     background: transparent;
@@ -1784,7 +1783,7 @@
     flex: none;
     width: 0.375rem;
     height: 0.375rem;
-    border-radius: 1px;
+    border-radius: var(--fui-radius-full);
     background: var(--fui-badge-dot, var(--fui-badge-solid));
   }
   .fui-badge-dot[data-hollow] {
@@ -1860,6 +1859,19 @@
     outline: 2px solid var(--fui-focus);
     outline-offset: 2px;
   }
+  /* 0.11: the card's one link, stretched over the whole card, so the card is a single target. The card draws the ring. */
+  .fui-card-link {
+    color: inherit;
+    text-decoration: none;
+  }
+  .fui-card[data-interactive] .fui-card-link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+  .fui-card-link:focus-visible {
+    outline: none;
+  }
   .fui-card-header {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
@@ -1901,22 +1913,27 @@
     align-items: center;
     gap: var(--fui-space-2);
     min-width: 0;
-    padding: var(--fui-space-3) var(--fui-space-5);
-    border-top: 1px solid var(--border);
+    padding: var(--fui-space-4) var(--fui-space-5);
+  }
+  /* The footer belongs to the plate: no line above it, the content's own padding is the space between them. */
+  .fui-card-content + .fui-card-footer {
+    padding-top: 0;
   }
 
   /* ----------------------------------------------------------------- alert */
+  /* An alert is a tinted plate: its tone mixed into the card, an edge in the same tone and the icon in its ink. --fui-alert-tint
+     and --fui-alert-border are what a variant sets. */
   .fui-alert {
+    --fui-alert-tone: var(--muted-foreground);
     --fui-alert-ink: var(--muted-foreground);
-    --fui-alert-tint: var(--card);
-    --fui-alert-border: var(--border);
+    --fui-alert-tint: color-mix(in oklab, var(--fui-alert-tone) var(--fui-tint-strength), var(--card));
+    --fui-alert-border: color-mix(in oklab, var(--fui-alert-tone) var(--fui-tint-edge), var(--card));
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     align-items: start;
     gap: var(--fui-space-1) var(--fui-space-3);
     padding: var(--fui-space-3) var(--fui-space-4);
-    border: 1px solid var(--border);
-    border-inline-start: 2px solid var(--fui-alert-border);
+    border: 1px solid var(--fui-alert-border);
     border-radius: var(--fui-radius-plate);
     background: var(--fui-alert-tint);
     color: var(--foreground);
@@ -1943,24 +1960,20 @@
     margin-top: var(--fui-space-2);
   }
   .fui-alert[data-variant="info"] {
+    --fui-alert-tone: var(--brand);
     --fui-alert-ink: var(--brand-ink);
-    --fui-alert-tint: var(--card);
-    --fui-alert-border: var(--brand-ink);
   }
   .fui-alert[data-variant="success"] {
+    --fui-alert-tone: var(--success);
     --fui-alert-ink: var(--fui-success-ink);
-    --fui-alert-tint: var(--card);
-    --fui-alert-border: var(--fui-success-ink);
   }
   .fui-alert[data-variant="warning"] {
+    --fui-alert-tone: var(--warning);
     --fui-alert-ink: var(--fui-warning-ink);
-    --fui-alert-tint: var(--card);
-    --fui-alert-border: var(--fui-warning-ink);
   }
   .fui-alert[data-variant="destructive"] {
+    --fui-alert-tone: var(--destructive);
     --fui-alert-ink: var(--fui-danger-ink);
-    --fui-alert-tint: var(--card);
-    --fui-alert-border: var(--fui-danger-ink);
   }
   .fui-alert[data-variant="destructive"] .fui-alert-title {
     color: var(--fui-danger-ink);
@@ -2040,7 +2053,7 @@
     width: 100%;
     height: 0.375rem;
     border: 0;
-    border-radius: 0;
+    border-radius: var(--fui-radius-full);
     overflow: hidden;
     appearance: none;
     accent-color: var(--fui-progress-fill);
@@ -2115,6 +2128,7 @@
     position: relative;
     height: 0.375rem;
     overflow: hidden;
+    border-radius: var(--fui-radius-full);
     background: var(--muted);
   }
   /* Where the warning and danger inks begin: a 1 px notch across the track, so the threshold is visible before it is crossed. */
@@ -2192,13 +2206,15 @@
   .fui-table th,
   .fui-table td {
     padding: var(--fui-row-padding) var(--fui-space-4);
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--fui-separator);
     text-align: start;
     vertical-align: middle;
   }
+  /* The head is a band inside the plate, not a row under a line. */
   .fui-table th {
     padding-block: var(--fui-space-2);
-    background: var(--card);
+    border-bottom-color: var(--border);
+    background: var(--fui-surface-inset);
     color: var(--muted-foreground);
     font-family: var(--fui-font-label);
     font-size: var(--fui-text-label);
@@ -2206,6 +2222,11 @@
     line-height: var(--fui-leading-label);
     letter-spacing: var(--fui-tracking-label);
     white-space: nowrap;
+  }
+  /* A header cell in the body (a row's name) reads as a cell. */
+  .fui-table tbody th {
+    border-bottom-color: var(--fui-separator);
+    background: transparent;
   }
   .fui-table-scroll[data-sticky-header] thead th {
     position: sticky;
@@ -2226,11 +2247,11 @@
   .fui-table tfoot td {
     border-top: 1px solid var(--border);
     border-bottom: 0;
-    background: color-mix(in oklab, var(--muted) 45%, var(--card));
+    background: var(--fui-surface-inset);
     font-weight: var(--fui-weight-medium);
   }
-  .fui-table tr[data-selected] td {
-    background: color-mix(in oklab, var(--brand) 7%, var(--card));
+  .fui-table tr[data-selected] :is(td, th) {
+    background: color-mix(in oklab, var(--brand) var(--fui-tint-strength), var(--card));
   }
 
   /* -------------------------------------------------- tabs, toggle group */
@@ -2379,7 +2400,8 @@
     outline-offset: -2px;
   }
   .fui-tabs-list[data-orientation="vertical"] .fui-tab[data-active] {
-    background: var(--sidebar-accent);
+    background: var(--fui-sidebar-active);
+    box-shadow: var(--fui-shadow-xs), var(--fui-highlight);
     color: var(--sidebar-accent-foreground);
   }
   .fui-tabs-list[data-orientation="vertical"] .fui-tabs-indicator {
@@ -2388,9 +2410,9 @@
     left: auto;
     inset-inline-start: 0;
     width: var(--fui-bar);
-    height: var(--active-tab-height);
-    translate: 0 var(--active-tab-top);
-    border-radius: 0;
+    height: calc(var(--active-tab-height) - 1.125rem);
+    translate: 0 calc(var(--active-tab-top) + 0.5625rem);
+    border-radius: var(--fui-radius-full);
     background: var(--brand-ink);
   }
   .fui-tabs-list[data-scrollable="always"] {
@@ -2452,13 +2474,13 @@
     list-style: none;
   }
   .fui-item-group[data-bordered] {
-    border-block-start: 1px solid var(--border);
+    border-block-start: 1px solid var(--fui-separator);
   }
   .fui-item {
     position: relative;
     box-sizing: border-box;
     min-block-size: var(--fui-control-height-lg);
-    border-block-end: 1px solid var(--border);
+    border-block-end: 1px solid var(--fui-separator);
     color: var(--foreground);
     transition: background-color var(--fui-duration-fast) var(--fui-ease);
   }
@@ -2469,9 +2491,10 @@
   .fui-item[data-current]::before {
     content: "";
     position: absolute;
-    inset-block: 0;
+    inset-block: var(--fui-space-2);
     inset-inline-start: 0;
     inline-size: var(--fui-bar);
+    border-radius: var(--fui-radius-full);
     background: var(--brand-ink);
     pointer-events: none;
   }
@@ -2482,7 +2505,7 @@
   .fui-item[data-variant="muted"] {
     border-color: transparent;
     border-radius: var(--fui-radius-md);
-    background: color-mix(in oklab, var(--muted) 50%, transparent);
+    background: var(--fui-surface-inset);
   }
   .fui-item-link {
     color: inherit;
@@ -2531,13 +2554,13 @@
     align-items: center;
     justify-content: center;
   }
+  /* An icon tile: a soft square of the inset surface, no edge. */
   .fui-item-media[data-variant="icon"] {
     inline-size: 2rem;
     block-size: 2rem;
-    border: 1px solid var(--border);
     border-radius: var(--fui-radius-md);
-    background: var(--muted);
-    color: var(--muted-foreground);
+    background: color-mix(in oklab, var(--foreground) 6%, var(--card));
+    color: color-mix(in oklab, var(--foreground) 70%, var(--muted-foreground));
   }
   .fui-item-media[data-variant="icon"] svg {
     inline-size: 1rem;
@@ -2606,9 +2629,9 @@
   }
   .fui-item-unread {
     flex: none;
-    inline-size: 0.375rem;
-    block-size: 0.375rem;
-    border-radius: 1px;
+    inline-size: 0.4375rem;
+    block-size: 0.4375rem;
+    border-radius: var(--fui-radius-full);
     background: var(--foreground);
   }
   .fui-item-header,
@@ -2624,7 +2647,7 @@
     margin: 0;
     padding: 0;
     border: 0;
-    background: var(--border);
+    background: var(--fui-separator);
     list-style: none;
   }
   .fui-item:has(+ .fui-item-separator) {
@@ -2639,7 +2662,7 @@
   }
   @media (hover: hover) {
     .fui-item[data-stretch]:not([data-current], [data-selected]):not(:has(.fui-item-check :checked)):hover {
-      background: var(--accent);
+      background: var(--fui-surface-hover);
     }
   }
   @media (forced-colors: active) {
@@ -2699,7 +2722,7 @@
     display: grid;
   }
   .fui-accordion-item {
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--fui-separator);
   }
   .fui-accordion-header {
     margin: 0;
@@ -2743,6 +2766,23 @@
   .fui-accordion-content {
     padding-bottom: var(--fui-space-4);
     color: var(--muted-foreground);
+  }
+  /* The body opens as the panel grows: it rises out of a slight blur and settles; it closes the same way, faster. */
+  @media (prefers-reduced-motion: no-preference) {
+    .fui-accordion-panel > .fui-accordion-content {
+      transition:
+        opacity var(--fui-duration-slow) var(--fui-ease-out),
+        filter var(--fui-duration-slow) var(--fui-ease-out),
+        translate var(--fui-duration-slow) var(--fui-ease-out);
+    }
+    .fui-accordion-panel:is([data-starting-style], [data-ending-style]) > .fui-accordion-content {
+      opacity: 0;
+      filter: blur(3px);
+      translate: 0 -0.25rem;
+    }
+    .fui-accordion-panel[data-ending-style] > .fui-accordion-content {
+      transition-duration: var(--fui-duration);
+    }
   }
 
   /* 0.8: a row with an aside (tags, counts) outside the trigger, and the variant "rows": a stack of independent tools. The
@@ -2816,22 +2856,23 @@
     opacity: 0.5;
     cursor: not-allowed;
   }
-  /* The open row reads as the current one: accent fill and the 2 px Stormlight bar. */
+  /* The open row reads as the current one: the hover fill held and the 2 px Stormlight bar. */
   .fui-accordion[data-variant="rows"] .fui-accordion-item[data-open] > .fui-accordion-head {
-    background: var(--accent);
+    background: var(--fui-surface-hover);
   }
   .fui-accordion[data-variant="rows"] .fui-accordion-item[data-open] > .fui-accordion-head::before {
     content: "";
     position: absolute;
-    inset-block: 0;
+    inset-block: var(--fui-space-2);
     inset-inline-start: 0;
     inline-size: var(--fui-bar);
+    border-radius: var(--fui-radius-full);
     background: var(--brand-ink);
     pointer-events: none;
   }
   @media (hover: hover) {
     .fui-accordion[data-variant="rows"] .fui-accordion-item:not([data-open]) > .fui-accordion-head:hover {
-      background: var(--accent);
+      background: var(--fui-surface-hover);
     }
   }
   @media (forced-colors: active) {
@@ -3291,13 +3332,29 @@
     border-radius: var(--fui-radius-plate);
     background: var(--card);
   }
+  /* One plate: the figures share it and a soft line, short of the plate's edges, stands between them. Each figure draws the line
+     on its start side and above it; the plate clips the ones of the first column and the first row. */
   .fui-stat-group > .fui-stat {
     border: 0;
     border-radius: 0;
     background: transparent;
-    box-shadow:
-      -1px 0 0 var(--border),
-      0 -1px 0 var(--border);
+  }
+  .fui-stat-group > .fui-stat::before,
+  .fui-stat-group > .fui-stat::after {
+    content: "";
+    position: absolute;
+    background: var(--fui-separator);
+    pointer-events: none;
+  }
+  .fui-stat-group > .fui-stat::before {
+    inset-block: var(--fui-space-4);
+    inset-inline-start: -1px;
+    width: 1px;
+  }
+  .fui-stat-group > .fui-stat::after {
+    inset-inline: var(--fui-space-5);
+    top: -1px;
+    height: 1px;
   }
   .fui-sparkline {
     display: block;
@@ -3331,7 +3388,7 @@
     grid-template-columns: subgrid;
     column-gap: var(--fui-space-6);
     padding: var(--fui-space-2-5) 0;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--fui-separator);
   }
   .fui-description-item:first-child {
     border-top: 0;
@@ -3629,8 +3686,9 @@
     align-items: flex-start;
     gap: var(--fui-space-3);
     padding: var(--fui-space-6);
-    border: 1px dashed color-mix(in oklab, var(--foreground) 18%, transparent);
+    border: 1px solid transparent;
     border-radius: var(--fui-radius-plate);
+    background: var(--fui-surface-inset);
   }
   .fui-state-icon {
     flex-shrink: 0;
@@ -3638,9 +3696,8 @@
     color: var(--muted-foreground);
   }
   .fui-state-panel[data-state="error"] {
-    border-style: solid;
-    border-color: color-mix(in oklab, var(--fui-danger-ink) 32%, var(--border));
-    background: color-mix(in oklab, var(--destructive) 5%, transparent);
+    border-color: color-mix(in oklab, var(--destructive) var(--fui-tint-edge), var(--card));
+    background: color-mix(in oklab, var(--destructive) var(--fui-tint-strength), var(--card));
   }
   .fui-state-panel[data-state="error"] .fui-state-icon {
     color: var(--fui-danger-ink);
@@ -4411,8 +4468,11 @@
     background: var(--background);
     box-shadow: 0 0 0 1px var(--sidebar-border);
   }
+  /* The current row is a raised key on the sidebar's ground: the card's fill, a soft shadow and the light along its top, with the
+     Stormlight bar on its start edge. */
   .fui-sidebar-menu-button[data-active] {
-    background: var(--sidebar-accent);
+    background: var(--fui-sidebar-active);
+    box-shadow: var(--fui-shadow-xs), var(--fui-highlight);
     color: var(--sidebar-accent-foreground);
     font-weight: var(--fui-weight-medium);
   }
@@ -4422,10 +4482,10 @@
   .fui-sidebar-menu-button[data-active]::before {
     content: "";
     position: absolute;
-    inset-block: 0.5rem;
+    inset-block: 0.5625rem;
     inset-inline-start: 0;
     width: var(--fui-bar);
-    border-radius: 1px;
+    border-radius: var(--fui-radius-full);
     background: var(--brand-ink);
   }
   /* touch: a navigation row. The border box is the 44 px target, the padding box the 40 px band (the transparent block
@@ -4451,6 +4511,13 @@
   }
   .fui-sidebar-menu-button[data-size="touch"][data-active]::before {
     inset-block: var(--fui-space-1-5);
+  }
+  /* A touch row's transparent block borders are its target, so a shadow outside them would float 2 px off the band; the band
+     draws its edge inside instead. */
+  .fui-sidebar-menu-button[data-size="touch"][data-active] {
+    box-shadow:
+      inset 0 0 0 1px color-mix(in oklab, var(--foreground) 7%, transparent),
+      var(--fui-highlight);
   }
   /* The icon column stays quiet: a row's state is its fill and bar, not a darker glyph. */
   .fui-sidebar-menu-button[data-size="touch"] svg,
@@ -5038,7 +5105,7 @@
     gap: var(--fui-space-2);
     min-height: 2.25rem;
     padding: var(--fui-space-2) var(--fui-space-2-5);
-    border-radius: var(--fui-radius-sm);
+    border-radius: var(--fui-radius-lg);
     color: var(--foreground);
     text-decoration: none;
     transition: background-color var(--fui-duration) var(--fui-ease);
@@ -5563,8 +5630,8 @@
     .fui-sidebar-rail:hover::after {
       background: var(--sidebar-border);
     }
-    .fui-table tbody tr:not([data-selected]):hover td {
-      background: color-mix(in oklab, var(--accent) 45%, var(--card));
+    .fui-table tbody tr:not([data-selected]):hover :is(td, th) {
+      background: var(--fui-surface-hover);
     }
     .fui-card[data-interactive]:hover {
       border-color: color-mix(in oklab, var(--foreground) 22%, var(--border));
@@ -5927,7 +5994,6 @@
   border-radius: var(--fui-radius-plate);
   background: var(--popover);
   border-color: var(--border);
-  border-inline-start: 2px solid var(--fui-toast-bar, var(--border));
   box-shadow: var(--fui-shadow-md), var(--fui-highlight);
   color: var(--foreground);
   font-family: var(--fui-font-sans);
@@ -5937,25 +6003,21 @@
 .fui-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"][data-type="success"],
 .fui-toaster[data-sonner-toaster] [data-rich-colors="true"][data-sonner-toast][data-type="success"] {
   background: var(--popover);
-  --fui-toast-bar: var(--fui-success-ink);
   color: var(--foreground);
 }
 .fui-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"][data-type="error"],
 .fui-toaster[data-sonner-toaster] [data-rich-colors="true"][data-sonner-toast][data-type="error"] {
   background: var(--popover);
-  --fui-toast-bar: var(--fui-danger-ink);
   color: var(--foreground);
 }
 .fui-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"][data-type="warning"],
 .fui-toaster[data-sonner-toaster] [data-rich-colors="true"][data-sonner-toast][data-type="warning"] {
   background: var(--popover);
-  --fui-toast-bar: var(--fui-warning-ink);
   color: var(--foreground);
 }
 .fui-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"][data-type="info"],
 .fui-toaster[data-sonner-toaster] [data-rich-colors="true"][data-sonner-toast][data-type="info"] {
   background: var(--popover);
-  --fui-toast-bar: var(--brand-ink);
   color: var(--foreground);
 }
 .fui-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"] [data-icon] {
@@ -6187,7 +6249,7 @@
     inline-size: 100%;
     min-inline-size: 0;
     padding-top: var(--fui-space-6);
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--fui-separator);
     color: var(--foreground);
     font-family: var(--fui-font-sans);
   }
@@ -6941,8 +7003,7 @@
     flex-wrap: wrap;
     justify-content: space-between;
     gap: var(--fui-space-1) var(--fui-space-4);
-    padding: var(--fui-space-2) var(--fui-space-4);
-    border-top: 1px solid var(--border);
+    padding: var(--fui-space-2-5) var(--fui-space-5) var(--fui-space-3);
     color: var(--muted-foreground);
     font-family: var(--fui-font-label);
     font-size: var(--fui-text-label);
@@ -7205,18 +7266,16 @@
     box-shadow: var(--fui-shadow-xs), var(--fui-highlight);
   }
 
-  /* Plates rest just above the page. */
+  /* Plates rest just above the page: an edge, a soft shadow and the light along their top. */
   .fui-card,
   .fui-stat,
   .fui-stat-group,
   .fui-table-scroll,
   .fui-code-panel {
-    box-shadow: var(--fui-shadow-sm), var(--fui-highlight);
+    box-shadow: var(--fui-shadow-xs), var(--fui-highlight);
   }
   .fui-stat-group > .fui-stat {
-    box-shadow:
-      -1px 0 0 var(--border),
-      0 -1px 0 var(--border);
+    box-shadow: none;
   }
 
   /* Keys are keycaps. */
@@ -9094,5 +9153,125 @@
       outline: 1px solid Highlight;
       outline-offset: -1px;
     }
+  }
+}
+
+/* 0.11 "Instrument with life": arrivals, lifts and the working light.
+   - Arrivals: what streams in (a row, a step, a tile, a message) rises 4 px out of a slight blur. A list staggers its children
+     by giving each one --fui-stagger (its index); the delay stops growing after the eighth, so a long list never keeps anyone
+     waiting. Under reduced motion everything is simply there.
+   - The working light is the only light in the system. It shows while an agent works or something loads and at no other
+     time, it is painted from three gems (--fui-light-1, -2 and -3), and it is gone under reduced motion (a still edge in the
+     first gem says the same) and in forced colors. A surface carries it with <WorkingLight> as its last child; the surface
+     must be positioned (and must not clip its overflow, or the bloom is cut), and the light takes its corners. */
+@property --fui-light-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+@layer components {
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes fui-rise {
+      from {
+        opacity: 0;
+        translate: 0 0.25rem;
+        filter: blur(3px);
+      }
+    }
+    .fui-rise {
+      animation: fui-rise var(--fui-duration-slow) var(--fui-ease-out) both;
+      animation-delay: calc(min(var(--fui-stagger, 0), 8) * 45ms);
+    }
+    .fui-card[data-interactive] {
+      transition:
+        border-color var(--fui-duration) var(--fui-ease),
+        box-shadow var(--fui-duration) var(--fui-ease),
+        translate var(--fui-duration) var(--fui-ease-out);
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+    /* A card that is a link lifts a pixel toward the pointer. */
+    .fui-card[data-interactive]:hover {
+      translate: 0 -1px;
+    }
+  }
+
+  /* Light in words: a band of the working light crosses the muted ink. */
+  @media (prefers-reduced-motion: no-preference) {
+    .fui-shimmer-text[data-tone="light"] {
+      background-image:
+        linear-gradient(
+          90deg,
+          transparent calc(50% - var(--fui-shimmer-spread, 32px)),
+          var(--fui-light-1) calc(50% - var(--fui-shimmer-spread, 32px) / 3),
+          var(--fui-light-3) calc(50% + var(--fui-shimmer-spread, 32px) / 3),
+          transparent calc(50% + var(--fui-shimmer-spread, 32px))
+        ),
+        linear-gradient(var(--muted-foreground), var(--muted-foreground));
+    }
+  }
+
+  .fui-working-light,
+  .fui-working-light-bloom {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+  /* The bloom: the same band, blurred by its parent (a filter on the band itself would be cut back by its own mask). */
+  .fui-working-light-bloom {
+    filter: blur(7px);
+    opacity: 0.55;
+  }
+  .fui-working-light::before,
+  .fui-working-light-bloom::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    padding: 1.5px;
+    border-radius: inherit;
+    background: conic-gradient(
+      from var(--fui-light-angle),
+      transparent 0% 46%,
+      var(--fui-light-1) 64%,
+      var(--fui-light-2) 78%,
+      var(--fui-light-3) 90%,
+      transparent 100%
+    );
+    mask:
+      linear-gradient(var(--foreground) 0 0) content-box exclude,
+      linear-gradient(var(--foreground) 0 0);
+  }
+  .fui-working-light-bloom::before {
+    padding: 3px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes fui-light-turn {
+      to {
+        --fui-light-angle: 360deg;
+      }
+    }
+    .fui-working-light::before,
+    .fui-working-light-bloom::before {
+      animation: fui-light-turn 3.2s linear infinite;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fui-working-light::before {
+      background: color-mix(in oklab, var(--fui-light-1) 70%, transparent);
+    }
+    .fui-working-light-bloom {
+      display: none;
+    }
+  }
+  @media (forced-colors: active) {
+    .fui-working-light {
+      display: none;
+    }
+  }
+  /* A view that is loading is a skeleton: there is no work in it to light. */
+  [data-fui-loading] > .fui-loading-content .fui-working-light {
+    visibility: hidden !important;
   }
 }
