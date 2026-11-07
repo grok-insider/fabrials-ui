@@ -8,7 +8,8 @@ Run this before saying UI work is done. Report each item as checked, not applica
 - [ ] Components come from `@fabrials/ui` / `@fabrials/ai-ui` (or registry shims and blocks); no re-implemented control, no edited `vendor/` copy.
 - [ ] The anti-slop checks in `style-rules.md` pass; run the `rg` scan on the changed files and review every hit.
 - [ ] Only tokens: no literal colours, radii, shadows or font stacks in product code.
-- [ ] Instrument details (0.10): the plates that carry the page (three or four at most) sit in `CornerMarks`; figures end in a `CardCaption` with a real reading; shares and levels have a named ruler; labels and readings use the label voice; charts are dithered unless a colour means something; plates are square with no shadow.
+- [ ] Instrument details (0.11): figures end in a `CardCaption` with a real reading; shares and levels have a named ruler; labels and readings use the label voice; charts are dithered unless a colour means something; plates have 12 px corners and the resting shadow, and what belongs together shares one plate with soft dividers; states are tints with the tone's ink, never side bars; `CornerMarks` only in a brand moment.
+- [ ] Life: what arrives after first paint rises (`.fui-rise`, staggered); nothing animates on the first paint of a screen people revisit; the working light (`WorkingLight`, `ShimmerText tone="light"`, agent indicators) shows only while something works and the state is also said in words; reduced motion stops all of it.
 - [ ] Copy is sentence case, names destinations, and errors say what happened and what to do.
 - [ ] Loading, empty, error, stale or offline, and long-content cases exist for every collection and panel you touched.
 - [ ] Data in stories, previews, screenshots and tests is synthetic.

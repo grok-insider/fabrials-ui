@@ -1,11 +1,11 @@
 ---
 name: fabrials-design-system
-description: Build, restyle or review React interfaces in the Fabrials house style (Fabrials UI 0.10 "Instrument", the successor of 0.7 "Highstorm"), in Fabrials products that use @fabrials/ui or @fabrials/ai-ui and in apps that install from the ui.fabrials.com shadcn registry. Use for page layout, components, tokens, theming, on-screen copy and UI QA. Not for backend-only work, and not for a product whose own DESIGN.md or owner has chosen a different look.
+description: Build, restyle or review React interfaces in the Fabrials house style (Fabrials UI 0.11 "Instrument with life", the successor of 0.10 "Instrument" and 0.7 "Highstorm"), in Fabrials products that use @fabrials/ui or @fabrials/ai-ui and in apps that install from the ui.fabrials.com shadcn registry. Use for page layout, components, tokens, theming, on-screen copy and UI QA. Not for backend-only work, and not for a product whose own DESIGN.md or owner has chosen a different look.
 ---
 
 # Fabrials design system
 
-Fabrials UI 0.10 "Instrument" (Highstorm's rules with a voice: deep Stormwall neutrals, square plates, corner marks, a mono label voice, dithered data) is one house style for every Fabrials product and for apps that install from ui.fabrials.com. Reproduce it; do not invent a style per screen. This file is the operating guide; the detail lives in `references/`.
+Fabrials UI 0.11 "Instrument with life" (Highstorm's rules with a voice: deep Stormwall neutrals, soft 12 px plates grouped by space, states as tints, a mono label voice, dithered data, motion that answers, and a working light for agents) is one house style for every Fabrials product and for apps that install from ui.fabrials.com. Reproduce it; do not invent a style per screen. This file is the operating guide; the detail lives in `references/`.
 
 ## Sources of truth
 
@@ -31,18 +31,18 @@ Without a local checkout (an outside app), the repository is public at https://g
 ## Instrument in operational rules
 
 1. **One interaction colour.** Stormlight (`--brand-ink`, `--ring`, `--brand`) marks focus, links, checked controls, the current navigation item and the first data series. Nothing else is blue. Primary buttons are ink (`variant="default"`); `variant="accent"` only when one action must stand out.
-2. **Light is dithered, never glowing.** Brand light comes only from `DitherScene`, `DitherBand` and `DitherGem` (canvas, 8x8 Bayer). No gradients, glows, blurred blobs or gradient text.
+2. **Light is dithered, or it is work.** Brand light comes only from `DitherScene`, `DitherBand` and `DitherGem` (canvas, 8x8 Bayer). The one other light is the working light (`WorkingLight`, `ShimmerText tone="light"`, the agent indicators of `@fabrials/ai-ui`), shown only while an agent works or something loads. No other gradients, glows, blurred blobs or gradient text.
 3. **Nothing is centred on the page.** Headers span the window; content anchors to the left gutter (`--fui-page-padding`) with a reading max-width and no `margin-inline: auto`. Wide screens keep the free space on the right or give it to panels. Centring is only for small things inside a component.
-4. **Indexes, not card grids.** Lists of products or features are rows: mark, name, one line, a link. One panel with hairline dividers beats cards inside cards.
-5. **Square plates, crisp parts, dense.** Plates (`Card`, `Stat`, `StatGroup`, `Table`) are square with a hairline and no shadow; tags 3, small parts 4, controls 5, menus 6, dialogs 8 px. Controls 40 px, body 14 px, metadata 12 px. Shadows belong to overlays.
-6. **Tags, not pills.** `Badge` is a 3 px tag with a square dot. Counts and chips are tags too. A pill only for one passive label that must stand out.
+4. **Indexes, not card grids.** Lists of products or features are rows: mark, name, one line, a link. One plate with soft dividers beats cards inside cards.
+5. **Soft plates, grouped by space, dense.** Plates (`Card`, `Stat`, `StatGroup`, `Table`, alerts, state panels) have 12 px corners, a hairline edge and a soft resting shadow; what belongs together shares one plate, divided by soft lines (`--fui-separator`). Keys 4, tags 6, controls 8, menus 10, plates 12, dialogs 16 px. A state is a tint, never a coloured side bar. Controls 40 px, body 14 px, metadata 12 px.
+6. **Tags, not pills.** `Badge` is a soft 6 px tag tinted by its tone, with a round dot. Counts and chips are tags too. A pill only for one passive label that must stand out.
 7. **Sentence case, plain words.** No tracked uppercase eyebrows, no word of a headline in another colour, no `→` or arrow icons appended to buttons or links. Plex Sans Condensed 600 is for hero headlines, page titles, marketing section titles, figures and the wordmark only.
 8. **Gems sign marks only.** Each product has one gem (`data-gem` on the root, `DitherGem`/`FabrialsGem`/`ProductLockup`). A gem never colours a status, button or link.
 9. **Motion answers a person.** 100/150/240 ms, zero under reduced motion. One orchestrated moment per page at most (a `DitherScene` or large `DitherGem` `reveal`). Continuous motion only for real loading indicators.
 10. **Say what happened.** Stale is not fresh, configured is not reachable. Errors say what went wrong and what to do; empty states offer the next action; every pattern covers loading, empty, error and long content.
 11. **Accessible by default.** Every control has a name, a visible 2 px Stormlight focus and a keyboard path; colour always travels with a word or symbol; AA contrast in both themes.
 12. **Both themes are designed.** Light (`#f6f7f8` page, white plates) and dark (Deep Stormwall `#08090b`, plates `#0e1014`) are each checked; no literal colours, only tokens.
-13. **Built like an instrument.** The three or four plates that carry a page sit in `CornerMarks`; figures end in a `CardCaption`; a share or level gets a ruler (`Stat meter`, `Meter variant="ruler"`); a landing hero draws its grid (`GridGuides`). Labels and readings speak in the label voice (Plex Mono 11 px, muted); a value and its label never share a face. Charts are dithered.
+13. **Built like an instrument, alive like one.** Figures end in a `CardCaption`; a share or level gets a ruler (`Stat meter`, `Meter variant="ruler"`); a landing hero draws its grid (`GridGuides`) and its figure carries `CornerMarks` (brand moments only, never product screens). What arrives after first paint rises (`.fui-rise`); what works carries light. Labels and readings speak in the label voice (Plex Mono 11 px, muted); a value and its label never share a face. Charts are dithered.
 
 The full list with checks: [references/style-rules.md](references/style-rules.md).
 

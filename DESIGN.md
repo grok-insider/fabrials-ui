@@ -1,16 +1,16 @@
 # Fabrials design system
 
-Fabrials UI 0.10 "Instrument" is the shared interface of the Fabrials products and the registry at ui.fabrials.com. This document is the brief: what the system looks like, why, and the rules a screen follows. Code is the source of truth for values (`packages/ui/src/tokens.css`); this file explains them. Explicit product decisions, recorded in that product's own `DESIGN.md`, win over it.
+Fabrials UI 0.11 "Instrument with life" is the shared interface of the Fabrials products and the registry at ui.fabrials.com. This document is the brief: what the system looks like, why, and the rules a screen follows. Code is the source of truth for values (`packages/ui/src/tokens.css`); this file explains them. Explicit product decisions, recorded in that product's own `DESIGN.md`, win over it.
 
 ## Principles
 
-1. **One interaction light.** Stormlight blue marks what you can act on and where you are: focus, links, checked controls, the active navigation item, the first data series. Nothing else is blue.
-2. **Light only appears dithered.** Fabrials are gems that hold stormlight. On screen, brand light is an ordered dither on canvas, never a gradient or a glow.
-3. **Quiet, dense and crisp.** Screens read like good instruments: slate surfaces, hairline dividers, small radii, text at working sizes. One panel with dividers beats cards inside cards.
+1. **One interaction light.** Stormlight blue marks what you can act on and where you are: focus, links, checked controls, the active navigation item, the first data series. Nothing else is blue, apart from the working light while something works (principle 2).
+2. **Light is dithered, or it is work.** Fabrials are gems that hold stormlight. On screen, brand light is an ordered dither on canvas. The one other light is the working light: while an agent works or something loads, a band of light turns along an edge or crosses a label, and it goes out when the work ends. Nothing else glows.
+3. **Calm surfaces, grouped by space.** Screens read like good instruments: slate surfaces, plates with soft corners, text at working sizes. Things that belong together share one plate; space and a tint separate them before a line does, and the lines that remain are soft. One plate with soft dividers beats cards inside cards, and a state is a tint, not a box.
 4. **Say what happened.** A stale value is not a fresh one; a configured connection is not a reachable one. Errors say what went wrong and what to do; empty states invite the next action.
 5. **Accessible by default.** Every control has a name, a visible focus and a keyboard path. Colour always travels with text or a symbol.
 6. **Small pieces, owned by the host.** Shared components present; products own routing, requests, authentication and storage. Compose small components instead of adding a universal one with dozens of flags.
-7. **Built like an instrument.** A screen reads like a calibrated device: square plates, registration marks on the plates that matter, a scale under a figure, captions that say what a figure shows. The construction is shown, quietly; it is what makes a Fabrials page recognisable.
+7. **Built like an instrument, alive like one.** A screen reads like a calibrated device: a scale under a figure, captions that say what a figure shows, readings in the label voice. And it responds like one: what arrives rises into place, what you press goes down, what works carries light. Registration marks and the drawn grid are kept for brand moments.
 8. **Synthetic data in public.** Stories, docs and previews never show real mail, credentials or account records.
 
 ## Colour
@@ -26,6 +26,9 @@ Deep Stormwall: cold slate taken almost to black in the dark theme and almost to
 | Hover | `--accent` | `#e9ecef` | `#191d24` |
 | Hairline | `--border` | `#e0e3e7` | `#1d2128` |
 | Control boundary | `--fui-control-border` | `#858d98` | `#5e6672` |
+| Soft divider (rows inside one plate) | `--fui-separator` | the hairline at 62 % on the surface | the same |
+| Inset band (a table head, a well) | `--fui-surface-inset` | ink at 3.5 % on the surface | the same |
+| Hover fill | `--fui-surface-hover` | ink at 4.5 % on the surface | the same |
 | Marks and guides | `--fui-mark`, `--fui-guide` | ink at half, hairline at 75 % | the same |
 | Ink | `--foreground`, `--primary` | `#0e1116` | Cold bone `#e8eae6` |
 | Secondary ink | `--muted-foreground` | `#565d68` | `#9399a2` |
@@ -35,6 +38,8 @@ Deep Stormwall: cold slate taken almost to black in the dark theme and almost to
 - **Primary actions are ink**: ink on paper in light mode, paper on ink in dark. Stormlight fills a button only when one action must stand out (`variant="accent"`).
 - **60, 30, 10.** About 60 % of a screen is the Stormwall page; about 30 % is the storm-slate layer (plates, sidebar, hover, hairlines, secondary ink), a cool blue slate one step above the page; at most 10 % is colour that means something: Stormlight for interaction and the status inks. A screen that is mostly accent, or where status colours outnumber Stormlight, is wrong.
 - **Status inks come from the gems, not the stock palette**: verdigris for success (oxidised emerald, hue 168), heliodor brass for warning (hue 70 to 82), garnet for danger (ruby, hue 24), each at a similar lightness and a restrained chroma, and each with a word or icon beside it (`--fui-success-ink`, `--fui-warning-ink`, `--fui-danger-ink`; fills `--success`, `--warning`, `--destructive`). No Tailwind green, amber or red. Chart hues follow the same family: Stormlight, verdigris, brass, garnet, amethyst, steel.
+- **A state is a tint.** A tinted surface mixes its tone into the card: an alert, a selected row and an error panel at `--fui-tint-strength` (8 % light, 12 % dark), a tag at `--fui-tint-strong` (13 %, 18 %), the edge at `--fui-tint-edge` (22 %, 28 %). The text on it is the tone's ink, so it keeps AA.
+- **The working light** is three gems, `--fui-light-1` to `-3` (Stormlight, zircon, amethyst). It paints only `WorkingLight`, `ShimmerText tone="light"` and the agent pieces of `@fabrials/ai-ui` while they work.
 - **Crem** `#5a5247`, a warm stone, exists only inside the storm's dither ramp.
 - Contrast is checked on the real surfaces: body and control text meet WCAG AA in both themes.
 
@@ -71,8 +76,10 @@ Numbers use tabular figures. Headings wrap with `text-wrap: balance`. Copy is se
 
 - Spacing follows a 4 px grid (`--fui-space-*`).
 - Controls are 40 px (`--fui-control-height`); small 32, extra small 28, large 44. `data-density="compact"` tightens controls to 32 px and collection rows, as a composition choice, not a stored preference. Narrow screens and coarse pointers keep 44 px targets.
-- **Plates are square.** Cards, stats, stat groups and tables are plates: a hairline, the surface, no corner radius (`--fui-radius-plate: 0`) and a soft resting elevation (`--fui-shadow-sm`). Everything else keeps crisp corners: 3 px for keys and badges, 4 px for small parts and tooltips, 5 px for controls, 6 px for menus, popovers and the command palette, 8 px for dialogs, sheets, toasts and the sign-in card (`--fui-radius-xs` to `--fui-radius-xl`). Tailwind's `rounded-2xl` and larger are not part of the system. Badges, counts and chips are tags with those 3 to 4 px corners, and a badge's status dot is square, like one pixel of the dither; `StatusDot` stays a round light. Pills are only for a passive label that must stand out.
-- Separate with space and hairlines before borders. Do not box every label and control.
+- **Soft corners, one scale.** 4 px for keys, kbd and small marks; 6 px for tags, chips and small controls; 8 px for controls (buttons, fields, selects, segments); 10 px for menus, popovers and the command palette; 12 px for plates (cards, stats, stat groups, tables, code panels, alerts, state panels, toasts); 16 px for dialogs and sheets (`--fui-radius-xs` to `--fui-radius-2xl`, `--fui-radius-plate`). Dots, avatars, switches and meter tracks are round. Nothing rounder than 16 px except those.
+- **Plates.** A plate is the surface, a hairline edge, 12 px corners and a soft resting elevation (`--fui-shadow-xs` and the top highlight). What belongs together shares one plate: a `StatGroup` is one plate whose figures are divided by soft lines that stop short of its edges; a table's head is an inset band inside its plate; a card's footer and caption sit on the plate with no line above them.
+- **Tags.** Badges are soft tags: 6 px corners, a tint of their tone and the tone's ink, a round dot. The outline variant is the only one with an edge; solid is for the rare tag that must shout.
+- Separate with space first, a tint second and a soft line third. Do not box every label and control, and never put a plate inside a plate.
 
 ## Material
 
@@ -80,14 +87,14 @@ Components are not flat: they read as physical parts of an instrument. Depth com
 
 | Recipe | Token | On |
 | --- | --- | --- |
-| Elevation | `--fui-shadow-xs` (controls), `-sm` (plates), `-md` (menus, popovers, toasts), `-lg` (dialogs, sheets) | Layered: a contact shadow, a short drop and a long soft one, darker in the dark theme |
+| Elevation | `--fui-shadow-xs` (controls and plates), `-sm` (a raised plate, a card under the pointer), `-md` (menus, popovers, toasts), `-lg` (dialogs, sheets) | Layered: a contact shadow, a short drop and a long soft one, darker in the dark theme |
 | Key | `--fui-bevel` and `--fui-sheen` | Solid fills: primary and accent buttons, ticked checks and radios, a switch that is on. A light top edge, a dark bottom edge, a 10 to 16 % tonal sheen |
-| Raised plate | `--fui-shadow-xs` and `--fui-highlight`, `--fui-sheen-soft` | Outline and destructive buttons, the chosen segment, a switch thumb, keycaps |
+| Raised plate | `--fui-shadow-xs` and `--fui-highlight`, `--fui-sheen-soft` | Outline and destructive buttons, the chosen segment, a switch thumb, keycaps, the current row of a sidebar or a vertical tab rail (on `--fui-sidebar-active`) |
 | Well | `--fui-shadow-well` | Fields, selects, unticked checks, a switch track, a segmented group: a soft inner shadow from the top |
 | Pressed | `--fui-pressed` | A key while held: the bevel becomes an inner shadow and the key goes down 1 px |
 | Focus | `--fui-focus-halo` | A field in focus: a Stormlight edge and a 3 px halo at 22 % |
 
-- These tokens are the only gradients and the only shadows in the system. No glow, no coloured shadow, no gradient as decoration or text, no glass blur.
+- These tokens are the only gradients and the only shadows in the system, with one exception: the working light (`WorkingLight`, `ShimmerText tone="light"`), which exists only while something works. No other glow, no coloured shadow, no gradient as decoration or text, no glass blur.
 - Forced colors drop every sheen and shadow; states keep their system-colour forms.
 - Tables scroll inside their labelled region; the page never scrolls sideways.
 
@@ -97,7 +104,7 @@ The small marks that make a screen look built rather than generated. Each has on
 
 | Piece | Where | Rules |
 | --- | --- | --- |
-| `CornerMarks` | Around the plates that carry a page: the totals, the main chart, the main table, a hero figure | A 9 px cross on each corner in `--fui-mark`. Not on every box: three or four per screen at most |
+| `CornerMarks` | Brand moments only: the hero figure of a landing, a figure on a sign-in page or a public stats page | A 9 px cross on each corner in `--fui-mark`, like registration marks around a print. Never on product screens, at most two per page |
 | `GridGuides` | Behind a landing hero | The 12-column grid as dashed guides in `--fui-guide`, aligned to `--fui-page-padding`. Off under 768 px, in forced colors and in print. Text and controls sit above them |
 | `CardCaption` | The last row of a plate that shows a figure or a chart | What the figure shows on the start side ("Last 14 days, local time."), a reading on the end side ("Peak 244 on Nov 4"). "Fig. 1." numbering only where a page shows several figures |
 | `Meter variant="ruler"` and `Stat meter` | Under a figure that is a share or a level (unread of total, quota, disk) | Ticks every unit, taller every 5 and 10; inked up to the value; one Stormlight mark at the value; warning and danger tones colour the mark |
@@ -123,9 +130,9 @@ Three pieces use it, and every product uses them in these places:
 
 ## Motion
 
-Motion answers what a person did or what the data did, like an instrument responding to its controls: opening, expanding, choosing, confirming, a value arriving. Durations are 100, 150 and 240 ms (`--fui-duration-fast`, `--fui-duration`, `--fui-duration-slow`) with a quick-out ease, and all drop to 0 under reduced motion, where every state still shows at once.
+Motion answers what a person did, what the data did or what an agent is doing, like an instrument responding to its controls: opening, expanding, choosing, confirming, a value arriving, work in progress. Durations are 100, 150 and 240 ms (`--fui-duration-fast`, `--fui-duration`, `--fui-duration-slow`) on a quick-out ease (`--fui-ease-out`); things a hand moves (a thumb, a tile landing) may overshoot a little on `--fui-ease-spring`. All of it drops to 0 under reduced motion, where every state still shows at once.
 
-The vocabulary (0.10, "living instrument"), each tied to one cause:
+The vocabulary (0.11, "instrument with life"), each tied to one cause:
 
 | Cause | Motion | Where |
 | --- | --- | --- |
@@ -135,18 +142,21 @@ The vocabulary (0.10, "living instrument"), each tied to one cause:
 | A level changes | The ruler inks its ticks in order and its mark travels | `Meter variant="ruler"`, `Stat meter` |
 | A number changes | The digits roll like an odometer | `NumberTicker` |
 | A reading changes | The characters cycle for 240 ms and settle left to right | `Readout` |
+| Something arrives after the view is shown | It rises 4 px out of a slight blur; a list staggers its items by 45 ms, up to the eighth | `.fui-rise` with `--fui-stagger`; an agent's steps, search results, attachment tiles |
 | Media or data arrives after the view is shown | It appears through a 2 px dither in four steps | `FileThumb`; any host element with `data-fui-reveal="in"` |
-| Busy | A ring of square cells lights in turn (the only motion that loops) | `Spinner`, `Button loading`, `StatePanel` loading, loading toasts |
-| Opening and closing | Overlays fade, scale and slide 4 px from their trigger's side on a quick-out curve (`--fui-ease-out`, 240 ms) and leave faster (100 ms); dialogs grow from 96 %; panels grow to their height | Menus, popovers, tooltips, dialogs, sheets, accordions |
+| Busy | A ring of square cells lights in turn | `Spinner`, `Button loading`, `StatePanel` loading, loading toasts |
+| An agent works | The working light turns along the edge of what it works on, a band of light crosses its label, its indicator ripples, and the time it has taken counts up | `WorkingLight`, `ShimmerText tone="light"`, the agent pieces of `@fabrials/ai-ui` |
+| Opening and closing | Overlays fade, scale and slide 4 px from their trigger's side and leave faster (100 ms); dialogs grow from 96 %; an accordion's body rises out of a slight blur as its panel grows | Menus, popovers, tooltips, dialogs, sheets, accordions |
+| A pointer over a card that is a link | The card lifts 1 px and its shadow deepens | `Card` with `interactive` |
 | Holding a switch | The thumb stretches while held and springs across | `Switch` |
 | A tick | The check or dot pops in from 60 % | `Checkbox`, `Radio` |
 
-- Continuous motion is reserved for genuine loading indicators, and for a `StatusDot` with `pulse` while something is live or in progress.
+- Continuous motion is reserved for genuine loading indicators, an agent at work, and a `StatusDot` with `pulse` while something is live or in progress. Each stops when the work does.
 - A page may have one orchestrated moment: `DitherScene` and a large `DitherGem` accept `reveal`, so the storm rolls in or the gem fills with light once on first paint. Never again, and not under reduced motion.
 - A `TimelineItem` marked `fresh` highlights once when a live item arrives.
 - `MoonPhase` and `Starfield` are the sign-in exception inherited from Radiant; they stop under reduced motion.
-- Nothing moves on its own, nothing enters in a cascade on load, nothing reacts to scroll, nothing lifts on hover. No enter animations on navigation people repeat all day; a cached image or a value present at first render shows at once.
-- Effects from animation libraries (React Bits and the like) are ideas, not code: their licences rarely allow redistribution in a library, and their defaults (perpetual motion, glow, stagger) break these rules.
+- Nothing moves on its own and nothing reacts to scroll. Arrivals rise only when they arrive after the view is shown: the first paint of a screen people revisit all day, a cached image and a value present at first render show at once, with no cascade.
+- Effects from animation libraries (React Bits and the like) are ideas, not code: their licences rarely allow redistribution in a library, and their defaults (perpetual motion, glow, stagger on load) break these rules.
 
 ## Loading states
 
@@ -161,10 +171,10 @@ A loading view is the finished view painted as its own skeleton. Wrap the real c
 
 ## Layout and composition
 
-- **Product screens** read as an instrument panel: a `PageHeader` with a mono eyebrow (the period or source), then the totals as one `StatGroup` with rulers, the main chart and the main table as plates, each of those three inside `CornerMarks`, captions on figures. They use `WorkspaceShell` with navigation and header slots when they need a shell; hosts own routing, active state, authentication, theme storage and native window chrome. Mail keeps its resizable panes; desktop keeps native window behaviour.
+- **Product screens** read as an instrument panel: a `PageHeader` with a mono eyebrow (the period or source), then the totals as one `StatGroup` with rulers, the main chart and the main table as plates, captions on figures. No corner marks or guides on product screens. They use `WorkspaceShell` with navigation and header slots when they need a shell; hosts own routing, active state, authentication, theme storage and native window chrome. Mail keeps its resizable panes; desktop keeps native window behaviour.
 - **Page patterns** come first: `PageHeader`, `SectionHeader`, `CollectionToolbar`, `Table`, `BulkActions`, `StatePanel`. Bulk actions appear once selection begins. Filters live next to their collection; primary actions next to their task.
 - **Nothing is centred on the page.** Headers span the window; content anchors to the same left gutter (`--fui-page-padding`), with a maximum width for reading but no `margin-inline: auto`. On a wide screen the free space stays on the right. Centring is for small things inside a component (an empty state, a toast on a phone), never for a page column. Two frames are the exceptions: documentation uses three columns (a sidebar panel reaching the left edge, the article, the page index) whose outer columns share the extra width, and a sign-in `AuthLayout` without an aside centres its card; with the storm aside the card anchors left.
-- **Landings** are left-aligned and asymmetric: `GridGuides` behind the hero, the headline and one command or action on the left (columns 1 to 6), the storm as a captioned plate with corner marks on the right (columns 8 to 12). Lists of products or features are indexes (rows with a mark, a name, one line and a link), not grids of identical cards. Numbered markers only for real sequences. Marketing compositions stay in the host and may use tokens and controls; they never become a `WorkspaceShell`.
+- **Landings** are left-aligned and asymmetric: `GridGuides` behind the hero, the headline and one command or action on the left (columns 1 to 6), the storm as a captioned plate with corner marks on the right (columns 8 to 12). This hero is the brand moment; the sections below it use plain plates. Lists of products or features are indexes (rows with a mark, a name, one line and a link), not grids of identical cards. Numbered markers only for real sequences. Marketing compositions stay in the host and may use tokens and controls; they never become a `WorkspaceShell`.
 - **Navigation** that will grow groups its items: fabrials.com's Products menu groups tools by how people use them (install, hosted, developers, open data), each with its gem.
 
 ## Content and voice
@@ -173,7 +183,7 @@ Write from the user's side: name things by what people recognise, in plain verbs
 
 ## Components
 
-The catalogue lives in Storybook (`bun run storybook`, port 6041) and at ui.fabrials.com, where every control has a page with a live preview and its import.
+The catalogue lives in Storybook (`bun run storybook`, port 6041) and at ui.fabrials.com. Each main component has a page in both: the component in context, then every way of using it as a live demo over its code (the examples live once, in `apps/site/components/examples`), and in Storybook a playground of its props with their documentation read from the types.
 
 - **Controls:** Button (`default`, `accent`, `outline`, `secondary`, `ghost`, `destructive`, `link`; sizes `xs` to `lg` and `icon-*`; `loading`), Input, Textarea (`autoResize`), SearchInput, PasswordInput, NumberField, Slider, InputOTP, Calendar, DatePicker, DateRangePicker, Dropzone, Field, Label, Checkbox, Switch, Select, RadioGroup, NativeRadioGroup, ToggleGroup, ThemeSwitcher, MultiSelect, Combobox, IconButton, FileInput, Toolbar, FieldSet.
 - **Overlays:** Dialog, AlertDialog, Sheet, DropdownMenu (with submenus), ContextMenu, ImageViewer (a dark stage in both themes), Tooltip, Popover, StatusPopover, HoverCard, Command (with CommandTrigger), ConfirmDialog (and `useConfirm` for a confirm you can await). They render from `fui-` styles without Tailwind.
@@ -182,9 +192,9 @@ The catalogue lives in Storybook (`bun run storybook`, port 6041) and at ui.fabr
 - **Docs pieces:** CodePanel, CodeTabs, PackageInstall, Files/Folder/File and RepoInfo. Syntax uses the muted `--fui-syntax-*` inks, never Stormlight.
 - **Media:** Image, AspectRatio, MediaGrid, ImageViewer, VideoPlayer, AudioPlayer, AnimatedImage (a GIF or a silent loop that moves only on screen and can always be paused); Avatar sizes `xs` to `xl`, AvatarGroup with a count, AvatarBadge.
 - **Brand and chrome:** CornerMarks, GridGuides, CardCaption, DitherScene, DitherBand, DitherGem, DitherCanvas, ProductLockup, FabrialsGem, Avatar, Snippet, CopyButton, SiteHeader, AuthLayout, MoonPhase, Starfield.
-- **Patterns:** WorkspaceShell, AppHeader, Sidebar (menu rows work without a shell), SidePanel (a docked detail pane, a sheet on a phone), NavSwitcher, ResizablePanelGroup, PageHeader, SectionHeader, CollectionToolbar, BulkActions, StatePanel, SettingsSection, FilterChip, FileThumb, SuggestionCard, TruncatedText, ShimmerText.
+- **Patterns:** WorkspaceShell, AppHeader, Sidebar (menu rows work without a shell), SidePanel (a docked detail pane, a sheet on a phone), NavSwitcher, ResizablePanelGroup, PageHeader, SectionHeader, CollectionToolbar, BulkActions, StatePanel, SettingsSection, FilterChip, FileThumb, SuggestionCard, TruncatedText, ShimmerText (`tone="light"` for an agent at work), WorkingLight.
 - **Loading:** `Loading` with `placeholderText`, `placeholderList` and `useLoading` (see Loading states).
-- **`@fabrials/ai-ui`:** provider, quota, history and migration presentation, and the chat pieces (ChatMessage, ChatComposer, CodeBlock with `.fui-markdown`, citations, activity, attachments, VoiceInputButton).
+- **`@fabrials/ai-ui`:** provider, quota, history and migration presentation, the chat pieces (ChatMessage, ChatComposer, CodeBlock with `.fui-markdown`, citations, activity, attachments, VoiceInputButton), and the agent at work: AgentThinking and AgentMark, TaskList, GenerationFrame, ContextMeter. These carry the working light only while they work, say their state in words (a polite status) and hold still under reduced motion.
 
 Every pattern covers its normal, loading, empty, error and long-content cases; the loading case is the pattern inside `Loading`. Use named exports; interactive modules carry `"use client"`, tokens and styles need no React. Controls keep Base UI or native semantics; form validation belongs to the host, and `Field` connects label, hint and error.
 

@@ -30,7 +30,9 @@ import { ChatMessage, ChatComposer } from "@fabrials/ai-ui";         // needs @f
 | A status | `Badge` (tag) or `StatusDot` (dot and word) | A coloured pill, colour without text |
 | A number and its change | `Stat` in a `StatGroup` | A big number in a card with a gradient |
 | A quota or budget | `Meter` (`variant="ruler"` under a figure) | `Progress` (that is for a task that finishes) |
-| A plate that carries the page (totals, main chart, main table, hero figure) | `CornerMarks` around it, `CardCaption` as its last row | Corner marks on every box, a shadow, a coloured border |
+| A figure or chart on a plate | `Card` with `CardCaption` as its last row | A caption in body text, a coloured border, a plate inside a plate |
+| The hero figure of a landing or sign-in (a brand moment) | `CornerMarks` around its plate | Corner marks on product screens or on every box |
+| Something an agent is doing right now | `WorkingLight` on the surface it works on, `ShimmerText tone="light"` for its label, and the `@fabrials/ai-ui` agent pieces | A spinner with no words, a glow that stays after the work ends, a gradient border at rest |
 | The grid behind a landing hero | `GridGuides` | A background image of lines, a gradient grid |
 | A settings row | `SettingsSection` | A `Card` per setting |
 | A choice that applies now | `Switch` | A checkbox that saves immediately |
@@ -165,7 +167,7 @@ Triggers take `render` to become a Fabrials button: `<DialogTrigger render={<But
 | `Spreadsheet` (`workbook`, `sheet`, `height`, `locale`); `readSpreadsheet`, `readXlsx`, `csvToSheet`, `SpreadsheetError` from `@fabrials/ui/spreadsheet` | A read-only workbook: sticky letters and row numbers, frozen panes, merged cells, the address bar, sheet tabs, only the visible cells drawn; files read in the browser with no dependency |
 | `Tabs` (`TabsList`, `TabsTrigger`, `TabsContent`) | Peer panels on one page; not steps. `orientation="vertical"` is a rail (sidebar surface, 2 px Stormlight bar); `TabsList scrollable` (`true`, or `"narrow"` below 48rem) is one line that scrolls, snaps and keeps the selected tab in view |
 | `ItemGroup`, `Item` (`stretch`, `current`, `selected`, `unread`), `ItemLink`, `ItemMedia`, `ItemContent`, `ItemTitle`, `ItemDescription`, `ItemActions`, `ItemControl`, `ItemCheck`, `ItemUnread`, `ItemHeader`, `ItemFooter`, `ItemSeparator` | Records as rows: one stretched target, controls above it, a soft Stormlight fill and 2 px bar for the open record, the focus ring inside the row, the actions wrapping under the text in a narrow list |
-| `Badge` | A short status or fact as a 3 px tag: `tone` `neutral`, `info`, `success`, `warning`, `danger`; `variant` `soft`, `outline` (facts such as a license or version), `solid`; `dot` (`"hollow"` for an archived item), `dotColor`, `truncate`; `--fui-badge-solid` (tint, hairline, dot) and `--fui-badge-ink` (text) are public properties for a tag coloured by data, set on the badge itself (a class or `style`) |
+| `Badge` | A short status or fact as a soft 6 px tag tinted by its tone, with a round dot: `tone` `neutral`, `info`, `success`, `warning`, `danger`; `variant` `soft`, `outline` (facts such as a license or version), `solid`; `dot` (`"hollow"` for an archived item), `dotColor`, `truncate`; `--fui-badge-solid` (tint, hairline, dot) and `--fui-badge-ink` (text) are public properties for a tag coloured by data, set on the badge itself (a class or `style`) |
 | `Alert` (`AlertTitle`, `AlertDescription`, `AlertAction`) | A status that stays on the page: `variant` `default`, `info`, `success`, `warning`, `destructive`; `layout="inline"` for a one-line notice from 48rem of its own width (fills its container; not for status that refreshes) |
 | `Card` (`CardHeader`, `CardTitle`, `CardDescription`, `CardAction`, `CardContent`, `CardFooter`, `CardCaption`) | A plate: one bounded summary, a panel around a chart (square, hairline, no shadow). `CardCaption` is the mono caption strip at its foot. Not for lists of peers, not nested |
 | `DescriptionList` (`DescriptionItem`, `DescriptionTerm`, `DescriptionDetails`) | A record's properties; `layout="auto"` stacks under 30rem of its own width |
@@ -206,7 +208,7 @@ Triggers take `render` to become a Fabrials button: `<DialogTrigger render={<But
 | Component | Use for |
 | --- | --- |
 | `Spinner` | An indeterminate wait, with text saying what is happening; drawn as a ring of square cells that light in turn |
-| `ShimmerText` | A short pending label (plain text under reduced motion) |
+| `ShimmerText` | A short pending label (plain text under reduced motion); `tone="light"` crosses it with the working light for an agent at work |
 | `Toaster`, `toast` | A completed action; mount `Toaster` once |
 | `Snippet`, `CopyButton` | Commands with copy; long lines wrap with a hanging indent |
 | `Carousel` (`CarouselContent`, `CarouselItem`, `CarouselPrevious`, `CarouselNext`) | A sideways list of peers such as citations |
@@ -293,7 +295,8 @@ Chart colours come from `--chart-1` to `--chart-6`; the first series reads as St
 | Component | Where | Rules |
 | --- | --- | --- |
 | `DitherScene` | Landing hero (`variant="full"` inside a captioned plate with `CornerMarks`, or `variant="hero"` across the section), sign-in (`variant="full"` or inside `AuthLayout` `aside`) | Absolute: the parent is positioned. Text on the calm side or a solid surface. `reveal` once (default 1200 ms), `reveal={0}` turns it off. `seed`, `cell` |
-| `CornerMarks` | Around the three or four plates that carry a page | Wraps one child; decorative crosses on its corners, never focusable |
+| `CornerMarks` | Brand moments only: the hero figure of a landing, a figure on a sign-in or public stats page | Wraps one child; decorative crosses on its corners, never focusable |
+| `WorkingLight` | The light of work: a band that turns along the edge of the surface an agent works on, with a soft bloom outside | Render it only while something works, as the last child of a positioned surface; decorative (say the state in words too); a still edge under reduced motion, hidden in forced colors |
 | `GridGuides` | Behind a landing hero | First child of a positioned section; 12 dashed column guides on `--fui-page-padding`; hidden under 768 px, in forced colors and print |
 | `DitherBand` | Above one heading that carries the brand | One per view; height from `--fui-band-height` (4.5rem); on a card set `--fui-dither-bg: var(--card)` |
 | `DitherGem` | Product mark in navigation, index rows, empty states; large beside a hero | `gem`, `size` 16, 20, 28 or 40; decorative, always next to the product name |
@@ -303,7 +306,7 @@ Chart colours come from `--chart-1` to `--chart-6`; the first series reads as St
 
 Pure helpers in `@fabrials/ui/dither`: `paintRampField`, `STORM_RAMP`, `gemRamp`, `GEM_HEX`, `stormField`, `stormBandField`, `gemField`, `fbm`, `valueNoise`, `DITHER_BACKGROUND`. Gem names: `stormlight`, `heliodor`, `sapphire`, `ruby`, `emerald`, `zircon`, `smokestone`, `amethyst`.
 
-`MoonPhase` and `Starfield` are the only sanctioned glow and continuous motion, for sign-in and landing surfaces only; they stop under reduced motion.
+`MoonPhase` and `Starfield` are the only sanctioned glow and continuous motion outside work, for sign-in and landing surfaces only; they stop under reduced motion. The working light is the other one, and only while something works.
 
 ## `@fabrials/ai-ui`
 
@@ -312,11 +315,15 @@ Presentational only: the host supplies data, rendering, uploads, transcription a
 | Component | Use for |
 | --- | --- |
 | `ChatMessage` (`from` `user`, `assistant`, `system`; `actions`), `MessageActions`, `MessageAction`, `CopyMessageAction`, `MessageTimestamp` | A turn with its actions |
-| `ChatComposer` (`onSubmit`, `status` `ready`, `submitting`, `streaming`, `onStop`, `tools`, `attachments`), `ComposerToggle`, `ComposerButton` | The message field |
+| `ChatComposer` (`onSubmit`, `status` `ready`, `submitting`, `streaming`, `onStop`, `tools`, `attachments`, `working`), `ComposerToggle`, `ComposerButton` | The message field; the working light runs along its edge while the agent answers |
 | `CodeBlock` and the `.fui-markdown` class | Styles for rendered markdown and code with copy and download |
 | `CitationProvider`, `CitationChip`, `Sources`, `SourceCard`, `SourceFavicon`, `LinkWithPreview`, `LinkPreviewCard` | Numbered citations and their sources |
-| `ActivityDisclosure`, `ReasoningDisclosure`, `SearchStepsDisclosure`, `ActivityIcon` | Reasoning, search steps and tool activity inside an answer |
-| `Attachments`, `AttachmentChip` | Files on a message |
+| `ActivityDisclosure`, `ReasoningDisclosure`, `SearchStepsDisclosure`, `ActivityIcon` | Reasoning, search steps and tool activity inside an answer; while live the label carries the working light and the time counts (`timer`, `startedAt`) |
+| `AgentThinking` (`label`, `variant` `wave`, `orbit`, `dither`, `tone`, `timer`, `startedAt`), `AgentMark` | The line that says an agent is working on a reply; the mark alone for a dense row |
+| `TaskList` (`tasks` with `status` `pending`, `running`, `done`, `failed`, `skipped`, `detail`, `meta`; `title`, `labels`) | The steps of an agent's plan as they are worked through |
+| `GenerationFrame` (`status` `queued`, `generating`, `done`, `failed`; `progress`, `src`, `alt`, `aspectRatio`, `error`) | A picture being made, and the picture when it arrives |
+| `ContextMeter` (`parts`, `limit`, `warnAt`, `dangerAt`, `format`, `unit`) | How full an agent's context window (or any budget) is |
+| `Attachments` (`variant`, `size`), `AttachmentChip` | Files on a message or in a composer; an upload with `progress` draws its ring and counts |
 | `VoiceInputButton`, `VoiceInputButtonView` | Dictation; the microphone is requested only after a press |
 | `ProviderIcon`, `providerBrand` | Marks of AI providers and coding agents; third-party marks keep their colours |
 | `ProviderCard`, `BalanceCard`, `ResetInventory`, `ObservationStatus`, `RoutingExplanation`, `RoutingPolicyForm` | Provider accounts, balances, resets, routing |
