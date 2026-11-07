@@ -5,7 +5,7 @@ import { Block, Frame, Page } from "./story-frame";
 import { PHOTOS, scene } from "./media-fixtures";
 
 const meta = {
-  title: "Fabrials/Players",
+  title: "Tests/Players",
   parameters: { layout: "fullscreen" },
 } satisfies Meta;
 export default meta;

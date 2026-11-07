@@ -11,7 +11,7 @@ const open = async (page: Page, id: string, theme = "light") => {
 };
 
 test("calendar: one tab stop on the chosen day; arrows, Home, End and Page keys move; Enter chooses", async ({ page }) => {
-  await open(page, "fabrials-dates--calendars");
+  await open(page, "tests-dates--calendars");
   const calendar = page.locator(".fui-calendar").first();
   await calendar.getByRole("button", { name: "Next month" }).focus();
   await page.keyboard.press("Tab");
@@ -39,7 +39,7 @@ test("calendar: one tab stop on the chosen day; arrows, Home, End and Page keys 
 });
 
 test("calendar: disabled days are passed over by the arrows but cannot be chosen", async ({ page }) => {
-  await open(page, "fabrials-dates--calendars");
+  await open(page, "tests-dates--calendars");
   const calendar = page.locator(".fui-calendar").nth(1);
   await day(calendar, "2026-11-20").focus();
   await page.keyboard.press("ArrowRight");
@@ -51,7 +51,7 @@ test("calendar: disabled days are passed over by the arrows but cannot be chosen
 });
 
 test("a range calendar chooses a start and an end, and previews the band in between", async ({ page }) => {
-  await open(page, "fabrials-dates--calendars");
+  await open(page, "tests-dates--calendars");
   const calendar = page.locator('.fui-calendar[data-mode="range"]');
   await day(calendar, "2026-11-23").click();
   await expect(calendar).toHaveAttribute("data-range", "partial");
@@ -64,7 +64,7 @@ test("a range calendar chooses a start and an end, and previews the band in betw
 });
 
 test("date picker: opens on the chosen day, Enter chooses and closes, focus returns, the form gets yyyy-mm-dd", async ({ page }) => {
-  await open(page, "fabrials-dates--pickers");
+  await open(page, "tests-dates--pickers");
   const trigger = page.getByRole("button", { name: "Due date" }).first();
   await expect(trigger).toContainText("12 Nov 2026");
   await trigger.click();
@@ -88,7 +88,7 @@ test("date picker: opens on the chosen day, Enter chooses and closes, focus retu
 });
 
 test("date range picker: the second choice ends the range and closes; the trigger reads the range", async ({ page }) => {
-  await open(page, "fabrials-dates--pickers");
+  await open(page, "tests-dates--pickers");
   const trigger = page.getByRole("button", { name: "Report period" });
   await trigger.click();
   const popover = page.locator(".fui-date-picker-popover");
@@ -101,7 +101,7 @@ test("date range picker: the second choice ends the range and closes; the trigge
 
 for (const theme of ["light", "dark"])
   test(`the open date picker, ${theme}`, async ({ page }) => {
-    await open(page, "fabrials-dates--pickers", theme);
+    await open(page, "tests-dates--pickers", theme);
     await page.getByRole("button", { name: "Trip" }).click();
     const popover = page.locator(".fui-date-picker-popover");
     await expect(day(popover, "2026-12-21")).toBeFocused();

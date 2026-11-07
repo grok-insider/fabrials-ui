@@ -22,7 +22,7 @@ import {
 import { seeded } from "@fabrials/ui/dither";
 
 const meta = {
-  title: "Fabrials/Monitoring",
+  title: "Tests/Monitoring",
   parameters: { layout: "fullscreen" },
 } satisfies Meta;
 export default meta;

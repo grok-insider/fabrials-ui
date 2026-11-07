@@ -1001,3 +1001,63 @@ h3.docs-heading {
 .docs .docs-props td:nth-child(2) {
   min-width: 8rem;
 }
+
+/* Examples: one plate per way of using a component, the live demo over the code that makes it. */
+.docs-examples {
+  display: grid;
+  gap: var(--fui-space-10);
+  min-width: 0;
+}
+.docs-example {
+  display: grid;
+  gap: var(--fui-space-2);
+  min-width: 0;
+}
+h3.docs-heading.docs-example-title {
+  font-size: var(--fui-text-md);
+  font-weight: var(--fui-weight-semibold);
+}
+.docs-example > p code {
+  padding: 0.0625rem 0.3125rem;
+  border-radius: var(--fui-radius-xs);
+  background: var(--fui-surface-inset);
+  font-size: 0.8125rem;
+}
+.docs-example-plate {
+  min-width: 0;
+  margin-top: var(--fui-space-2);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--fui-radius-plate);
+  background: var(--card);
+  box-shadow: var(--fui-shadow-xs), var(--fui-highlight);
+}
+.docs-example-stage {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: safe center;
+  gap: var(--fui-space-4);
+  min-width: 0;
+  min-height: 9rem;
+  padding: var(--fui-space-8) var(--fui-space-6);
+  overflow-x: auto;
+  background:
+    radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--foreground) 7%, transparent) 1px, transparent 0) 0 0 / 16px 16px,
+    var(--background);
+}
+.docs-example-stage[data-align="start"] {
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+.docs-example-plate > .fui-code-panel {
+  border: 0;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+  box-shadow: none;
+}
+@media (max-width: 47.99rem) {
+  .docs-example-stage {
+    padding: var(--fui-space-6) var(--fui-space-4);
+  }
+}

@@ -10,7 +10,7 @@ import {
 } from "@fabrials/ui";
 
 const meta = {
-  title: "Fabrials/Effects",
+  title: "Foundations/Effects",
   parameters: { layout: "fullscreen" },
 } satisfies Meta;
 export default meta;

@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test("corner marks and grid guides never take focus: Tab goes from control to control across the plates", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 960 });
-  await page.goto("/iframe.html?id=fabrials-instrument--landing-page&viewMode=story&globals=theme:light");
+  await page.goto("/iframe.html?id=patterns-instrument--landing-page&viewMode=story&globals=theme:light");
   await expect(page.locator("#storybook-root h1").first()).toBeVisible();
   expect(await page.locator(".fui-corner-mark").count()).toBeGreaterThan(0);
   expect(await page.locator(".fui-grid-guides").getAttribute("aria-hidden")).toBe("true");
@@ -18,7 +18,7 @@ test("corner marks and grid guides never take focus: Tab goes from control to co
 
 test("a ruler meter is a meter with its value and name, and draws its mark at the value", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 960 });
-  await page.goto("/iframe.html?id=fabrials-instrument--pieces-page&viewMode=story&globals=theme:light");
+  await page.goto("/iframe.html?id=patterns-instrument--pieces-page&viewMode=story&globals=theme:light");
   const meter = page.getByRole("meter", { name: "Disk" });
   await expect(meter).toHaveAttribute("aria-valuenow", "82");
   const ticks = meter.locator(".fui-meter-tick-on");
@@ -30,7 +30,7 @@ test("a ruler meter is a meter with its value and name, and draws its mark at th
 
 test("the chart legend still toggles a dithered series from the keyboard", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 960 });
-  await page.goto("/iframe.html?id=fabrials-instrument--pieces-page&viewMode=story&globals=theme:dark");
+  await page.goto("/iframe.html?id=patterns-instrument--pieces-page&viewMode=story&globals=theme:dark");
   const hide = page.getByRole("button", { name: "Hide Personal" });
   await hide.focus();
   await page.keyboard.press("Enter");
@@ -38,7 +38,7 @@ test("the chart legend still toggles a dithered series from the keyboard", async
   await expect(page.locator(".fui-chart-legend svg.fui-chart-swatch rect").first()).toHaveAttribute("fill", /^url\(#fui-dither-/);
 });
 
-const pieces = "/iframe.html?id=fabrials-instrument--pieces-page&viewMode=story&globals=theme:dark";
+const pieces = "/iframe.html?id=patterns-instrument--pieces-page&viewMode=story&globals=theme:dark";
 
 test("a single-choice toggle group slides one indicator to the pressed item, from the keyboard too", async ({ page }) => {
   await page.goto(pieces);
@@ -96,7 +96,7 @@ test("the busy mark is one status with a name, eight cells and a stepped animati
 
 test("data-theme=system follows the operating system with no class: tokens and the dither canvas", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "dark" });
-  await page.goto("/iframe.html?id=fabrials-instrument--landing-page&viewMode=story&globals=theme:light");
+  await page.goto("/iframe.html?id=patterns-instrument--landing-page&viewMode=story&globals=theme:light");
   await expect(page.locator("#storybook-root h1").first()).toBeVisible();
   await page.evaluate(() => {
     document.documentElement.classList.remove("dark");
@@ -109,15 +109,15 @@ test("data-theme=system follows the operating system with no class: tokens and t
 });
 
 test("a non-modal sheet says so on its popup, and a modal one does not", async ({ page }) => {
-  await page.goto("/iframe.html?id=fabrials-overlays--non-modal-sheet&viewMode=story&globals=theme:light");
+  await page.goto("/iframe.html?id=tests-overlays--non-modal-sheet&viewMode=story&globals=theme:light");
   await expect(page.getByRole("dialog", { name: "Tools" })).toHaveAttribute("data-modal", "false");
-  await page.goto("/iframe.html?id=fabrials-overlays--modal-sheet&viewMode=story&globals=theme:light");
+  await page.goto("/iframe.html?id=tests-overlays--modal-sheet&viewMode=story&globals=theme:light");
   await expect(page.locator('.fui-dialog[data-modal="false"]')).toHaveCount(0);
 });
 
 test("a toggle group is as wide as its items in a grid column, and a stretched card keeps its footer on its bottom edge", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 960 });
-  await page.goto("/iframe.html?id=fabrials-components--gallery&viewMode=story&globals=theme:dark");
+  await page.goto("/iframe.html?id=tests-components-gallery--gallery&viewMode=story&globals=theme:dark");
   for (const name of ["Range", "Theme with labels"]) {
     const group = page.getByRole("group", { name, exact: true });
     const widths = await group.evaluate((element) => {

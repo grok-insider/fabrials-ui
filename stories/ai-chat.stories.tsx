@@ -26,7 +26,7 @@ import {
 } from "@fabrials/ai-ui";
 import "@fabrials/ai-ui/styles.css";
 
-const meta = { title: "AI/Chat", parameters: { layout: "fullscreen" } } satisfies Meta;
+const meta = { title: "Tests/AI chat", parameters: { layout: "fullscreen" } } satisfies Meta;
 export default meta;
 type Story = StoryObj<typeof meta>;
 

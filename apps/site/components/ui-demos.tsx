@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { moreDemos } from "@/components/ui-demos-more";
 import { instrumentDemos } from "@/components/ui-demos-instrument";
+import { exampleSets } from "@/components/examples";
 import {
   BookOpen,
   ChevronDown,
@@ -443,7 +444,7 @@ const demos: Record<string, () => ReactNode> = {
       </div>
       <div className="flex flex-wrap gap-2">
         <Badge variant="outline">MIT</Badge>
-        <Badge variant="outline">v0.10.0</Badge>
+        <Badge variant="outline">v0.11.0</Badge>
         <Badge variant="solid" tone="info">New</Badge>
         <Badge variant="solid">12</Badge>
       </div>
@@ -1326,7 +1327,7 @@ function VoiceDemo() {
 }
 
 export function UiDemo({ slug }: { slug: string }) {
-  const Demo = demos[slug] ?? moreDemos[slug] ?? instrumentDemos[slug];
+  const Demo = exampleSets[slug]?.preview ?? demos[slug] ?? moreDemos[slug] ?? instrumentDemos[slug];
   if (!Demo) return <p className="text-sm">This preview is not available.</p>;
   return <Demo />;
 }

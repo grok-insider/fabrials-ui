@@ -46,7 +46,7 @@ import {
 } from "@fabrials/ui";
 
 const meta = {
-  title: "Fabrials/Commands",
+  title: "Tests/Commands",
   parameters: { layout: "fullscreen" },
   decorators: [
     (Story) => (
@@ -303,7 +303,7 @@ function OptionsPage() {
 
 function CommandDialogPage() {
   return (
-    <Page title="Command dialog" description="6 px corners, the overlay shadow and highlight, and a height that follows the window: the top and the maximum height share one variable.">
+    <Page title="Command dialog" description="10 px corners, the overlay shadow and highlight, and a height that follows the window: the top and the maximum height share one variable.">
       <CommandDialog defaultOpen title="Command palette" description="Search for a page or an action.">
         <Command label="Command palette">
         <CommandInput placeholder="Search commands" />

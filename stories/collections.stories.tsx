@@ -38,7 +38,7 @@ import {
 import { Block, Frame, Page } from "./story-frame";
 
 const meta = {
-  title: "Fabrials/Collections",
+  title: "Tests/Collections",
   parameters: { layout: "fullscreen" },
 } satisfies Meta;
 export default meta;

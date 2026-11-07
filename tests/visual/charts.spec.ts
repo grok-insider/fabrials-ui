@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-const story = "/iframe.html?id=fabrials-catalogue--charts&viewMode=story";
+const story = "/iframe.html?id=tests-catalogue--charts&viewMode=story";
 
 const plots = [
   { kind: "bars", name: "Synthetic requests and errors over two weeks" },

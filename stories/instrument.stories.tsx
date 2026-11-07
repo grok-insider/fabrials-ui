@@ -60,7 +60,7 @@ import "./instrument.css";
 // 0.10 "Instrument": the reference landing and product overview, composed only from package pieces. Synthetic data.
 
 const meta = {
-  title: "Fabrials/Instrument",
+  title: "Patterns/Instrument",
   parameters: { layout: "fullscreen" },
 } satisfies Meta;
 export default meta;
@@ -170,25 +170,21 @@ function Landing() {
       <section className="ins-section ins-week" id="week" aria-labelledby="ins-week">
         <div>
           <PageHeader headingLevel={2} title="Usage AI, this week" eyebrow="Week 45, 2026. Updated every Monday." />
-          <CornerMarks>
-            <StatGroup>
-              <Stat label="Shared snapshots" value="1,284" hint="from 9 countries" />
-              <Stat label="Requests priced" value="3.9" unit="M" hint="+6% on week 44" />
-              <Stat label="Median cost per day" value="$4.12" hint="per person" />
-            </StatGroup>
-          </CornerMarks>
+          <StatGroup>
+            <Stat label="Shared snapshots" value="1,284" hint="from 9 countries" />
+            <Stat label="Requests priced" value="3.9" unit="M" hint="+6% on week 44" />
+            <Stat label="Median cost per day" value="$4.12" hint="per person" />
+          </StatGroup>
         </div>
-        <CornerMarks>
-          <Card>
-            <CardContent>
-              <SeriesChart data={week} xKey="day" series={[{ key: "requests", label: "Requests" }]} yFormat={(v) => `${v}k`} caption="Requests per day this week, in thousands" height={200} />
-            </CardContent>
-            <CardCaption>
-              <span>Requests per day, thousands.</span>
-              <span>Peak 649k on Friday</span>
-            </CardCaption>
-          </Card>
-        </CornerMarks>
+        <Card>
+          <CardContent>
+            <SeriesChart data={week} xKey="day" series={[{ key: "requests", label: "Requests" }]} yFormat={(v) => `${v}k`} caption="Requests per day this week, in thousands" height={200} />
+          </CardContent>
+          <CardCaption>
+            <span>Requests per day, thousands.</span>
+            <span>Peak 649k on Friday</span>
+          </CardCaption>
+        </Card>
       </section>
 
       <footer className="ins-foot">
@@ -273,96 +269,88 @@ function Workspace() {
         </header>
         <div className="ins-body">
           <PageHeader eyebrow="Last 14 days, local time" title="Overview" description="What Palanaeum has indexed from your mailboxes. Only headers are read; message bodies stay on the server." />
-          <CornerMarks>
-            <StatGroup>
-              <Stat label="Messages indexed" value="28,714" hint="3 accounts" meter={{ value: 100, label: "All indexed messages" }} />
-              <Stat label="Unread" value="6,102" hint="21% of indexed" meter={{ value: 21, label: "21% of indexed messages are unread" }} />
-              <Stat label="Senders" value="1,206" hint="318 send bulk mail" meter={{ value: 26, label: "26% of senders send bulk mail" }} />
-              <Stat label="Bulk mail" value="19,930" hint="69% of indexed" meter={{ value: 69, label: "69% of indexed messages are bulk mail" }} />
-            </StatGroup>
-          </CornerMarks>
+          <StatGroup>
+            <Stat label="Messages indexed" value="28,714" hint="3 accounts" meter={{ value: 100, label: "All indexed messages" }} />
+            <Stat label="Unread" value="6,102" hint="21% of indexed" meter={{ value: 21, label: "21% of indexed messages are unread" }} />
+            <Stat label="Senders" value="1,206" hint="318 send bulk mail" meter={{ value: 26, label: "26% of senders send bulk mail" }} />
+            <Stat label="Bulk mail" value="19,930" hint="69% of indexed" meter={{ value: 69, label: "69% of indexed messages are bulk mail" }} />
+          </StatGroup>
           <div className="ins-row">
-            <CornerMarks>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Mail received per day</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <SeriesChart
-                    data={daily}
-                    xKey="day"
-                    stacked
-                    series={[
-                      { key: "bulk", label: "Bulk" },
-                      { key: "personal", label: "Personal" },
-                    ]}
-                    caption="Mail received per day, bulk and personal, last 14 days"
-                    height={240}
-                  />
-                </CardContent>
-                <CardCaption>
-                  <span>Last 14 days, local time.</span>
-                  <span>Peak 244 on Nov 4</span>
-                </CardCaption>
-              </Card>
-            </CornerMarks>
-            <CornerMarks>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Accounts</CardTitle>
-                  <CardAction>
-                    <a href="#accounts">Manage</a>
-                  </CardAction>
-                </CardHeader>
-                <ul className="ins-accounts">
-                  <li>
-                    <StatusDot tone="success" label="Personal" />
-                    <span className="ins-label">ana@proton.example</span>
-                    <span>Synced 2 minutes ago</span>
-                  </li>
-                  <li>
-                    <StatusDot tone="info" label="Work" pulse />
-                    <span className="ins-label">ana@work.example</span>
-                    <span>Reading INBOX, 61%</span>
-                  </li>
-                  <li>
-                    <StatusDot tone="danger" label="Old" />
-                    <span className="ins-label">ana.old@mail.example</span>
-                    <span className="ins-danger">Password rejected. Update it in Accounts.</span>
-                  </li>
-                </ul>
-              </Card>
-            </CornerMarks>
+            <Card>
+              <CardHeader>
+                <CardTitle>Mail received per day</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <SeriesChart
+                  data={daily}
+                  xKey="day"
+                  stacked
+                  series={[
+                    { key: "bulk", label: "Bulk" },
+                    { key: "personal", label: "Personal" },
+                  ]}
+                  caption="Mail received per day, bulk and personal, last 14 days"
+                  height={240}
+                />
+              </CardContent>
+              <CardCaption>
+                <span>Last 14 days, local time.</span>
+                <span>Peak 244 on Nov 4</span>
+              </CardCaption>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Accounts</CardTitle>
+                <CardAction>
+                  <a href="#accounts">Manage</a>
+                </CardAction>
+              </CardHeader>
+              <ul className="ins-accounts">
+                <li>
+                  <StatusDot tone="success" label="Personal" />
+                  <span className="ins-label">ana@proton.example</span>
+                  <span>Synced 2 minutes ago</span>
+                </li>
+                <li>
+                  <StatusDot tone="info" label="Work" pulse />
+                  <span className="ins-label">ana@work.example</span>
+                  <span>Reading INBOX, 61%</span>
+                </li>
+                <li>
+                  <StatusDot tone="danger" label="Old" />
+                  <span className="ins-label">ana.old@mail.example</span>
+                  <span className="ins-danger">Password rejected. Update it in Accounts.</span>
+                </li>
+              </ul>
+            </Card>
           </div>
-          <CornerMarks>
-            <Table aria-label="Senders of the most bulk mail">
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Sender</TableHead>
-                  <TableHead numeric>Messages</TableHead>
-                  <TableHead numeric>Unread</TableHead>
-                  <TableHead>Last message</TableHead>
-                  <TableHead>Unsubscribe</TableHead>
+          <Table aria-label="Senders of the most bulk mail">
+            <TableHeader>
+              <TableRow>
+                <TableHead>Sender</TableHead>
+                <TableHead numeric>Messages</TableHead>
+                <TableHead numeric>Unread</TableHead>
+                <TableHead>Last message</TableHead>
+                <TableHead>Unsubscribe</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {senders.map((s) => (
+                <TableRow key={s.address}>
+                  <TableCell>
+                    <strong className="ins-strong">{s.name}</strong>
+                    <span className="ins-label">{s.address}</span>
+                  </TableCell>
+                  <TableCell numeric>{s.messages.toLocaleString("en")}</TableCell>
+                  <TableCell numeric>{s.unread.toLocaleString("en")}</TableCell>
+                  <TableCell>{s.last}</TableCell>
+                  <TableCell>
+                    <Badge tone={s.unsubscribe === "None" ? "neutral" : "success"}>{s.unsubscribe}</Badge>
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {senders.map((s) => (
-                  <TableRow key={s.address}>
-                    <TableCell>
-                      <strong className="ins-strong">{s.name}</strong>
-                      <span className="ins-label">{s.address}</span>
-                    </TableCell>
-                    <TableCell numeric>{s.messages.toLocaleString("en")}</TableCell>
-                    <TableCell numeric>{s.unread.toLocaleString("en")}</TableCell>
-                    <TableCell>{s.last}</TableCell>
-                    <TableCell>
-                      <Badge tone={s.unsubscribe === "None" ? "neutral" : "success"}>{s.unsubscribe}</Badge>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CornerMarks>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       </SidebarInset>
     </SidebarProvider>
@@ -415,7 +403,7 @@ function Pieces() {
             <CardHeader>
               <CardTitle>Plate</CardTitle>
             </CardHeader>
-            <CardContent>A square container with a hairline; the marks sit on its corners.</CardContent>
+            <CardContent>A plate with a hairline; the marks sit on its corners, like registration marks round a print.</CardContent>
             <CardCaption>
               <span>Fig. 2. Caption strip.</span>
               <span>Reading</span>

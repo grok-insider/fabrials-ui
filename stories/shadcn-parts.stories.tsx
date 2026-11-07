@@ -46,7 +46,7 @@ import {
 } from "@fabrials/ui";
 
 const meta = {
-  title: "Fabrials/Shadcn parts",
+  title: "Tests/Shadcn parts",
   parameters: { layout: "fullscreen" },
 } satisfies Meta;
 export default meta;

@@ -73,7 +73,7 @@ function style(page: Page, selector: string, properties: string[], pseudo?: stri
 for (const scheme of ["light", "dark"] as const) {
   test.describe(`forced colors, ${scheme} palette`, () => {
     test("components: meters, status dots, badges, radios, avatars, tabs and toggles", async ({ page }) => {
-      await open(page, "fabrials-components--gallery", scheme);
+      await open(page, "tests-components-gallery--gallery", scheme);
       const system = await palette(page);
 
       // 2. A meter is an edged track with a Highlight fill, not two Canvas boxes.
@@ -137,7 +137,7 @@ for (const scheme of ["light", "dark"] as const) {
     });
 
     test("a focused pressed toggle still shows the bar and the ring", async ({ page }) => {
-      await open(page, "fabrials-components--gallery", scheme);
+      await open(page, "tests-components-gallery--gallery", scheme);
       const system = await palette(page);
       // The theme switcher's pressed segment is a tab stop (a toggle group is a roving one, and its pressed item is not the first).
       const pressed = page.locator(".fui-theme-switcher .fui-toggle[data-pressed]").first();
@@ -156,13 +156,13 @@ for (const scheme of ["light", "dark"] as const) {
     });
 
     test("a vertical tab list's bar is Highlight too (its own rule paints --brand-ink with three classes of specificity)", async ({ page }) => {
-      await open(page, "fabrials-structure--sections", scheme);
+      await open(page, "tests-structure--sections", scheme);
       const system = await palette(page);
       expect(await style(page, '.fui-tabs-list[data-orientation="vertical"] .fui-tabs-indicator', ["backgroundColor"])).toEqual({ backgroundColor: system.Highlight });
     });
 
     test("controls: the switch, checked and mixed checkboxes, progress and the native select", async ({ page }) => {
-      await open(page, "fabrials-foundation--controls", scheme);
+      await open(page, "tests-foundation--controls", scheme);
       const system = await palette(page);
 
       // The switch is the plan's worst case: its thumb was Canvas on Canvas. On: Highlight track, HighlightText thumb. Off: CanvasText.
@@ -188,7 +188,7 @@ for (const scheme of ["light", "dark"] as const) {
     });
 
     test("monitoring: activity cells step through Highlight, timeline markers have an edge and the dot keeps its tone", async ({ page }) => {
-      await open(page, "fabrials-monitoring--gallery", scheme);
+      await open(page, "tests-monitoring--gallery", scheme);
       const system = await palette(page);
       const cells = await page.evaluate(() => {
         const level = (n: string) => {
@@ -222,7 +222,7 @@ for (const scheme of ["light", "dark"] as const) {
     });
 
     test("tags: a hollow badge dot is an edge with no fill", async ({ page }) => {
-      await open(page, "fabrials-feedback--tags", scheme);
+      await open(page, "tests-feedback--tags", scheme);
       const system = await palette(page);
       const hollow = await style(page, ".fui-badge-dot[data-hollow]", ["forcedColorAdjust", "outlineColor", "backgroundColor"]);
       expect(hollow.forcedColorAdjust).toBe("none");
@@ -231,7 +231,7 @@ for (const scheme of ["light", "dark"] as const) {
     });
 
     test("charts: the legend keys keep the series' colours (the plot's SVG already does) and the axis text is CanvasText", async ({ page }) => {
-      await open(page, "fabrials-catalogue--charts", scheme);
+      await open(page, "tests-catalogue--charts", scheme);
       const system = await palette(page);
       const keys = await page.evaluate(() =>
         [...document.querySelectorAll(".fui-chart-legend .fui-chart-swatch")].map((swatch) => {
@@ -262,13 +262,13 @@ for (const scheme of ["light", "dark"] as const) {
     test("the axis text is readable when the page's theme is not the palette's", async ({ page }) => {
       // A light page under a dark high-contrast palette (or the reverse): the theme's muted ink would sit on the wrong Canvas.
       const other: Scheme = scheme === "light" ? "dark" : "light";
-      await open(page, "fabrials-catalogue--charts", scheme, other);
+      await open(page, "tests-catalogue--charts", scheme, other);
       const system = await palette(page);
       expect(await style(page, ".fui-chart-frame .recharts-surface text", ["fill"])).toEqual({ fill: system.CanvasText });
     });
 
     test("focus that was only a box-shadow: an input group and the command input draw a Highlight ring", async ({ page }) => {
-      await open(page, "fabrials-catalogue--gallery", scheme);
+      await open(page, "tests-catalogue--gallery", scheme);
       const system = await palette(page);
       for (const [control, wrapper, offset] of [
         [".fui-input-group-control", ".fui-input-group", "2px"],
@@ -288,7 +288,7 @@ for (const scheme of ["light", "dark"] as const) {
     });
 
     test("a native select gives way to the browser's own arrow", async ({ page }) => {
-      await open(page, "fabrials-enterprise--preferences", scheme);
+      await open(page, "tests-enterprise--preferences", scheme);
       expect(await style(page, "select.fui-native-select", ["appearance", "backgroundImage"])).toEqual({ appearance: "auto", backgroundImage: "none" });
     });
   });

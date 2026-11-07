@@ -8,7 +8,7 @@ import {
 } from "@fabrials/ui";
 
 const meta = {
-  title: "Fabrials/Brand",
+  title: "Foundations/Brand",
   parameters: { layout: "fullscreen" },
 } satisfies Meta;
 export default meta;

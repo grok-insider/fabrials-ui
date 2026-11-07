@@ -71,7 +71,7 @@ import {
 } from "@fabrials/ui";
 
 const meta = {
-  title: "Fabrials/Structure",
+  title: "Tests/Structure",
   parameters: { layout: "fullscreen" },
   decorators: [
     (Story) => (

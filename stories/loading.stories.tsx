@@ -37,7 +37,7 @@ import { ChatMessage } from "@fabrials/ai-ui";
 import "@fabrials/ai-ui/styles.css";
 
 const meta = {
-  title: "Fabrials/Loading",
+  title: "Tests/Loading",
   parameters: { layout: "fullscreen" },
 } satisfies Meta;
 export default meta;

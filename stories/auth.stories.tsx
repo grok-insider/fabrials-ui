@@ -4,7 +4,7 @@ import { Languages } from "lucide-react";
 import { AuthLayout, Button, DitherScene, Field, Input, ProductLockup } from "@fabrials/ui";
 
 const meta = {
-  title: "Fabrials/Auth",
+  title: "Patterns/Sign in",
   parameters: { layout: "fullscreen" },
 } satisfies Meta;
 export default meta;

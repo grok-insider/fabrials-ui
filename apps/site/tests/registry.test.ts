@@ -40,7 +40,7 @@ describe("published registry", () => {
     expect(init.config).toMatchObject({ style: "base-nova", registries: { "@fabrials": "https://ui.fabrials.com/r/{name}.json" } });
     expect(init.cssVars.theme["font-sans"]).toBe("var(--fui-font-sans)");
     expect(init.cssVars.dark.background).toMatch(/^oklch\(/);
-    expect(init.cssVars.light.radius).toBe("0.375rem");
+    expect(init.cssVars.light.radius).toBe("0.625rem");
     expect(Object.keys(styles.css)).toContain('@import "@fabrials/ui/tokens.css"');
     expect(styles.dependencies[0]).toMatch(/^@fabrials\/ui@\^0\.\d+\.\d+$/);
   });

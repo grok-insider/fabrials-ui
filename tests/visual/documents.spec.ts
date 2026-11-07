@@ -3,7 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 const open = async (page: Page) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.goto(`/iframe.html?id=fabrials-documents--sheets&viewMode=story&globals=theme:light`);
+  await page.goto(`/iframe.html?id=tests-documents--sheets&viewMode=story&globals=theme:light`);
   await expect(page.locator("#storybook-root h1").first()).toBeVisible();
   await page.evaluate(() => document.fonts.ready);
 };

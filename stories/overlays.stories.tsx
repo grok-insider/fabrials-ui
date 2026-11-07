@@ -45,7 +45,7 @@ import {
 } from "@fabrials/ui";
 
 const meta = {
-  title: "Fabrials/Overlays",
+  title: "Tests/Overlays",
   parameters: { layout: "fullscreen" },
   decorators: [
     (Story) => (

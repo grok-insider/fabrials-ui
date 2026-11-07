@@ -53,7 +53,7 @@ import {
 } from "@fabrials/ui";
 
 const meta = {
-  title: "Fabrials/Catalogue",
+  title: "Tests/Catalogue",
   parameters: { layout: "fullscreen" },
 } satisfies Meta;
 export default meta;

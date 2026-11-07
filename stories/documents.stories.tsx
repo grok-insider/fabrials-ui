@@ -5,7 +5,7 @@ import { readSpreadsheet, SpreadsheetError } from "@fabrials/ui/spreadsheet";
 import { Block, Page } from "./story-frame";
 
 const meta = {
-  title: "Fabrials/Documents",
+  title: "Tests/Documents",
   parameters: { layout: "fullscreen" },
 } satisfies Meta;
 export default meta;

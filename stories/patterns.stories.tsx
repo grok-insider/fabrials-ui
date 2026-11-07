@@ -79,7 +79,7 @@ import {
 } from "@fabrials/ui";
 
 const meta = {
-  title: "Fabrials/Patterns",
+  title: "Patterns/Product pages",
   parameters: { layout: "fullscreen" },
 } satisfies Meta;
 export default meta;

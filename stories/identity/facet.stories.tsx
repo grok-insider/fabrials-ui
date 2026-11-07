@@ -10,7 +10,7 @@ import "./facet.css";
 // faint lattice of beads (Shadesmar) where the page is empty.
 
 const meta = {
-  title: "Identity proposals/C Facet",
+  title: "Archive/Identity proposals/C Facet",
   parameters: { layout: "fullscreen" },
 } satisfies Meta;
 export default meta;

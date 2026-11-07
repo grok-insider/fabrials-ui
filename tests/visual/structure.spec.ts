@@ -10,7 +10,7 @@ const open = async (page: Page, id: string, width = 1440) => {
 };
 
 test("a stretched item: the row is the target, controls above it are their own, the ring is inside the row", async ({ page }) => {
-  await open(page, "fabrials-structure--items");
+  await open(page, "tests-structure--items");
   const row = page.locator("ul[aria-label='Messages'] > li").first();
   const box = (await row.boundingBox())!;
   expect(box.height).toBeGreaterThanOrEqual(44);
@@ -32,7 +32,7 @@ test("a stretched item: the row is the target, controls above it are their own, 
 });
 
 test("the current row has a 2 px Stormlight bar and the soft fill; a checked row has the fill and no bar", async ({ page }) => {
-  await open(page, "fabrials-structure--items");
+  await open(page, "tests-structure--items");
   const rows = page.locator("ul[aria-label='Messages'] > li");
   const bar = await rows.nth(2).evaluate((element) => ({ width: getComputedStyle(element, "::before").width, content: getComputedStyle(element, "::before").content }));
   expect(bar.width).toBe("2px");
@@ -41,7 +41,7 @@ test("the current row has a 2 px Stormlight bar and the soft fill; a checked row
 });
 
 test("the header keeps its command slot at a definite width in every mode and never overflows", async ({ page }) => {
-  await open(page, "fabrials-structure--application-header");
+  await open(page, "tests-structure--application-header");
   const rows = await page.evaluate(() =>
     [...document.querySelectorAll("header.fui-app-header")].map((header) => {
       const command = header.querySelector(".fui-app-header-command");
@@ -67,7 +67,7 @@ test("the header keeps its command slot at a definite width in every mode and ne
 });
 
 test("a double click on a handle resets the layout and is reported as a user interaction, wherever in the hit target it lands", async ({ page }) => {
-  await open(page, "fabrials-structure--navigation");
+  await open(page, "tests-structure--navigation");
   const saved = page.locator("output").first();
   const handle = page.getByRole("separator", { name: "Resize the navigation", exact: true });
   await handle.focus();
@@ -80,7 +80,7 @@ test("a double click on a handle resets the layout and is reported as a user int
 });
 
 test("the resizable handle moves with the arrows, Home and End, and a disabled handle leaves the tab order", async ({ page }) => {
-  await open(page, "fabrials-structure--navigation");
+  await open(page, "tests-structure--navigation");
   const handle = page.getByRole("separator", { name: "Resize the navigation", exact: true });
   await handle.focus();
   const start = Number(await handle.getAttribute("aria-valuenow"));
@@ -94,7 +94,7 @@ test("the resizable handle moves with the arrows, Home and End, and a disabled h
 });
 
 test("a scrolling strip keeps the selected tab in view without moving the page, and a rail follows the arrow keys", async ({ page }) => {
-  await open(page, "fabrials-structure--sections", 390);
+  await open(page, "tests-structure--sections", 390);
   const strip = page.getByRole("tablist", { name: "Settings sections" }).nth(1);
   const inside = () => strip.evaluate((list) => {
     const tab = list.querySelector('[aria-selected="true"]')!.getBoundingClientRect();
@@ -117,7 +117,7 @@ test("a scrolling strip keeps the selected tab in view without moving the page, 
 });
 
 test("the switcher opens on the current link and Escape returns focus to its trigger", async ({ page }) => {
-  await open(page, "fabrials-structure--navigation");
+  await open(page, "tests-structure--navigation");
   const trigger = page.getByRole("button", { name: /Switch mailbox/ }).first();
   await trigger.focus();
   await page.keyboard.press("Enter");
@@ -128,7 +128,7 @@ test("the switcher opens on the current link and Escape returns focus to its tri
 
 test("a header that spans the window grows its command slot to 18rem at 90rem and 22rem at 120rem", async ({ page }) => {
   for (const [width, expected] of [[1200, 224], [1440, 288], [2560, 352]] as const) {
-    await open(page, "fabrials-structure--full-width-header", width);
+    await open(page, "tests-structure--full-width-header", width);
     const slot = await page.locator("header.fui-app-header .fui-app-header-command").evaluate((element) => Math.round(element.getBoundingClientRect().width));
     expect(slot, `${width} px window`).toBe(expected);
   }
@@ -145,7 +145,7 @@ const focusedName = (page: Page) =>
   });
 
 test("BulkActions parts: the status is a live region that exists at 0 and is the same node at 1; the hidden actions are out of the tab order and the shown ones follow the title row", async ({ page }) => {
-  await open(page, "fabrials-commands--bulk-parts", 1440);
+  await open(page, "tests-commands--bulk-parts", 1440);
   const root = page.locator(".fui-bulk-actions-root").first();
   const status = root.getByRole("status");
   // 0: the live region is in the DOM, visually hidden (1 px), and the group of actions is not rendered.
@@ -178,7 +178,7 @@ test("BulkActions parts: the status is a live region that exists at 0 and is the
 });
 
 test("BulkActions parts on a phone row: the form stays closed (mounted) until the menu button opens it, and the layout does not overflow", async ({ page }) => {
-  await open(page, "fabrials-commands--bulk-parts", 390);
+  await open(page, "tests-commands--bulk-parts", 390);
   const root = page.locator(".fui-bulk-actions-root").nth(2);
   const group = root.getByRole("group", { name: "Selection actions" });
   await expect(root.getByRole("status")).toHaveText("Selected: 1");
@@ -193,14 +193,14 @@ test("BulkActions parts on a phone row: the form stays closed (mounted) until th
 });
 
 test("BulkActions parts: a layout's own display does not reopen a hidden form", async ({ page }) => {
-  await open(page, "fabrials-commands--bulk-parts", 1440);
+  await open(page, "tests-commands--bulk-parts", 1440);
   // The story gives the form `display: flex` inline; [hidden] must still win, or Tab would reach a closed form.
   const form = page.locator(".fui-bulk-actions-root").first().locator(".fui-bulk-actions-content");
   expect(await form.evaluate((element) => ({ hidden: element.hasAttribute("hidden"), display: getComputedStyle(element).display }))).toEqual({ hidden: true, display: "none" });
 });
 
 test("a switcher with contain={false} follows the pane named nav-switcher; the default follows its own trigger", async ({ page }) => {
-  await open(page, "fabrials-structure--switcher-in-pane");
+  await open(page, "tests-structure--switcher-in-pane");
   const state = () =>
     page.evaluate(() =>
       [...document.querySelectorAll("[data-pane]")].map((pane) => {
@@ -248,7 +248,7 @@ test.describe("a toolbar on a phone keeps its targets at 44 px", () => {
           if (set()) observer.disconnect();
         }).observe(document, { childList: true });
       }, scale);
-      await page.goto("/iframe.html?id=fabrials-controls--toolbars&viewMode=story&globals=theme:light");
+      await page.goto("/iframe.html?id=tests-controls--toolbars&viewMode=story&globals=theme:light");
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
       await page.evaluate(() => document.fonts.ready);
       expect(await page.evaluate(() => matchMedia("(pointer: coarse)").matches)).toBe(true);
@@ -291,7 +291,7 @@ test.describe("a toolbar on a phone keeps its targets at 44 px", () => {
 // ---------------------------------------------------------------------------------------- data-hit shapes (0.8.1)
 
 test("data-hit: 44 reaches four sides, y block-wise only, end block-wise and past the end edge only (LTR and RTL)", async ({ page }) => {
-  await open(page, "fabrials-structure--hit-areas");
+  await open(page, "tests-structure--hit-areas");
   const reach = (demo: string) =>
     page.locator(`[data-demo="${demo}"] [data-hit]`).first().evaluate((element) => {
       const box = element.getBoundingClientRect();
@@ -337,7 +337,7 @@ test("data-hit: 44 reaches four sides, y block-wise only, end block-wise and pas
 test("the three data-hit shapes, with the target drawn", async ({ page }) => {
   for (const theme of ["light", "dark"] as const) {
     await page.setViewportSize({ width: 1000, height: 900 });
-    await page.goto(`/iframe.html?id=fabrials-structure--hit-areas&viewMode=story&globals=theme:${theme}`);
+    await page.goto(`/iframe.html?id=tests-structure--hit-areas&viewMode=story&globals=theme:${theme}`);
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     await page.evaluate(() => document.fonts.ready);
     await expect(page.locator("main.catalogue")).toHaveScreenshot(`hit-areas-${theme}.png`);
@@ -346,7 +346,7 @@ test("the three data-hit shapes, with the target drawn", async ({ page }) => {
 
 // Request 7: the row's name rule costs no specificity, so a consumer's bare class wins, and a trailing count or tag keeps its width.
 test("a menu row cuts a long name by default, keeps a trailing count and tag at their width, and lets a bare consumer class wrap the name", async ({ page }) => {
-  await open(page, "fabrials-structure--navigation-labels");
+  await open(page, "tests-structure--navigation-labels");
   const measure = () =>
     page.evaluate(() => {
       const row = (label: string, href: string) => document.querySelector(`nav[aria-label="${label}"] a[href="${href}"]`)!;
@@ -409,7 +409,7 @@ const toggleHeights = (page: Page) =>
     };
   });
 test("a large toggle group and theme switcher paint 44 px on a fine pointer, the group's padding around them", async ({ page }) => {
-  await open(page, "fabrials-controls--toggles");
+  await open(page, "tests-controls--toggles");
   const heights = await toggleHeights(page);
   expect(heights.pointerCoarse).toBe(false);
   expect(heights.lg).toBe(44);
@@ -421,7 +421,7 @@ test("a large toggle group and theme switcher paint 44 px on a fine pointer, the
 test.describe("on a coarse pointer", () => {
   test.use({ hasTouch: true, isMobile: true });
   test("a large toggle group paints the same 44 px", async ({ page }) => {
-    await page.goto("/iframe.html?id=fabrials-controls--toggles&viewMode=story&globals=theme:light");
+    await page.goto("/iframe.html?id=tests-controls--toggles&viewMode=story&globals=theme:light");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     await page.evaluate(() => document.fonts.ready);
     const heights = await toggleHeights(page);
@@ -434,7 +434,7 @@ test.describe("on a coarse pointer", () => {
 
 // Request 11: the rows variant has its fill as the hover cue and does not underline the title; the default accordion still does.
 test("an accordion trigger underlines on hover in the default look and not in the rows variant", async ({ page }) => {
-  await open(page, "fabrials-commands--tools");
+  await open(page, "tests-commands--tools");
   const line = (locator: ReturnType<Page["locator"]>) => locator.evaluate((element) => getComputedStyle(element).textDecorationLine);
   const rows = page.locator(".fui-accordion[data-variant='rows'] .fui-accordion-trigger").first();
   const plain = page.locator(".fui-accordion:not([data-variant='rows']) .fui-accordion-trigger").last();

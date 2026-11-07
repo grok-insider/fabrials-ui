@@ -1,0 +1,148 @@
+/* The Storybook front page: a brand moment, so the hero may carry the gem and an agent at work in its light. */
+.ov {
+  display: grid;
+  gap: var(--fui-space-16);
+  max-width: 76rem;
+  padding: var(--fui-space-16) var(--fui-page-padding) var(--fui-space-20);
+}
+.ov-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  align-items: center;
+  gap: var(--fui-space-12);
+}
+.ov-copy {
+  display: grid;
+  gap: var(--fui-space-5);
+}
+.ov-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--fui-space-2);
+  margin: 0;
+  color: var(--muted-foreground);
+  font-family: var(--fui-font-label);
+  font-size: var(--fui-text-label);
+  letter-spacing: var(--fui-tracking-label);
+}
+.ov h1 {
+  margin: 0;
+  font-family: var(--fui-font-display);
+  font-size: clamp(2.75rem, 6vw, 4.5rem);
+  font-weight: var(--fui-weight-semibold);
+  line-height: 0.96;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+.ov-lead {
+  max-width: 34rem;
+  margin: 0;
+  color: color-mix(in oklab, var(--foreground) 78%, var(--muted-foreground));
+  font-size: var(--fui-text-lg);
+  line-height: 1.6;
+}
+.ov-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--fui-space-5);
+  margin: 0;
+}
+.ov-links a,
+.ov-index a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--fui-space-1);
+  color: var(--brand-ink);
+  font-weight: var(--fui-weight-medium);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklab, var(--brand-ink) 35%, transparent);
+  text-underline-offset: 3px;
+}
+.ov-run {
+  position: relative;
+  display: grid;
+  gap: var(--fui-space-4);
+  padding: var(--fui-space-5);
+  border: 1px solid var(--border);
+  border-radius: var(--fui-radius-2xl);
+  background: var(--card);
+  box-shadow: var(--fui-shadow-sm), var(--fui-highlight);
+}
+.ov-run-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fui-space-3);
+}
+.ov-run-title {
+  font-weight: var(--fui-weight-semibold);
+}
+.ov-section {
+  display: grid;
+  gap: var(--fui-space-5);
+}
+.ov-section h2 {
+  margin: 0;
+  font-family: var(--fui-font-display);
+  font-size: var(--fui-text-2xl);
+  font-weight: var(--fui-weight-semibold);
+  letter-spacing: -0.02em;
+}
+.ov-index {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--fui-separator);
+}
+.ov-index li {
+  display: grid;
+  grid-template-columns: 2rem 11rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--fui-space-4);
+  padding: var(--fui-space-4) 0;
+  border-bottom: 1px solid var(--fui-separator);
+}
+.ov-index h3,
+.ov-rules h3 {
+  margin: 0;
+  font-size: var(--fui-text-md);
+  font-weight: var(--fui-weight-semibold);
+}
+.ov-index p,
+.ov-rules p {
+  margin: 0;
+  color: var(--muted-foreground);
+}
+.ov-rules {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: var(--fui-space-8) var(--fui-space-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ov-rules li {
+  display: grid;
+  align-content: start;
+  gap: var(--fui-space-2);
+}
+.ov-rule-number {
+  color: var(--muted-foreground);
+  font-family: var(--fui-font-label);
+  font-size: var(--fui-text-label);
+}
+@media (max-width: 59.99rem) {
+  .ov {
+    gap: var(--fui-space-12);
+    padding-block: var(--fui-space-10) var(--fui-space-16);
+  }
+  .ov-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ov-index li {
+    grid-template-columns: 2rem minmax(0, 1fr);
+  }
+  .ov-index li > :is(p, a) {
+    grid-column: 2;
+  }
+}

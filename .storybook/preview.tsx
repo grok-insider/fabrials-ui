@@ -1,9 +1,12 @@
 import { useEffect, type ReactNode } from "react";
 import type { Preview } from "@storybook/react-vite";
+import { fabrialsTheme } from "./theme";
 import "@fabrials/ui/tokens.css";
 import "@fabrials/ui/fonts.css";
 import "@fabrials/ui/styles.css";
+import "@fabrials/ai-ui/styles.css";
 import "../stories/catalogue.css";
+import "../stories/showcase.css";
 
 function PreviewFrame({
   theme,
@@ -41,7 +44,16 @@ const preview: Preview = {
     },
   },
   initialGlobals: { theme: "light", density: "standard" },
-  parameters: { layout: "fullscreen", a11y: { test: "error" } },
+  parameters: {
+    layout: "fullscreen",
+    a11y: { test: "error" },
+    docs: { theme: fabrialsTheme },
+    options: {
+      storySort: {
+        order: ["Overview", "Foundations", "Components", "Agents", "Patterns", "Tests", "Archive"],
+      },
+    },
+  },
   decorators: [
     (Story, context) => (
       <PreviewFrame

@@ -9,7 +9,7 @@ const open = async (page: Page, id: string, width = 1440) => {
 };
 
 test("a mosaic tile opens the viewer on its item; arrows move, Home and End go to the ends; Escape returns focus to the tile", async ({ page }) => {
-  await open(page, "fabrials-media--images");
+  await open(page, "tests-media--images");
   const tile = page.getByRole("button", { name: /Orchard terraces on the north side \(2 of 4\)/ });
   await tile.click();
   const viewer = page.getByRole("dialog", { name: "Photos, 2 of 4" });
@@ -28,7 +28,7 @@ test("a mosaic tile opens the viewer on its item; arrows move, Home and End go t
 });
 
 test("zoom: Z brings the image to its real size around the middle, the arrows look around, Z fits it again", async ({ page }) => {
-  await open(page, "fabrials-media--viewer");
+  await open(page, "tests-media--viewer");
   const viewer = page.getByRole("dialog", { name: "Photos, 1 of 6" });
   const image = viewer.getByRole("img", { name: "A harbour at dusk under a pale sun" });
   await expect(image).toBeVisible();
@@ -53,7 +53,7 @@ test("zoom: Z brings the image to its real size around the middle, the arrows lo
 });
 
 test("a click on the image zooms where it was pressed; the viewer is dark in the light theme", async ({ page }) => {
-  await open(page, "fabrials-media--viewer");
+  await open(page, "tests-media--viewer");
   const image = page.getByRole("img", { name: "A harbour at dusk under a pale sun" });
   await expect(image).toBeVisible();
   const box = (await image.boundingBox())!;
@@ -66,14 +66,14 @@ test("a click on the image zooms where it was pressed; the viewer is dark in the
 });
 
 test("people: a group folds the rest into a count named in full; a badge says its status", async ({ page }) => {
-  await open(page, "fabrials-media--people");
+  await open(page, "tests-media--people");
   await expect(page.getByRole("img", { name: "3 more" }).first()).toHaveText("+3");
   await expect(page.getByRole("img", { name: "Busy" })).toBeVisible();
   await expect(page.getByRole("img", { name: "3 unread" })).toHaveText("3");
 });
 
 test("an image that fails says what it was", async ({ page }) => {
-  await open(page, "fabrials-media--images");
+  await open(page, "tests-media--images");
   const failed = page.locator('.fui-image[data-state="error"]');
   await expect(failed).toHaveCount(1);
   await expect(failed.getByRole("img", { name: "The night shift roster" })).toBeVisible();

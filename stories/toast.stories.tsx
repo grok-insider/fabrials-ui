@@ -21,7 +21,7 @@ function NoticesPreview() {
 }
 
 const meta = {
-  title: "Fabrials/Toast",
+  title: "Tests/Toast",
   component: Toaster,
 } satisfies Meta<typeof Toaster>;
 

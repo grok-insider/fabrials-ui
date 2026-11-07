@@ -3,7 +3,7 @@ import { Button, DitherBand, DitherGem, DitherScene, Snippet, type GemName } fro
 import "./highstorm.css";
 
 const meta = {
-  title: "Fabrials/Highstorm",
+  title: "Patterns/Highstorm",
   parameters: { layout: "fullscreen" },
 } satisfies Meta;
 export default meta;

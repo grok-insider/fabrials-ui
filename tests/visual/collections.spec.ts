@@ -10,7 +10,7 @@ const open = async (page: Page, id: string, width = 1440) => {
 };
 
 test("listbox: one tab stop on the choice, arrows move the selection, type-ahead jumps, Enter opens", async ({ page }) => {
-  await open(page, "fabrials-collections--lists");
+  await open(page, "tests-collections--lists");
   const list = page.getByRole("listbox", { name: "Senders", exact: true });
   await list.focus();
   const active = async () => list.evaluate((element) => document.getElementById(element.getAttribute("aria-activedescendant") ?? "")?.textContent ?? "");
@@ -31,7 +31,7 @@ test("listbox: one tab stop on the choice, arrows move the selection, type-ahead
 });
 
 test("listbox, several: Shift extends, Space toggles, Ctrl+A takes every enabled row, a disabled row is passed over", async ({ page }) => {
-  await open(page, "fabrials-collections--lists");
+  await open(page, "tests-collections--lists");
   const list = page.getByRole("listbox", { name: "Senders to clean up" });
   await expect(list).toHaveAttribute("aria-multiselectable", "true");
   await list.focus();
@@ -52,7 +52,7 @@ test("listbox, several: Shift extends, Space toggles, Ctrl+A takes every enabled
 });
 
 test("a virtual listbox draws only what is on screen and reaches the last of 10 000 rows", async ({ page }) => {
-  await open(page, "fabrials-collections--lists");
+  await open(page, "tests-collections--lists");
   const list = page.getByRole("listbox", { name: "Sync log" });
   expect(await list.getByRole("option").count()).toBeLessThan(40);
   await list.focus();
@@ -68,7 +68,7 @@ test("a virtual listbox draws only what is on screen and reaches the last of 10 
 });
 
 test("a virtual feed measures its rows: none overlaps the next", async ({ page }) => {
-  await open(page, "fabrials-collections--lists");
+  await open(page, "tests-collections--lists");
   const feed = page.getByRole("region", { name: "Feed" });
   await expect(feed.getByRole("listitem").first()).toBeVisible();
   await page.waitForTimeout(100);
@@ -77,7 +77,7 @@ test("a virtual feed measures its rows: none overlaps the next", async ({ page }
 });
 
 test("side panel: the handle resizes with the arrows and Home, Escape inside closes the panel", async ({ page }) => {
-  await open(page, "fabrials-collections--panels");
+  await open(page, "tests-collections--panels");
   const panel = page.locator(".fui-side-panel");
   const handle = page.getByRole("separator", { name: "Resize panel" });
   await expect(handle).toHaveAttribute("aria-valuenow", "340");
@@ -95,7 +95,7 @@ test("side panel: the handle resizes with the arrows and Home, Escape inside clo
 });
 
 test("side panel: on a phone it is a modal sheet named by its title", async ({ page }) => {
-  await open(page, "fabrials-collections--panels", 390);
+  await open(page, "tests-collections--panels", 390);
   const sheet = page.getByRole("dialog", { name: "North workspace" });
   await expect(sheet).toBeVisible();
   await sheet.getByRole("button", { name: "Close panel" }).click();
@@ -103,7 +103,7 @@ test("side panel: on a phone it is a modal sheet named by its title", async ({ p
 });
 
 test("context menu: a right-click opens it at the pointer, Escape closes it, Shift+F10 opens it from the keyboard", async ({ page }) => {
-  await open(page, "fabrials-collections--panels");
+  await open(page, "tests-collections--panels");
   const row = page.getByRole("listbox", { name: "Inbox senders" }).getByRole("option", { name: /Field office/ });
   // An open menu makes the rest of the page inert, so the row is measured first.
   const at = (await row.boundingBox())!;
@@ -122,7 +122,7 @@ test("context menu: a right-click opens it at the pointer, Escape closes it, Shi
 });
 
 test("dropzone: chosen files are kept, a file that is too large is said and refused, a drag lights the zone", async ({ page }) => {
-  await open(page, "fabrials-collections--panels");
+  await open(page, "tests-collections--panels");
   const input = page.getByLabel("Choose files").first();
   await input.setInputFiles([
     { name: "receipt.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.7 synthetic") },

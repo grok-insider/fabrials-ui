@@ -10,6 +10,7 @@ export type UiGroup =
   | "Documentation"
   | "Effects"
   | "AI chat"
+  | "AI at work"
   | "AI providers";
 
 export type UiPackage = "@fabrials/ui" | "@fabrials/ai-ui";
@@ -70,6 +71,11 @@ export const uiGroups: { name: UiGroup; description: string }[] = [
   {
     name: "AI chat",
     description: "Presentational chat pieces from @fabrials/ai-ui. The host supplies the data.",
+  },
+  {
+    name: "AI at work",
+    description:
+      "What an agent is doing while it works: thinking, its plan, the picture it is making and how full its context is. They carry the working light, and only while they work.",
   },
   {
     name: "AI providers",
@@ -687,12 +693,12 @@ export const uiCatalog: UiCatalogItem[] = [
     [
       ["tone", "neutral | info | success | warning | danger", "Color is paired with the word."],
       ["variant", "soft | outline | solid", "soft for status, outline for facts such as a license or version, solid for a count that must stand out."],
-      ["dot", "boolean | hollow", "A square marker before the text, like one pixel of the dither. hollow is an outline dot for an archived or inactive item."],
+      ["dot", "boolean | hollow", "A round light before the text, for a state that changes. hollow is an outline dot for an archived or inactive item."],
       ["dotColor", "string", "Colours the dot alone with any CSS colour (var(--label-tone)); it sets --fui-badge-dot."],
       ["truncate", "boolean", "The tag shrinks to its container and cuts long text with an ellipsis; the full text goes to the title. --fui-badge-max caps the width."],
       ["--fui-badge-solid / --fui-badge-ink", "CSS properties", "Public. A tag whose colour is data sets --fui-badge-solid (tint, hairline, dot) and, if needed, --fui-badge-ink (text) on the badge itself (a class or style, not an ancestor); tones only set their defaults."],
     ],
-    "A small tag with 3 px corners, never a pill. Color is not the only signal: the text says what the status is. A data colour tints the tag while the ink stays neutral, so the name reads on any colour.",
+    "A soft tag with 6 px corners, tinted by its tone and inked in it; never a pill. Color is not the only signal: the text says what the status is. A data colour tints the tag while the ink stays neutral, so the name reads on any colour.",
   ),
   ui(
     "card",
@@ -702,9 +708,11 @@ export const uiCatalog: UiCatalogItem[] = [
     ["Card", "CardHeader", "CardTitle", "CardDescription", "CardContent", "CardFooter", "CardCaption"],
     [
       ["children", "ReactNode", "Header, content and optional footer."],
-      ["CardCaption", "component", "A caption strip along the bottom edge in the label voice: what the figure shows, then a reading."],
+      ["CardCaption", "component", "A caption along the bottom edge in the label voice: what the figure shows, then a reading."],
+      ["interactive", "boolean", "For a card that leads somewhere: it lifts 1 px under the pointer and draws the focus ring round the card."],
+      ["fui-card-link", "class", "On the card's one link: the link covers the whole interactive card, so the card is a single target."],
     ],
-    "A card is a plate: square, flat, one hairline. It is a section, not a clickable surface, unless the host adds one action. Wrap a card that carries the brand in CornerMarks.",
+    "A card is a plate: 12 px corners, a hairline edge and a soft resting shadow; its footer and caption sit on it with no line above. It is a section, not a clickable surface, unless it has one link (interactive with fui-card-link). Corner marks only on a brand moment's figure.",
   ),
   ui(
     "alert",
@@ -822,7 +830,7 @@ export const uiCatalog: UiCatalogItem[] = [
     [
       ["open", "boolean", "CommandDialog open state."],
     ],
-    "fabrials.com and the ai-relay console open this with Ctrl or Command K. Radiant uses Command to choose a model and does not add a second palette. The dialog has 6 px corners, the overlay shadow and one variable for its top and its maximum height; the selected row has the accent fill and the 2 px Stormlight bar. CommandDialog does not wrap its children: put a Command inside.",
+    "fabrials.com and the ai-relay console open this with Ctrl or Command K. Radiant uses Command to choose a model and does not add a second palette. The dialog has 10 px corners, the overlay shadow and one variable for its top and its maximum height; the selected row has the accent fill and the 2 px Stormlight bar. CommandDialog does not wrap its children: put a Command inside.",
   ),
   ui(
     "command-trigger",
@@ -1086,6 +1094,7 @@ export const uiCatalog: UiCatalogItem[] = [
       ["children", "string", "The label."],
       ["as", "ElementType", "Element to render. Defaults to p."],
       ["duration", "number", "Sweep length in seconds. spread sets the highlight width."],
+      ["tone", "ink | light", "ink (default) sweeps the foreground across the muted text; light sweeps the working light, for a label that names an agent at work."],
     ],
     "Use it for a short pending label, not for content. Under reduced motion it is plain muted text.",
   ),
@@ -1204,8 +1213,11 @@ export const uiCatalog: UiCatalogItem[] = [
       ["onSubmit", "(value) => void", "Enter sends; Shift+Enter adds a line."],
       ["status", "ChatComposerStatus", "ready, submitting or streaming. Streaming turns send into stop, which calls onStop."],
       ["tools", "ReactNode", "ComposerButton and ComposerToggle on the left. trailing holds voice input."],
-      ["attachments", "ReactNode", "Attachments shown above the field."],
+      ["attachments", "ReactNode", "Attachments shown above the field; size=\"sm\" grid tiles suit it."],
       ["onPasteFiles", "(files) => void", "Receives pasted files. Backspace in an empty field calls the remove-last handler."],
+      ["working", "boolean", "The working light along the edge. On by default while status is submitting or streaming; false keeps the edge still."],
+      ["queueWhileBusy", "boolean", "Keeps Send next to Stop, for a follow-up that waits its turn."],
+      ["footer", "ReactNode", "A quiet line under the field."],
     ],
     "Presentational. The host sends the message, uploads pasted files and owns the tool state.",
   ),
@@ -1245,10 +1257,12 @@ export const uiCatalog: UiCatalogItem[] = [
     [
       ["streaming", "boolean", "ReasoningDisclosure shows Thinking, then Thought for durationSeconds."],
       ["phase", "SearchPhase", "For search steps: searching, reading or done, with steps and sourceCount."],
-      ["live", "boolean", "ActivityDisclosure for any other activity. ActivityIcon marks the live state."],
+      ["live", "boolean", "ActivityDisclosure for any other activity. ActivityIcon marks the live state; the label carries the working light."],
+      ["timer / startedAt", "boolean / number | Date", "While live, the time taken beside the label, never read out on every tick. On by default for reasoning and search; startedAt counts from the server's start."],
+      ["steps", "SearchStep[]", "Searches (query and the sources found) and pages read. The first four sources' marks stack beside the count; faviconUrl gives their icons."],
       ["open", "boolean", "Controlled open state. defaultOpen works uncontrolled."],
     ],
-    "Presentational. The host maps its stream events to these props. Live indicators stop under reduced motion.",
+    "Presentational. The host maps its stream events to these props. Steps that arrive after the list is shown rise into place. Live indicators stop under reduced motion.",
   ),
   aiUi(
     "attachments",
@@ -1256,12 +1270,90 @@ export const uiCatalog: UiCatalogItem[] = [
     "Files attached to a message, inline, as a grid or as a list.",
     ["Attachments", "AttachmentChip"],
     [
-      ["items", "AttachmentItem[]", "id, name, mediaType, url, size, status and error."],
+      ["items", "AttachmentItem[]", "id, name, mediaType, url, size, status, progress and error."],
+      ["progress", "number (0 to 1)", "On an uploading item: a grid tile draws a ring that closes as the file goes up and counts the percentage (a progressbar); at 100 % the count fades out. A chip says the percentage."],
       ["variant", "inline | grid | list", "Layout."],
+      ["size", "sm | md", "Grid tiles: md is 96 px, sm 56 px for a composer."],
       ["onRemove", "(id) => void", "Shows a remove button on each file."],
       ["empty", "ReactNode", "Shown when there are no files."],
     ],
-    "Presentational. The host uploads the files and reports uploading and error states.",
+    "Presentational. The host uploads the files and reports uploading and error states. Files that arrive after the list is shown rise into place.",
+  ),
+  ui(
+    "agent-thinking",
+    "Agent thinking",
+    "AI at work",
+    "The line that says an agent is working on a reply: a mark, a label in the working light and the time it has taken.",
+    ["AgentThinking", "AgentMark"],
+    [
+      ["label", "string", "What the agent is doing, in plain words. Read out when it changes; the time is not."],
+      ["variant", "wave | orbit | dither", "The mark: a wave across a 3x3 grid, a head round the ring, or a 4x4 ordered dither filling with light."],
+      ["tone", "light | ink", "light (default) carries the working light, where a person waits; ink is a muted line for background work."],
+      ["timer / startedAt", "boolean / number | Date", "The time taken beside the label (on by default); startedAt counts from the server's start."],
+      ["shimmer", "boolean", "false keeps the label still."],
+      ["AgentMark", "variant, tone", "The mark alone, decorative, for a dense row or a button."],
+    ],
+    "A role=status line. Under reduced motion the mark holds a still pattern, the label is plain and the time counts in whole seconds.",
+    "@fabrials/ai-ui",
+  ),
+  ui(
+    "task-list",
+    "Task list",
+    "AI at work",
+    "The steps of an agent's plan as they are worked through, with the running step in the working light.",
+    ["TaskList"],
+    [
+      ["tasks", "TaskItem[]", "id, title, status (pending, running, done, failed, skipped), detail (a second line) and meta (a reading)."],
+      ["title", "ReactNode", "A heading; with it the header counts the settled steps and draws a bar with a segment per step."],
+      ["label", "string", "The list's name when there is no title."],
+      ["labels", "Partial<TaskListLabels>", "The words for each state, the count and the closing summary, in your language."],
+    ],
+    "Each state is said in words to assistive technology; the running step is aria-current=step and a polite status announces the step that starts, fails or the end. Steps that arrive rise into place; a settled step draws its tick.",
+    "@fabrials/ai-ui",
+  ),
+  ui(
+    "generation-frame",
+    "Generation frame",
+    "AI at work",
+    "A picture being made: light ripples through a field of square dots, then the image arrives through the dither.",
+    ["GenerationFrame"],
+    [
+      ["status", "queued | generating | done | failed", "What the frame shows."],
+      ["progress", "number (0 to 1)", "Known progress: the status counts it and fills a line. Without it the frame counts the time instead (startedAt)."],
+      ["src / alt", "string", "The finished image and its text alternative."],
+      ["aspectRatio", "number | string", "Keeps the frame's shape before and after; 1 by default."],
+      ["label / doneLabel", "string", "What it is doing, and what is read out when the image is ready."],
+      ["error / caption", "ReactNode", "What to do when it fails (a retry), and a line under the frame in the label voice."],
+    ],
+    "A polite status says what it is doing and how far it got; a failure is an alert. Under reduced motion the field and the edge hold still and the image appears at once.",
+    "@fabrials/ai-ui",
+  ),
+  ui(
+    "context-meter",
+    "Context meter",
+    "AI at work",
+    "How full an agent's context window is: a stacked bar of what fills it, a legend and a reading.",
+    ["ContextMeter"],
+    [
+      ["parts", "{ label, value }[]", "What fills the window, drawn in order, each in its series colour."],
+      ["limit", "number", "The window's size."],
+      ["warnAt / dangerAt", "number (0 to 1)", "Shares of the limit where the reading turns to warning (0.8) and danger (0.95)."],
+      ["format / unit", "(value) => string / string", "How numbers read (42.1k by default) and what they count, for assistive technology."],
+      ["legend", "boolean", "false hides the legend; the meter keeps its value."],
+    ],
+    "One role=meter whose value reads in full (42,100 of 200,000 tokens, 21%).",
+    "@fabrials/ai-ui",
+  ),
+  ui(
+    "working-light",
+    "Working light",
+    "AI at work",
+    "A band of light that turns along the edge of what an agent works on, with a soft bloom. Only while it works.",
+    ["WorkingLight"],
+    [
+      ["(no props)", "", "Render it as the last child of a positioned surface while the work lasts; it takes the surface's corners. The surface must not clip its overflow."],
+    ],
+    "Decorative (aria-hidden): say the state in words too. A still edge under reduced motion; hidden in forced colors. The composer, the generation frame and the agent pieces carry it for you.",
   ),
   aiUi(
     "voice-input",
@@ -1325,9 +1417,9 @@ export const uiCatalog: UiCatalogItem[] = [
     "Registration crosses on the corners of a plate, like a technical drawing.",
     ["CornerMarks"],
     [
-      ["children", "ReactNode", "The plate: a Card, a StatGroup, a Table or a chart."],
+      ["children", "ReactNode", "The plate of a brand moment: the hero figure of a landing, a figure on a sign-in or public stats page."],
     ],
-    "Decorative (aria-hidden) and never focusable. Use it on the plates that carry a page, not on every box.",
+    "Decorative (aria-hidden) and never focusable. Brand moments only, two per page at most; never on product screens.",
   ),
   ui(
     "grid-guides",

@@ -30,6 +30,8 @@ import { uiCatalog, uiCatalogItem } from "@/lib/ui-catalog";
 import { docsPages } from "@/lib/docs-nav";
 import { DocsShell } from "@/components/docs/docs-shell";
 import { ComponentPreview } from "@/components/component-preview";
+import { ComponentExamples } from "@/components/component-examples";
+import { hasExamples } from "@/lib/example-slugs";
 import { CodeBlock } from "@/components/code-block";
 import { shimIndex } from "@/lib/shims-index.generated";
 
@@ -209,6 +211,7 @@ export default async function Docs({
   const toc = item
     ? [
         ...(slug === "server-connector" ? [] : [{ title: "Preview", url: "#preview", depth: 2 }]),
+        ...(hasExamples(slug) ? [{ title: "Examples", url: "#examples", depth: 2 }] : []),
         { title: "Installation", url: "#installation", depth: 2 },
         { title: "API reference", url: "#api", depth: 2 },
         { title: "Behavior", url: "#behavior", depth: 2 },
@@ -255,6 +258,11 @@ export default async function Docs({
               recommendations, cart state and tool registration belong to the example.{" "}
               <Link href="/playground#comparison">Explore the shopping example</Link>
             </Note>
+          )}
+          {hasExamples(slug) && (
+            <Section id="examples" title="Examples">
+              <ComponentExamples slug={slug} />
+            </Section>
           )}
           <Section id="installation" title="Installation">
             {uiItem ? (

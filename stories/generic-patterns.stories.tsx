@@ -23,7 +23,7 @@ import {
 } from "@fabrials/ui";
 
 const meta = {
-  title: "Fabrials/Generic patterns",
+  title: "Patterns/Generic",
   parameters: { layout: "fullscreen" },
 } satisfies Meta;
 export default meta;

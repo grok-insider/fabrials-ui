@@ -6,7 +6,7 @@ import {
   PageHeader, Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow,
 } from "@fabrials/ui";
 
-const meta = { title: "Fabrials/Enterprise", parameters: { layout: "fullscreen" } } satisfies Meta;
+const meta = { title: "Tests/Enterprise", parameters: { layout: "fullscreen" } } satisfies Meta;
 export default meta;
 type Story = StoryObj<typeof meta>;
 

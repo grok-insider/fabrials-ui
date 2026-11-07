@@ -12,7 +12,7 @@ const prop = (player: Locator, name: "paused" | "currentTime" | "muted" | "playb
   media(player).evaluate((element, key) => (element as unknown as Record<string, number | boolean>)[key]!, name);
 
 test("video: K plays and pauses, the arrows seek, M mutes, C shows captions, the speed menu sets the rate", async ({ page }) => {
-  await open(page, "fabrials-players--video");
+  await open(page, "tests-players--video");
   const player = page.getByRole("group", { name: "The harbour at dusk" });
   await expect.poll(() => prop(player, "duration")).toBeGreaterThan(5);
   await player.focus();
@@ -36,7 +36,7 @@ test("video: K plays and pauses, the arrows seek, M mutes, C shows captions, the
 });
 
 test("one video plays at a time; a file that fails says why", async ({ page }) => {
-  await open(page, "fabrials-players--video");
+  await open(page, "tests-players--video");
   const first = page.getByRole("group", { name: "The harbour at dusk" });
   const second = page.getByRole("group", { name: "The harbour, small" });
   await first.getByRole("button", { name: "Play" }).first().click();
@@ -50,7 +50,7 @@ test("one video plays at a time; a file that fails says why", async ({ page }) =
 });
 
 test("a video in the viewer takes the keys while it has focus; Escape still closes the viewer", async ({ page }) => {
-  await open(page, "fabrials-players--video");
+  await open(page, "tests-players--video");
   await page.getByRole("button", { name: /Footage of the harbour at dusk/ }).click();
   const viewer = page.getByRole("dialog", { name: "Harbour, 2 of 3" });
   await expect(viewer).toBeVisible();
@@ -66,7 +66,7 @@ test("a video in the viewer takes the keys while it has focus; Escape still clos
 
 test("a narrow video: only the play key before the first play, then the seek bar on its own row and every key inside", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto(`/iframe.html?id=fabrials-players--video&viewMode=story&globals=theme:light`);
+  await page.goto(`/iframe.html?id=tests-players--video&viewMode=story&globals=theme:light`);
   await expect(page.locator("#storybook-root h1").first()).toBeVisible();
   const player = page.getByRole("group", { name: "The harbour at dusk" });
   await expect.poll(() => prop(player, "duration")).toBeGreaterThan(5);
@@ -92,7 +92,7 @@ test("a narrow video: only the play key before the first play, then the seek bar
 });
 
 test("audio: Space plays from the frame, the seek bar speaks the time", async ({ page }) => {
-  await open(page, "fabrials-players--sound-and-animation");
+  await open(page, "tests-players--sound-and-animation");
   const player = page.getByRole("group", { name: "Three-note chime" });
   await expect.poll(() => prop(player, "duration")).toBeGreaterThan(4);
   await player.focus();
@@ -105,7 +105,7 @@ test("audio: Space plays from the frame, the seek bar speaks the time", async ({
 });
 
 test("animations hold still under reduced motion, and play when asked", async ({ page }) => {
-  await open(page, "fabrials-players--sound-and-animation");
+  await open(page, "tests-players--sound-and-animation");
   const loop = page.locator(".fui-animated-image").first();
   await expect(loop.getByRole("button", { name: "Play animation" })).toBeVisible();
   expect(await loop.locator("video").evaluate((element) => (element as HTMLVideoElement).paused)).toBe(true);

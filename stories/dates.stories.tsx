@@ -4,7 +4,7 @@ import { Calendar, DatePicker, DateRangePicker, Field, type DateRange } from "@f
 import { Block, Frame, Page } from "./story-frame";
 
 const meta = {
-  title: "Fabrials/Dates",
+  title: "Tests/Dates",
   parameters: { layout: "fullscreen" },
 } satisfies Meta;
 export default meta;

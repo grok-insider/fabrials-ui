@@ -11,7 +11,7 @@ type Palette = "obsidian" | "ember" | "deep" | undefined;
 // voice for readouts and captions, data drawn in dither, square plates.
 
 const meta = {
-  title: "Identity proposals/A Instrument",
+  title: "Archive/Identity proposals/A Instrument",
   parameters: { layout: "fullscreen" },
 } satisfies Meta;
 export default meta;

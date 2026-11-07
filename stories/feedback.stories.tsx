@@ -29,7 +29,7 @@ import {
 } from "@fabrials/ui";
 
 const meta = {
-  title: "Fabrials/Feedback",
+  title: "Tests/Feedback",
   parameters: { layout: "fullscreen" },
 } satisfies Meta;
 export default meta;
@@ -478,7 +478,7 @@ function TagsPage() {
       title="Tags"
       description="A tag whose colour is data: --fui-badge-solid tints the tag and its dot, --fui-badge-ink is the text, dotColor recolours the dot alone, and truncate keeps a long name in its row."
     >
-      <Block title="--fui-badge-solid on a neutral tag" description="The tint, the hairline and the square dot follow the property; the ink stays neutral so the name reads on any colour.">
+      <Block title="--fui-badge-solid on a neutral tag" description="The tint, the hairline and the round dot follow the property; the ink stays neutral so the name reads on any colour.">
         <div className="catalogue-row">
           {labelTones.map(({ name, tone }) => (
             <Badge key={name} dot style={{ "--fui-badge-solid": tone } as React.CSSProperties}>{name}</Badge>

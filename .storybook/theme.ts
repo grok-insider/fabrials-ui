@@ -1,0 +1,33 @@
+import { create } from "storybook/theming";
+
+// Storybook's own frame in the Fabrials palette: Plex, the light Stormwall page, Stormlight for what is current.
+export const fabrialsTheme = create({
+  base: "light",
+  brandTitle: "Fabrials UI",
+  brandUrl: "https://ui.fabrials.com",
+  brandTarget: "_blank",
+  fontBase: '"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif',
+  fontCode: '"IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace',
+  colorPrimary: "#2459b3",
+  colorSecondary: "#2a63c4",
+  appBg: "#f6f7f8",
+  appContentBg: "#ffffff",
+  appPreviewBg: "#f6f7f8",
+  appBorderColor: "#e0e3e7",
+  appBorderRadius: 10,
+  textColor: "#0e1116",
+  textMutedColor: "#565d68",
+  textInverseColor: "#f6f7f8",
+  barBg: "#ffffff",
+  barTextColor: "#565d68",
+  barSelectedColor: "#2459b3",
+  barHoverColor: "#2459b3",
+  inputBg: "#ffffff",
+  inputBorder: "#858d98",
+  inputTextColor: "#0e1116",
+  inputBorderRadius: 8,
+  buttonBg: "#ffffff",
+  buttonBorder: "#e0e3e7",
+  booleanBg: "#eef0f2",
+  booleanSelectedBg: "#ffffff",
+});

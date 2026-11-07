@@ -9,7 +9,7 @@ import "./folio.css";
 // said in sentences, dither printed in ink like an engraving.
 
 const meta = {
-  title: "Identity proposals/B Folio",
+  title: "Archive/Identity proposals/B Folio",
   parameters: { layout: "fullscreen" },
 } satisfies Meta;
 export default meta;

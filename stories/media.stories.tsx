@@ -16,7 +16,7 @@ import { Block, Frame, Page } from "./story-frame";
 import { PHOTOS, PORTRAIT } from "./media-fixtures";
 
 const meta = {
-  title: "Fabrials/Media",
+  title: "Tests/Media",
   parameters: { layout: "fullscreen" },
 } satisfies Meta;
 export default meta;

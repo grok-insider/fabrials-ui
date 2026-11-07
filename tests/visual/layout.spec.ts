@@ -38,22 +38,22 @@ for (const engine of Object.keys(engines) as (keyof typeof engines)[]) {
           return { columns, overlap, cut: boxes.some((box) => box.cut), overflow: grid.scrollWidth - grid.clientWidth, template: getComputedStyle(grid).gridTemplateColumns.split(" ").length };
         });
       // A 320 px window: the pane has no room for two 9rem columns, so it is one column.
-      await open(page, "fabrials-controls--native-radio-grid", 320);
+      await open(page, "tests-controls--native-radio-grid", 320);
       expect(await read("default")).toMatchObject({ columns: 1, overlap: false, cut: false, overflow: 0, template: 1 });
       // A 390 px window: two columns by default, one when the group sets a wider minimum; the wide pane keeps two.
-      await open(page, "fabrials-controls--native-radio-grid", 390);
+      await open(page, "tests-controls--native-radio-grid", 390);
       expect(await read("default")).toMatchObject({ columns: 2, overlap: false, cut: false, overflow: 0, template: 2 });
       expect(await read("wide-min")).toMatchObject({ columns: 1, overlap: false, cut: false, overflow: 0, template: 1 });
       expect(await read("wide")).toMatchObject({ columns: 2, overlap: false, cut: false, overflow: 0 });
       // A 1440 px window: the 358 px pane still has two columns of 9rem, the 640 px pane has four; the floor never adds columns.
-      await open(page, "fabrials-controls--native-radio-grid", 1440);
+      await open(page, "tests-controls--native-radio-grid", 1440);
       expect(await read("default")).toMatchObject({ columns: 2, overlap: false, cut: false });
       expect(await read("wide")).toMatchObject({ columns: 4, overlap: false, cut: false });
     });
 
     test("the default minimum is what it was for short labels: four columns of the 640 px frame, as it always was", async () => {
       const page = await launchPage(engine);
-      await open(page, "fabrials-controls--field-sets", 1440);
+      await open(page, "tests-controls--field-sets", 1440);
       const columns = await page.locator(".fui-native-radio-options[data-layout='grid']").first().evaluate((grid) => getComputedStyle(grid).gridTemplateColumns.split(" ").length);
       expect(columns).toBe(4);
     });
@@ -66,7 +66,7 @@ for (const engine of Object.keys(engines) as (keyof typeof engines)[]) {
   test.describe(`${engine} description list`, () => {
     test("layout=auto: stacked under 30rem, and from 30rem a term column with the 1 rem column gap between it and its details", async () => {
       const page = await launchPage(engine);
-      await open(page, "fabrials-structure--description-auto", 1440);
+      await open(page, "tests-structure--description-auto", 1440);
       const read = (width: string) =>
         page.locator(`[data-desc="${width}"] .fui-description-item`).nth(1).evaluate((item) => {
           const style = getComputedStyle(item);

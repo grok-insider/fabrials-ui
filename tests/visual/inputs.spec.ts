@@ -10,7 +10,7 @@ const open = async (page: Page, id: string, width = 1440) => {
 };
 
 test("search: the clear button comes with text, Escape clears first and then belongs to the page", async ({ page }) => {
-  await open(page, "fabrials-inputs--text-fields");
+  await open(page, "tests-inputs--text-fields");
   const field = page.getByRole("searchbox", { name: "Search messages" });
   const clearButton = field.locator("..").getByRole("button", { name: "Clear search" });
   await expect(clearButton).toHaveCount(0);
@@ -39,7 +39,7 @@ test("search: the clear button comes with text, Escape clears first and then bel
 });
 
 test("password: the eye is a toggle, Caps Lock is said, and a submitted form hides the password again", async ({ page }) => {
-  await open(page, "fabrials-inputs--text-fields");
+  await open(page, "tests-inputs--text-fields");
   const field = page.getByLabel("Account password");
   const toggle = page.getByRole("form", { name: "Sign in" }).getByRole("button", { name: "Show password" });
   await expect(field).toHaveAttribute("type", "password");
@@ -61,7 +61,7 @@ test("password: the eye is a toggle, Caps Lock is said, and a submitted form hid
 });
 
 test("number field: arrows step, Shift steps large, Home and End go to the limits, the keys stop at the ends", async ({ page }) => {
-  await open(page, "fabrials-inputs--numbers");
+  await open(page, "tests-inputs--numbers");
   const seats = page.getByRole("textbox", { name: "Seats" });
   await seats.focus();
   await page.keyboard.press("ArrowUp");
@@ -84,7 +84,7 @@ test("number field: arrows step, Shift steps large, Home and End go to the limit
 });
 
 test("slider: a thumb takes focus, arrows and End move it, a range names both thumbs", async ({ page }) => {
-  await open(page, "fabrials-inputs--numbers");
+  await open(page, "tests-inputs--numbers");
   const volume = page.getByRole("slider", { name: "Volume" });
   await volume.focus();
   await page.keyboard.press("ArrowRight");
@@ -106,7 +106,7 @@ test("slider: a thumb takes focus, arrows and End move it, a range names both th
 });
 
 test("right to left, with the direction provider: Left raises the value and the thumb sits on the end of the fill", async ({ page }) => {
-  await open(page, "fabrials-inputs--numbers");
+  await open(page, "tests-inputs--numbers");
   const slider = page.getByRole("slider", { name: "مستوى الصوت" });
   await expect(slider).toHaveAttribute("aria-valuenow", "40");
   const root = page.locator(".fui-slider").filter({ has: slider });
@@ -130,7 +130,7 @@ test("right to left, with the direction provider: Left raises the value and the 
 });
 
 test("one-time code: typing moves on, Backspace moves back, a paste fills every slot", async ({ page }) => {
-  await open(page, "fabrials-inputs--codes");
+  await open(page, "tests-inputs--codes");
   const first = page.getByRole("textbox", { name: "Verification code" });
   await first.focus();
   await page.keyboard.type("12");
@@ -152,7 +152,7 @@ test("one-time code: typing moves on, Backspace moves back, a paste fills every 
 });
 
 test("a growing textarea grows with its text and scrolls past its last row", async ({ page }) => {
-  await open(page, "fabrials-inputs--text-fields");
+  await open(page, "tests-inputs--text-fields");
   const reply = page.getByRole("textbox", { name: "Reply" });
   const empty = (await reply.boundingBox())!.height;
   await reply.fill("one\ntwo\nthree\nfour");

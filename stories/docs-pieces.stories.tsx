@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { CodePanel, CodeTabs, File, Files, Folder, PackageInstall, PageHeader, RepoInfo, SectionHeader } from "@fabrials/ui";
 
 const meta = {
-  title: "Fabrials/Docs pieces",
+  title: "Tests/Docs pieces",
   parameters: { layout: "fullscreen" },
 } satisfies Meta;
 export default meta;

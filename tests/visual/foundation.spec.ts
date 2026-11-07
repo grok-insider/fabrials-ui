@@ -32,79 +32,79 @@ async function auditLandmarks(page: Page) {
 }
 
 const stories: Record<string, string> = {
-  controls: "fabrials-foundation--controls",
-  accounts: "fabrials-foundation--accounts",
-  states: "fabrials-foundation--states",
-  enterprise: "fabrials-enterprise--preferences",
-  catalogue: "fabrials-catalogue--gallery",
-  "brand-tokens": "fabrials-brand--tokens",
-  "brand-lockups": "fabrials-brand--lockups",
-  components: "fabrials-components--gallery",
-  console: "fabrials-patterns--console",
-  "public-site": "fabrials-patterns--public-site",
-  "sign-in": "fabrials-patterns--sign-in",
-  settings: "fabrials-patterns--settings-page",
-  monitoring: "fabrials-monitoring--gallery",
-  highstorm: "fabrials-highstorm--landing",
-  "highstorm-sign-in": "fabrials-highstorm--sign-in",
-  instrument: "fabrials-instrument--landing-page",
-  "instrument-workspace": "fabrials-instrument--workspace-page",
-  "instrument-pieces": "fabrials-instrument--pieces-page",
-  "shadcn-parts": "fabrials-shadcn-parts--gallery",
-  "docs-pieces": "fabrials-docs-pieces--gallery",
-  loading: "fabrials-loading--gallery",
-  "controls-icon-buttons": "fabrials-controls--icon-buttons",
-  "controls-toolbars": "fabrials-controls--toolbars",
-  "controls-file-inputs": "fabrials-controls--file-inputs",
-  "controls-disclosures": "fabrials-controls--disclosures",
-  "controls-field-sets": "fabrials-controls--field-sets",
-  "controls-toggles": "fabrials-controls--toggles",
-  "inputs-text-fields": "fabrials-inputs--text-fields",
-  "inputs-numbers": "fabrials-inputs--numbers",
-  "inputs-codes": "fabrials-inputs--codes",
-  "dates-calendars": "fabrials-dates--calendars",
-  "dates-pickers": "fabrials-dates--pickers",
-  "collections-lists": "fabrials-collections--lists",
-  "collections-panels": "fabrials-collections--panels",
-  "media-people": "fabrials-media--people",
-  "media-images": "fabrials-media--images",
-  "media-viewer": "fabrials-media--viewer",
-  "players-video": "fabrials-players--video",
-  "players-sound": "fabrials-players--sound-and-animation",
-  "documents-sheets": "fabrials-documents--sheets",
-  "feedback-state-panels": "fabrials-feedback--state-panels",
-  "feedback-confirmations": "fabrials-feedback--confirmations",
-  "feedback-times": "fabrials-feedback--times",
-  "feedback-keys": "fabrials-feedback--keys",
-  "feedback-notices": "fabrials-feedback--notices",
-  "feedback-tags": "fabrials-feedback--tags",
-  "feedback-text": "fabrials-feedback--text",
-  "structure-items": "fabrials-structure--items",
-  "structure-header": "fabrials-structure--application-header",
-  "structure-header-full": "fabrials-structure--full-width-header",
-  "structure-navigation": "fabrials-structure--navigation",
-  "structure-switcher-open": "fabrials-structure--switcher-open",
-  "structure-sections": "fabrials-structure--sections",
-  "structure-section-aside": "fabrials-structure--section-aside",
-  "overlays-dialog-fixed": "fabrials-overlays--fixed-dialog",
-  "overlays-dialog-long-title": "fabrials-overlays--long-title",
-  "overlays-dialog-settings": "fabrials-overlays--settings-dialog",
-  "overlays-sheet-non-modal": "fabrials-overlays--non-modal-sheet",
-  "overlays-sheet-modal": "fabrials-overlays--modal-sheet",
-  "overlays-keep-mounted": "fabrials-overlays--keep-mounted",
-  "overlays-status-popovers": "fabrials-overlays--status-popovers",
-  "commands-launcher": "fabrials-commands--launcher",
-  "commands-launcher-outline": "fabrials-commands--launcher-outline",
-  "commands-site-header": "fabrials-commands--in-the-site-header",
-  "commands-options": "fabrials-commands--options",
-  "commands-palette": "fabrials-commands--palette-dialog",
-  "commands-tools": "fabrials-commands--tools",
-  "commands-bulk": "fabrials-commands--bulk",
-  "commands-bulk-parts": "fabrials-commands--bulk-parts",
-  "auth-aside": "fabrials-auth--aside-auto",
-  "auth-aside-centred": "fabrials-auth--aside-centred",
-  "auth-centred": "fabrials-auth--centred",
-  "auth-start": "fabrials-auth--start",
+  controls: "tests-foundation--controls",
+  accounts: "tests-foundation--accounts",
+  states: "tests-foundation--states",
+  enterprise: "tests-enterprise--preferences",
+  catalogue: "tests-catalogue--gallery",
+  "brand-tokens": "foundations-brand--tokens",
+  "brand-lockups": "foundations-brand--lockups",
+  components: "tests-components-gallery--gallery",
+  console: "patterns-product-pages--console",
+  "public-site": "patterns-product-pages--public-site",
+  "sign-in": "patterns-product-pages--sign-in",
+  settings: "patterns-product-pages--settings-page",
+  monitoring: "tests-monitoring--gallery",
+  highstorm: "patterns-highstorm--landing",
+  "highstorm-sign-in": "patterns-highstorm--sign-in",
+  instrument: "patterns-instrument--landing-page",
+  "instrument-workspace": "patterns-instrument--workspace-page",
+  "instrument-pieces": "patterns-instrument--pieces-page",
+  "shadcn-parts": "tests-shadcn-parts--gallery",
+  "docs-pieces": "tests-docs-pieces--gallery",
+  loading: "tests-loading--gallery",
+  "controls-icon-buttons": "tests-controls--icon-buttons",
+  "controls-toolbars": "tests-controls--toolbars",
+  "controls-file-inputs": "tests-controls--file-inputs",
+  "controls-disclosures": "tests-controls--disclosures",
+  "controls-field-sets": "tests-controls--field-sets",
+  "controls-toggles": "tests-controls--toggles",
+  "inputs-text-fields": "tests-inputs--text-fields",
+  "inputs-numbers": "tests-inputs--numbers",
+  "inputs-codes": "tests-inputs--codes",
+  "dates-calendars": "tests-dates--calendars",
+  "dates-pickers": "tests-dates--pickers",
+  "collections-lists": "tests-collections--lists",
+  "collections-panels": "tests-collections--panels",
+  "media-people": "tests-media--people",
+  "media-images": "tests-media--images",
+  "media-viewer": "tests-media--viewer",
+  "players-video": "tests-players--video",
+  "players-sound": "tests-players--sound-and-animation",
+  "documents-sheets": "tests-documents--sheets",
+  "feedback-state-panels": "tests-feedback--state-panels",
+  "feedback-confirmations": "tests-feedback--confirmations",
+  "feedback-times": "tests-feedback--times",
+  "feedback-keys": "tests-feedback--keys",
+  "feedback-notices": "tests-feedback--notices",
+  "feedback-tags": "tests-feedback--tags",
+  "feedback-text": "tests-feedback--text",
+  "structure-items": "tests-structure--items",
+  "structure-header": "tests-structure--application-header",
+  "structure-header-full": "tests-structure--full-width-header",
+  "structure-navigation": "tests-structure--navigation",
+  "structure-switcher-open": "tests-structure--switcher-open",
+  "structure-sections": "tests-structure--sections",
+  "structure-section-aside": "tests-structure--section-aside",
+  "overlays-dialog-fixed": "tests-overlays--fixed-dialog",
+  "overlays-dialog-long-title": "tests-overlays--long-title",
+  "overlays-dialog-settings": "tests-overlays--settings-dialog",
+  "overlays-sheet-non-modal": "tests-overlays--non-modal-sheet",
+  "overlays-sheet-modal": "tests-overlays--modal-sheet",
+  "overlays-keep-mounted": "tests-overlays--keep-mounted",
+  "overlays-status-popovers": "tests-overlays--status-popovers",
+  "commands-launcher": "tests-commands--launcher",
+  "commands-launcher-outline": "tests-commands--launcher-outline",
+  "commands-site-header": "tests-commands--in-the-site-header",
+  "commands-options": "tests-commands--options",
+  "commands-palette": "tests-commands--palette-dialog",
+  "commands-tools": "tests-commands--tools",
+  "commands-bulk": "tests-commands--bulk",
+  "commands-bulk-parts": "tests-commands--bulk-parts",
+  "auth-aside": "patterns-sign-in--aside-auto",
+  "auth-aside-centred": "patterns-sign-in--aside-centred",
+  "auth-centred": "patterns-sign-in--centred",
+  "auth-start": "patterns-sign-in--start",
 };
 
 for (const theme of ["light", "dark"]) {
@@ -139,7 +139,7 @@ for (const theme of ["light", "dark"]) {
 }
 
 test("native preference controls retain form submission semantics", async ({ page }) => {
-  await page.goto("/iframe.html?id=fabrials-enterprise--preferences&viewMode=story");
+  await page.goto("/iframe.html?id=tests-enterprise--preferences&viewMode=story");
   await page.getByLabel("Density").selectOption("compact");
   await page.getByLabel("Notifications", { exact: true }).uncheck();
   await page.getByRole("button", { name: "Save preferences" }).click();
@@ -150,7 +150,7 @@ test("dialog traps focus, validates and restores the trigger", async ({
   page,
 }) => {
   await page.goto(
-    "/iframe.html?id=fabrials-foundation--overlays&viewMode=story",
+    "/iframe.html?id=tests-foundation--overlays&viewMode=story",
   );
   const trigger = page.getByRole("button", {
     name: "Add account",
@@ -182,7 +182,7 @@ test("confirmation, menu and sheet retain their keyboard semantics", async ({
   page,
 }) => {
   await page.goto(
-    "/iframe.html?id=fabrials-foundation--overlays&viewMode=story",
+    "/iframe.html?id=tests-foundation--overlays&viewMode=story",
   );
   await page
     .getByRole("button", { name: "Remove account", exact: true })
@@ -211,7 +211,7 @@ test("selection is contextual and search can recover from no results", async ({
   page,
 }) => {
   await page.goto(
-    "/iframe.html?id=fabrials-foundation--accounts&viewMode=story",
+    "/iframe.html?id=tests-foundation--accounts&viewMode=story",
   );
   await expect(
     page.getByRole("group", { name: "Selection actions" }),
@@ -236,7 +236,7 @@ test("select, tabs and reduced motion work without a host framework", async ({
   page,
 }) => {
   await page.goto(
-    "/iframe.html?id=fabrials-foundation--controls&viewMode=story",
+    "/iframe.html?id=tests-foundation--controls&viewMode=story",
   );
   await page.getByRole("combobox", { name: "Provider" }).click();
   await page.getByRole("option", { name: "Grok", exact: true }).click();
@@ -258,7 +258,7 @@ test("select, tabs and reduced motion work without a host framework", async ({
 test("200 percent text size does not cause page overflow", async ({ page }) => {
   await page.setViewportSize({ width: 768, height: 960 });
   await page.goto(
-    "/iframe.html?id=fabrials-foundation--accounts&viewMode=story",
+    "/iframe.html?id=tests-foundation--accounts&viewMode=story",
   );
   await expect(
     page.getByRole("heading", { name: "Accounts", exact: true }),

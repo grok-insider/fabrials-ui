@@ -16,7 +16,7 @@ const ready = () =>
     async (response) => {
       if (!response.ok) return false;
       const index = await response.json();
-      return Object.hasOwn(index.entries ?? {}, "fabrials-brand--tokens");
+      return Object.hasOwn(index.entries ?? {}, "foundations-brand--tokens");
     },
     () => false,
   );

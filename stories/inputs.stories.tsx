@@ -19,7 +19,7 @@ import {
 import { Block, Frame, Page } from "./story-frame";
 
 const meta = {
-  title: "Fabrials/Inputs",
+  title: "Tests/Inputs",
   parameters: { layout: "fullscreen" },
 } satisfies Meta;
 export default meta;
