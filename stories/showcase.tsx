@@ -25,7 +25,8 @@ export function Showcase({
       <PageHeader eyebrow={eyebrow} title={title} description={description} />
       {set.preview ? (
         <section aria-label="In context" className="sb-preview">
-          {set.preview()}
+          <div className="sb-preview-stage">{set.preview()}</div>
+          {set.previewCode ? <CodePanel code={set.previewCode} language="tsx" title="Code" /> : null}
         </section>
       ) : null}
       {children}

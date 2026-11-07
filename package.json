@@ -24,7 +24,7 @@
     "check:site": "bun run --cwd apps/site check && bun run --cwd apps/site test",
     "dev:site": "bun run --cwd apps/site dev",
     "build:site": "bun run build && bun run --cwd apps/site build",
-    "registry:build": "bun run --cwd apps/site registry:shims && bun run --cwd apps/site registry:build",
+    "registry:build": "bun run --cwd apps/site registry:shims && bun run --cwd apps/site registry:demo-code && bun run --cwd apps/site registry:build",
     "stage:publish": "node scripts/stage-publish.mjs"
   },
   "overrides": {

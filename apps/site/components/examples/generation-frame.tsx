@@ -40,6 +40,25 @@ function LiveGeneration() {
 
 export const generationExamples: ExampleSet = {
   preview: () => <LiveGeneration />,
+  previewCode: `import { GenerationFrame, type GenerationStatus } from "@fabrials/ai-ui";
+
+// \`job\` is the image request as your backend reports it: queued,
+// generating with a progress, then done with its URL.
+export function Picture({
+  job,
+}: {
+  job: { status: GenerationStatus; progress?: number; url?: string };
+}) {
+  return (
+    <GenerationFrame
+      alt="A harbour at dusk under a pale sun"
+      caption="harbour at dusk, pale sun, 1024 × 1024"
+      progress={job.progress}
+      src={job.url}
+      status={job.status}
+    />
+  );
+}`,
   examples: [
     {
       id: "progress",

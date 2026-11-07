@@ -65,6 +65,47 @@ function LivePlan() {
 
 export const taskListExamples: ExampleSet = {
   preview: () => <LivePlan />,
+  previewCode: `import { TaskList, type TaskItem } from "@fabrials/ai-ui";
+
+// The steps come from the agent's run and change as it works;
+// this is the plan once it has finished.
+const steps: TaskItem[] = [
+  {
+    id: "read",
+    title: "Read the billing schema",
+    status: "done",
+    meta: "0.9s",
+  },
+  {
+    id: "plan",
+    title: "Plan the copy in batches",
+    status: "done",
+    meta: "12 batches",
+  },
+  {
+    id: "copy",
+    title: "Copy 48,210 invoices",
+    status: "done",
+    detail: "48,210 rows in 12 batches of 4,018",
+    meta: "1m 42s",
+  },
+  {
+    id: "verify",
+    title: "Compare the row counts",
+    status: "done",
+    meta: "match",
+  },
+  {
+    id: "switch",
+    title: "Switch reads to the new table",
+    status: "done",
+    meta: "0.3s",
+  },
+];
+
+export function MigrationPlan() {
+  return <TaskList title="Move invoices to the new schema" tasks={steps} />;
+}`,
   examples: [
     {
       id: "title",

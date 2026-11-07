@@ -32,6 +32,7 @@ import { DocsShell } from "@/components/docs/docs-shell";
 import { ComponentPreview } from "@/components/component-preview";
 import { ComponentExamples } from "@/components/component-examples";
 import { hasExamples } from "@/lib/example-slugs";
+import { demoCode } from "@/lib/demo-code.generated";
 import { CodeBlock } from "@/components/code-block";
 import { shimIndex } from "@/lib/shims-index.generated";
 
@@ -247,8 +248,9 @@ export default async function Docs({
             <section id="preview" aria-label="Component preview" className="docs-section docs-section-first">
               <ComponentPreview
                 slug={slug}
-                code={uiItem ? usage : source}
-                codeLabel={uiItem ? "Usage" : "Source code"}
+                code={uiItem ? (demoCode[slug] ?? usage) : source}
+                codeLabel={uiItem ? "Code" : "Source code"}
+                codeTitle={uiItem ? `${slug}-example.tsx` : "Source code"}
               />
             </section>
           )}

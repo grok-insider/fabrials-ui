@@ -92,6 +92,65 @@ function ToolsComposer() {
 
 export const composerExamples: ExampleSet = {
   preview: () => <LiveComposer />,
+  previewCode: `import { useState } from "react";
+import { Paperclip } from "lucide-react";
+import {
+  Attachments,
+  ChatComposer,
+  ComposerButton,
+  type AttachmentItem,
+  type ChatComposerStatus,
+} from "@fabrials/ai-ui";
+
+// \`files\` report their upload progress (0 to 1);
+// \`status\` follows the agent's answer.
+export function AskAboutInvoices({
+  files,
+  status,
+  onAttach,
+  onRemove,
+  onSend,
+  onStop,
+}: {
+  files: AttachmentItem[];
+  status: ChatComposerStatus;
+  onAttach: () => void;
+  onRemove: (id: string) => void;
+  onSend: (message: string) => void;
+  onStop: () => void;
+}) {
+  const [value, setValue] = useState("");
+  return (
+    <ChatComposer
+      attachments={
+        files.length ? (
+          <Attachments
+            items={files}
+            onRemove={onRemove}
+            size="sm"
+            variant="grid"
+          />
+        ) : null
+      }
+      onStop={onStop}
+      onSubmit={(message) => {
+        onSend(message);
+        setValue("");
+      }}
+      onValueChange={setValue}
+      placeholder="Ask about your invoices"
+      status={status}
+      tools={
+        <ComposerButton
+          icon={<Paperclip />}
+          label="Attach files"
+          onClick={onAttach}
+        />
+      }
+      value={value}
+    />
+  );
+}`,
   examples: [
     {
       id: "working",
@@ -172,6 +231,45 @@ export const attachmentsExamples: ExampleSet = {
       variant="grid"
     />
   ),
+  previewCode: `import { Attachments, type AttachmentItem } from "@fabrials/ai-ui";
+
+const files: AttachmentItem[] = [
+  {
+    id: "photo",
+    name: "harbour.png",
+    mediaType: "image/png",
+    size: 248_000,
+    url: "/files/harbour.png",
+    status: "ready",
+  },
+  {
+    id: "sheet",
+    name: "invoices-q3.xlsx",
+    mediaType:
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    size: 1_240_000,
+    status: "uploading",
+    progress: 0.64,
+  },
+  {
+    id: "notes",
+    name: "migration-notes.pdf",
+    mediaType: "application/pdf",
+    size: 96_000,
+    status: "ready",
+  },
+  {
+    id: "scan",
+    name: "scan-0042.tiff",
+    mediaType: "image/tiff",
+    status: "error",
+    error: "Too large: the limit is 20 MB",
+  },
+];
+
+export function Files({ onRemove }: { onRemove: (id: string) => void }) {
+  return <Attachments items={files} onRemove={onRemove} variant="grid" />;
+}`,
   examples: [
     {
       id: "grid",

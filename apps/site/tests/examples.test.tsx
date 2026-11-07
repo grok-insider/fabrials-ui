@@ -4,6 +4,7 @@ import { cleanup, render } from "@testing-library/react";
 import { exampleSets } from "@/components/examples";
 import { exampleSlugs } from "@/lib/example-slugs";
 import { uiCatalog } from "@/lib/ui-catalog";
+import { demoCode } from "@/lib/demo-code.generated";
 
 afterEach(cleanup);
 
@@ -33,6 +34,8 @@ it("every example belongs to a catalogue page and says what it shows", () => {
       // Backticks mark code in a description; an odd count would leave the rest of it as code.
       expect((example.description.match(/`/g) ?? []).length % 2, `${slug}/${example.id}`).toBe(0);
     }
+    // A preview shows its code under it, like every other preview (scripts/generate-demo-code.ts checks that it compiles).
+    if (set.preview) expect(set.previewCode?.trim(), `${slug} preview code`).toMatch(/^import [\s\S]+export function /);
   }
 });
 
@@ -49,4 +52,14 @@ it("every example and preview renders", () => {
       unmount();
     }
   }
+});
+
+it("every component preview has the code that makes it under Code", () => {
+  for (const item of uiCatalog) {
+    const set = exampleSets[item.slug];
+    const code = set?.preview ? set.previewCode : demoCode[item.slug];
+    expect(code, item.slug).toBeTruthy();
+  }
+  // And no demo code is left over from a page that has gone.
+  for (const slug of Object.keys(demoCode)) expect(uiCatalog.some((item) => item.slug === slug), slug).toBe(true);
 });

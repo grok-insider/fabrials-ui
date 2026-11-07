@@ -6,18 +6,27 @@ import { Loading, Tabs, TabsContent, TabsList, TabsTrigger } from "@fabrials/ui"
 import { LoadingToggle } from "@/components/loading-toggle";
 import { ComponentDemo } from "@/components/demos";
 import { CodeBlock } from "@/components/code-block";
+import { exampleSets } from "@/components/examples";
 
+/**
+ * A component's preview and, under its second tab, the code that makes it: the preview of an example set brings its own code,
+ * every other preview the code the server read from its demo (lib/demo-code.generated.ts).
+ */
 export function ComponentPreview({
   slug,
   code,
   codeLabel,
+  codeTitle,
 }: {
   slug: string;
   code: string;
   codeLabel: string;
+  codeTitle: string;
 }) {
   const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState("preview");
+  const set = exampleSets[slug];
+  const shown = set?.preview && set.previewCode ? set.previewCode : code;
   return (
     <Tabs value={tab} onValueChange={(next) => setTab(next as string)} className="docs-preview">
       <div className="docs-preview-bar">
@@ -39,7 +48,7 @@ export function ComponentPreview({
         </Loading>
       </TabsContent>
       <TabsContent value="code" className="docs-preview-code">
-        <CodeBlock code={code} label={codeLabel} />
+        <CodeBlock code={shown} label={codeTitle} language="tsx" />
       </TabsContent>
     </Tabs>
   );

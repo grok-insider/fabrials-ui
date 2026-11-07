@@ -19,5 +19,7 @@ export interface Example {
 export interface ExampleSet {
   /** The component in context, the first thing on its page. */
   preview?: () => ReactNode;
+  /** The code of the preview, shown under it: what a reader would write to get it (a replayed demo shows its end state). */
+  previewCode?: string;
   examples: Example[];
 }

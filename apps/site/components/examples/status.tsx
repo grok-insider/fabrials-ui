@@ -151,6 +151,21 @@ export const alertExamples: ExampleSet = {
       </Alert>
     </div>
   ),
+  previewCode: `import { CloudOff } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@fabrials/ui";
+
+export function StaleObservation() {
+  return (
+    <Alert variant="warning">
+      <CloudOff aria-hidden />
+      <AlertTitle>Observation is 3 hours old</AlertTitle>
+      <AlertDescription>
+        The relay has not reported since 11:42. Figures below may be out of
+        date.
+      </AlertDescription>
+    </Alert>
+  );
+}`,
   examples: [
     {
       id: "variants",

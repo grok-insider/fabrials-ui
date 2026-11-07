@@ -22,6 +22,18 @@ function Thread() {
 
 export const agentThinkingExamples: ExampleSet = {
   preview: () => <Thread />,
+  previewCode: `import { AgentThinking, ChatMessage } from "@fabrials/ai-ui";
+
+// \`step\` is what the agent is doing now, from your stream:
+// "Reading the schema".
+export function Thread({ question, step }: { question: string; step: string }) {
+  return (
+    <>
+      <ChatMessage from="user">{question}</ChatMessage>
+      <AgentThinking label={step} />
+    </>
+  );
+}`,
   examples: [
     {
       id: "marks",

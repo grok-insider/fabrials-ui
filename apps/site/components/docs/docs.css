@@ -431,14 +431,7 @@ h3.docs-heading {
   padding: var(--fui-space-8) var(--fui-space-6);
   border: 1px solid var(--border);
   border-radius: var(--fui-radius-lg);
-  background:
-    radial-gradient(
-        circle at 1px 1px,
-        color-mix(in srgb, var(--foreground) 9%, transparent) 1px,
-        transparent 0
-      )
-      0 0 / 16px 16px,
-    var(--background);
+  background: var(--background);
 }
 /* The preview may sit inside Loading's display: contents wrappers. */
 .docs-preview-stage :where(.fui-preview) {
@@ -1042,9 +1035,7 @@ h3.docs-heading.docs-example-title {
   min-height: 9rem;
   padding: var(--fui-space-8) var(--fui-space-6);
   overflow-x: auto;
-  background:
-    radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--foreground) 7%, transparent) 1px, transparent 0) 0 0 / 16px 16px,
-    var(--background);
+  background: var(--background);
 }
 .docs-example-stage[data-align="start"] {
   align-items: flex-start;

@@ -45,6 +45,49 @@ function LiveResearch() {
 
 export const activityExamples: ExampleSet = {
   preview: () => <LiveResearch />,
+  previewCode: `import {
+  SearchStepsDisclosure,
+  type SearchPhase,
+  type SearchStep,
+} from "@fabrials/ai-ui";
+
+// \`phase\` and \`steps\` come from the agent's stream:
+// searching, then reading, then done.
+const steps: SearchStep[] = [
+  {
+    type: "search",
+    query: "postgres move table to another schema without downtime",
+    sources: [
+      "https://www.postgresql.org/docs/current/sql-altertable.html",
+      "https://wiki.postgresql.org/wiki/Lock_Monitoring",
+      "https://dba.stackexchange.com/questions/ask",
+    ],
+  },
+  {
+    type: "search",
+    query: "pg_repack locks during swap",
+    sources: [
+      "https://reorg.github.io/pg_repack/",
+      "https://github.com/reorg/pg_repack/issues",
+    ],
+  },
+  {
+    type: "open_page",
+    url: "https://www.postgresql.org/docs/current/explicit-locking.html",
+    title: "Explicit locking",
+  },
+];
+
+export function Research({ phase }: { phase: SearchPhase }) {
+  return (
+    <SearchStepsDisclosure
+      defaultOpen
+      phase={phase}
+      sourceCount={5}
+      steps={steps}
+    />
+  );
+}`,
   examples: [
     {
       id: "reasoning",

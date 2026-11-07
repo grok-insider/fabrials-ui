@@ -20,7 +20,8 @@
     "video:render": "tsx scripts/render-film.ts",
     "video:studio": "remotion studio video/remotion/index.tsx --public-dir=artifacts/remotion-public --no-open",
     "registry:shadcn": "tsx scripts/snapshot-shadcn.ts",
-    "registry:shims": "bun scripts/generate-shims.ts"
+    "registry:shims": "bun scripts/generate-shims.ts",
+    "registry:demo-code": "bun scripts/generate-demo-code.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

@@ -23,6 +23,36 @@ export const contextMeterExamples: ExampleSet = {
       </CardContent>
     </Card>
   ),
+  previewCode: `import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@fabrials/ui";
+import { ContextMeter } from "@fabrials/ai-ui";
+
+export function Session() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Session</CardTitle>
+        <CardDescription>grok-4.7, started 14:02</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ContextMeter
+          limit={200_000}
+          parts={[
+            { label: "System prompt", value: 3_200 },
+            { label: "Tools", value: 11_800 },
+            { label: "Files", value: 18_400 },
+            { label: "Conversation", value: 8_700 },
+          ]}
+        />
+      </CardContent>
+    </Card>
+  );
+}`,
   examples: [
     {
       id: "parts",
@@ -118,6 +148,41 @@ export const workingLightExamples: ExampleSet = {
       <WorkingLight />
     </Card>
   ),
+  previewCode: `import {
+  Badge,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  ShimmerText,
+  WorkingLight,
+} from "@fabrials/ui";
+
+// The light shows only while the summary is being written;
+// the card says so in words too.
+export function WeeklySummary({ working }: { working: boolean }) {
+  return (
+    <Card style={{ position: "relative" }}>
+      <CardHeader>
+        <CardTitle>Weekly summary</CardTitle>
+        <CardDescription>
+          {working ? (
+            <ShimmerText as="span" tone="light">
+              Reading 1,206 senders
+            </ShimmerText>
+          ) : (
+            "Ready to read"
+          )}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Badge tone="info">{working ? "Agent at work" : "Done"}</Badge>
+      </CardContent>
+      {working ? <WorkingLight /> : null}
+    </Card>
+  );
+}`,
   examples: [
     {
       id: "surface",

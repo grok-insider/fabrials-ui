@@ -7,17 +7,26 @@
   min-width: 0;
   padding: var(--fui-space-10) var(--fui-page-padding) var(--fui-space-16);
 }
+/* The component in context: a plain stage, so nothing competes with it, over the code that makes it. */
 .sb-preview {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--fui-radius-2xl);
+  background: var(--card);
+  box-shadow: var(--fui-shadow-xs), var(--fui-highlight);
+}
+.sb-preview-stage {
   display: grid;
   place-items: center;
   min-height: 18rem;
   padding: var(--fui-space-10) var(--fui-space-6);
-  border: 1px solid var(--border);
-  border-radius: var(--fui-radius-2xl);
-  background:
-    radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--foreground) 7%, transparent) 1px, transparent 0) 0 0 / 16px 16px,
-    var(--background);
-  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--foreground) 4%, transparent);
+  background: var(--background);
+}
+.sb-preview > .fui-code-panel {
+  border: 0;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+  box-shadow: none;
 }
 .sb-examples {
   display: grid;
@@ -63,9 +72,7 @@
   gap: var(--fui-space-4);
   min-height: 9rem;
   padding: var(--fui-space-8) var(--fui-space-6);
-  background:
-    radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--foreground) 7%, transparent) 1px, transparent 0) 0 0 / 16px 16px,
-    var(--background);
+  background: var(--background);
 }
 .sb-example-stage[data-align="start"] {
   align-items: flex-start;
@@ -82,7 +89,7 @@
     gap: var(--fui-space-8);
     padding-block: var(--fui-space-6) var(--fui-space-12);
   }
-  .sb-preview {
+  .sb-preview-stage {
     min-height: 0;
     padding: var(--fui-space-6) var(--fui-space-4);
   }

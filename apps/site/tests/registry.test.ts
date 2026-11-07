@@ -20,6 +20,7 @@ describe("published registry", () => {
   it("is committed exactly as the build produces it", () => {
     execFileSync("bun", ["scripts/build-registry.ts", "--check"], { stdio: "pipe" });
     execFileSync("bun", ["scripts/generate-shims.ts", "--check"], { stdio: "pipe" });
+    execFileSync("bun", ["scripts/generate-demo-code.ts", "--check"], { stdio: "pipe" });
   }, 60_000);
 
   it("publishes only Fabrials entries and shims, never another library's components", () => {
