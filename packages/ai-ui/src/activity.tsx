@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger, ShimmerText } from "@fabrials/ui";
 import {
   BrainIcon,
@@ -11,6 +11,7 @@ import {
   SearchIcon,
 } from "./chat-icons";
 import { SourceFavicon, hostnameFromUrl, sourcePath, type FaviconResolver } from "./citations";
+import { formatWorkTime, useArrivals, useWorkTime } from "./agent";
 
 function join(...values: Array<string | false | null | undefined>) {
   return values.filter(Boolean).join(" ");
@@ -44,8 +45,21 @@ export type ActivityDisclosureProps = {
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
   toggleLabel?: (open: boolean) => string;
+  /** While live, the time the work has taken beside the label ("3.3s"). Never read out on every tick. */
+  timer?: boolean;
+  /** When the work began; defaults to when the row first went live. */
+  startedAt?: number | Date;
   className?: string;
 };
+
+function WorkTime({ startedAt }: { startedAt?: number | Date }) {
+  const elapsed = useWorkTime(startedAt);
+  return (
+    <span aria-hidden="true" className="fui-activity-time">
+      {elapsed === null ? "" : formatWorkTime(elapsed)}
+    </span>
+  );
+}
 
 export function ActivityDisclosure({
   icon,
@@ -56,13 +70,24 @@ export function ActivityDisclosure({
   defaultOpen = false,
   onOpenChange,
   toggleLabel,
+  timer = false,
+  startedAt,
   className,
 }: ActivityDisclosureProps) {
   const [open, setOpen] = useControllable(openProp, defaultOpen, onOpenChange);
   const text = (
-    <span className="fui-activity-label" key={label}>
-      {live ? <ShimmerText as="span" duration={1.6}>{label}</ShimmerText> : label}
-    </span>
+    <>
+      <span className="fui-activity-label" key={label}>
+        {live ? (
+          <ShimmerText as="span" duration={1.6} tone="light">
+            {label}
+          </ShimmerText>
+        ) : (
+          label
+        )}
+      </span>
+      {live && timer ? <WorkTime startedAt={startedAt} /> : null}
+    </>
   );
   if (children == null || children === false) {
     return (
@@ -120,6 +145,8 @@ export type ReasoningDisclosureProps = {
   autoClose?: boolean;
   labels?: ReasoningLabels;
   icon?: ReactNode;
+  /** The time spent thinking ticks beside the label while it streams (default on). */
+  timer?: boolean;
   className?: string;
 };
 
@@ -133,6 +160,7 @@ export function ReasoningDisclosure({
   autoClose = true,
   labels,
   icon = <BrainIcon />,
+  timer = true,
   className,
 }: ReasoningDisclosureProps) {
   const explicitlyClosed = defaultOpen === false;
@@ -179,6 +207,7 @@ export function ReasoningDisclosure({
       live={streaming}
       onOpenChange={setOpen}
       open={open}
+      timer={timer}
     >
       {children}
     </ActivityDisclosure>
@@ -277,6 +306,7 @@ function SearchStepItem({
   titleFor,
   faviconUrl,
   id,
+  stagger,
 }: {
   step: SearchStep;
   last: boolean;
@@ -284,6 +314,7 @@ function SearchStepItem({
   titleFor?: SearchResultTitle;
   faviconUrl?: FaviconResolver;
   id: string;
+  stagger?: number;
 }) {
   const [open, setOpen] = useState(false);
   const results = step.type === "search" ? uniqueUrls(step.sources) : [];
@@ -305,10 +336,26 @@ function SearchStepItem({
       )}
     </span>
   );
-  const count = results.length > 0 ? <span className="fui-search-step-count">{results.length}</span> : null;
+  const count =
+    results.length > 0 ? (
+      <span className="fui-search-step-sources">
+        <span aria-hidden="true" className="fui-search-step-stack">
+          {results.slice(0, 4).map((url) => (
+            <SourceFavicon faviconUrl={faviconUrl} key={url} url={url} />
+          ))}
+        </span>
+        <span className="fui-search-step-count">{results.length}</span>
+      </span>
+    ) : null;
 
   return (
-    <li className="fui-search-step" data-last={last || undefined} data-live={live || undefined} data-open={open || undefined}>
+    <li
+      className={stagger === undefined ? "fui-search-step" : "fui-search-step fui-rise"}
+      data-last={last || undefined}
+      data-live={live || undefined}
+      data-open={open || undefined}
+      style={stagger === undefined ? undefined : ({ "--fui-stagger": stagger } as CSSProperties)}
+    >
       <span aria-hidden className="fui-search-step-rail">
         <span className="fui-search-step-badge">
           <span className="fui-search-step-icon">{icon}</span>
@@ -356,17 +403,24 @@ export type SearchStepListProps = {
   faviconUrl?: FaviconResolver;
 };
 
+function stepKey(step: SearchStep, index: number) {
+  return `${step.type}-${step.type === "search" ? step.query : step.url}-${index}`;
+}
+
 export function SearchStepList({ steps, live = false, titleFor, faviconUrl }: SearchStepListProps) {
   const uid = useId().replace(/:/g, "");
+  const keys = steps.map(stepKey);
+  const stagger = useArrivals(keys);
   return (
     <ol className="fui-search-steps">
       {steps.map((step, index) => (
         <SearchStepItem
           faviconUrl={faviconUrl}
           id={`fui-search-${uid}-${index}`}
-          key={`${step.type}-${step.type === "search" ? step.query : step.url}-${index}`}
+          key={keys[index]}
           last={index === steps.length - 1}
           live={live && index === steps.length - 1}
+          stagger={stagger.get(keys[index]!)}
           step={step}
           titleFor={titleFor}
         />
@@ -385,6 +439,9 @@ export type SearchStepsDisclosureProps = {
   className?: string;
   titleFor?: SearchResultTitle;
   faviconUrl?: FaviconResolver;
+  /** While searching, the time it has taken beside the label (default on). */
+  timer?: boolean;
+  startedAt?: number | Date;
 };
 
 export function SearchStepsDisclosure({
@@ -397,6 +454,8 @@ export function SearchStepsDisclosure({
   className,
   titleFor,
   faviconUrl,
+  timer = true,
+  startedAt,
 }: SearchStepsDisclosureProps) {
   const text = label ?? searchLabel(phase, sourceCount, countSearches(steps));
   return (
@@ -406,6 +465,8 @@ export function SearchStepsDisclosure({
       icon={icon}
       label={text}
       live={phase !== "done"}
+      startedAt={startedAt}
+      timer={timer}
       toggleLabel={(open) => `${open ? "Hide" : "Show"} search queries`}
     >
       {steps.length > 0 ? (

@@ -1,7 +1,8 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { Spinner } from "@fabrials/ui";
+import { useArrivals } from "./agent";
 import {
   AlertIcon,
   FileTextIcon,
@@ -19,8 +20,15 @@ export type AttachmentItem = {
   url?: string;
   size?: number;
   status?: "ready" | "uploading" | "error";
+  /** Upload progress, 0 to 1, while `status` is "uploading". With it the tile draws a ring that closes as the file goes up and
+   * counts the percentage; without it a spinner says it is busy. */
+  progress?: number;
   error?: string;
 };
+
+function percentOf(progress: number | undefined) {
+  return progress === undefined ? undefined : Math.round(Math.min(1, Math.max(0, progress)) * 100);
+}
 
 export type AttachmentCategory = "image" | "video" | "audio" | "document" | "unknown";
 
@@ -74,15 +82,26 @@ function Preview({ item, variant }: { item: AttachmentItem; variant: AttachmentV
   } else if (item.status !== "error" && item.url && category === "video") {
     content = <video aria-hidden muted playsInline preload="metadata" src={item.url} />;
   }
+  const percent = percentOf(item.progress);
   return (
     <span className="fui-attachment-preview" data-category={category}>
       {content}
-      {item.status === "uploading" ? (
+      {item.status === "uploading" && percent === undefined ? (
         <span className="fui-attachment-busy">
           <Spinner label={`Uploading ${item.name}`} />
         </span>
       ) : null}
     </span>
+  );
+}
+
+/** The ring an upload draws round its tile: it closes clockwise as the file goes up. */
+function UploadRing({ percent }: { percent: number }) {
+  return (
+    <svg aria-hidden="true" className="fui-attachment-ring" focusable="false">
+      <rect className="fui-attachment-ring-track" height="100%" pathLength={100} rx={9} width="100%" />
+      <rect className="fui-attachment-ring-fill" height="100%" pathLength={100} rx={9} style={{ strokeDashoffset: 100 - percent }} width="100%" />
+    </svg>
   );
 }
 
@@ -101,16 +120,46 @@ export function AttachmentChip({
   removeLabel = (value) => `Remove ${value.name}`,
   className,
 }: AttachmentChipProps) {
-  const detail = item.status === "error" ? item.error || "Upload failed" : item.status === "uploading" ? "Uploading…" : attachmentDetail(item);
+  const percent = percentOf(item.progress);
+  const uploading = item.status === "uploading";
+  const detail =
+    item.status === "error"
+      ? item.error || "Upload failed"
+      : uploading
+        ? percent === undefined
+          ? "Uploading…"
+          : `Uploading ${percent}%`
+        : attachmentDetail(item);
   return (
     <div
-      aria-busy={item.status === "uploading" || undefined}
+      aria-busy={uploading || undefined}
       className={["fui-attachment", className].filter(Boolean).join(" ")}
       data-status={item.status ?? "ready"}
       data-variant={variant}
       title={variant === "grid" ? `${item.name}${detail ? ` · ${detail}` : ""}` : undefined}
     >
       <Preview item={item} variant={variant} />
+      {percent !== undefined && variant === "grid" ? (
+        <>
+          {uploading ? <UploadRing percent={percent} /> : null}
+          {uploading ? (
+            <span
+              aria-label={`Uploading ${item.name}`}
+              aria-valuemax={100}
+              aria-valuemin={0}
+              aria-valuenow={percent}
+              className="fui-attachment-percent"
+              role="progressbar"
+            >
+              {`${percent}%`}
+            </span>
+          ) : (
+            <span aria-hidden="true" className="fui-attachment-percent" data-done>
+              100%
+            </span>
+          )}
+        </>
+      ) : null}
       {variant === "grid" ? (
         item.status === "error" ? <span className="fui-sr-only">{`${item.name}: ${detail}`}</span> : null
       ) : (
@@ -144,6 +193,8 @@ export function AttachmentChip({
 export type AttachmentsProps = {
   items: readonly AttachmentItem[];
   variant?: AttachmentVariant;
+  /** The size of `grid` tiles: `md` (96 px, the default) or `sm` (56 px, for a composer). */
+  size?: "sm" | "md";
   onRemove?: (id: string) => void;
   removeLabel?: (item: AttachmentItem) => string;
   empty?: ReactNode;
@@ -154,19 +205,30 @@ export type AttachmentsProps = {
 export function Attachments({
   items,
   variant = "inline",
+  size = "md",
   onRemove,
   removeLabel,
   empty = null,
   label = "Attachments",
   className,
 }: AttachmentsProps) {
+  const stagger = useArrivals(items.map((item) => item.id));
   if (items.length === 0) {
     return empty ? <div className="fui-attachments-empty">{empty}</div> : null;
   }
   return (
-    <ul aria-label={label} className={["fui-attachments", className].filter(Boolean).join(" ")} data-variant={variant}>
+    <ul
+      aria-label={label}
+      className={["fui-attachments", className].filter(Boolean).join(" ")}
+      data-size={variant === "grid" && size === "sm" ? "sm" : undefined}
+      data-variant={variant}
+    >
       {items.map((item) => (
-        <li key={item.id}>
+        <li
+          className={stagger.has(item.id) ? "fui-rise" : undefined}
+          key={item.id}
+          style={stagger.has(item.id) ? ({ "--fui-stagger": stagger.get(item.id) } as CSSProperties) : undefined}
+        >
           <AttachmentChip item={item} onRemove={onRemove} removeLabel={removeLabel} variant={variant} />
         </li>
       ))}

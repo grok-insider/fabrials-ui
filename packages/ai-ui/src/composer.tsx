@@ -13,7 +13,7 @@ import {
   type Ref,
   type TextareaHTMLAttributes,
 } from "react";
-import { Button, Spinner, Tooltip, TooltipContent, TooltipTrigger } from "@fabrials/ui";
+import { Button, Spinner, Tooltip, TooltipContent, TooltipTrigger, WorkingLight } from "@fabrials/ui";
 import { ArrowUpIcon, SquareIcon } from "./chat-icons";
 
 const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
@@ -45,6 +45,9 @@ export type ChatComposerProps = {
   textareaRef?: Ref<HTMLTextAreaElement>;
   textareaProps?: Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "value" | "defaultValue" | "onChange" | "placeholder" | "disabled">;
   maxHeight?: string;
+  /** The working light along the composer's edge while the agent answers. Defaults to on while `status` is "submitting" or
+   * "streaming"; pass false to keep the composer still. */
+  working?: boolean;
   className?: string;
 };
 
@@ -78,6 +81,7 @@ export function ChatComposer({
   textareaRef,
   textareaProps,
   maxHeight = "min(40vh, 16rem)",
+  working,
   className,
 }: ChatComposerProps) {
   const [inner, setInner] = useState(defaultValue);
@@ -159,6 +163,7 @@ export function ChatComposer({
       className={["fui-composer", className].filter(Boolean).join(" ")}
       data-disabled={disabled || undefined}
       data-status={status}
+      data-working={(working ?? busy) || undefined}
       onSubmit={submit}
     >
       {attachments ? <div className="fui-composer-attachments">{attachments}</div> : null}
@@ -208,6 +213,7 @@ export function ChatComposer({
         </div>
       </div>
       {footer ? <div className="fui-composer-footer">{footer}</div> : null}
+      {(working ?? busy) ? <WorkingLight /> : null}
     </form>
   );
 }

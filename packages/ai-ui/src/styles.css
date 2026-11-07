@@ -1911,3 +1911,720 @@
     }
   }
 }
+
+/* 0.11 agent pieces. They carry the working light (--fui-light-1 to -3) only while they work: the mark, the light on a
+   label, the ring of an upload, the field of a picture being made, the edge of the composer. Everything holds still under
+   reduced motion (each mark keeps a still pattern), and in forced colors the marks are drawn in system colours. */
+@property --fui-generation-ripple {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+@layer components {
+  /* ------------------------------------------------------------ the mark */
+  .fui-agent-mark {
+    display: inline-block;
+    flex: none;
+    width: 1em;
+    height: 1em;
+    color: var(--muted-foreground);
+  }
+  .fui-agent-mark rect {
+    fill: currentColor;
+    opacity: 0.22;
+  }
+  .fui-agent-mark[data-tone="light"] rect[data-band="1"] {
+    fill: var(--fui-light-1);
+  }
+  .fui-agent-mark[data-tone="light"] rect[data-band="2"] {
+    fill: var(--fui-light-2);
+  }
+  .fui-agent-mark[data-tone="light"] rect[data-band="3"] {
+    fill: var(--fui-light-3);
+  }
+  /* The still patterns: what reduced motion shows, and the frame every animation starts from. */
+  .fui-agent-mark[data-variant="wave"] rect {
+    opacity: calc(1 - var(--fui-agent-step) * 0.18);
+  }
+  .fui-agent-mark[data-variant="orbit"] rect:first-child {
+    opacity: 1;
+  }
+  .fui-agent-mark[data-variant="orbit"] .fui-agent-core {
+    opacity: 0.45;
+  }
+  .fui-agent-mark[data-variant="dither"] rect[data-on] {
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes fui-agent-wave {
+      0%,
+      70%,
+      100% {
+        opacity: 0.18;
+      }
+      30% {
+        opacity: 1;
+      }
+    }
+    @keyframes fui-agent-orbit {
+      0% {
+        opacity: 1;
+      }
+      62%,
+      100% {
+        opacity: 0.14;
+      }
+    }
+    @keyframes fui-agent-breathe {
+      50% {
+        opacity: 0.95;
+      }
+    }
+    @keyframes fui-agent-dither {
+      0%,
+      4% {
+        opacity: 0.14;
+      }
+      12%,
+      50% {
+        opacity: 1;
+      }
+      58%,
+      100% {
+        opacity: 0.14;
+      }
+    }
+    .fui-agent-mark[data-variant="wave"] rect {
+      animation: fui-agent-wave 1.4s var(--fui-ease) infinite;
+      animation-delay: calc(var(--fui-agent-step) * 120ms - 1.4s);
+    }
+    .fui-agent-mark[data-variant="orbit"] rect:not(.fui-agent-core) {
+      animation: fui-agent-orbit 0.96s linear infinite;
+      animation-delay: calc(var(--fui-agent-step) * 120ms - 0.96s);
+    }
+    .fui-agent-mark[data-variant="orbit"] .fui-agent-core {
+      animation: fui-agent-breathe 1.92s ease-in-out infinite;
+    }
+    .fui-agent-mark[data-variant="dither"] rect {
+      animation: fui-agent-dither 2.4s linear infinite;
+      animation-delay: calc(var(--fui-agent-step) * 75ms - 2.4s);
+    }
+  }
+
+  /* ------------------------------------------------------------ thinking */
+  .fui-agent-thinking {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--fui-space-2);
+    min-height: 2rem;
+    max-width: 100%;
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-sm);
+  }
+  .fui-agent-thinking > .fui-agent-mark {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+  .fui-agent-thinking-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .fui-agent-thinking-time,
+  .fui-activity-time {
+    flex: none;
+    min-inline-size: 3.5ch;
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: var(--fui-tracking-label);
+  }
+
+  /* ----------------------------------------------------------- task list */
+  .fui-task-list {
+    display: grid;
+    gap: var(--fui-space-3);
+    min-width: 0;
+    color: var(--foreground);
+    font-size: var(--fui-text-sm);
+  }
+  .fui-task-list-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: var(--fui-space-2) var(--fui-space-3);
+  }
+  .fui-task-list-title {
+    min-width: 0;
+    font-weight: var(--fui-weight-semibold);
+    overflow-wrap: anywhere;
+  }
+  .fui-task-list-count {
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: var(--fui-tracking-label);
+  }
+  .fui-task-list-bar {
+    display: flex;
+    grid-column: 1 / -1;
+    gap: 3px;
+    height: 4px;
+  }
+  .fui-task-list-bar > span {
+    flex: 1 1 0;
+    border-radius: var(--fui-radius-full);
+    background: var(--muted);
+    transition: background-color var(--fui-duration-slow) var(--fui-ease);
+  }
+  .fui-task-list-bar > [data-status="done"] {
+    background: var(--success);
+  }
+  .fui-task-list-bar > [data-status="skipped"] {
+    background: color-mix(in oklab, var(--muted-foreground) 40%, var(--muted));
+  }
+  .fui-task-list-bar > [data-status="failed"] {
+    background: var(--destructive);
+  }
+  .fui-task-list-bar > [data-status="running"] {
+    background: var(--fui-light-1);
+  }
+  .fui-task-list-items {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .fui-task {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.25rem minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 0 var(--fui-space-2-5);
+    padding: var(--fui-space-1-5) 0;
+  }
+  /* The rail between two marks; the part that is behind the work takes a trace of the success tint. */
+  .fui-task:not(:last-child)::before {
+    content: "";
+    position: absolute;
+    top: calc(var(--fui-space-1-5) + 1.25rem + 3px);
+    bottom: calc(3px - var(--fui-space-1-5));
+    inset-inline-start: calc(0.625rem - 0.5px);
+    width: 1px;
+    border-radius: var(--fui-radius-full);
+    background: var(--fui-separator);
+  }
+  .fui-task:is([data-status="done"], [data-status="skipped"]):not(:last-child)::before {
+    background: color-mix(in oklab, var(--success) 40%, var(--fui-separator));
+  }
+  .fui-task-mark {
+    display: grid;
+    place-items: center;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  .fui-task-mark-icon {
+    width: 1rem;
+    height: 1rem;
+    overflow: visible;
+  }
+  .fui-task-mark-running {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+  .fui-task-mark-disc {
+    fill: transparent;
+    stroke: color-mix(in oklab, var(--muted-foreground) 55%, transparent);
+    stroke-width: 1.25;
+    stroke-dasharray: 2.6 2.2;
+  }
+  .fui-task-mark-tick {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+  .fui-task[data-status="done"] .fui-task-mark {
+    color: var(--fui-success-ink);
+  }
+  .fui-task[data-status="done"] .fui-task-mark-disc {
+    fill: color-mix(in oklab, var(--success) var(--fui-tint-strong), var(--card));
+    stroke: color-mix(in oklab, var(--success) 45%, transparent);
+    stroke-dasharray: none;
+  }
+  .fui-task[data-status="failed"] .fui-task-mark {
+    color: var(--fui-danger-ink);
+  }
+  .fui-task[data-status="failed"] .fui-task-mark-disc {
+    fill: color-mix(in oklab, var(--destructive) var(--fui-tint-strong), var(--card));
+    stroke: color-mix(in oklab, var(--destructive) 45%, transparent);
+    stroke-dasharray: none;
+  }
+  .fui-task[data-status="skipped"] .fui-task-mark {
+    color: var(--muted-foreground);
+  }
+  .fui-task[data-status="skipped"] .fui-task-mark-disc {
+    fill: var(--muted);
+    stroke: none;
+  }
+  .fui-task-body {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+  }
+  .fui-task-title {
+    line-height: var(--fui-leading-sm);
+    overflow-wrap: anywhere;
+  }
+  .fui-task[data-status="pending"] .fui-task-title,
+  .fui-task[data-status="skipped"] .fui-task-title {
+    color: var(--muted-foreground);
+  }
+  .fui-task[data-status="failed"] .fui-task-title {
+    color: var(--fui-danger-ink);
+  }
+  .fui-task-detail {
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+    line-height: var(--fui-leading-xs);
+    overflow-wrap: anywhere;
+  }
+  .fui-task-meta {
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: var(--fui-tracking-label);
+    line-height: var(--fui-leading-sm);
+    white-space: nowrap;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    /* A tick is drawn when a step settles; the disc fills behind it. */
+    .fui-task-mark-tick {
+      transition: stroke-dashoffset var(--fui-duration-slow) var(--fui-ease-out);
+    }
+    @starting-style {
+      .fui-task-mark-tick {
+        stroke-dashoffset: 1;
+      }
+    }
+    .fui-task-mark-disc {
+      transition:
+        fill var(--fui-duration-slow) var(--fui-ease),
+        stroke var(--fui-duration-slow) var(--fui-ease);
+    }
+    @keyframes fui-task-running {
+      50% {
+        opacity: 0.45;
+      }
+    }
+    .fui-task-list-bar > [data-status="running"] {
+      animation: fui-task-running 1.6s ease-in-out infinite;
+    }
+  }
+
+  /* ------------------------------------------------------- context meter */
+  .fui-context-meter {
+    display: grid;
+    gap: var(--fui-space-2);
+    min-width: 0;
+    font-size: var(--fui-text-sm);
+  }
+  .fui-context-meter-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--fui-space-1) var(--fui-space-3);
+  }
+  .fui-context-meter-label {
+    font-weight: var(--fui-weight-medium);
+  }
+  .fui-context-meter-reading {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--fui-space-2);
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: var(--fui-tracking-label);
+  }
+  .fui-context-meter-percent {
+    color: var(--foreground);
+  }
+  .fui-context-meter[data-tone="warning"] .fui-context-meter-percent {
+    color: var(--fui-warning-ink);
+  }
+  .fui-context-meter[data-tone="danger"] .fui-context-meter-percent {
+    color: var(--fui-danger-ink);
+  }
+  .fui-context-meter-track {
+    display: flex;
+    gap: 2px;
+    height: 0.5rem;
+    overflow: hidden;
+    border-radius: var(--fui-radius-full);
+    background: var(--muted);
+  }
+  .fui-context-meter[data-tone="warning"] .fui-context-meter-track {
+    background: color-mix(in oklab, var(--warning) var(--fui-tint-edge), var(--muted));
+  }
+  .fui-context-meter[data-tone="danger"] .fui-context-meter-track {
+    background: color-mix(in oklab, var(--destructive) var(--fui-tint-edge), var(--muted));
+  }
+  .fui-context-meter-part {
+    flex: none;
+    min-inline-size: 2px;
+    height: 100%;
+    transition: inline-size var(--fui-duration-slow) var(--fui-ease-out);
+  }
+  .fui-context-meter-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--fui-space-1-5) var(--fui-space-4);
+    margin: 0;
+    padding: 0;
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+    list-style: none;
+  }
+  .fui-context-meter-legend > li {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--fui-space-1-5);
+  }
+  .fui-context-meter-swatch {
+    flex: none;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 2px;
+  }
+  :is(.fui-context-meter-part, .fui-context-meter-swatch)[data-series="1"] {
+    background: var(--chart-1);
+  }
+  :is(.fui-context-meter-part, .fui-context-meter-swatch)[data-series="2"] {
+    background: var(--chart-2);
+  }
+  :is(.fui-context-meter-part, .fui-context-meter-swatch)[data-series="3"] {
+    background: var(--chart-3);
+  }
+  :is(.fui-context-meter-part, .fui-context-meter-swatch)[data-series="4"] {
+    background: var(--chart-5);
+  }
+  :is(.fui-context-meter-part, .fui-context-meter-swatch)[data-series="5"] {
+    background: var(--chart-6);
+  }
+  .fui-context-meter-swatch[data-free] {
+    background: var(--muted);
+    box-shadow: inset 0 0 0 1px var(--border);
+  }
+  .fui-context-meter-value {
+    color: var(--foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: var(--fui-tracking-label);
+  }
+
+  /* ---------------------------------------------------- generation frame */
+  /* One column that never grows past the figure, rows from the top: a figure stretched taller by its row (beside one with a
+     caption) would otherwise widen the frame through its aspect ratio. */
+  .fui-generation {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    gap: var(--fui-space-2);
+    min-width: 0;
+    margin: 0;
+  }
+  .fui-generation-frame {
+    position: relative;
+    isolation: isolate;
+    width: 100%;
+    aspect-ratio: var(--fui-generation-ratio, 1);
+    border-radius: var(--fui-radius-plate);
+    background: var(--fui-surface-inset);
+    box-shadow: inset 0 0 0 1px var(--border);
+  }
+  .fui-generation[data-status="done"] .fui-generation-frame {
+    box-shadow: var(--fui-shadow-xs);
+  }
+  .fui-generation-image {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    object-fit: cover;
+  }
+  .fui-generation-image[data-fui-reveal="pending"] {
+    opacity: 0;
+  }
+  /* The field: square dots on a 6 px pitch, the dither's grain. The ripple is the same field in the working light, shown only
+     inside a ring that grows from the centre. */
+  .fui-generation-field,
+  .fui-generation-ripple {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+  .fui-generation-field {
+    background: conic-gradient(at 2px 2px, transparent 75%, color-mix(in oklab, var(--muted-foreground) 30%, transparent) 0) 2px 2px / 6px 6px;
+  }
+  .fui-generation-ripple {
+    background: conic-gradient(at 2px 2px, transparent 75%, var(--fui-light-1) 0) 2px 2px / 6px 6px;
+    mask: radial-gradient(
+      circle at 50% 50%,
+      transparent calc(var(--fui-generation-ripple) - 14%),
+      var(--foreground) var(--fui-generation-ripple),
+      transparent calc(var(--fui-generation-ripple) + 14%)
+    );
+    opacity: 0.85;
+  }
+  .fui-generation-status {
+    position: absolute;
+    z-index: 2;
+    inset-inline-start: var(--fui-space-3);
+    bottom: var(--fui-space-3);
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--fui-space-1) var(--fui-space-2);
+    max-width: calc(100% - var(--fui-space-6));
+    padding: var(--fui-space-1-5) var(--fui-space-2-5);
+    border-radius: var(--fui-radius-md);
+    background: color-mix(in oklab, var(--card) 92%, transparent);
+    box-shadow: var(--fui-shadow-xs), var(--fui-highlight);
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+  }
+  .fui-generation-status > .fui-agent-mark {
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+  .fui-generation-words {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--foreground);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .fui-generation-reading {
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: var(--fui-tracking-label);
+  }
+  .fui-generation-progress {
+    grid-column: 1 / -1;
+    height: 2px;
+    overflow: hidden;
+    border-radius: var(--fui-radius-full);
+    background: var(--muted);
+  }
+  .fui-generation-progress > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--fui-light-1);
+    transition: inline-size var(--fui-duration-slow) var(--fui-ease-out);
+  }
+  .fui-generation-failed {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: var(--fui-space-2);
+    padding: var(--fui-space-6);
+    border-radius: inherit;
+    background: color-mix(in oklab, var(--destructive) var(--fui-tint-strength), var(--card));
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--destructive) var(--fui-tint-edge), var(--card));
+    text-align: center;
+  }
+  .fui-generation-failed .fui-generation-words {
+    color: var(--fui-danger-ink);
+    font-weight: var(--fui-weight-medium);
+    white-space: normal;
+  }
+  .fui-generation-error {
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+  }
+  .fui-generation-caption {
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    letter-spacing: var(--fui-tracking-label);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes fui-generation-ripple {
+      from {
+        --fui-generation-ripple: 0%;
+        opacity: 0.95;
+      }
+      to {
+        --fui-generation-ripple: 80%;
+        opacity: 0.35;
+      }
+    }
+    .fui-generation-ripple {
+      animation: fui-generation-ripple 2.2s var(--fui-ease-out) infinite;
+    }
+    .fui-generation-image[data-fui-reveal="in"] {
+      animation-duration: 480ms;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fui-generation-ripple {
+      --fui-generation-ripple: 36%;
+    }
+  }
+
+  /* --------------------------------------------- the composer at work */
+  .fui-composer {
+    position: relative;
+    border-radius: var(--fui-radius-xl);
+  }
+
+  /* ------------------------------------------------- uploads that count */
+  .fui-attachment-ring {
+    position: absolute;
+    z-index: 2;
+    inset: 1px;
+    width: calc(100% - 2px);
+    height: calc(100% - 2px);
+    overflow: visible;
+    pointer-events: none;
+  }
+  .fui-attachment-ring rect {
+    fill: none;
+    stroke-width: 2;
+  }
+  .fui-attachment-ring-track {
+    stroke: color-mix(in oklab, var(--foreground) 10%, transparent);
+  }
+  .fui-attachment-ring-fill {
+    stroke: var(--fui-light-1);
+    stroke-dasharray: 100;
+    stroke-linecap: round;
+    transition: stroke-dashoffset var(--fui-duration-slow) var(--fui-ease-out);
+  }
+  .fui-attachment-percent {
+    position: absolute;
+    z-index: 2;
+    inset-block-end: var(--fui-space-1);
+    inset-inline-end: var(--fui-space-1);
+    padding: 0.0625rem 0.3125rem;
+    border-radius: var(--fui-radius-xs);
+    background: color-mix(in oklab, var(--card) 88%, transparent);
+    color: var(--foreground);
+    font-family: var(--fui-font-label);
+    font-size: 0.625rem;
+    font-variant-numeric: tabular-nums;
+    line-height: 1rem;
+    transition:
+      opacity var(--fui-duration-slow) var(--fui-ease),
+      filter var(--fui-duration-slow) var(--fui-ease);
+  }
+  .fui-attachment-percent[data-done] {
+    opacity: 0;
+    filter: blur(4px);
+  }
+  .fui-attachment[data-variant="grid"] .fui-attachment-remove {
+    transition:
+      opacity var(--fui-duration) var(--fui-ease),
+      filter var(--fui-duration) var(--fui-ease),
+      background-color var(--fui-duration) var(--fui-ease);
+  }
+  /* On a fine pointer the remove key waits out of focus until the tile is hovered or focused, an upload included; on a touch
+     screen it stays in view, so an upload can be cancelled. */
+  @media (hover: hover) and (pointer: fine) {
+    .fui-attachment[data-variant="grid"]:not(:hover, :focus-within) .fui-attachment-remove {
+      filter: blur(4px);
+    }
+  }
+
+  /* A composer's tiles: 56 px, the ring a little tighter. */
+  .fui-attachments[data-size="sm"] .fui-attachment[data-variant="grid"] {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+  .fui-attachments[data-size="sm"] .fui-attachment[data-variant="grid"] .fui-attachment-remove {
+    top: var(--fui-space-1);
+    right: var(--fui-space-1);
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  .fui-attachments[data-size="sm"] .fui-attachment-percent {
+    inset-block-end: 0.1875rem;
+    inset-inline-end: 0.1875rem;
+    padding-inline: 0.25rem;
+  }
+
+  /* ------------------------------------------- search: the sources it found */
+  .fui-search-step-sources {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: var(--fui-space-1-5);
+  }
+  .fui-search-step-stack {
+    display: inline-flex;
+    align-items: center;
+  }
+  .fui-search-step-stack > .fui-source-favicon {
+    box-shadow: 0 0 0 1.5px var(--card);
+  }
+  .fui-search-step-stack > .fui-source-favicon + .fui-source-favicon {
+    margin-inline-start: -0.25rem;
+  }
+
+  /* Inside Loading the pieces are skeletons too: the dot field, the ripple and the upload ring go, and the parts of a bar
+     become one neutral bone. */
+  [data-fui-loading] > .fui-loading-content :is(.fui-generation-field, .fui-generation-ripple, .fui-attachment-ring) {
+    visibility: hidden !important;
+  }
+  [data-fui-loading]
+    > .fui-loading-content
+    :is(.fui-context-meter-part, .fui-context-meter-swatch, .fui-task-list-bar > span, .fui-generation-progress > span):not(
+      :where([data-skeleton="keep"], [data-skeleton="keep"] *)
+    ) {
+    background-color: var(--fui-skeleton) !important;
+    box-shadow: none !important;
+    animation: none !important;
+  }
+
+  @media (forced-colors: active) {
+    .fui-agent-mark rect {
+      fill: CanvasText;
+    }
+    .fui-task-list-bar > [data-status] {
+      background: GrayText;
+    }
+    .fui-task-list-bar > :is([data-status="done"], [data-status="running"]) {
+      background: Highlight;
+    }
+    .fui-context-meter-part {
+      background: CanvasText;
+    }
+    .fui-generation-field,
+    .fui-generation-ripple,
+    .fui-attachment-ring {
+      display: none;
+    }
+    .fui-generation-status {
+      border: 1px solid CanvasText;
+    }
+  }
+}
