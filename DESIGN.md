@@ -26,6 +26,7 @@ Deep Stormwall: cold slate taken almost to black in the dark theme and almost to
 | Hover | `--accent` | `#e9ecef` | `#191d24` |
 | Hairline | `--border` | `#e0e3e7` | `#1d2128` |
 | Control boundary | `--fui-control-border` | `#858d98` | `#5e6672` |
+| Thumb of an off switch | `--fui-switch-thumb` | the surface | ink at 66 % on the sunken track, so the state reads at about 6:1 |
 | Soft divider (rows inside one plate) | `--fui-separator` | the hairline at 62 % on the surface | the same |
 | Inset band (a table head, a well) | `--fui-surface-inset` | ink at 3.5 % on the surface | the same |
 | Hover fill | `--fui-surface-hover` | ink at 4.5 % on the surface | the same |

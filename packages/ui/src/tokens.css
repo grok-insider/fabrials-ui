@@ -146,6 +146,7 @@
   --sidebar-border: oklch(0.905 0.011 250);
   --sidebar-ring: oklch(0.481 0.154 260);
   --fui-sidebar-active: var(--card);
+  --fui-switch-thumb: var(--card);
 
   --fui-control-border: oklch(0.63 0.022 256);
   --fui-focus: var(--brand-ink);
@@ -256,6 +257,8 @@
   --sidebar-border: oklch(0.215 0.017 260);
   --sidebar-ring: oklch(0.813 0.094 258);
   --fui-sidebar-active: var(--sidebar-accent);
+  /* An off switch keeps a light thumb on its dark track, so its state reads at 3:1 and more. */
+  --fui-switch-thumb: color-mix(in oklab, var(--foreground) 66%, var(--muted));
 
   --info: var(--brand);
   --fui-control-border: oklch(0.52 0.025 256);
@@ -349,6 +352,7 @@
     --sidebar-border: oklch(0.215 0.017 260);
     --sidebar-ring: oklch(0.813 0.094 258);
     --fui-sidebar-active: var(--sidebar-accent);
+    --fui-switch-thumb: color-mix(in oklab, var(--foreground) 66%, var(--muted));
 
     --info: var(--brand);
     --fui-control-border: oklch(0.52 0.025 256);

@@ -147,3 +147,14 @@ test("the working light is the only light: painted from the three light tokens, 
   for (const scope of [":root", ".dark", '[data-theme="system"]']) assert.ok(tokens.includes(scope));
   assert.match(tokens, /--fui-light-1: var\(--gem-stormlight\);/);
 });
+
+test("an off switch keeps a light thumb on its dark track in the dark themes, and stays white on light", () => {
+  assert.match(styles, /\n  \.fui-switch-thumb \{[^}]*background: var\(--fui-switch-thumb\);/);
+  const values = [...tokens.matchAll(/--fui-switch-thumb: ([^;]+);/g)].map((match) => match[1]);
+  // Light, dark and the dark half of data-theme="system", in that order.
+  assert.deepEqual(values, [
+    "var(--card)",
+    "color-mix(in oklab, var(--foreground) 66%, var(--muted))",
+    "color-mix(in oklab, var(--foreground) 66%, var(--muted))",
+  ]);
+});

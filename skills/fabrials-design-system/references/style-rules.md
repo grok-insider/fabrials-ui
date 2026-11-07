@@ -16,6 +16,7 @@ Values live in `packages/ui/src/tokens.css`; the reasons in `DESIGN.md`. This fi
 | Inset band, hover fill | `--fui-surface-inset`, `--fui-surface-hover` | ink at 3.5 % and 4.5 % on the surface | the same |
 | Working light (only while something works) | `--fui-light-1`, `-2`, `-3` | Stormlight, zircon, amethyst | the same gems, lighter |
 | Control boundary | `--fui-control-border` [`border-control-border`] | `#858d98` | `#5e6672` |
+| Off switch thumb | `--fui-switch-thumb` | the surface | ink at 66 % on the track (about 6:1) |
 | Corner marks, grid guides (brand moments) | `--fui-mark`, `--fui-guide` | ink at half; hairline at 75 % | the same |
 | Ink, primary button | `--foreground`, `--primary` [`text-foreground`, `bg-primary`] | `#0e1116` | Cold bone `#e8eae6` |
 | Secondary ink | `--muted-foreground` [`text-muted-foreground`] | `#565d68` | `#9399a2` |

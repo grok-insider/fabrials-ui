@@ -20,6 +20,7 @@ Re-vendor (`bun run vendor <product> --write`) or update `@fabrials/ui` and `@fa
 | Sidebar current row, vertical tabs | Hover fill and a bar | A raised key (`--fui-sidebar-active`: the card in light, the sidebar accent in dark) with a rounded Stormlight bar |
 | `Item`, `DescriptionList`, `Accordion`, `SettingsSection` | `--border` between rows | `--fui-separator` (softer); the current row's bar is inset and rounded; an icon tile has no edge |
 | `Meter`, `Progress` | Square tracks | Round tracks (the ruler keeps its ticks) |
+| `Switch`, off, dark themes | A thumb in the surface colour, barely apart from its track (about 1:1) | A light thumb (`--fui-switch-thumb`), about 6:1 against the track; the light theme keeps its white thumb |
 | `Dialog` | 8 px | 16 px |
 | `CornerMarks`, `GridGuides` | On the plates that carry a page | Brand moments only (a landing hero, a sign-in figure) |
 
@@ -56,4 +57,4 @@ Changed, visibly:
 
 ## New tokens
 
-`--fui-radius-2xl`, `--fui-ease-spring`, `--fui-tint-strength`, `--fui-tint-strong`, `--fui-tint-edge`, `--fui-surface-inset`, `--fui-surface-hover`, `--fui-separator`, `--fui-sidebar-active`, `--fui-light-1`, `--fui-light-2`, `--fui-light-3`. The derived ones are declared on every theme scope, so a nested theme island computes them from its own surface.
+`--fui-radius-2xl`, `--fui-ease-spring`, `--fui-tint-strength`, `--fui-tint-strong`, `--fui-tint-edge`, `--fui-surface-inset`, `--fui-surface-hover`, `--fui-separator`, `--fui-sidebar-active`, `--fui-switch-thumb`, `--fui-light-1`, `--fui-light-2`, `--fui-light-3`. The derived ones are declared on every theme scope, so a nested theme island computes them from its own surface.
