@@ -5,7 +5,7 @@ import { Showcase } from "../showcase";
 import { toggleGroupExamples } from "../../apps/site/components/examples/actions";
 
 const description =
-  "A segmented choice: the group sits in a well, the chosen segment is raised, and the indicator slides to a new choice.";
+  "A segmented choice: the group sits in a well, the chosen segment is a raised plate, and the plate slides to a new choice, its leading edge first.";
 
 const meta = {
   title: "Components/Toggle group",

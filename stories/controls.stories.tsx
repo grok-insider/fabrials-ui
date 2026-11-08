@@ -35,10 +35,12 @@ import {
   FieldLegend,
   FieldSet,
   FileInput,
+  FilterChip,
   IconButton,
   Input,
   Label,
   Loading,
+  MultiSelect,
   NativeCheckbox,
   NativeRadio,
   NativeRadioGroup,
@@ -585,6 +587,91 @@ function TogglesPage() {
   );
 }
 
+// ------------------------------------------------------------------ Filters
+
+const startFilters = [
+  { field: "owner", label: "Owner", value: "ada@example.org" },
+  { field: "type", label: "Type", value: "image/png" },
+  { field: "workspace", label: "Workspace", value: "The quarterly planning workspace for the storage migration and the retention review" },
+];
+
+const providers = [
+  { value: "grok", label: "Grok" },
+  { value: "claude", label: "Claude Code" },
+  { value: "codex", label: "Codex" },
+  { value: "cursor", label: "Cursor" },
+];
+
+function FiltersPage() {
+  const [filters, setFilters] = useState(startFilters);
+  const [chosen, setChosen] = useState<string[]>(["grok", "codex"]);
+  const [none, setNone] = useState<string[]>([]);
+  const [one, setOne] = useState<string[]>(["claude"]);
+  return (
+    <Page
+      title="Filters"
+      description="Filter chips name an active filter and clear it with their own key; a multi-select picks several values for one filter and sums them up in its trigger."
+    >
+      <Block title="Filter chips" description="Only the clear key is a control. A removed chip fades out and hands focus to the next one; a long value is cut inside its chip.">
+        <div className="catalogue-row" role="group" aria-label="Active filters" style={{ gap: 8, maxWidth: "32rem", minWidth: 0 }}>
+          {filters.map((filter) => (
+            <FilterChip
+              key={filter.field}
+              label={filter.label}
+              value={filter.value}
+              onRemove={() => setFilters((current) => current.filter((item) => item.field !== filter.field))}
+            />
+          ))}
+          {filters.length ? (
+            <Button size="sm" variant="ghost" onClick={() => setFilters([])}>
+              Clear all
+            </Button>
+          ) : (
+            <Button size="sm" variant="outline" onClick={() => setFilters(startFilters)}>
+              Restore filters
+            </Button>
+          )}
+        </div>
+      </Block>
+      <Block title="Links and a disabled key" description="With href, or a router link through render, the key is a link to the list without the filter.">
+        <div className="catalogue-row" style={{ gap: 8 }}>
+          <FilterChip href="?owner=" label="Owner" value="ada@example.org" />
+          <FilterChip href="?type=" label="Type" value="application/pdf" clearLabel="Show every type" />
+          <FilterChip disabled label="Mailbox" value="Archive" onRemove={() => undefined} />
+        </div>
+      </Block>
+      <Block title="Multi-select" description="The trigger is as wide as its summary, from 10rem to 20rem: the placeholder, one name, or the first name and how many more. The popup is at least as wide.">
+        <div className="catalogue-row" style={{ alignItems: "end" }}>
+          <MultiSelect id="story-providers-none" label="Providers" options={providers} value={none} onValueChange={setNone} />
+          <MultiSelect id="story-providers-one" label="Providers, one" options={providers} value={one} onValueChange={setOne} />
+          <MultiSelect id="story-providers" label="Providers, several" options={providers} value={chosen} onValueChange={setChosen} />
+          <MultiSelect id="story-providers-off" label="Providers, disabled" options={providers} value={["grok"]} onValueChange={() => undefined} disabled />
+        </div>
+      </Block>
+      <Block title="In a 358 px pane">
+        <Frame width={358}>
+          <div className="catalogue-stack">
+            <MultiSelect id="story-providers-narrow" label="Providers, in a pane" options={providers} value={chosen} onValueChange={setChosen} />
+            <div className="catalogue-row" style={{ gap: 8, minWidth: 0 }}>
+              {startFilters.map((filter) => (
+                <FilterChip key={filter.field} label={filter.label} value={filter.value} clearLabel={`Clear ${filter.label.toLowerCase()} (in a pane)`} onRemove={() => undefined} />
+              ))}
+            </div>
+          </div>
+        </Frame>
+      </Block>
+      <Block title="Loading">
+        <Loading when label="Loading filters">
+          <div className="catalogue-row" style={{ gap: 8 }}>
+            <FilterChip label="Owner" value="ada@example.org" clearLabel="Clear owner (loading)" onRemove={() => undefined} />
+            <MultiSelect id="story-providers-loading" label="Providers, loading" options={providers} value={chosen} onValueChange={() => undefined} />
+          </div>
+        </Loading>
+      </Block>
+    </Page>
+  );
+}
+
 // ------------------------------------------------------ Native radio grid, long labels
 
 const longColours = [
@@ -658,4 +745,5 @@ export const FileInputs: Story = { render: () => <FileInputsPage /> };
 export const Disclosures: Story = { render: () => <DisclosuresPage /> };
 export const FieldSets: Story = { render: () => <FieldSetsPage /> };
 export const Toggles: Story = { render: () => <TogglesPage /> };
+export const Filters: Story = { render: () => <FiltersPage /> };
 export const NativeRadioGrid: Story = { render: () => <RadioGridPage /> };

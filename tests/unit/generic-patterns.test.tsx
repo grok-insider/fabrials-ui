@@ -83,23 +83,25 @@ test("settings section labels itself with its heading and description", () => {
   assert.doesNotMatch(generated, /aria-describedby/);
 });
 
-test("filter chip renders as a link or a remove button with an accessible name", () => {
-  const link = renderToStaticMarkup(<FilterChip href="/files" label="Type" value="image/png" />);
-  assert.match(link, /^<a /);
-  assert.match(link, /href="\/files"/);
-  assert.match(link, /aria-label="Clear type filter \(image\/png\)"/);
-  assert.match(link, /Type:<\/span><span class="fui-filter-chip-value">image\/png/);
+test("filter chip: a name and value, then a clear key of its own, a link or a button with an accessible name", () => {
+  const link = renderToStaticMarkup(<FilterChip className="host" href="/files" label="Type" value="image/png" />);
+  // The chip is not a control; the class goes on it and every other prop on the key.
+  assert.match(link, /^<span class="fui-filter-chip host">/);
+  assert.match(link, /<span class="fui-filter-chip-text" title="Type: image\/png"><span class="fui-filter-chip-label">Type:<\/span><span class="fui-filter-chip-value">image\/png<\/span><\/span>/);
+  assert.match(link, /<a class="fui-filter-chip-remove" aria-label="Clear type filter \(image\/png\)" href="\/files">/);
+  assert.equal(link.match(/<a /g)?.length, 1);
 
   const routed = renderToStaticMarkup(
     <FilterChip href="/chats" label="Owner" render={<a data-router="" />} value="Ada" />,
   );
-  assert.match(routed, /data-router=""/);
-  assert.match(routed, /href="\/chats"/);
+  assert.match(routed, /<a data-router="" class="fui-filter-chip-remove"[^>]*href="\/chats"/);
 
   const button = renderToStaticMarkup(
-    <FilterChip clearLabel="Remove owner" label="Owner" onRemove={() => undefined} value="Ada" />,
+    <FilterChip clearLabel="Remove owner" disabled id="owner-chip" label="Owner" onRemove={() => undefined} value="Ada" />,
   );
-  assert.match(button, /^<button type="button" class="fui-filter-chip" aria-label="Remove owner"/);
+  assert.match(button, /^<span class="fui-filter-chip">/);
+  assert.match(button, /<button type="button" class="fui-filter-chip-remove" aria-label="Remove owner" disabled="" id="owner-chip">/);
+  assert.equal(button.match(/<button/g)?.length, 1);
 });
 
 test("suggestion grid wraps each card in a list item", () => {

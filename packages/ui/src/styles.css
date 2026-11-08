@@ -521,10 +521,14 @@
     background: var(--popover);
     color: var(--popover-foreground);
   }
+  /* 0.11: as wide as its summary (10rem to 20rem), never stretched by a grid or column; the popup is at least as wide as the
+     trigger. The summary is the placeholder, one name, or the first name and a soft count of the others. */
   .fui-multi-select {
     display: grid;
     gap: var(--fui-space-1);
-    min-width: 9rem;
+    inline-size: fit-content;
+    min-inline-size: 10rem;
+    max-inline-size: min(100%, 20rem);
   }
   .fui-multi-select-label {
     color: var(--muted-foreground);
@@ -534,40 +538,107 @@
   }
   .fui-multi-select-trigger {
     width: 100%;
+    min-width: 0;
   }
-  .fui-multi-select-popup {
-    width: max(14rem, var(--anchor-width, 14rem));
-    padding: var(--fui-space-2);
+  .fui-multi-select-summary {
+    display: flex;
+    align-items: center;
+    gap: var(--fui-space-1-5);
+    min-width: 0;
   }
-  .fui-multi-select-menu {
+  .fui-multi-select-first {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .fui-multi-select-trigger[data-placeholder] .fui-multi-select-first {
+    color: var(--muted-foreground);
+  }
+  .fui-multi-select-more {
+    flex: none;
+    padding: 0 var(--fui-space-1-5);
+    border-radius: var(--fui-radius-xs);
+    background: var(--fui-surface-inset);
+    box-shadow: inset 0 0 0 1px var(--fui-separator);
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-mono);
+    font-size: var(--fui-text-xs);
+    line-height: 1.25rem;
+  }
+  .fui-multi-select-icon {
+    display: flex;
+    transition: rotate var(--fui-duration) var(--fui-ease);
+  }
+  .fui-multi-select-trigger[data-popup-open] .fui-multi-select-icon {
+    rotate: 180deg;
+  }
+  .fui-menu.fui-multi-select-popup {
     display: grid;
-    max-height: 16rem;
-    margin: 0;
-    overflow: auto;
-    overscroll-behavior: contain;
+    min-width: max(10rem, var(--anchor-width, 0px));
+    padding: 0;
+    overflow: hidden;
   }
-  .fui-multi-select-option {
+  .fui-multi-select-list {
+    display: grid;
+    max-height: min(16rem, var(--available-height, 16rem));
+    padding: var(--fui-space-1);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    outline: none;
+  }
+  .fui-menu-item.fui-multi-select-item {
+    gap: var(--fui-space-2-5);
+    padding-inline-end: var(--fui-space-3);
+    cursor: pointer;
+  }
+  .fui-menu-item.fui-multi-select-item[data-selected] {
+    font-weight: var(--fui-weight-regular);
+  }
+  /* A row's icons are muted 16 px glyphs; the tick is the checkbox's own 12 px mark in the key's ink. */
+  .fui-menu-item .fui-checkbox.fui-multi-select-box svg {
+    width: 0.75rem;
+    height: 0.75rem;
+    color: var(--brand-foreground);
+  }
+  .fui-multi-select-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .fui-multi-select-footer {
+    padding: var(--fui-space-1);
+    border-top: 1px solid var(--fui-separator);
+  }
+  .fui-multi-select-clear {
     display: flex;
     align-items: center;
     gap: var(--fui-space-2);
-    min-height: 2.75rem;
-    padding: 0 var(--fui-space-2);
-    border-radius: var(--fui-radius-sm);
-    cursor: pointer;
-  }
-  .fui-multi-select-option:hover {
-    background: var(--accent);
-  }
-  .fui-multi-select-clear {
-    justify-self: start;
-    min-height: 2.75rem;
-    padding: 0 var(--fui-space-2);
+    inline-size: 100%;
+    min-height: 2rem;
+    padding: var(--fui-space-1-5) var(--fui-space-2);
     border: 0;
+    border-radius: var(--fui-radius-sm);
     background: transparent;
-    color: var(--brand-ink);
+    color: var(--muted-foreground);
     font: inherit;
-    font-size: var(--fui-text-xs);
+    font-size: var(--fui-text-sm);
+    text-align: start;
     cursor: pointer;
+    transition:
+      background-color var(--fui-duration) var(--fui-ease),
+      color var(--fui-duration) var(--fui-ease);
+  }
+  .fui-multi-select-clear:hover,
+  .fui-multi-select-clear:focus-visible {
+    background: var(--accent);
+    color: var(--foreground);
+  }
+  @media (max-width: 767px), (pointer: coarse) {
+    .fui-multi-select-clear {
+      min-height: 2.75rem;
+    }
   }
   .fui-field {
     display: grid;
@@ -637,9 +708,11 @@
     gap: var(--fui-space-3);
     min-inline-size: 0;
   }
+  /* As many 15rem columns as fit (0.11: auto-fill, was auto-fit): in a wide form two fields keep a field's width and the free
+     room stays at the end, instead of each stretching to half the row. */
   .fui-field-group[data-layout="columns"] {
     gap: var(--fui-space-3) var(--fui-space-4);
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
   }
   .fui-native-radio-group {
     gap: var(--fui-space-1);
@@ -6299,33 +6372,33 @@
     }
   }
 
+  /* 0.11: a filter chip is its name and value, then a clear key of its own behind a soft divider. Only the key is
+     interactive; hovering it tints the key and draws the chip's edge, so it is plain what goes. */
   .fui-filter-chip {
     display: inline-flex;
-    align-items: center;
-    gap: var(--fui-space-1-5);
+    align-items: stretch;
     max-width: 100%;
     min-width: 0;
-    min-height: 2rem;
-    margin: 0;
-    padding: 0 var(--fui-space-3);
+    min-height: 1.75rem;
     border: 1px solid var(--border);
     border-radius: var(--fui-radius-sm);
     background: var(--card);
     color: var(--foreground);
-    font: inherit;
     font-family: var(--fui-font-sans);
     font-size: var(--fui-text-xs);
     line-height: var(--fui-leading-xs);
-    text-decoration: none;
-    cursor: pointer;
-    transition: background-color var(--fui-duration) var(--fui-ease);
+    box-shadow: var(--fui-shadow-xs);
+    transition: border-color var(--fui-duration) var(--fui-ease);
   }
-  .fui-filter-chip:hover {
-    background: var(--muted);
+  .fui-filter-chip[data-leaving] {
+    pointer-events: none;
   }
-  .fui-filter-chip:disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
+  .fui-filter-chip-text {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--fui-space-1);
+    min-width: 0;
+    padding-inline: var(--fui-space-2-5) var(--fui-space-2);
   }
   .fui-filter-chip-label {
     flex: none;
@@ -6338,11 +6411,48 @@
     white-space: nowrap;
     font-weight: var(--fui-weight-medium);
   }
-  .fui-filter-chip-icon {
+  .fui-filter-chip-remove {
+    position: relative;
+    display: inline-flex;
     flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: 1.75rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-inline-start: 1px solid var(--fui-separator);
+    border-start-end-radius: calc(var(--fui-radius-sm) - 1px);
+    border-end-end-radius: calc(var(--fui-radius-sm) - 1px);
+    background: transparent;
+    color: var(--muted-foreground);
+    font: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      background-color var(--fui-duration) var(--fui-ease),
+      color var(--fui-duration) var(--fui-ease);
+  }
+  .fui-filter-chip-remove svg {
     width: 0.875rem;
     height: 0.875rem;
-    color: var(--muted-foreground);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .fui-filter-chip-remove:not(:disabled, [aria-disabled="true"]):hover {
+      background: var(--accent);
+      color: var(--foreground);
+    }
+    .fui-filter-chip:has(> .fui-filter-chip-remove:not(:disabled, [aria-disabled="true"]):hover) {
+      border-color: var(--fui-control-border);
+    }
+  }
+  .fui-filter-chip-remove:not(:disabled, [aria-disabled="true"]):active {
+    background: color-mix(in oklab, var(--foreground) 10%, var(--card));
+  }
+  /* A filter that cannot be cleared is still active: its words stay readable and only the key is quieted. */
+  .fui-filter-chip-remove:is(:disabled, [aria-disabled="true"]) {
+    opacity: 0.45;
+    cursor: not-allowed;
   }
 
   .fui-suggestion-grid {
@@ -6520,9 +6630,12 @@
     line-height: 1;
   }
 
+  /* On touch and narrow screens the clear key reaches 44 px around its 28 px square; the chip keeps its size. */
   @media (max-width: 767px), (pointer: coarse) {
-    .fui-filter-chip {
-      min-height: 2.75rem;
+    .fui-filter-chip-remove::before {
+      content: "";
+      position: absolute;
+      inset: -0.5rem;
     }
   }
 }
@@ -7058,20 +7171,18 @@
     height: 0.875rem;
   }
 
-  /* One indicator under the pressed item of a single-choice group. */
-  .fui-toggle-group[data-indicator] {
+  /* One plate under the pressed item of a single-choice group (a toggle group, a theme switcher) or the active tab of a
+     segmented list. It is placed by its four edges, so each edge can move on its own (0.11). */
+  .fui-toggle-group,
+  .fui-tabs-list[data-variant="segmented"] {
     position: relative;
     isolation: isolate;
   }
-  .fui-toggle-group[data-indicator]::before {
+  .fui-toggle-group[data-indicator]::before,
+  .fui-tabs-plate {
     content: "";
     position: absolute;
     z-index: 0;
-    top: 0;
-    left: 0;
-    width: var(--fui-toggle-w);
-    height: var(--fui-toggle-h);
-    translate: var(--fui-toggle-x) var(--fui-toggle-y);
     border-radius: calc(var(--fui-radius-md) - 2px);
     background: var(--fui-segment);
     box-shadow:
@@ -7079,18 +7190,38 @@
       0 0 0 1px color-mix(in oklab, var(--foreground) 8%, transparent);
     pointer-events: none;
   }
-  .fui-toggle-group[data-indicator] > .fui-toggle {
+  .fui-toggle-group[data-indicator]::before {
+    top: var(--fui-toggle-y);
+    left: var(--fui-toggle-x);
+    right: var(--fui-toggle-r);
+    height: var(--fui-toggle-h);
+  }
+  .fui-tabs-plate {
+    top: var(--active-tab-top);
+    left: var(--active-tab-left);
+    right: var(--active-tab-right);
+    height: var(--active-tab-height);
+  }
+  /* A list that scrolls measures its right edge from its scroll width, which the plate cannot use: it keeps a width. */
+  .fui-tabs-list[data-scrollable] > .fui-tabs-plate {
+    right: auto;
+    width: var(--active-tab-width);
+  }
+  .fui-toggle-group[data-indicator] > .fui-toggle,
+  .fui-tabs-list[data-variant="segmented"]:has(> .fui-tabs-plate) > .fui-tab {
     position: relative;
     z-index: 1;
   }
   @media (forced-colors: none) {
-    .fui-toggle-group[data-indicator] > .fui-toggle[data-pressed] {
+    .fui-toggle-group[data-indicator] > .fui-toggle[data-pressed],
+    .fui-tabs-list[data-variant="segmented"]:has(> .fui-tabs-plate) > .fui-tab[data-active] {
       background: transparent;
       box-shadow: none;
     }
   }
   @media (forced-colors: active) {
-    .fui-toggle-group[data-indicator]::before {
+    .fui-toggle-group[data-indicator]::before,
+    .fui-tabs-plate {
       display: none;
     }
   }
@@ -7136,11 +7267,38 @@
       transform: translateY(1px);
     }
 
-    .fui-toggle-group[data-indicator="ready"]::before {
+    /* The plate slides to the new choice on a quick-out curve. Its leading edge leaves first and the trailing edge follows
+       a beat later, so it stretches toward the choice and settles there; the labels change colour as it arrives. */
+    .fui-toggle-group[data-indicator="ready"]::before,
+    .fui-tabs-plate {
       transition:
-        translate var(--fui-duration-slow) var(--fui-ease),
-        width var(--fui-duration-slow) var(--fui-ease),
-        height var(--fui-duration-slow) var(--fui-ease);
+        left var(--fui-duration-slow) var(--fui-ease-out),
+        right var(--fui-duration-slow) var(--fui-ease-out),
+        top var(--fui-duration-slow) var(--fui-ease-out),
+        width var(--fui-duration-slow) var(--fui-ease-out),
+        height var(--fui-duration-slow) var(--fui-ease-out);
+    }
+    .fui-toggle-group[data-indicator="ready"][data-direction="right"]::before,
+    .fui-tabs-plate[data-activation-direction="right"] {
+      transition-delay: 70ms, 0ms, 0ms, 0ms, 0ms;
+    }
+    .fui-toggle-group[data-indicator="ready"][data-direction="left"]::before,
+    .fui-tabs-plate[data-activation-direction="left"] {
+      transition-delay: 0ms, 70ms, 0ms, 0ms, 0ms;
+    }
+    .fui-toggle-group[data-indicator] > .fui-toggle,
+    .fui-tabs-list[data-variant="segmented"]:has(> .fui-tabs-plate) > .fui-tab {
+      transition-duration: var(--fui-duration-slow);
+    }
+    /* A theme's icon turns into place when it is chosen; not on the first paint (data-direction comes with the first move). */
+    @keyframes fui-theme-icon {
+      from {
+        rotate: -40deg;
+        scale: 0.7;
+      }
+    }
+    .fui-theme-switcher[data-direction] > .fui-toggle[data-pressed] > svg {
+      animation: fui-theme-icon var(--fui-duration-slow) var(--fui-ease-spring);
     }
 
     /* The check is drawn, not switched on. */
@@ -7260,6 +7418,7 @@
     box-shadow: var(--fui-shadow-well);
   }
   .fui-toggle-group[data-indicator]::before,
+  .fui-tabs-plate,
   .fui-toggle[data-pressed],
   .fui-tabs-list[data-variant="segmented"] .fui-tab[data-active] {
     background-image: var(--fui-sheen-soft);

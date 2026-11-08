@@ -11,6 +11,7 @@ import {
   FieldSet,
   FileInput,
   IconButton,
+  MultiSelect,
   NativeCheckbox,
   NativeRadio,
   NativeRadioGroup,
@@ -132,6 +133,52 @@ test("field sets are real fieldsets and legends, and radios are native inputs a 
   assert.match(group, /<label class="fui-native-choice"><input class="fui-native-radio"/);
   assert.match(group, /data-layout="grid"/);
   assert.match(renderToStaticMarkup(<NativeRadioGroup legend="Hidden" hideLegend><i /></NativeRadioGroup>), /class="fui-field-legend fui-sr-only"/);
+});
+
+test("a field group's columns keep a field's width in a wide form: auto-fill, the free room at the end", () => {
+  assert.match(styles, /\.fui-field-group\[data-layout="columns"\] \{[^}]*grid-template-columns: repeat\(auto-fill, minmax\(min\(100%, 15rem\), 1fr\)\);/);
+});
+
+test("multi-select sums up its value in the trigger: the placeholder, one name, or the first name and how many more", () => {
+  const options = [
+    { value: "grok", label: "Grok" },
+    { value: "claude", label: "Claude Code" },
+    { value: "codex", label: "Codex" },
+  ];
+  const render = (value: string[]) =>
+    renderToStaticMarkup(<MultiSelect id="providers" label="Providers" options={options} value={value} onValueChange={() => undefined} />);
+  const empty = render([]);
+  assert.match(empty, /<span class="fui-multi-select-label" id="providers-label">Providers<\/span>/);
+  assert.match(empty, /aria-labelledby="providers-label"/);
+  assert.match(empty, /id="providers"/);
+  assert.match(empty, /data-placeholder=""/);
+  assert.match(empty, /<span class="fui-multi-select-first">Any<\/span>/);
+  const one = render(["claude"]);
+  assert.doesNotMatch(one, /data-placeholder/);
+  assert.match(one, /<span class="fui-multi-select-first">Claude Code<\/span><\/span>/);
+  // Several: the first in the options' order, a soft count the eye reads and words a screen reader reads.
+  const several = render(["codex", "grok"]);
+  assert.match(several, /<span class="fui-multi-select-first">Grok<\/span><span aria-hidden="true" class="fui-multi-select-more">\+1<\/span><span class="fui-sr-only"> and 1 more<\/span>/);
+});
+
+test("multi-select styles: as wide as its summary within 10rem and 20rem, a popup at least as wide, the checkbox's own tick", () => {
+  assert.match(styles, /\.fui-multi-select \{[^}]*inline-size: fit-content;[^}]*min-inline-size: 10rem;[^}]*max-inline-size: min\(100%, 20rem\);/);
+  assert.match(styles, /\.fui-menu\.fui-multi-select-popup \{[^}]*min-width: max\(10rem, var\(--anchor-width, 0px\)\);/);
+  assert.match(styles, /\.fui-menu-item \.fui-checkbox\.fui-multi-select-box svg \{[^}]*color: var\(--brand-foreground\);/);
+});
+
+test("segmented plates are placed by their four edges and slide leading edge first, only without reduced motion", () => {
+  assert.match(styles, /\.fui-toggle-group\[data-indicator\]::before \{\s*top: var\(--fui-toggle-y\);\s*left: var\(--fui-toggle-x\);\s*right: var\(--fui-toggle-r\);/);
+  assert.match(styles, /\.fui-tabs-plate \{\s*top: var\(--active-tab-top\);\s*left: var\(--active-tab-left\);\s*right: var\(--active-tab-right\);/);
+  const motion = styles.slice(styles.indexOf("@media (prefers-reduced-motion: no-preference) {", styles.indexOf("/* Data and images arriving")));
+  assert.match(motion, /\[data-direction="right"\]::before,\s*\.fui-tabs-plate\[data-activation-direction="right"\] \{\s*transition-delay: 70ms, 0ms/);
+  assert.match(motion, /\[data-direction="left"\]::before,\s*\.fui-tabs-plate\[data-activation-direction="left"\] \{\s*transition-delay: 0ms, 70ms/);
+  const segmented = renderToStaticMarkup(
+    <ToggleGroup aria-label="Range" defaultValue={["7d"]}>
+      <ToggleGroupItem value="7d">7 days</ToggleGroupItem>
+    </ToggleGroup>,
+  );
+  assert.match(segmented, /class="fui-toggle-group"/);
 });
 
 test("native radio grid: the column floor is a custom property whose default is the old 9rem", () => {

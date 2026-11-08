@@ -137,7 +137,8 @@ The vocabulary (0.11, "instrument with life"), each tied to one cause:
 
 | Cause | Motion | Where |
 | --- | --- | --- |
-| A choice in a single-choice group | The indicator slides to the new item | `ToggleGroup`, `ThemeSwitcher`; the `Tabs` underline |
+| A choice in a single-choice group | The plate slides to the new item, its leading edge first, and settles; a chosen theme's icon turns into place | `ToggleGroup`, `ThemeSwitcher`, segmented `Tabs`; the `Tabs` underline slides |
+| A filter cleared | The chip fades and shrinks a little before it goes; focus moves to the next chip | `FilterChip` |
 | A press | The key goes down 1 px while held | `Button` |
 | A check | The tick is drawn | `Checkbox` |
 | A level changes | The ruler inks its ticks in order and its mark travels | `Meter variant="ruler"`, `Stat meter` |

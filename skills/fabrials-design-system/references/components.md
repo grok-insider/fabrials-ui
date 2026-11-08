@@ -108,9 +108,9 @@ import { ChatMessage, ChatComposer } from "@fabrials/ai-ui";         // needs @f
 | `RadioGroup` + `RadioGroupItem` (or `Radio`) | One visible choice inside a form |
 | `ToggleGroup` + `ToggleGroupItem` (`size` `sm`, `default`, `lg`) | A segmented view or range next to what it changes; 44 px hit area on touch (`size="lg"` paints the whole height). A single-choice group slides one indicator to the pressed item |
 | `ThemeSwitcher` (`size`) | System, light or dark; the host stores the choice and sets the root class |
-| `MultiSelect` | Several values, for filters |
+| `MultiSelect` | Several values, for filters: a listbox with checkbox rows; the trigger sums them up (one name, or the first and a count) |
 | `Combobox` | A text field filtering known values |
-| `FilterChip` | An active filter with a clear action (`href` or `onRemove`) |
+| `FilterChip` | An active filter: name and value, and its own clear key (`href` or `onRemove`); focus moves on when one goes |
 | `InputGroup` (`InputGroupAddon`, `InputGroupInput`, `InputGroupTextarea`, `InputGroupText`, `InputGroupButton`) | A field with an attached addon or action |
 | `ButtonGroup` (`ButtonGroupText`, `ButtonGroupSeparator`) | Actions on the same subject; not a way to save space |
 

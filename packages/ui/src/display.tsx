@@ -359,7 +359,9 @@ export function TabsList({
       {...props}
     >
       {props.children}
-      {variant === "segmented" ? null : (
+      {variant === "segmented" ? (
+        <BaseTabs.Indicator className="fui-tabs-plate" />
+      ) : (
         <BaseTabs.Indicator className="fui-tabs-indicator" />
       )}
     </BaseTabs.List>

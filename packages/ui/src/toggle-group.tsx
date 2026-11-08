@@ -8,8 +8,10 @@ import { classes, type StyledProps } from "./shared";
 
 /**
  * Keeps one indicator under the pressed item of a single-choice group and lets it slide when the choice changes (0.10). It
- * sets `--fui-toggle-x/y/w/h` on the group; with two or more pressed items (a multiple group) there is no indicator and each
- * pressed item paints its own fill, as before. The first placement does not animate.
+ * sets `--fui-toggle-x/r/y/w/h` on the group (the item's left, right, top, width and height inside it); with two or more
+ * pressed items (a multiple group) there is no indicator and each pressed item paints its own fill, as before. The first
+ * placement does not animate; after it, `data-direction` (left or right) says which way the last move went, so the leading
+ * edge can go first (0.11).
  */
 function useSlidingIndicator(ref?: Ref<HTMLDivElement>) {
   const node = useRef<HTMLDivElement | null>(null);
@@ -25,24 +27,35 @@ function useSlidingIndicator(ref?: Ref<HTMLDivElement>) {
     const group = node.current;
     if (!group) return;
     let frame = 0;
+    let last: { item: HTMLElement; left: number } | undefined;
     const place = () => {
       const pressed = group.querySelectorAll<HTMLElement>(":scope > [data-pressed]");
       if (pressed.length !== 1) {
         delete group.dataset.indicator;
+        last = undefined;
         return;
       }
       const item = pressed[0]!;
-      group.style.setProperty("--fui-toggle-x", `${item.offsetLeft}px`);
+      const left = item.offsetLeft;
+      // A new choice sets the direction; the same choice measured again (fonts, a resize) does not.
+      if (last && last.item !== item) group.dataset.direction = left > last.left ? "right" : "left";
+      last = { item, left };
+      group.style.setProperty("--fui-toggle-x", `${left}px`);
+      group.style.setProperty("--fui-toggle-r", `${group.clientWidth - left - item.offsetWidth}px`);
       group.style.setProperty("--fui-toggle-y", `${item.offsetTop}px`);
       group.style.setProperty("--fui-toggle-w", `${item.offsetWidth}px`);
       group.style.setProperty("--fui-toggle-h", `${item.offsetHeight}px`);
-      if (group.dataset.indicator === undefined) {
+      // Ready a frame after the first placement. Checked against "ready", not set once: an effect that runs twice (React's
+      // strict mode) cancels the first frame, and the indicator would otherwise never slide.
+      if (group.dataset.indicator !== "ready") {
         group.dataset.indicator = "";
         const ready = () => {
           group.dataset.indicator = "ready";
         };
-        if (typeof requestAnimationFrame === "function") frame = requestAnimationFrame(ready);
-        else ready();
+        if (typeof requestAnimationFrame === "function") {
+          cancelAnimationFrame(frame);
+          frame = requestAnimationFrame(ready);
+        } else ready();
       }
     };
     place();

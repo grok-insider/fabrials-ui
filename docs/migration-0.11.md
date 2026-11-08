@@ -32,6 +32,7 @@ A host that wants a piece square again sets the token in its own CSS, for both t
 - An accordion's body rises out of a slight blur as it opens.
 - A `Card` with `interactive` lifts 1 px under the pointer. The new class `fui-card-link` on its one link stretches the link over the card, so the card is a single target.
 - `--fui-ease-spring` is a small overshoot for what a hand moves.
+- A single-choice `ToggleGroup`, the `ThemeSwitcher` and a segmented `TabsList` have one plate that slides to the choice: its leading edge leaves first and the trailing edge follows 70 ms later, so it stretches toward the choice and settles. The plate is placed by its edges (`--fui-toggle-x`, `--fui-toggle-r`, `--fui-toggle-y`, `--fui-toggle-h` on the group; `--fui-toggle-w` stays), and the group says which way it last moved in `data-direction` (left or right). A segmented `TabsList` renders a plate (`.fui-tabs-plate`, Base UI's tab indicator) instead of painting the active tab. The chosen theme's icon turns into place. Before, the toggle plate never slid in React's strict mode (development builds): the effect that readies it ran twice and lost its frame.
 - All of it is off under reduced motion.
 
 ## The working light
@@ -54,6 +55,12 @@ Changed, visibly:
 - `ReasoningDisclosure` and `SearchStepsDisclosure` count the time beside their label while live (`timer={false}` drops it); `ActivityDisclosure` does when given `timer`. Live labels carry the working light.
 - `SearchStepsDisclosure` stacks the marks of the first four sources beside a step's count, and steps that arrive rise into place.
 - `AttachmentItem` gains `progress` (0 to 1): an uploading grid tile draws a ring that closes as the file goes up and counts the percentage (a progressbar); at 100 % the count fades out. On a touch screen the remove key stays in view while a file uploads. A chip says the percentage. `Attachments` gains `size="sm"` (56 px tiles for a composer), and files that arrive rise into place.
+
+## Controls
+
+- **`FilterChip`** is its name and value, then a clear key of its own behind a soft divider. Only the key is a control (before, the whole chip was the link or button); hovering it tints the key and draws the chip's edge. `className` goes on the chip, every other prop (`disabled`, `id`, `data-*`, a router link through `render`) on the key, and `clearLabel` names the key as before. A button chip fades out before `onRemove` runs (at once under reduced motion), runs it once, and moves focus to the next chip's key in its row (or the previous one); when the last one goes, the host moves focus. On touch the key reaches 44 px around its 28 px square and the chip keeps its size (before, the whole chip grew to 44 px). The markup changed: a host that styled `.fui-filter-chip` as the control, or `.fui-filter-chip-icon`, moves those rules to `.fui-filter-chip-remove`.
+- **`MultiSelect`** is a Base UI Select with `multiple`: a listbox the arrows, Home, End and typing move through, where Enter or Space ticks a row and the popup stays open; Tab reaches Clear and Escape returns focus to the trigger. Each row has a checkbox's look. The trigger sums the value up as the placeholder, one name, or the first name with a soft count of the others (`+2`, read as "and 2 more"), instead of "N selected". It is as wide as its summary, from 10rem to 20rem, instead of filling its column; the popup is at least as wide as the trigger. Props are unchanged.
+- **`FieldGroup layout="columns"`** fills its row with as many 15rem columns as fit (`auto-fill`, was `auto-fit`): in a wide form two fields keep a field's width and the free room stays at the end, instead of each taking half the row. In a pane narrower than about 31rem nothing changes.
 
 ## New tokens
 

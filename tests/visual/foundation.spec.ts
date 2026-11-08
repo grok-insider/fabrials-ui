@@ -59,6 +59,7 @@ const stories: Record<string, string> = {
   "controls-disclosures": "tests-controls--disclosures",
   "controls-field-sets": "tests-controls--field-sets",
   "controls-toggles": "tests-controls--toggles",
+  "controls-filters": "tests-controls--filters",
   "inputs-text-fields": "tests-inputs--text-fields",
   "inputs-numbers": "tests-inputs--numbers",
   "inputs-codes": "tests-inputs--codes",

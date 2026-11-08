@@ -220,7 +220,7 @@ function FilterDemo() {
     { label: "Workspace", value: "A remarkably long workspace name that should truncate inside the chip" },
   ]);
   return (
-    <Frame title="Filter chips" description="Active filters with a one-click clear, as a link or a button. 44px on touch.">
+    <Frame title="Filter chips" description="Active filters, each with a clear key of its own: a link or a button. The key reaches 44px on touch.">
       <section className="catalogue-stack" aria-label="Filter chips">
         <SectionHeader title="Links" />
         <div className="catalogue-row" style={{ gap: 8 }}>
