@@ -90,6 +90,14 @@ test("avatars: a group folds the rest into a named count; a badge with a label i
   assert.match(renderToStaticMarkup(<AvatarBadge />), /aria-hidden="true"/);
 });
 
+test("a frame waiting for its picture draws no img, so a browser never shows its broken-image mark", () => {
+  const waiting = renderToStaticMarkup(<Image alt="A pier" ratio="4 / 3" />);
+  assert.match(waiting, /data-state="loading"/);
+  assert.doesNotMatch(waiting, /<img/);
+  assert.doesNotMatch(renderToStaticMarkup(<Image alt="A pier" ratio="4 / 3" src="" />), /<img/);
+  assert.match(renderToStaticMarkup(<Image alt="A pier" ratio="4 / 3" src="a.png" />), /<img [^>]*src="a\.png"/);
+});
+
 test("frames keep their shape: an aspect ratio, an image ratio from its size, a figure only with a caption", () => {
   assert.match(renderToStaticMarkup(<AspectRatio ratio={16 / 9} />), /--fui-aspect-ratio:1\.7777/);
   const plain = renderToStaticMarkup(<Image src="a.png" alt="A pier" width={1200} height={800} />);

@@ -4,7 +4,6 @@
 import { useLayoutEffect, useState, type ReactNode } from "react";
 import {
   AnimatedImage,
-  AspectRatio,
   AudioPlayer,
   Avatar,
   AvatarFallback,
@@ -276,14 +275,6 @@ export const instrumentDemos: Record<string, () => ReactNode> = {
         <AnimatedImage src="/media/loop.webm" alt="Colour drifting across a dusk sky" width={320} height={180} />
         <AnimatedImage src="/media/loop.gif" alt="Green copper light rippling" type="image" width={240} height={135} />
       </div>
-    </Frame>
-  ),
-  image: () => (
-    <Frame width="form">
-      <Image src={SCENES[0]!.src} alt={SCENES[0]!.alt} ratio="16 / 9" caption="The harbour at dusk. Synthetic." />
-      <AspectRatio ratio={3} className="grid place-items-center rounded-md bg-muted font-mono text-xs text-muted-foreground">
-        3 / 1
-      </AspectRatio>
     </Frame>
   ),
   "media-grid": () => <GalleryDemo count={5} />,

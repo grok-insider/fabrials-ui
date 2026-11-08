@@ -90,7 +90,7 @@ export function Image({
               </>
             )}
           </span>
-        ) : (
+        ) : src ? (
           <img
             {...props}
             ref={watch}
@@ -111,7 +111,7 @@ export function Image({
               onError?.(event);
             }}
           />
-        )}
+        ) : null}
       </span>
       {caption ? <figcaption className="fui-image-caption">{caption}</figcaption> : null}
     </Frame>

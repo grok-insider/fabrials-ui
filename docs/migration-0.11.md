@@ -99,6 +99,10 @@ What a host checks:
 - **A count of one shows the face.** With `max`, a group that would hide a single person draws that face instead of "+1" (the same width).
 - **The ring is the surface's colour.** Each face in a group, and a badge's edge, is ringed in `--fui-avatar-ring`: the page by default and the card's colour inside a `Card` (before, the page colour drew a visible ring on a card). Set it on a surface of your own.
 
+## Image
+
+- A frame whose `src` is not there yet (left out or empty) no longer renders an `<img>`: browsers drew their broken-image mark in its corner while it waited. It shows the quiet plate, and the picture comes in through the dither when the `src` arrives.
+
 ## New tokens
 
 `--fui-radius-2xl`, `--fui-ease-spring`, `--fui-tint-strength`, `--fui-tint-strong`, `--fui-tint-edge`, `--fui-surface-inset`, `--fui-surface-hover`, `--fui-separator`, `--fui-sidebar-active`, `--fui-switch-thumb`, `--fui-light-1`, `--fui-light-2`, `--fui-light-3`. The derived ones are declared on every theme scope, so a nested theme island computes them from its own surface.

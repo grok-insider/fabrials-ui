@@ -1314,6 +1314,7 @@ const previewWidths: Record<string, FrameWidth> = {
   progress: "form",
   "scroll-area": "form",
   "avatar-group": "form",
+  image: "form",
 };
 
 export function UiDemo({ slug }: { slug: string }) {
