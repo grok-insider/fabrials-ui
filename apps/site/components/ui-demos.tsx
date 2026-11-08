@@ -26,7 +26,6 @@ import {
   ChatComposer,
   CitationChip,
   CitationProvider,
-  CodeBlock,
   ComposerButton,
   ComposerToggle,
   ReasoningDisclosure,
@@ -772,46 +771,6 @@ const demos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   "chat-composer": () => <ComposerDemo />,
-  "code-block": () => (
-    <Frame>
-      <div className="fui-markdown min-w-0">
-        <h3>Layered styles</h3>
-        <p>
-          Shared components live in the <code>components</code> layer. Hosts override after them.
-        </p>
-        <ol>
-          <li>Import tokens once.</li>
-          <li>Import component styles.</li>
-        </ol>
-        <blockquote>
-          <p>Color always has a text or symbol companion.</p>
-        </blockquote>
-        <CodeBlock code={themeCode} download language="ts" />
-        <table>
-          <thead>
-            <tr>
-              <th>Surface</th>
-              <th>Width</th>
-              <th>Controls</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Phone</td>
-              <td>390</td>
-              <td>44px</td>
-            </tr>
-            <tr>
-              <td>Desktop</td>
-              <td>1440</td>
-              <td>40px</td>
-            </tr>
-          </tbody>
-        </table>
-        <CodeBlock code={longLine} language="js" lineNumbers />
-      </div>
-    </Frame>
-  ),
   citations: () => (
     <Frame width="wide">
       <CitationProvider sources={citationSources}>
@@ -1140,34 +1099,6 @@ const searchSteps: SearchStep[] = [
   { type: "open_page", url: "https://docs.example.org/guides/cascade-layers" },
 ];
 
-const themeCode = `type Theme = "light" | "dark";
-
-export function applyTheme(theme: Theme) {
-  document.documentElement.classList.toggle("dark", theme === "dark");
-  return { theme, appliedAt: Date.now() };
-}`;
-
-const longLine = `const endpoint = "https://api.example.test/v1/really/long/path/segment/that/keeps/going/and/going/until/it/scrolls/horizontally?with=query&and=more";`;
-
-function TurnActions({ user, latest, copy }: { user?: boolean; latest?: boolean; copy: string }) {
-  return (
-    <MessageActions>
-      <CopyMessageAction text={copy} />
-      {user && (
-        <MessageAction label="Edit">
-          <Pencil aria-hidden="true" />
-        </MessageAction>
-      )}
-      {latest && (
-        <MessageAction label="Retry">
-          <RotateCcw aria-hidden="true" />
-        </MessageAction>
-      )}
-      <MessageTimestamp dateTime="2026-09-26T10:42:00Z" detail="Sep 26, 2026, 10:42" label="10:42" />
-    </MessageActions>
-  );
-}
-
 const attachmentFiles: AttachmentItem[] = [
   {
     id: "1",
@@ -1277,6 +1208,7 @@ const previewWidths: Record<string, FrameWidth> = {
   image: "form",
   "source-tally": "form",
   "chat-message": "wide",
+  "code-block": "wide",
   "scramble-text": "field",
   "shimmer-text": "field",
 };

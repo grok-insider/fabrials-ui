@@ -1,9 +1,10 @@
 /**
- * A small syntax highlighter for documentation and product code panels:
- * TypeScript/JavaScript (and JSX), JSON, shell, CSS and HTML. It turns code
- * into lines of classified tokens, pure and server-safe, so CodePanel can
- * render it without shipping a grammar engine. Hosts that already use Shiki
- * can pass their own highlighted children instead.
+ * A small syntax highlighter for documentation, product code panels and the code
+ * in an agent's answers: TypeScript/JavaScript (and JSX), JSON, shell, CSS,
+ * HTML, Python, Rust, Go, SQL, YAML, TOML and diffs. It turns code into lines of
+ * classified tokens, pure and server-safe, so CodePanel and CodeBlock can render
+ * it without shipping a grammar engine. Hosts that already use Shiki can pass
+ * their own highlighted children instead.
  */
 
 export type SyntaxToken = { text: string; type?: SyntaxKind };
@@ -18,7 +19,9 @@ export type SyntaxKind =
   | "tag"
   | "attribute"
   | "property"
-  | "variable";
+  | "variable"
+  | "inserted"
+  | "deleted";
 
 const JS_KEYWORDS =
   "import|from|export|default|function|return|const|let|var|if|else|for|while|do|switch|case|break|continue|new|class|extends|implements|interface|type|enum|as|async|await|yield|try|catch|finally|throw|typeof|instanceof|in|of|void|delete|this|super|null|undefined|true|false|satisfies|readonly|public|private|protected|static|declare|namespace|keyof";
@@ -87,6 +90,103 @@ const htmlRules: Rule[] = [
   [/\/?>|=/y, "punctuation"],
 ];
 
+const PYTHON_KEYWORDS =
+  "def|class|return|if|elif|else|for|while|in|not|and|or|is|None|True|False|import|from|as|with|try|except|finally|raise|lambda|yield|pass|break|continue|global|nonlocal|async|await|assert|del|match|case|self";
+
+const pythonRules: Rule[] = [
+  [/#[^\n]*/y, "comment"],
+  [/[rRbBuUfF]{0,2}(?:"""[\s\S]*?"""|'''[\s\S]*?'''|"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*')/y, "string"],
+  [/@[\w.]+/y, "attribute"],
+  [new RegExp(`\\b(?:${PYTHON_KEYWORDS})\\b`, "y"), "keyword"],
+  [/\b\d[\d_]*(?:\.\d+)?(?:e[+-]?\d+)?j?\b/iy, "number"],
+  [/[A-Za-z_]\w*(?=\s*\()/y, "function"],
+  [/\b[A-Z]\w*/y, "type"],
+  [/[A-Za-z_]\w*/y, "variable"],
+  [/[{}()[\];,.:=<>+\-*/%!&|^~]/y, "punctuation"],
+];
+
+const RUST_KEYWORDS =
+  "fn|let|mut|pub|use|mod|struct|enum|impl|trait|for|in|if|else|match|while|loop|return|self|Self|crate|super|as|where|const|static|async|await|move|ref|unsafe|dyn|type|true|false|break|continue|extern";
+
+const RUST_TYPES = "u8|u16|u32|u64|u128|usize|i8|i16|i32|i64|i128|isize|f32|f64|bool|char|str";
+
+const rustRules: Rule[] = [
+  [/\/\/[^\n]*|\/\*[\s\S]*?\*\//y, "comment"],
+  [/r#*"[\s\S]*?"#*|b?"(?:[^"\\]|\\[\s\S])*"|b?'(?:[^'\\\n]|\\.)'/y, "string"],
+  [/#!?\[[^\]\n]*\]/y, "attribute"],
+  [/'[A-Za-z_]\w*\b(?!')/y, "type"],
+  [new RegExp(`\\b(?:${RUST_KEYWORDS})\\b`, "y"), "keyword"],
+  [new RegExp(`\\b(?:${RUST_TYPES})\\b`, "y"), "type"],
+  [/\b\d[\d_]*(?:\.\d+)?(?:[iuf](?:8|16|32|64|128|size))?\b/y, "number"],
+  [/[A-Za-z_]\w*!(?!=)/y, "function"],
+  [/[A-Za-z_]\w*(?=\s*(?:::<[^()]*>)?\()/y, "function"],
+  [/\b[A-Z]\w*/y, "type"],
+  [/[A-Za-z_]\w*/y, "variable"],
+  [/[{}()[\];,.:=<>+\-*/%!&|^~?@]/y, "punctuation"],
+];
+
+const GO_KEYWORDS =
+  "package|import|func|return|if|else|for|range|switch|case|default|break|continue|go|defer|select|chan|map|struct|interface|type|var|const|nil|true|false|fallthrough|goto";
+const GO_TYPES = "string|int|int8|int16|int32|int64|uint|uint8|uint16|uint32|uint64|uintptr|float32|float64|complex64|complex128|bool|byte|rune|error|any";
+
+const goRules: Rule[] = [
+  [/\/\/[^\n]*|\/\*[\s\S]*?\*\//y, "comment"],
+  [/`[^`]*`|"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'/y, "string"],
+  [new RegExp(`\\b(?:${GO_KEYWORDS})\\b`, "y"), "keyword"],
+  [new RegExp(`\\b(?:${GO_TYPES})\\b`, "y"), "type"],
+  [/\b\d[\d_]*(?:\.\d+)?(?:e[+-]?\d+)?\b/iy, "number"],
+  [/[A-Za-z_]\w*(?=\s*\()/y, "function"],
+  [/\b[A-Z]\w*/y, "type"],
+  [/[A-Za-z_]\w*/y, "variable"],
+  [/[{}()[\];,.:=<>+\-*/%!&|^~]/y, "punctuation"],
+];
+
+const SQL_KEYWORDS =
+  "select|from|where|join|left|right|inner|outer|full|cross|on|and|or|not|null|is|in|as|insert|into|values|update|set|delete|create|table|view|alter|add|drop|column|index|primary|key|foreign|references|group|by|order|having|limit|offset|distinct|union|all|case|when|then|else|end|with|returning|default|unique|constraint|begin|commit|rollback|exists|between|like|ilike|asc|desc|true|false|if|cascade|grant|revoke|to|using|lateral|over|partition|window|interval|filter|coalesce|returns|language|function|trigger|for|each|row|execute|procedure";
+
+const sqlRules: Rule[] = [
+  [/--[^\n]*|\/\*[\s\S]*?\*\//y, "comment"],
+  [/'(?:[^']|'')*'/y, "string"],
+  [/"(?:[^"]|"")*"/y, "property"],
+  [new RegExp(`\\b(?:${SQL_KEYWORDS})\\b`, "iy"), "keyword"],
+  [/\b\d+(?:\.\d+)?\b/y, "number"],
+  [/[A-Za-z_]\w*(?=\s*\()/y, "function"],
+  [/::/y, "punctuation"],
+  [/[$:@]\w+/y, "variable"],
+  [/[A-Za-z_]\w*/y, "variable"],
+  [/[(),;.*=<>+\-/%!|]/y, "punctuation"],
+];
+
+const yamlRules: Rule[] = [
+  [/(?<![^\s])#[^\n]*/y, "comment"],
+  [/"(?:[^"\\\n]|\\.)*"|'(?:[^'\n]|'')*'/y, "string"],
+  [/[\w.$/-]+(?=\s*:(?:\s|$))/my, "property"],
+  [/[&*][\w-]+/y, "variable"],
+  [/\b(?:true|false|yes|no|on|off|null)\b|~/y, "keyword"],
+  [/-?\b\d+(?:\.\d+)?\b/y, "number"],
+  [/[-:|>?[\]{},]/y, "punctuation"],
+];
+
+const tomlRules: Rule[] = [
+  [/(?<![^\s])#[^\n]*/y, "comment"],
+  // A table header starts its line; a [ after a key is an array.
+  [/^[ \t]*\[\[?[^\]\n]+\]\]?/my, "type"],
+  [/"""[\s\S]*?"""|'''[\s\S]*?'''|"(?:[^"\\\n]|\\.)*"|'[^'\n]*'/y, "string"],
+  [/[\w.-]+(?=\s*=)/y, "property"],
+  [/\b(?:true|false)\b/y, "keyword"],
+  [/[+-]?\b\d[\d_]*(?:\.\d+)?(?:e[+-]?\d+)?\b/iy, "number"],
+  [/[=[\]{},.]/y, "punctuation"],
+];
+
+// A diff is read a line at a time: what a line starts with says what it is.
+const diffRules: Rule[] = [
+  [/^(?:diff |index |--- |\+\+\+ )[^\n]*/my, "comment"],
+  [/^@@[^\n]*/my, "keyword"],
+  [/^\+[^\n]*/my, "inserted"],
+  [/^-[^\n]*/my, "deleted"],
+  [/[^\n]+/y, "variable"],
+];
+
 const LANGUAGES: Record<string, Rule[]> = {
   ts: jsRules,
   tsx: jsRules,
@@ -104,6 +204,20 @@ const LANGUAGES: Record<string, Rule[]> = {
   css: cssRules,
   html: htmlRules,
   xml: htmlRules,
+  py: pythonRules,
+  python: pythonRules,
+  rs: rustRules,
+  rust: rustRules,
+  go: goRules,
+  golang: goRules,
+  sql: sqlRules,
+  postgres: sqlRules,
+  postgresql: sqlRules,
+  yaml: yamlRules,
+  yml: yamlRules,
+  toml: tomlRules,
+  diff: diffRules,
+  patch: diffRules,
 };
 
 /** Languages with rules; anything else renders as plain text. */

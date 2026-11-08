@@ -28,6 +28,7 @@ export const exampleSlugs = [
   "image",
   "source-tally",
   "chat-message",
+  "code-block",
   "scramble-text",
   "shimmer-text",
   "table",

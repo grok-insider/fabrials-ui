@@ -53,6 +53,7 @@ for (const name of genericOnly.has(consumer) ? ["ui"] : ["ui", "ai-ui"]) {
   const metadata = {
     "package.json": `${JSON.stringify(pkg, null, 2)}\n`,
     LICENSE: await readFile(resolve(root, "LICENSE"), "utf8"),
+    "THIRD_PARTY.md": await readFile(resolve(root, "THIRD_PARTY.md"), "utf8"),
   };
   const extra = name === "ui" ? "DESIGN.md" : "LOBE-ICONS-LICENSE";
   metadata[extra] = await readFile(resolve(root, extra), "utf8");

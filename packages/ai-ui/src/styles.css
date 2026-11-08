@@ -298,35 +298,8 @@
 }
 
 @layer utilities {
-  :where(.fui-markdown, .fui-code-block) {
-    --fui-syntax-keyword: oklch(0.5 0.17 305);
-    --fui-syntax-string: oklch(0.5 0.12 150);
-    --fui-syntax-number: oklch(0.55 0.14 55);
-    --fui-syntax-function: oklch(0.5 0.14 250);
-    --fui-syntax-type: oklch(0.5 0.1 200);
-    --fui-syntax-variable: var(--foreground);
-    --fui-syntax-comment: var(--muted-foreground);
-    --fui-syntax-punctuation: color-mix(in oklab, var(--foreground) 70%, var(--muted-foreground));
-    --fui-syntax-deleted: var(--fui-danger-ink);
-    --fui-syntax-inserted: var(--success);
-  }
-  :is(.dark, [data-theme="dark"]) :where(.fui-markdown, .fui-code-block) {
-    --fui-syntax-keyword: oklch(0.78 0.12 305);
-    --fui-syntax-string: oklch(0.8 0.12 150);
-    --fui-syntax-number: oklch(0.8 0.12 60);
-    --fui-syntax-function: oklch(0.8 0.1 245);
-    --fui-syntax-type: oklch(0.8 0.08 200);
-  }
-  @media (prefers-color-scheme: dark) {
-    [data-theme="system"] :where(.fui-markdown, .fui-code-block) {
-      --fui-syntax-keyword: oklch(0.78 0.12 305);
-      --fui-syntax-string: oklch(0.8 0.12 150);
-      --fui-syntax-number: oklch(0.8 0.12 60);
-      --fui-syntax-function: oklch(0.8 0.1 245);
-      --fui-syntax-type: oklch(0.8 0.08 200);
-    }
-  }
-
+  /* Code in an answer is painted with the syntax inks of @fabrials/ui (--fui-syntax-*), the ones CodePanel uses, so a code
+     block reads the same in a chat as in the docs, in both themes. */
   .fui-markdown {
     min-width: 0;
     max-width: 100%;
@@ -432,7 +405,10 @@
     outline-offset: 2px;
     border-radius: var(--fui-radius-xs);
   }
+  /* Code reads left to right in any page: in a right-to-left answer a call keeps its brackets after its name. */
   .fui-markdown :is([data-streamdown="inline-code"], :not(pre) > code) {
+    direction: ltr;
+    unicode-bidi: isolate;
     padding: 0.125em 0.375em;
     border-radius: var(--fui-radius-xs);
     background: var(--muted);
@@ -451,22 +427,133 @@
     overflow-x: auto;
     border-radius: var(--fui-radius-lg);
   }
+  /* Code inside a link takes the link's ink. */
+  .fui-markdown a > :is(code, [data-streamdown="inline-code"]) {
+    color: inherit;
+  }
+  /* A key to press, as Kbd draws it. */
+  .fui-markdown kbd {
+    display: inline-block;
+    min-width: 1.25rem;
+    padding: 0.0625rem 0.3125rem;
+    border: 1px solid var(--border);
+    border-bottom-width: 2px;
+    border-radius: var(--fui-radius-xs);
+    background: var(--card);
+    color: var(--foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    font-weight: var(--fui-weight-medium);
+    line-height: 1.25;
+    text-align: center;
+    white-space: nowrap;
+  }
+  /* Marked text is a soft tint of the warning ink; struck text recedes. Never the marks of a code block's own lines. */
+  .fui-markdown mark:not(.fui-code-word) {
+    padding: 0 0.125em;
+    border-radius: var(--fui-radius-xs);
+    background: color-mix(in oklab, var(--warning) var(--fui-tint-edge), transparent);
+    color: inherit;
+  }
+  .fui-markdown :is(del, s):not(.fui-code-line) {
+    color: var(--muted-foreground);
+    text-decoration-color: color-mix(in oklab, currentColor 70%, transparent);
+  }
+  .fui-markdown :is(sup, sub) {
+    line-height: 0;
+  }
+  /* A task list (GFM): no bullet, the box sits where the bullet was and the text lines up with the other items. The boxes
+     are read-only, so they keep the browser's disabled look. A box needs a name: wrap the item's text and its box in a label. */
+  .fui-markdown li:is(.task-list-item, :has(> input[type="checkbox"]), :has(> label > input[type="checkbox"])) {
+    list-style: none;
+  }
+  .fui-markdown li > input[type="checkbox"],
+  .fui-markdown li > label > input[type="checkbox"] {
+    width: 0.875rem;
+    height: 0.875rem;
+    margin: 0 0.375rem 0 -1.25rem;
+    vertical-align: -0.125rem;
+    accent-color: var(--brand);
+  }
+  /* Footnotes (GFM): a reference is a small raised number, the notes sit under a rule in smaller type. */
+  .fui-markdown a:is([data-footnote-ref], [data-footnote-backref]) {
+    text-decoration: none;
+  }
+  .fui-markdown a[data-footnote-ref] {
+    padding: 0 0.125rem;
+    font-size: 0.75em;
+    font-variant-numeric: tabular-nums;
+  }
+  .fui-markdown [data-footnotes] {
+    margin-top: var(--fui-space-6);
+    padding-top: var(--fui-space-3);
+    border-top: 1px solid var(--border);
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+  }
+  .fui-markdown [data-footnotes] > :is(h2, h3).sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .fui-markdown [data-footnotes] li + li {
+    margin-top: var(--fui-space-0-5);
+  }
+  /* A details block: a quiet plate whose summary is the line you press. */
+  .fui-markdown details {
+    padding: var(--fui-space-2) var(--fui-space-3);
+    border: 1px solid var(--border);
+    border-radius: var(--fui-radius-lg);
+    background: var(--card);
+  }
+  .fui-markdown summary {
+    margin: calc(-1 * var(--fui-space-2)) calc(-1 * var(--fui-space-3));
+    padding: var(--fui-space-2) var(--fui-space-3);
+    border-radius: inherit;
+    color: var(--foreground);
+    font-weight: var(--fui-weight-medium);
+    cursor: pointer;
+  }
+  .fui-markdown summary::marker {
+    color: var(--muted-foreground);
+  }
+  .fui-markdown details[open] > summary {
+    margin-bottom: var(--fui-space-2);
+    border-bottom: 1px solid var(--fui-separator);
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
+  }
+  .fui-markdown summary:focus-visible {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: -2px;
+  }
+  .fui-markdown figcaption {
+    margin-top: var(--fui-space-2);
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+  }
 
+  /* A fenced block a renderer leaves as a bare pre: the same well as a code block, without its bar. */
   .fui-markdown > pre {
+    direction: ltr;
     min-width: 0;
     max-width: 100%;
     margin-block: var(--fui-space-4);
     padding: var(--fui-space-3) var(--fui-space-4);
     overflow-x: auto;
     border: 1px solid var(--border);
-    border-radius: var(--fui-radius-lg);
-    background: var(--card);
+    border-radius: var(--fui-radius-plate);
+    background: var(--fui-code);
     font-family: var(--fui-font-mono);
     font-size: 0.8125rem;
-    line-height: 1.6;
+    line-height: 1.7;
     overflow-wrap: normal;
   }
 
+  /* A code block is a plate with 12 px corners, its bar on the card. */
   :is(.fui-code-block, .fui-markdown [data-streamdown="code-block"]) {
     position: relative;
     display: flex;
@@ -478,7 +565,7 @@
     padding: 0;
     overflow: hidden;
     border: 1px solid var(--border);
-    border-radius: var(--fui-radius-lg);
+    border-radius: var(--fui-radius-plate);
     background: var(--card);
     color: var(--foreground);
     font-size: var(--fui-text-sm);
@@ -495,12 +582,16 @@
     height: 2.5rem;
     padding: 0 var(--fui-space-1) 0 var(--fui-space-4);
     border-bottom: 1px solid var(--border);
-    background: color-mix(in oklab, var(--muted) 55%, var(--card));
+    background: var(--card);
     color: var(--muted-foreground);
     font-size: var(--fui-text-xs);
   }
   .fui-markdown [data-streamdown="code-block-header"] {
     padding-right: 7rem;
+  }
+  .fui-code-block-header > .fui-language-icon {
+    width: 0.875rem;
+    height: 0.875rem;
   }
   :is(.fui-code-block-language, .fui-markdown [data-streamdown="code-block-header"] > span) {
     flex: 1;
@@ -511,6 +602,30 @@
     text-overflow: ellipsis;
     text-transform: lowercase;
     white-space: nowrap;
+  }
+  /* With a file name, the header reads like a tab: the name in ink, the language beside it as a quiet tag. */
+  .fui-code-block-title {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: var(--fui-space-2);
+    min-width: 0;
+  }
+  .fui-code-block-filename {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--foreground);
+    font-family: var(--fui-font-mono);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .fui-code-block-header .fui-code-block-title > .fui-code-block-language {
+    flex: none;
+    padding: 0 var(--fui-space-1-5);
+    border-radius: var(--fui-radius-sm);
+    background: var(--muted);
+    font-size: var(--fui-text-label);
+    line-height: 1.25rem;
   }
   .fui-markdown [data-streamdown="code-block"] > div:has(> [data-streamdown="code-block-actions"]) {
     position: static;
@@ -568,6 +683,7 @@
     color: var(--foreground);
   }
   :is(.fui-code-block-body, .fui-markdown [data-streamdown="code-block-body"]) {
+    direction: ltr;
     min-width: 0;
     max-width: 100%;
     margin: 0;
@@ -577,7 +693,7 @@
     border-radius: 0;
     background: transparent;
     font-size: 0.8125rem;
-    line-height: 1.6;
+    line-height: 1.7;
     overscroll-behavior-x: contain;
     scrollbar-width: thin;
     scrollbar-color: color-mix(in oklch, var(--foreground) 20%, transparent) transparent;
@@ -585,6 +701,30 @@
   .fui-code-block-body:focus-visible {
     outline: 2px solid var(--fui-focus);
     outline-offset: -2px;
+  }
+  /* Lines drawn by CodeBlock sit in CodePanel's well (--fui-code), the background its inks are made for, and carry their own
+     inset, numbers and diff gutter (CodePanel's .fui-code-line rules), so a marked or changed line is tinted from edge to
+     edge. Lines a host highlights (Shiki, Streamdown) stay on the card, the background their themes are made for, with the
+     body's inset. */
+  .fui-code-block-body:has(> pre > code > .fui-code-line) {
+    padding-inline: 0;
+    background: var(--fui-code);
+  }
+  /* Wrapped, a long line folds under its own start, past the number and the diff mark. */
+  .fui-code-block[data-wrap] .fui-code-block-body pre {
+    width: auto;
+  }
+  .fui-code-block[data-wrap] .fui-code-line {
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+  }
+  .fui-code-block[data-wrap][data-line-numbers] .fui-code-line {
+    --fui-code-gutter: calc(1.75rem + var(--fui-space-4));
+    padding-inline-start: calc(var(--fui-space-4) + var(--fui-code-gutter));
+    text-indent: calc(-1 * var(--fui-code-gutter));
+  }
+  .fui-code-block[data-wrap][data-line-numbers] [data-diff-gutter] .fui-code-line {
+    --fui-code-gutter: calc(1.75rem + var(--fui-space-2) + 2ch);
   }
   :is(.fui-code-block-body, .fui-markdown [data-streamdown="code-block-body"]) pre {
     width: max-content;
@@ -620,14 +760,13 @@
       color: var(--shiki-dark, var(--sdm-c, inherit));
     }
   }
-  .fui-code-block[data-line-numbers] code > span::before {
+  .fui-code-block[data-line-numbers] code > span:not(.fui-code-line)::before {
     content: counter(fui-code-line);
     counter-increment: fui-code-line;
     display: inline-block;
-    width: 1.5rem;
+    width: 1.75rem;
     margin-right: var(--fui-space-4);
-    color: color-mix(in oklab, var(--muted-foreground) 60%, transparent);
-    font-size: 0.75rem;
+    color: color-mix(in oklab, var(--muted-foreground) 70%, transparent);
     text-align: right;
     user-select: none;
   }
@@ -654,6 +793,12 @@
   }
   :is(.fui-markdown, .fui-code-block) :is(.fui-token-variable, .token.variable, .hljs-variable) {
     color: var(--fui-syntax-variable);
+  }
+  :is(.fui-markdown, .fui-code-block) :is(.fui-token-tag, .token.tag, .hljs-tag, .hljs-name) {
+    color: var(--fui-syntax-tag);
+  }
+  :is(.fui-markdown, .fui-code-block) :is(.fui-token-attribute, .fui-token-property, .token.attr-name, .token.property, .hljs-attr, .hljs-property) {
+    color: var(--fui-syntax-function);
   }
   :is(.fui-markdown, .fui-code-block) :is(.fui-token-comment, .token.comment, .hljs-comment) {
     color: var(--fui-syntax-comment);

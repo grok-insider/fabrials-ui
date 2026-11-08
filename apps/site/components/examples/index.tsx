@@ -16,6 +16,7 @@ import { avatarGroupExamples } from "./avatar-group";
 import { imageExamples } from "./image";
 import { sourceTallyExamples } from "./source-tally";
 import { chatMessageExamples } from "./chat-message";
+import { codeBlockExamples } from "./code-block";
 import { scrambleTextExamples, shimmerTextExamples } from "./text";
 import { checkboxExamples, fieldExamples, radioGroupExamples, selectExamples, sliderExamples, switchExamples } from "./forms";
 import { accordionExamples, dialogExamples, dropdownMenuExamples, itemExamples, tabsExamples, tooltipExamples } from "./structure";
@@ -49,6 +50,7 @@ export const exampleSets: Record<string, ExampleSet> = {
   image: imageExamples,
   "source-tally": sourceTallyExamples,
   "chat-message": chatMessageExamples,
+  "code-block": codeBlockExamples,
   "scramble-text": scrambleTextExamples,
   "shimmer-text": shimmerTextExamples,
   table: tableExamples,

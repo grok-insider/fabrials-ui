@@ -8,6 +8,7 @@ playwright-report/
 *.tsbuildinfo
 .DS_Store
 packages/*/LICENSE
+packages/*/THIRD_PARTY.md
 packages/*/LOBE-ICONS-LICENSE
 packages/ui/DESIGN.md
 packages/ui/verify.mjs

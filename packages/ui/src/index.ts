@@ -66,6 +66,7 @@ export * from "./file-thumb";
 export * from "./dither-canvas";
 export * from "./dither-brand";
 export * from "./code-panel";
+export * from "./language-icon";
 export * from "./files";
 export * from "./syntax";
 export * from "./activity-strip";

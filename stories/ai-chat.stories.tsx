@@ -79,6 +79,18 @@ export function applyTheme(theme: Theme) {
 
 const longLine = `const endpoint = "https://api.example.test/v1/really/long/path/segment/that/keeps/going/and/going/until/it/scrolls/horizontally?with=query&and=more";`;
 
+const syncCode = `export async function syncMailbox(id: string) {
+  const response = await fetch(url);
+  const response = await withRetry(() => fetch(url), { attempts: 5 });
+  if (!response.ok) throw new SyncError(response.status); // keep the status
+  return response.json() as Promise<Headers[]>;
+}`;
+
+const pythonCode = `@retry(attempts=5)
+def sync_mailbox(mailbox_id: str) -> int:
+    # Headers only: bodies arrive when a message is opened.
+    return len(fetch_headers(mailbox_id, since=None))`;
+
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section aria-label={title} className="catalogue-stack" style={{ marginBottom: "2.5rem" }}>
@@ -113,7 +125,45 @@ function MarkdownDemo() {
       <blockquote>
         <p>Color always has a text or symbol companion.</p>
       </blockquote>
-      <CodeBlock code={tsCode} download language="ts">
+      <CodeBlock
+        addedLines={[3]}
+        code={syncCode}
+        download
+        filename="sync.ts"
+        highlightLines={[4]}
+        highlightWords={["response"]}
+        language="ts"
+        lineNumbers
+        removedLines={[2]}
+      />
+      <ul>
+        <li>
+          <label>
+            <input checked disabled readOnly type="checkbox" /> Retry on 429 and 503
+          </label>
+        </li>
+        <li>
+          <label>
+            <input disabled readOnly type="checkbox" /> Log the attempt count
+          </label>
+        </li>
+      </ul>
+      <p>
+        Press <kbd>Ctrl</kbd> <kbd>Enter</kbd> to sync again; search the logs for <mark>retry</mark>. The <del>--legacy</del> flag is
+        gone
+        <sup>
+          <a aria-describedby="markdown-notes-label" data-footnote-ref href="#markdown-note-1" id="markdown-ref-1">
+            1
+          </a>
+        </sup>
+        .
+      </p>
+      <CodeBlock code={pythonCode} language="py" />
+      <details>
+        <summary>Why bodies are lazy</summary>
+        <p>Headers are enough to list and sort a mailbox; a body is fetched when a message is opened.</p>
+      </details>
+      <CodeBlock code={tsCode} download language="ts" lineNumbers>
         <span><span className="fui-token-keyword">type</span> <span className="fui-token-type">Theme</span> <span className="fui-token-punctuation">=</span> <span className="fui-token-string">&quot;light&quot;</span> <span className="fui-token-punctuation">|</span> <span className="fui-token-string">&quot;dark&quot;</span><span className="fui-token-punctuation">;</span></span>
         <span />
         <span><span className="fui-token-keyword">export function</span> <span className="fui-token-function">applyTheme</span><span className="fui-token-punctuation">(</span>theme<span className="fui-token-punctuation">:</span> <span className="fui-token-type">Theme</span><span className="fui-token-punctuation">) {"{"}</span></span>
@@ -133,7 +183,23 @@ function MarkdownDemo() {
         </tbody>
       </table>
       <CodeBlock code={longLine} language="js" lineNumbers />
+      <CodeBlock code={longLine} language="js" lineNumbers wrap />
       <pre><code>plain fenced block without a header</code></pre>
+      <section data-footnotes>
+        <h2 className="sr-only" id="markdown-notes-label">
+          Footnotes
+        </h2>
+        <ol>
+          <li id="markdown-note-1">
+            <p>
+              Removed in 0.4.{" "}
+              <a aria-label="Back to reference 1" data-footnote-backref href="#markdown-ref-1">
+                ↩
+              </a>
+            </p>
+          </li>
+        </ol>
+      </section>
     </div>
   );
 }

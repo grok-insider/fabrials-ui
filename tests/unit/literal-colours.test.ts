@@ -71,8 +71,6 @@ test("the detector finds each way of writing a colour and ignores comments", () 
 function allowed(hit: Hit) {
   if (/^\.fui-moon-phase-(shadow|ring)$/.test(hit.selector)) return true;
   if (/shadow/.test(hit.property) && /^oklch\((?:0|1) 0 0 \/ \d+%\)$/.test(hit.literal)) return true;
-  // @fabrials/ai-ui defines the muted syntax inks in its own sheet; they are tokens, not component paint.
-  if (/^--fui-syntax-/.test(hit.property)) return true;
   // A mask is alpha only: the colour of an SVG drawn as a mask (the refine field's dither tile) is never seen.
   if (/^mask(-image)?$/.test(hit.property) && hit.literal === "data:image") return true;
   return false;
@@ -81,7 +79,7 @@ function allowed(hit: Hit) {
 const packages = new URL("../../packages/", import.meta.url);
 
 for (const sheet of ["ui/src/styles.css", "ai-ui/src/styles.css"]) {
-  test(`${sheet} paints with tokens: the only literal colours are the moon, shadow alphas and the syntax inks`, () => {
+  test(`${sheet} paints with tokens: the only literal colours are the moon, shadow alphas and a mask's tile`, () => {
     const hits = cssLiterals(readFileSync(new URL(sheet, packages), "utf8")).filter((hit) => !allowed(hit));
     assert.deepEqual(
       hits.map((hit) => `${hit.selector} { ${hit.property}: … ${hit.literal} }`),

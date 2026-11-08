@@ -275,12 +275,13 @@ Chart colours come from `--chart-1` to `--chart-6`; the first series reads as St
 
 | Component | Use for |
 | --- | --- |
-| `CodePanel` | A sample with `title` (file name), `language`, `lineNumbers`, `highlightLines`, `addedLines`, `removedLines`, `highlightWords`, `copyValue`; `bare` for inline; Shiki output as children replaces the built-in highlighter |
+| `CodePanel` | A sample with `title` (file name), `language`, `lineNumbers`, `highlightLines`, `addedLines`, `removedLines`, `highlightWords`, `copyValue`; `bare` for inline; Shiki output as children replaces the built-in highlighter. `CodeLines` is its highlighted `code` element alone, for a frame of your own |
 | `CodeTabs` | Several versions of one sample (`items` with `value` and `label`) |
 | `PackageInstall` | One command for npm, pnpm, yarn and bun; the choice is shared by the page. `command` without the runner, `kind="install"` for a package |
 | `Files`, `Folder`, `File` | A file tree; `note`, `highlighted`, `defaultOpen` |
 | `RepoInfo` | A GitHub repository link with stars and forks the host fetched |
-| `highlightCode`, `packageCommand` | The pure helpers behind them (server-safe) |
+| `highlightCode`, `packageCommand` | The pure helpers behind them (server-safe). The highlighter reads TS/JS/JSX, JSON, shell, CSS, HTML, Python, Rust, Go, SQL, YAML, TOML and diffs |
+| `LanguageIcon` (`language`), `languageMark` | A language's logo in its own colour, as CodePanel, CodeTabs and CodeBlock show it before the name; decorative, so the name or file always goes beside it. A plain glyph for SQL, JSON and languages without a shareable logo |
 
 ```tsx
 <PackageInstall command="shadcn@latest add @fabrials/button" />
@@ -318,7 +319,7 @@ Presentational only: the host supplies data, rendering, uploads, transcription a
 | --- | --- |
 | `ChatMessage` (`from` `user`, `assistant`, `system`; `actions`; `streaming`), `MessageActions`, `MessageAction`, `CopyMessageAction`, `MessageTimestamp` | A turn with its actions; while an answer arrives, `streaming` ends it in a caret of the working light and makes it `aria-busy` |
 | `ChatComposer` (`onSubmit`, `status` `ready`, `submitting`, `streaming`, `onStop`, `tools`, `attachments`, `working`), `ComposerToggle`, `ComposerButton` | The message field; the working light runs along its edge while the agent answers |
-| `CodeBlock` and the `.fui-markdown` class | Styles for rendered markdown and code with copy and download |
+| `CodeBlock` (`code`, `language`, `filename`, `lineNumbers`, `highlightLines`, `addedLines`, `removedLines`, `highlightWords`, `wrap`, `download`, `actions`) and the `.fui-markdown` class | The code in an answer, highlighted in CodePanel's inks on its plate, with copy and download; `.fui-markdown` styles the rest of rendered markdown (task lists, keys, marks, tables, footnotes, details). Map a renderer's fenced code to `CodeBlock`; name a task's box with a `label` |
 | `CitationProvider`, `CitationChip`, `Sources`, `SourceCard`, `SourceFavicon`, `LinkWithPreview`, `LinkPreviewCard` | Numbered citations and their sources |
 | `ActivityDisclosure`, `ReasoningDisclosure`, `SearchStepsDisclosure`, `ActivityIcon` | Reasoning, search steps and tool activity inside an answer; while live the label carries the working light and the time counts (`timer`, `startedAt`) |
 | `AgentThinking` (`activity` `thinking`, `searching`, `reading`, `writing`, `running`, `rendering`, `uploading`; `label`, `status` `working`, `done`, `failed`, `tone`, `timer`, `startedAt`, `endedAt`), `AgentMark` (`variant`, `outcome`) | The line that says an agent is working on a reply, with a mark per kind of work so the states read apart at a glance, settling on a tick or a cross; the mark alone for a dense row |

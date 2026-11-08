@@ -2,20 +2,10 @@
 
 import { useEffect, useState, useSyncExternalStore, type ComponentProps, type ReactNode } from "react";
 import { Tabs as BaseTabs } from "@base-ui/react/tabs";
-import { Braces, FileCode2, FileText, Palette, Terminal } from "lucide-react";
+import { LanguageIcon } from "./language-icon";
 import { CopyButton } from "./snippet";
 import { classes } from "./shared";
 import { highlightCode, packageCommand, PACKAGE_MANAGERS, type PackageManager } from "./syntax";
-
-const ICONS: Record<string, typeof FileCode2> = {
-  bash: Terminal,
-  sh: Terminal,
-  shell: Terminal,
-  zsh: Terminal,
-  json: Braces,
-  jsonc: Braces,
-  css: Palette,
-};
 
 /** Copy with a spoken result: "Copied", or how to copy by hand when the clipboard refuses. */
 function useCopyStatus() {
@@ -35,17 +25,13 @@ function CopyStatus({ status }: { status: string }) {
   );
 }
 
-function languageIcon(language?: string) {
-  const Icon = ICONS[(language ?? "").toLowerCase()] ?? (language ? FileCode2 : FileText);
-  return <Icon aria-hidden size={14} />;
-}
-
 export type CodePanelProps = Omit<ComponentProps<"figure">, "title" | "children"> & {
   code: string;
-  /** ts, tsx, js, json, bash, css, html… Other languages render as plain text. */
+  /** ts, tsx, js, json, bash, css, html, py, rs, go, sql, yaml, toml, diff… Other languages render as plain text. */
   language?: string;
   /** Usually the file name. Without it the bar shows the language. */
   title?: ReactNode;
+  /** Replaces the language's logo at the start of the bar (LanguageIcon). */
   icon?: ReactNode;
   lineNumbers?: boolean;
   /** 1-based lines to draw attention to. */
@@ -53,7 +39,7 @@ export type CodePanelProps = Omit<ComponentProps<"figure">, "title" | "children"
   /** 1-based lines shown as added or removed, for diffs. */
   addedLines?: number[];
   removedLines?: number[];
-  /** Words boxed wherever they appear, to point at a name. */
+  /** Names boxed wherever they stand on their own (never inside a longer word), to point at them. */
   highlightWords?: string[];
   /** What Copy puts on the clipboard, when it differs from the code (e.g. without removed lines). */
   copyValue?: string;
@@ -63,13 +49,16 @@ export type CodePanelProps = Omit<ComponentProps<"figure">, "title" | "children"
   bare?: boolean;
 };
 
+// A name is boxed where it stands on its own: never the c inside const, nor a name inside a longer one.
 function Words({ text, words, type }: { text: string; words?: string[]; type?: string }) {
   if (!words?.length) return <span className={type ? `fui-token-${type}` : undefined}>{text}</span>;
-  const pattern = new RegExp(`(${words.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})`, "g");
+  const names = words.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
+  const pattern = new RegExp(`(?<![\\w$])(${names})(?![\\w$])`, "g");
   return (
     <span className={type ? `fui-token-${type}` : undefined}>
       {text.split(pattern).map((part, index) =>
-        words.includes(part) ? (
+        // split puts each match at an odd index, between the text around it.
+        index % 2 === 1 ? (
           <mark key={index} className="fui-code-word">
             {part}
           </mark>
@@ -81,14 +70,14 @@ function Words({ text, words, type }: { text: string; words?: string[]; type?: s
   );
 }
 
-function CodeLines({
-  code,
-  language,
-  highlightLines,
-  addedLines,
-  removedLines,
-  highlightWords,
-}: Pick<CodePanelProps, "code" | "language" | "highlightLines" | "addedLines" | "removedLines" | "highlightWords">) {
+export type CodeLinesProps = Pick<CodePanelProps, "code" | "language" | "highlightLines" | "addedLines" | "removedLines" | "highlightWords">;
+
+/**
+ * The highlighted lines of a code sample, as `CodePanel` draws them: a `code` element of line spans with classified tokens
+ * (`fui-token-*`), marked lines, diff lines as `ins` and `del`, and boxed words. Put it in your own `pre` (CodeBlock in
+ * `@fabrials/ai-ui` does) to share the highlighter and the inks.
+ */
+export function CodeLines({ code, language, highlightLines, addedLines, removedLines, highlightWords }: CodeLinesProps) {
   const lines = highlightCode(code.replace(/\n$/, ""), language);
   const diff = Boolean(addedLines?.length || removedLines?.length);
   return (
@@ -120,8 +109,9 @@ function CodeLines({
 
 /**
  * A code sample with its file name, a copy button and optional line numbers,
- * highlighted lines, boxed words and diff marks. Highlights TypeScript,
- * JSON, shell, CSS and HTML itself; pass Shiki output as children to use it.
+ * highlighted lines, boxed words and diff marks. Highlights TypeScript, JSON,
+ * shell, CSS, HTML, Python, Rust, Go, SQL, YAML, TOML and diffs itself; pass
+ * Shiki output as children to use it.
  */
 export function CodePanel({
   code,
@@ -152,7 +142,7 @@ export function CodePanel({
       {bare ? null : (
         <figcaption className="fui-code-panel-bar">
           <span className="fui-code-panel-title">
-            {icon ?? languageIcon(language)}
+            {icon ?? <LanguageIcon language={language} />}
             <span>{title ?? language ?? "Code"}</span>
           </span>
           <CopyButton value={copy} label="Copy code" onCopy={copied.onCopy} onCopyError={copied.onCopyError} />
@@ -200,6 +190,11 @@ export function CodeTabs({
   const copied = useCopyStatus();
   const current = value ?? internal;
   const active = items.find((item) => item.value === current) ?? items[0];
+  // Samples in different languages (or with an icon of their own) carry their logo on their tab; samples in one language
+  // show it once, before the tabs.
+  const languages = new Set(items.map((item) => (item.language ?? "").trim().toLowerCase()));
+  const mixed = languages.size > 1 || items.some((item) => item.icon);
+  const shared = !mixed && items[0]?.language ? items[0].language : undefined;
   return (
     <BaseTabs.Root
       value={current}
@@ -211,15 +206,25 @@ export function CodeTabs({
       className={classes("fui-code-panel", "fui-code-tabs", className)}
     >
       <div className="fui-code-panel-bar">
+        {shared ? <LanguageIcon className="fui-code-tabs-language" language={shared} /> : null}
         <BaseTabs.List aria-label={label} className="fui-code-tabs-list">
           {items.map((item) => (
             <BaseTabs.Tab key={item.value} value={item.value} className="fui-code-tab">
+              {mixed ? (item.icon ?? <LanguageIcon language={item.language} />) : null}
               {item.label}
             </BaseTabs.Tab>
           ))}
         </BaseTabs.List>
         {active && (
-          <CopyButton value={active.copyValue ?? active.code} label="Copy code" onCopy={copied.onCopy} onCopyError={copied.onCopyError} />
+          <CopyButton
+            value={
+              active.copyValue ??
+              (active.removedLines?.length ? active.code.split("\n").filter((_, i) => !active.removedLines!.includes(i + 1)).join("\n") : active.code)
+            }
+            label="Copy code"
+            onCopy={copied.onCopy}
+            onCopyError={copied.onCopyError}
+          />
         )}
       </div>
       {items.map(({ value: tab, label: _label, code, language, lineNumbers, highlightLines, addedLines, removedLines, highlightWords, children }) => (

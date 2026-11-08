@@ -1030,7 +1030,9 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+  /* Code reads left to right in any page, its numbers on the left. */
   .fui-code-panel-body {
+    direction: ltr;
     margin: 0;
     padding: var(--fui-space-3) 0;
     overflow: auto;
@@ -1142,14 +1144,53 @@
     color: var(--fui-syntax-comment);
     font-style: italic;
   }
+  .fui-code-panel .fui-token-inserted { color: var(--fui-syntax-inserted); }
+  .fui-code-panel .fui-token-deleted { color: var(--fui-syntax-deleted); }
+
+  /* A language's logo in its own colour, as an editor's tab shows it. A third-party mark: it says which language and never
+     decorates. One too dark for the dark theme takes the text's ink there; forced colours take the system's text colour. */
+  .fui-language-icon {
+    flex: none;
+    width: 1em;
+    height: 1em;
+  }
+  .fui-language-icon[data-language] {
+    color: var(--fui-language-color);
+  }
+  :is(.dark, [data-theme="dark"]) .fui-language-icon[data-ink] {
+    color: inherit;
+  }
+  @media (prefers-color-scheme: dark) {
+    [data-theme="system"] .fui-language-icon[data-ink] {
+      color: inherit;
+    }
+  }
+  @media (forced-colors: active) {
+    .fui-language-icon,
+    :root .fui-language-icon[data-language] {
+      color: CanvasText;
+    }
+  }
+  :is(.fui-code-panel-title, .fui-code-tab) > .fui-language-icon,
+  .fui-code-tabs-language {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+  .fui-code-tabs-language {
+    margin-inline-start: var(--fui-space-1);
+  }
   .fui-code-tabs-list {
     display: flex;
     align-items: center;
     gap: var(--fui-space-1);
     min-width: 0;
+    margin-inline-end: auto;
     overflow-x: auto;
   }
   .fui-code-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--fui-space-1-5);
     height: 1.75rem;
     padding-inline: var(--fui-space-2);
     border: 0;

@@ -44,6 +44,7 @@
   "files": [
     "dist",
     "LICENSE",
+    "THIRD_PARTY.md",
     "DESIGN.md",
     "verify.mjs",
     "integrity.mjs"
