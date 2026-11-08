@@ -9028,12 +9028,18 @@
     min-height: var(--fui-header-height);
     padding: var(--fui-space-1) var(--fui-space-2) var(--fui-space-1) var(--fui-space-4);
   }
-  .fui-viewer-count {
+  .fui-viewer-count,
+  .fui-viewer-zoom {
     color: var(--muted-foreground);
     font-family: var(--fui-font-label);
     font-size: var(--fui-text-label);
     font-variant-numeric: tabular-nums;
     letter-spacing: var(--fui-tracking-label);
+  }
+  /* The zoom level beside its key, in a fixed width so the key does not move as it changes. */
+  .fui-viewer-zoom {
+    min-width: 4.5ch;
+    text-align: end;
   }
   .fui-viewer-actions {
     display: flex;
@@ -9051,7 +9057,9 @@
   }
   .fui-viewer[data-zoomed] .fui-viewer-stage {
     overflow: auto;
-    touch-action: auto;
+    /* Zoomed, one finger looks around and two zoom: the viewer follows both, so the browser does neither. */
+    touch-action: none;
+    scrollbar-width: thin;
     cursor: grab;
   }
   .fui-viewer[data-zoomed] .fui-viewer-stage:active {
@@ -9064,6 +9072,11 @@
     min-width: 0;
     min-height: 0;
     padding: 0 var(--fui-space-12);
+  }
+  /* Fitted, the picture's cell is the stage. Left to size itself, its row grew to the picture's height, so max-height had
+     nothing to hold it to and a picture taller than the stage was cut off at the bottom. */
+  .fui-viewer:not([data-zoomed]) .fui-viewer-canvas:not([data-media-keys]) {
+    grid-template: minmax(0, 1fr) / minmax(0, 1fr);
   }
   .fui-viewer[data-zoomed] .fui-viewer-canvas {
     width: max-content;

@@ -103,6 +103,16 @@ What a host checks:
 
 - A frame whose `src` is not there yet (left out or empty) no longer renders an `<img>`: browsers drew their broken-image mark in its corner while it waited. It shows the quiet plate, and the picture comes in through the dither when the `src` arrives.
 
+## Image viewer
+
+- **The wheel zooms by steps around the pointer**, in and out, from fitted to twice the real size (never less than four times fitted, so a small picture can be looked into). A notch of a mouse wheel is a quarter more or less; a trackpad moves smoothly and a pinch follows the fingers. Before, the wheel only went to the real size and a plain wheel at real size scrolled. A sideways scroll still scrolls a zoomed picture.
+- **Zoomed, drag with the left button to look around**, at any level; a click without moving fits the picture again. Before, a click at real size did nothing (the release was reported on the stage).
+- A click, Z or the zoom key still go to the real size around the point pressed and back. A picture no larger than the stage goes to twice its size; its key is then called `labels.enlarge` ("Zoom in"). New keys: + and − step, 0 fits.
+- The level shows beside the zoom key as a share of the real size (`labels.zoom`, `(percent) => "64%"` by default). `ViewerLabels` gains `enlarge` and `zoom`; `labels` stays partial.
+- **A fitted picture taller than the stage is no longer cut off at the bottom.** Its row in the stage grew to the picture's height, so `max-height` had nothing to hold it to; at 1440 × 900 a 2400 × 1500 picture lost 76 px, and in a 2560 × 1315 window it showed at its real size, lost 321 px and could not zoom.
+- Zoomed, the stage takes every touch (`touch-action: none`): one finger looks around and two zoom, without the page zooming.
+- New helpers in `media-logic`: `zoomLimit`, `wheelScale`, `stepScale`, `pinchScale`, `scrollToKeep` and `ZOOM_STEP`. `wheelIntent` and `pinchIntent` are deprecated; they still work.
+
 ## New tokens
 
 `--fui-radius-2xl`, `--fui-ease-spring`, `--fui-tint-strength`, `--fui-tint-strong`, `--fui-tint-edge`, `--fui-surface-inset`, `--fui-surface-hover`, `--fui-separator`, `--fui-sidebar-active`, `--fui-switch-thumb`, `--fui-light-1`, `--fui-light-2`, `--fui-light-3`. The derived ones are declared on every theme scope, so a nested theme island computes them from its own surface.

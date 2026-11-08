@@ -16,14 +16,67 @@ import {
   MediaGrid,
   panDelta,
   pinchIntent,
+  pinchScale,
   scrollForFocus,
+  scrollToKeep,
   spokenClock,
+  stepScale,
   stepSpeed,
   swipeStep,
   wheelIntent,
+  wheelScale,
+  ZOOM_STEP,
+  zoomLimit,
 } from "@fabrials/ui";
 
-test("viewer gestures: the wheel zooms in and only a pinch-out leaves real size; a pinch needs a real spread", () => {
+const near = (actual: number | null, expected: number) => assert.ok(actual !== null && Math.abs(actual - expected) < 1e-9, `${actual} is not ${expected}`);
+
+test("viewer zoom: a notch of the wheel is a quarter more or less, however far the system says it turned", () => {
+  assert.equal(ZOOM_STEP, 1.25);
+  near(wheelScale({ deltaY: -100, ctrlKey: false }, 1, 4), 1.25);
+  near(wheelScale({ deltaY: -53, ctrlKey: false }, 1, 4), 1.25);
+  near(wheelScale({ deltaY: -3, deltaMode: 1, ctrlKey: false }, 1, 4), 1.25);
+  near(wheelScale({ deltaY: 100, ctrlKey: false }, 2, 4), 1.6);
+  near(wheelScale({ deltaY: 40, ctrlKey: true }, 2, 4), 1.6);
+  assert.equal(wheelScale({ deltaY: -100, ctrlKey: false }, 3.5, 4), 4);
+  assert.equal(wheelScale({ deltaY: 100, ctrlKey: false }, 1.1, 4), 1);
+  assert.equal(wheelScale({ deltaY: -100, ctrlKey: false }, 4, 4), null);
+  assert.equal(wheelScale({ deltaY: 100, ctrlKey: false }, 1, 4), null);
+});
+
+test("viewer zoom: a trackpad moves smoothly, a pinch follows the fingers, and a sideways turn is left to scroll", () => {
+  near(wheelScale({ deltaY: -10, ctrlKey: false }, 1, 4), Math.exp(0.03));
+  near(wheelScale({ deltaY: 10, ctrlKey: false }, 2, 4), 2 * Math.exp(-0.03));
+  near(wheelScale({ deltaY: -10, ctrlKey: true }, 1, 4), Math.exp(0.1));
+  assert.equal(wheelScale({ deltaX: 50, deltaY: 10, ctrlKey: false }, 2, 4), null);
+  assert.equal(wheelScale({ deltaY: 0, ctrlKey: false }, 2, 4), null);
+  assert.equal(pinchScale(1, 100, 150, 4), 1.5);
+  assert.equal(pinchScale(3, 100, 200, 4), 4);
+  assert.equal(pinchScale(2, 100, 25, 4), 1);
+  assert.equal(pinchScale(2, 0, 25, 4), 2);
+});
+
+test("viewer zoom: + and − step, up to twice the real size and never less than four times fitted", () => {
+  assert.equal(stepScale(1, 1, 4), 1.25);
+  assert.equal(stepScale(1.25, -1, 4), 1);
+  assert.equal(stepScale(1, -1, 4), 1);
+  assert.equal(stepScale(3.6, 1, 4), 4);
+  assert.equal(zoomLimit(3), 6);
+  assert.equal(zoomLimit(1.5), 4);
+  assert.equal(zoomLimit(1), 4);
+  assert.equal(zoomLimit(Number.NaN), 4);
+});
+
+test("viewer zoom: the point under the pointer stays under it as the picture grows", () => {
+  // Fitted at 1000 × 500 with its left edge 200 px into the stage; the pointer is on its middle, 700 px in.
+  const anchor = { ...focusOf({ left: 200, top: 0, width: 1000, height: 500 }, { x: 700, y: 250 }), x: 700, y: 250 };
+  assert.deepEqual(scrollToKeep(anchor, { left: 0, top: 0, width: 2000, height: 1000 }), { left: 300, top: 250 });
+  // Three quarters across and a fifth down, 900 px into the stage and 100 px down.
+  const corner = { ...focusOf({ left: 200, top: 0, width: 1000, height: 500 }, { x: 950, y: 100 }), x: 950, y: 100 };
+  assert.deepEqual(scrollToKeep(corner, { left: 0, top: 0, width: 4000, height: 2000 }), { left: 2050, top: 300 });
+});
+
+test("viewer gestures (deprecated 0.11): the old wheel and pinch intents still answer; a press that moves is a drag", () => {
   assert.equal(wheelIntent({ deltaY: -40, ctrlKey: false }, false), "in");
   assert.equal(wheelIntent({ deltaY: 40, ctrlKey: false }, false), null);
   assert.equal(wheelIntent({ deltaY: 40, ctrlKey: false }, true), null);

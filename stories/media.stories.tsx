@@ -139,7 +139,10 @@ function ImagesPage() {
 function ViewerPage() {
   const [index, setIndex] = useState<number | null>(0);
   return (
-    <Page title="Viewer" description="A dark stage in both themes. Click, Z, the wheel or a pinch for the real size; drag or the arrows to look around; the arrows or a swipe move between items.">
+    <Page
+      title="Viewer"
+      description="A dark stage in both themes. The wheel or a pinch zooms around the pointer; click, Z or the key for the real size and back, + and − to step, 0 to fit. Zoomed, drag or the arrows to look around; fitted, the arrows or a swipe move between items."
+    >
       <ImageViewer
         items={PHOTOS.map((photo, position) => ({ ...photo, caption: position === 0 ? "The harbour from the east pier, synthetic." : undefined }))}
         index={index}

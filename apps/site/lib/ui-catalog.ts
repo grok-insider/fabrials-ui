@@ -360,15 +360,15 @@ export const uiCatalog: UiCatalogItem[] = [
     "image-viewer",
     "Image viewer",
     "Overlays",
-    "Images one at a time on a dark stage, with zoom to real size, a strip of neighbours and the keyboard.",
+    "Images one at a time on a dark stage: the wheel zooms, a drag looks around, with a strip of neighbours and the keyboard.",
     ["ImageViewer"],
     [
       ["items", "{ src, alt, thumb?, width?, height?, caption?, download?, kind? }[]", "What can be shown; video and GIF items are drawn by renderMedia."],
       ["index / onIndexChange / onClose", "number | null", "null is closed; focus returns to what opened it."],
-      ["label / labels", "string / object", "The viewer's name and every word on its controls."],
+      ["label / labels", "string / object", "The viewer's name and every word on its controls, the zoom level among them."],
       ["thumbnails / onNearEnd / renderMedia", "", "The strip of neighbours, loading more near the end, and players for other media."],
     ],
-    "Click, Z, the wheel or a pinch for the real size around the point looked at; drag, scroll or the arrows to look around; fitted, the arrows or a swipe move and Home and End go to the ends. It carries the dark theme's tokens, so it is dark in both themes.",
+    "The wheel or a pinch zooms by steps around the pointer, up to twice the real size, and the level shows beside the zoom key. A click, Z or the key goes to the real size and back; + and − step and 0 fits. Zoomed, drag with the left button (or a finger), scroll sideways or use the arrows to look around; fitted, the arrows or a swipe move and Home and End go to the ends. It carries the dark theme's tokens, so it is dark in both themes.",
   ),
   ui(
     "video-player",

@@ -14,9 +14,55 @@ export const SWIPE_DISTANCE = 48;
 export type ZoomIntent = "in" | "out" | null;
 
 /**
- * A wheel over the image: scrolling up (or a trackpad pinch spreading, which browsers send as Ctrl + wheel with a negative
- * delta) brings it to its real size; a pinch closing (Ctrl + wheel, positive) fits it again. A plain wheel at real size
- * scrolls the stage, so it never means "out": leaving by accident while looking around would be a trap.
+ * How far a picture may be enlarged, as a multiple of its fitted size: twice its real size (`real` is the real size over the
+ * fitted one), and never less than four times, so a small picture can be looked into too.
+ */
+export const zoomLimit = (real: number): number => Math.max(4, (Number.isFinite(real) && real > 0 ? real : 1) * 2);
+
+/** One notch of a mouse wheel, or one press of + or −: a quarter more, or a quarter less. */
+export const ZOOM_STEP = 1.25;
+/** A turn of the wheel this long (in pixels) or longer is a notch of a mouse wheel; shorter ones come from a trackpad. */
+const NOTCH = 40;
+
+/**
+ * The scale a turn of the wheel leads to, from fitted (1) to `max`; up zooms in and down zooms out. A notch of a mouse wheel
+ * (or a line, or a page) is one step of `ZOOM_STEP`, however far the system says it turned. Shorter turns come from a
+ * trackpad and move smoothly, and a pinch on it, which browsers send as Ctrl + wheel, follows the fingers. Null when
+ * nothing would change, or when the turn is mostly sideways: that one scrolls a zoomed picture.
+ */
+export function wheelScale(event: { deltaX?: number; deltaY: number; deltaMode?: number; ctrlKey: boolean }, scale: number, max: number): number | null {
+  if (event.deltaY === 0 || Math.abs(event.deltaX ?? 0) > Math.abs(event.deltaY)) return null;
+  const pixels = event.deltaY * (event.deltaMode === 1 ? 40 : event.deltaMode === 2 ? 800 : 1);
+  const turn = Math.abs(pixels) >= NOTCH ? Math.sign(pixels) * Math.log(ZOOM_STEP) : pixels * (event.ctrlKey ? 0.01 : 0.003);
+  const next = clamp(scale * Math.exp(-turn), 1, Math.max(1, max));
+  return Math.abs(next - scale) < 0.001 ? null : next;
+}
+
+/** A press of + or −: one `ZOOM_STEP` more or less, from fitted (1) to `max`. */
+export const stepScale = (scale: number, direction: 1 | -1, max: number): number =>
+  clamp(direction > 0 ? scale * ZOOM_STEP : scale / ZOOM_STEP, 1, Math.max(1, max));
+
+/** Two fingers that landed `startDistance` apart at `startScale` and are now `distance` apart: the scale they ask for. */
+export function pinchScale(startScale: number, startDistance: number, distance: number, max: number): number {
+  if (!(startDistance > 0) || !Number.isFinite(distance)) return startScale;
+  return clamp(startScale * (distance / startDistance), 1, Math.max(1, max));
+}
+
+/**
+ * Where the stage scrolls so that the point of the picture that was under the pointer (`fx`, `fy`: fractions of the
+ * picture) stays under it (`x`, `y`: where the pointer is in the stage) once the picture has its new size (`content`, in
+ * the stage's scrolled content). The browser keeps the result inside what can be scrolled.
+ */
+export function scrollToKeep(
+  anchor: { fx: number; fy: number; x: number; y: number },
+  content: { left: number; top: number; width: number; height: number },
+): { left: number; top: number } {
+  return { left: content.left + anchor.fx * content.width - anchor.x, top: content.top + anchor.fy * content.height - anchor.y };
+}
+
+/**
+ * @deprecated 0.11: the viewer zooms by steps with the wheel (`wheelScale`). A wheel that only ever meant "real size" or
+ * "fit": up (or a pinch spreading) brings the picture to its real size, a pinch closing fits it.
  */
 export function wheelIntent(event: { deltaY: number; ctrlKey: boolean }, zoomed: boolean): ZoomIntent {
   if (event.deltaY === 0) return null;
@@ -24,7 +70,7 @@ export function wheelIntent(event: { deltaY: number; ctrlKey: boolean }, zoomed:
   return event.ctrlKey && event.deltaY > 0 ? "out" : null;
 }
 
-/** Two fingers: how far apart they were when they landed, and how far apart they are now. */
+/** @deprecated 0.11: the viewer follows the fingers (`pinchScale`). Two fingers: how far apart they landed and are now. */
 export function pinchIntent(startDistance: number, distance: number, zoomed: boolean): ZoomIntent {
   if (!(startDistance > 0) || !Number.isFinite(distance)) return null;
   const ratio = distance / startDistance;

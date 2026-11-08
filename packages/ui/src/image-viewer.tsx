@@ -3,12 +3,13 @@
 // with the keys, a swipe or the arrows to move, a strip of neighbours). The viewer is always dark: it carries the dark
 // theme's tokens, so every control in it reads on the stage in both themes.
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from "react";
+import { useCallback, useLayoutEffect, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from "react";
+import { flushSync } from "react-dom";
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
 import { ChevronLeft, ChevronRight, Download, ImageOff, X, ZoomIn, ZoomOut } from "lucide-react";
 import { buttonVariants } from "./button-variants";
 import { IconButton } from "./icon-button";
-import { focusOf, isDrag, panDelta, pinchIntent, scrollForFocus, swipeStep, wheelIntent } from "./media-logic";
+import { clamp, focusOf, isDrag, panDelta, pinchScale, scrollToKeep, stepScale, swipeStep, wheelScale, zoomLimit } from "./media-logic";
 import { PixelSpinner } from "./pixel-spinner";
 
 export type ViewerItem = {
@@ -32,6 +33,10 @@ export type ViewerLabels = {
   next: string;
   zoomIn: string;
   zoomOut: string;
+  /** The zoom key of a picture no larger than the stage, which has no real size to go to (0.11). */
+  enlarge: string;
+  /** The zoom level beside the key, as a share of the real size (0.11). */
+  zoom: (percent: number) => string;
   download: string;
   thumbnails: string;
   failed: string;
@@ -44,6 +49,8 @@ const LABELS: ViewerLabels = {
   next: "Next",
   zoomIn: "Real size",
   zoomOut: "Fit to screen",
+  enlarge: "Zoom in",
+  zoom: (percent) => `${percent}%`,
   download: "Download",
   thumbnails: "All items",
   failed: "This image could not be loaded.",
@@ -68,8 +75,9 @@ export type ImageViewerProps = {
 };
 
 /**
- * Images on a dark stage, one at a time. A click, Z, the wheel or a pinch brings an image to its real size around the point
- * looked at; then drag, scroll or use the arrows to look around, and the same again fits it. Fitted, the arrows (or a
+ * Images on a dark stage, one at a time. The wheel (or a pinch) zooms by steps around the pointer, from fitted to twice the
+ * real size; a click, Z or the key goes to the real size around the point pressed and back to fitted; + and − step, 0 fits.
+ * Zoomed, drag with the left button (or a finger), the arrows or a sideways scroll look around. Fitted, the arrows (or a
  * swipe) move to the neighbours, Home and End to the ends. Escape closes and focus goes back to what opened it.
  */
 export function ImageViewer({ items, index, onIndexChange, onClose, label = "Images", thumbnails, labels, renderMedia, onNearEnd }: ImageViewerProps) {
@@ -78,14 +86,20 @@ export function ImageViewer({ items, index, onIndexChange, onClose, label = "Ima
   const current = open ? items[index]! : null;
   const total = items.length;
   const isImage = !!current && (!current.kind || current.kind === "image");
-  const [zoomedKey, setZoomedKey] = useState<string | null>(null);
+  const [zoom, setZoom] = useState<{ src: string; scale: number } | null>(null);
+  const [fitted, setFitted] = useState<{ src: string; width: number; height: number; naturalWidth: number } | null>(null);
   const [state, setState] = useState<{ src: string; status: "loading" | "loaded" | "failed" } | null>(null);
-  const [canZoom, setCanZoom] = useState(false);
-  const zoomed = !!current && isImage && zoomedKey === current.src;
+  const scale = current && isImage && zoom?.src === current.src ? zoom.scale : 1;
+  const zoomed = scale > 1;
+  const fit = current && isImage && fitted?.src === current.src ? fitted : null;
+  // The real size over the fitted one: above 1 when the picture was shrunk to fit the stage.
+  const real = fit ? Math.max(1, fit.naturalWidth / fit.width) : 1;
+  const max = zoomLimit(real);
   const stage = useRef<HTMLDivElement | null>(null);
-  const focus = useRef({ fx: 0.5, fy: 0.5 });
+  const scaleNow = useRef(1);
+  const anchor = useRef<{ fx: number; fy: number; x: number; y: number } | null>(null);
   const pointers = useRef(new Map<number, { x: number; y: number }>());
-  const press = useRef<{ x: number; y: number; left: number; top: number; moved: boolean; pinch: number; fired: boolean } | null>(null);
+  const press = useRef<{ x: number; y: number; left: number; top: number; moved: boolean; onImage: boolean; pinch: number; scale: number } | null>(null);
   const status = current && state?.src === current.src ? state.status : "loading";
 
   const go = useCallback(
@@ -93,62 +107,95 @@ export function ImageViewer({ items, index, onIndexChange, onClose, label = "Ima
       if (!open) return;
       const next = Math.min(total - 1, Math.max(0, to));
       if (next === index) return;
-      setZoomedKey(null);
+      setZoom(null);
       onIndexChange(next);
       if (next >= total - 3) onNearEnd?.();
     },
     [open, total, index, onIndexChange, onNearEnd],
   );
 
-  const zoomTo = (on: boolean, at?: { x: number; y: number }) => {
-    if (!current || !isImage || (on && !canZoom)) return;
-    if (on) {
-      const image = stage.current?.querySelector("img");
-      focus.current = image ? focusOf(image.getBoundingClientRect(), at) : { fx: 0.5, fy: 0.5 };
-    }
-    setZoomedKey(on ? current.src : null);
-  };
-
-  // At real size, the point that was looked at goes to the middle of the stage.
-  useLayoutEffect(() => {
+  /**
+   * Zooms to `next` (1 is fitted) around a point of the screen, the middle of the stage without one: the point of the picture
+   * under it stays under it. `sync` paints it before the next event of a gesture arrives.
+   */
+  const zoomTo = (next: number, at?: { x: number; y: number }, sync = false) => {
     const node = stage.current;
     const image = node?.querySelector<HTMLElement>("[data-viewer-image]");
-    if (!node || !image || !zoomed) return;
-    const box = image.getBoundingClientRect();
+    if (!current || !isImage || !fit || !node || !image) return;
+    const target = clamp(next, 1, max);
+    if (Math.abs(target - scaleNow.current) < 0.001) return;
     const frame = node.getBoundingClientRect();
-    const to = scrollForFocus(
-      focus.current,
-      { left: box.left - frame.left + node.scrollLeft, top: box.top - frame.top + node.scrollTop, width: box.width, height: box.height },
-      { width: node.clientWidth, height: node.clientHeight },
-    );
-    node.scrollTo(to.left, to.top);
-  }, [zoomed]);
+    const point = at ?? { x: frame.left + node.clientWidth / 2, y: frame.top + node.clientHeight / 2 };
+    anchor.current = { ...focusOf(image.getBoundingClientRect(), point), x: point.x - frame.left, y: point.y - frame.top };
+    scaleNow.current = target;
+    const apply = () => setZoom(target > 1.0005 ? { src: current.src, scale: target } : null);
+    if (sync) flushSync(apply);
+    else apply();
+  };
+  /** Real size and back: the click, Z and the key. A picture no larger than the stage goes to twice its size. */
+  const toggle = (at?: { x: number; y: number }) => zoomTo(scaleNow.current > 1 ? 1 : real > 1.01 ? real : 2, at);
 
-  // The wheel needs preventDefault (a trackpad pinch would zoom the page), so it is attached by hand, not passive.
-  const wheel = useRef<(event: WheelEvent) => void>(() => {});
-  useEffect(() => {
-    wheel.current = (event) => {
-      if (!isImage) return;
-      if (event.ctrlKey) event.preventDefault();
-      const intent = wheelIntent(event, zoomed);
-      if (!intent) return;
-      event.preventDefault();
-      zoomTo(intent === "in", { x: event.clientX, y: event.clientY });
-    };
-  });
-  const stageRef = useCallback((node: HTMLDivElement | null) => {
-    const listener = (event: WheelEvent) => wheel.current(event);
-    stage.current = node;
-    node?.addEventListener("wheel", listener, { passive: false });
-    return () => node?.removeEventListener("wheel", listener);
+  const measure = useCallback(() => {
+    const image = stage.current?.querySelector<HTMLImageElement>("img[data-viewer-image]");
+    const src = image?.getAttribute("src");
+    if (!image || !src || scaleNow.current > 1 || !image.complete || !image.naturalWidth) return;
+    const box = image.getBoundingClientRect();
+    if (!box.width || !box.height) return;
+    setFitted((before) =>
+      before && before.src === src && Math.abs(before.width - box.width) < 0.5 && Math.abs(before.height - box.height) < 0.5
+        ? before
+        : { src, width: box.width, height: box.height, naturalWidth: image.naturalWidth },
+    );
   }, []);
 
-  const measure = (image: HTMLImageElement) => {
+  // Zoomed, the point that was zoomed around stays under the pointer. Fitted, the picture is inside the stage again, so
+  // nothing is left scrolled, and it is measured again: the window may have changed size while it was zoomed.
+  useLayoutEffect(() => {
+    scaleNow.current = scale;
     const node = stage.current;
-    if (!node) return;
-    const fitted = image.getBoundingClientRect();
-    setCanZoom(image.naturalWidth > fitted.width + 1 || image.naturalHeight > fitted.height + 1);
-  };
+    const image = node?.querySelector<HTMLImageElement>("img[data-viewer-image]");
+    const at = anchor.current;
+    anchor.current = null;
+    if (!node || !image) return;
+    if (scale <= 1) {
+      node.scrollTo(0, 0);
+      measure();
+    } else if (at) {
+      const box = image.getBoundingClientRect();
+      const frame = node.getBoundingClientRect();
+      const to = scrollToKeep(at, { left: box.left - frame.left + node.scrollLeft, top: box.top - frame.top + node.scrollTop, width: box.width, height: box.height });
+      node.scrollTo(to.left, to.top);
+    }
+  }, [scale, current?.src, measure]);
+
+  // The wheel needs preventDefault (it zooms, and a trackpad pinch would zoom the page), so it is attached by hand, not
+  // passive. A turn that is mostly sideways is left to the stage, which scrolls a zoomed picture.
+  const wheel = useRef<(event: WheelEvent) => void>(() => {});
+  useLayoutEffect(() => {
+    wheel.current = (event) => {
+      if (!isImage) return;
+      // Ctrl + wheel is a pinch on a trackpad, or the page's own zoom: over the picture, it is the picture's.
+      if (event.ctrlKey) event.preventDefault();
+      if (!fit || Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
+      event.preventDefault();
+      const next = wheelScale(event, scaleNow.current, max);
+      if (next !== null) zoomTo(next, { x: event.clientX, y: event.clientY }, true);
+    };
+  });
+  const stageRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      const listener = (event: WheelEvent) => wheel.current(event);
+      stage.current = node;
+      node?.addEventListener("wheel", listener, { passive: false });
+      const observer = node && typeof ResizeObserver !== "undefined" ? new ResizeObserver(() => measure()) : null;
+      if (node) observer?.observe(node);
+      return () => {
+        node?.removeEventListener("wheel", listener);
+        observer?.disconnect();
+      };
+    },
+    [measure],
+  );
 
   const keydown = (event: KeyboardEvent<HTMLDivElement>) => {
     const target = event.target as HTMLElement;
@@ -172,22 +219,30 @@ export function ImageViewer({ items, index, onIndexChange, onClose, label = "Ima
     } else if (key === "End") {
       event.preventDefault();
       go(total - 1);
-    } else if (key === "z" || key === "Z") zoomTo(!zoomed);
-    else if (key === "+" || key === "=") zoomTo(true);
-    else if (key === "-") zoomTo(false);
+    } else if (key === "z" || key === "Z") toggle();
+    else if (key === "+" || key === "=") zoomTo(stepScale(scaleNow.current, 1, max));
+    else if (key === "-" || key === "_") zoomTo(stepScale(scaleNow.current, -1, max));
+    else if (key === "0") zoomTo(1);
   };
 
   const pointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    // The first finger (or the mouse) starts a new gesture; a third finger changes nothing.
+    if (event.isPrimary) pointers.current.clear();
+    if (pointers.current.size >= 2) return;
     pointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
     const node = stage.current;
     if (!node) return;
     if (pointers.current.size === 2) {
       const [a, b] = [...pointers.current.values()];
-      press.current = { x: event.clientX, y: event.clientY, left: node.scrollLeft, top: node.scrollTop, moved: true, pinch: Math.hypot(a!.x - b!.x, a!.y - b!.y), fired: false };
+      const pinch = Math.hypot(a!.x - b!.x, a!.y - b!.y);
+      press.current = { x: event.clientX, y: event.clientY, left: node.scrollLeft, top: node.scrollTop, moved: true, onImage: false, pinch, scale: scaleNow.current };
       return;
     }
-    press.current = { x: event.clientX, y: event.clientY, left: node.scrollLeft, top: node.scrollTop, moved: false, pinch: 0, fired: false };
-    if (zoomed && event.pointerType !== "touch") event.currentTarget.setPointerCapture(event.pointerId);
+    // Where the press began: the pointer is captured, so the release is reported on the stage, not on the picture.
+    const onImage = !!(event.target as HTMLElement).closest("[data-viewer-image]");
+    press.current = { x: event.clientX, y: event.clientY, left: node.scrollLeft, top: node.scrollTop, moved: false, onImage, pinch: 0, scale: scaleNow.current };
+    event.currentTarget.setPointerCapture(event.pointerId);
   };
   const pointerMove = (event: PointerEvent<HTMLDivElement>) => {
     const start = press.current;
@@ -195,15 +250,11 @@ export function ImageViewer({ items, index, onIndexChange, onClose, label = "Ima
     pointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
     if (start.pinch > 0 && pointers.current.size === 2) {
       const [a, b] = [...pointers.current.values()];
-      const intent = pinchIntent(start.pinch, Math.hypot(a!.x - b!.x, a!.y - b!.y), zoomed);
-      if (intent && !start.fired) {
-        start.fired = true;
-        zoomTo(intent === "in", { x: (a!.x + b!.x) / 2, y: (a!.y + b!.y) / 2 });
-      }
+      zoomTo(pinchScale(start.scale, start.pinch, Math.hypot(a!.x - b!.x, a!.y - b!.y), max), { x: (a!.x + b!.x) / 2, y: (a!.y + b!.y) / 2 }, true);
       return;
     }
     if (isDrag(start, { x: event.clientX, y: event.clientY })) start.moved = true;
-    if (zoomed && event.pointerType !== "touch" && start.moved && stage.current) {
+    if (scaleNow.current > 1 && start.moved && stage.current) {
       stage.current.scrollLeft = start.left - (event.clientX - start.x);
       stage.current.scrollTop = start.top - (event.clientY - start.y);
     }
@@ -211,12 +262,21 @@ export function ImageViewer({ items, index, onIndexChange, onClose, label = "Ima
   const pointerUp = (event: PointerEvent<HTMLDivElement>) => {
     const start = press.current;
     pointers.current.delete(event.pointerId);
-    if (!start || pointers.current.size > 0) return;
+    if (!start) return;
+    if (pointers.current.size > 0) {
+      // One finger left a pinch: the one still down looks around from where the picture is now.
+      const [rest] = [...pointers.current.values()];
+      const node = stage.current;
+      if (start.pinch !== 0 && rest && node) {
+        press.current = { x: rest.x, y: rest.y, left: node.scrollLeft, top: node.scrollTop, moved: true, onImage: false, pinch: -1, scale: scaleNow.current };
+      }
+      return;
+    }
     press.current = null;
-    if (start.pinch > 0) return;
+    if (start.pinch !== 0) return;
     const end = { x: event.clientX, y: event.clientY };
-    if (!start.moved && (event.target as HTMLElement).closest("[data-viewer-image]")) zoomTo(!zoomed, end);
-    else if (!zoomed && event.pointerType === "touch") {
+    if (!start.moved && start.onImage) toggle(end);
+    else if (scaleNow.current <= 1 && event.pointerType === "touch") {
       const step = swipeStep(start, end, getComputedStyle(event.currentTarget).direction === "rtl");
       if (step) go(index! + step);
     }
@@ -244,14 +304,19 @@ export function ImageViewer({ items, index, onIndexChange, onClose, label = "Ima
                   {total > 1 ? `${index! + 1} / ${total}` : ""}
                 </span>
                 <span className="fui-viewer-actions">
+                  {isImage && fit ? (
+                    <span className="fui-viewer-zoom" aria-hidden="true">
+                      {text.zoom(Math.round(((fit.width * scale) / fit.naturalWidth) * 100))}
+                    </span>
+                  ) : null}
                   {isImage ? (
                     <IconButton
                       size="icon"
-                      label={zoomed ? text.zoomOut : text.zoomIn}
+                      label={zoomed ? text.zoomOut : real > 1.01 ? text.zoomIn : text.enlarge}
                       shortcut={["Z"]}
                       aria-pressed={zoomed}
-                      disabled={!canZoom && !zoomed}
-                      onClick={() => zoomTo(!zoomed)}
+                      disabled={!fit}
+                      onClick={() => toggle()}
                     >
                       {zoomed ? <ZoomOut aria-hidden="true" /> : <ZoomIn aria-hidden="true" />}
                     </IconButton>
@@ -272,7 +337,7 @@ export function ImageViewer({ items, index, onIndexChange, onClose, label = "Ima
                 aria-label={isImage ? current.alt || label : undefined}
                 role={isImage ? "group" : undefined}
                 className="fui-viewer-stage"
-                data-zoomable={isImage && canZoom ? "" : undefined}
+                data-zoomable={isImage && fit ? "" : undefined}
                 onPointerDown={pointerDown}
                 onPointerMove={pointerMove}
                 onPointerUp={pointerUp}
@@ -298,9 +363,10 @@ export function ImageViewer({ items, index, onIndexChange, onClose, label = "Ima
                         draggable={false}
                         data-viewer-image=""
                         className="fui-viewer-image"
-                        onLoad={(event) => {
+                        style={zoomed && fit ? { width: fit.width * scale, height: fit.height * scale } : undefined}
+                        onLoad={() => {
                           setState({ src: current.src, status: "loaded" });
-                          measure(event.currentTarget);
+                          measure();
                         }}
                         onError={() => setState({ src: current.src, status: "failed" })}
                       />
