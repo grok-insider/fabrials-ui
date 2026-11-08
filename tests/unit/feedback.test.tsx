@@ -194,6 +194,41 @@ test("badge: data colour hooks, truncation and a hollow dot", () => {
   assert.doesNotMatch(renderToStaticMarkup(<Badge>Untouched</Badge>), /title=/);
 });
 
+test("badge 0.11: sizes, a count shape for a number on its own, a live dot, and a tag that is a link or a button", () => {
+  assert.match(renderToStaticMarkup(<Badge size="sm">Team</Badge>), /data-size="sm"/);
+  assert.match(renderToStaticMarkup(<Badge size="lg">Beta</Badge>), /data-size="lg"/);
+  assert.doesNotMatch(renderToStaticMarkup(<Badge size="default">Team</Badge>), /data-size/);
+  for (const count of [3, "12", "99+", "1,204", "+3"]) assert.match(renderToStaticMarkup(<Badge>{count}</Badge>), /data-count="true"/, String(count));
+  for (const text of ["v0.11.0", "3 h old", "Team", "12 rows"]) assert.doesNotMatch(renderToStaticMarkup(<Badge>{text}</Badge>), /data-count/, text);
+  assert.match(renderToStaticMarkup(<Badge dot pulse tone="info">Syncing</Badge>), /<span aria-hidden="true" class="fui-badge-dot" data-pulse="true"><\/span>Syncing/);
+  assert.doesNotMatch(renderToStaticMarkup(<Badge pulse>No dot</Badge>), /fui-badge-dot/);
+  const link = renderToStaticMarkup(<Badge render={<a href="/labels/travel" />} dot className="host">Travel</Badge>);
+  assert.match(link, /^<a href="\/labels\/travel" data-slot="badge" class="fui-badge host" data-tone="neutral" data-variant="soft">/);
+  const button = renderToStaticMarkup(<Badge render={<button type="button" aria-pressed="true" />}>Receipts</Badge>);
+  assert.match(button, /^<button type="button" aria-pressed="true" data-slot="badge" class="fui-badge"/);
+  // The words carry the tag's type in a span of their own, out of reach of a host's button reset.
+  assert.match(link, /<span aria-hidden="true" class="fui-badge-dot"><\/span><span class="fui-badge-label">Travel<\/span><\/a>$/);
+  assert.match(rule(".fui-badge-label {"), /font-size: var\(--fui-badge-text\);[^}]*font-weight: var\(--fui-weight-medium\);[^}]*line-height: 1;/);
+});
+
+test("badge 0.11 styles: a 12 px icon, sizes, the count shape, a ripple only without reduced motion and never in a skeleton", () => {
+  assert.match(rule(".fui-badge-label > svg {"), /width: 0\.75rem;[^}]*height: 0\.75rem;/);
+  assert.match(styles, /\.fui-badge > svg,\s*\.fui-badge-label > svg \{/);
+  assert.match(rule('.fui-badge[data-size="sm"] {'), /min-height: 1\.125rem;/);
+  assert.match(rule('.fui-badge[data-size="lg"] {'), /min-height: 1\.5rem;/);
+  assert.match(rule(".fui-badge[data-count] {"), /justify-content: center;[^}]*min-inline-size: 1\.25rem;/);
+  assert.match(rule(".fui-badge-dot[data-pulse]::after {"), /animation: fui-pulse 2s/);
+  // Beside the live StatusDot's ripple, inside the same no-preference block.
+  const status = styles.indexOf(".fui-status[data-pulse] .fui-status-dot::after {");
+  const badge = styles.indexOf(".fui-badge-dot[data-pulse]::after {");
+  assert.ok(badge > status && !styles.slice(status, badge).includes("@media"), "the badge ripple sits in the no-preference block");
+  assert.ok(styles.lastIndexOf("@media (prefers-reduced-motion: no-preference) {", status) > styles.lastIndexOf("@media (prefers-reduced-motion: reduce)", status));
+  assert.match(styles, /\[data-fui-loading\] > \.fui-loading-content :is\(\.fui-badge-dot, \.fui-status-dot\)::after \{\s*content: none !important;/);
+  // A tag that takes the pointer deepens under it only on a fine pointer.
+  const hover = styles.indexOf(':is(a, button).fui-badge:not([data-variant="solid"]):hover');
+  assert.ok(hover > styles.lastIndexOf("@media (hover: hover) and (pointer: fine) {", hover));
+});
+
 test("the badge dot follows --fui-badge-solid on every tone, so a neutral data tag colours its dot", () => {
   assert.doesNotMatch(styles, /\.fui-badge\[data-tone="neutral"\] \.fui-badge-dot/);
   assert.match(rule(".fui-badge-dot {"), /background: var\(--fui-badge-dot, var\(--fui-badge-solid\)\)/);

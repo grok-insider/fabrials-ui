@@ -412,34 +412,6 @@ const demos: Record<string, () => ReactNode> = {
       </Tabs>
     </Frame>
   ),
-  badge: () => (
-    <Frame width="fit">
-      <div className="flex flex-wrap gap-2">
-        <Badge>Draft</Badge>
-        <Badge tone="success">Current</Badge>
-        <Badge tone="warning">Stale</Badge>
-        <Badge tone="danger">Failed</Badge>
-        <Badge tone="info">Preview</Badge>
-      </div>
-      <div className="flex flex-wrap gap-2">
-        <Badge dot tone="success">Synced</Badge>
-        <Badge dot tone="warning">3 h old</Badge>
-        <Badge dot tone="danger">Expired</Badge>
-        <Badge dot>Paused</Badge>
-      </div>
-      <div className="flex flex-wrap gap-2">
-        <Badge variant="outline">MIT</Badge>
-        <Badge variant="outline">v0.11.0</Badge>
-        <Badge variant="solid" tone="info">New</Badge>
-        <Badge variant="solid">12</Badge>
-      </div>
-      <div className="flex min-w-0 flex-wrap gap-2">
-        <Badge dot dotColor="var(--chart-2)">Travel</Badge>
-        <Badge variant="outline" dot="hollow" dotColor="var(--chart-2)">Travel, archived</Badge>
-        <Badge truncate variant="outline" style={{ "--fui-badge-max": "9rem" } as React.CSSProperties}>A label that is far too long for its row</Badge>
-      </div>
-    </Frame>
-  ),
   card: () => (
     <Frame width="form">
       <Card>
@@ -1355,6 +1327,7 @@ const previewWidths: Record<string, FrameWidth> = {
   "context-meter": "field",
   "working-light": "field",
   alert: "form",
+  badge: "form",
 };
 
 export function UiDemo({ slug }: { slug: string }) {

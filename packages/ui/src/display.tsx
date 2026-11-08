@@ -1,27 +1,21 @@
 "use client";
 
 import { useEffect, useRef, type ComponentProps, type CSSProperties, type RefObject } from "react";
+import { useRender } from "@base-ui/react/use-render";
 import { Tabs as BaseTabs } from "@base-ui/react/tabs";
 import { classes, type StyledProps } from "./shared";
 
 export type Tone = "neutral" | "info" | "success" | "warning" | "danger";
 
-export function Badge({
-  className,
-  tone = "neutral",
-  variant = "soft",
-  dot = false,
-  dotColor,
-  truncate = false,
-  style,
-  title,
-  children,
-  ...props
-}: ComponentProps<"span"> & {
+export type BadgeProps = ComponentProps<"span"> & {
   tone?: Tone | "accent";
   variant?: "soft" | "outline" | "solid";
+  /** `sm` 18 px for a dense row, `default` 20 px, `lg` 24 px beside a heading or in a card's header (0.11). */
+  size?: "sm" | "default" | "lg";
   /** Adds a leading status dot; the text remains the accessible meaning. `"hollow"` is an outline dot (an archived or inactive item). */
   dot?: boolean | "hollow";
+  /** The dot ripples while the state is live (syncing, recording), and stops when it is not (0.11). Still under reduced motion. */
+  pulse?: boolean;
   /**
    * Colours the dot only, with any CSS colour (`var(--label-tone)`); it sets `--fui-badge-dot`. To colour the tag itself
    * (tint, hairline and dot) from data, set `--fui-badge-solid` on the badge itself (a class or `style`); `--fui-badge-ink`
@@ -34,20 +28,68 @@ export function Badge({
    * string and no title is given). `--fui-badge-max` caps the width (default: 100% of the container).
    */
   truncate?: boolean;
-}) {
+  /**
+   * Renders the tag as another element, a link (`<a href>`, a router link) or a button: it then takes the pointer, deepens
+   * its tint under it and shows the focus ring (0.11).
+   */
+  render?: useRender.RenderProp;
+};
+
+/** A number on its own (3, 12, 1,204, 99+) is a count: it sits centred in a tag at least as wide as it is tall. */
+const COUNT = /^[+-]?\d[\d\s.,]*\+?$/;
+
+function badgeParts({
+  className,
+  tone = "neutral",
+  variant = "soft",
+  size = "default",
+  dot = false,
+  pulse = false,
+  dotColor,
+  truncate = false,
+  style,
+  title,
+  children,
+  ...props
+}: Omit<BadgeProps, "render">) {
+  const count = typeof children === "number" || (typeof children === "string" && COUNT.test(children.trim()));
+  const attributes = {
+    "data-slot": "badge",
+    className: classes("fui-badge", className),
+    "data-tone": tone === "accent" ? "info" : tone,
+    "data-variant": variant,
+    "data-size": size === "default" ? undefined : size,
+    "data-count": count || undefined,
+    "data-truncate": truncate || undefined,
+    title: title ?? (truncate && typeof children === "string" ? children : undefined),
+    style: dotColor ? ({ "--fui-badge-dot": dotColor, ...style } as CSSProperties) : style,
+    ...props,
+  };
+  const dotMark = dot ? <span aria-hidden className="fui-badge-dot" data-hollow={dot === "hollow" || undefined} data-pulse={pulse || undefined} /> : null;
+  const words = truncate ? <span className="fui-badge-text">{children}</span> : children;
+  return { attributes, dotMark, words };
+}
+
+function RenderedBadge({ render, ...props }: BadgeProps & { render: useRender.RenderProp }) {
+  const { attributes, dotMark, words } = badgeParts(props);
+  // The words carry the tag's type in their own span: a host reset that is not in a cascade layer (button { font: inherit })
+  // reaches the button or link itself, never the span inside it.
+  const children = (
+    <>
+      {dotMark}
+      <span className="fui-badge-label">{words}</span>
+    </>
+  );
+  return useRender({ defaultTagName: "span", render, props: { ...attributes, children } });
+}
+
+export function Badge({ render, ...props }: BadgeProps) {
+  if (render) return <RenderedBadge render={render} {...props} />;
+  const { attributes, dotMark, words } = badgeParts(props);
   return (
-    <span
-      data-slot="badge"
-      className={classes("fui-badge", className)}
-      data-tone={tone === "accent" ? "info" : tone}
-      data-variant={variant}
-      data-truncate={truncate || undefined}
-      title={title ?? (truncate && typeof children === "string" ? children : undefined)}
-      style={dotColor ? ({ "--fui-badge-dot": dotColor, ...style } as CSSProperties) : style}
-      {...props}
-    >
-      {dot ? <span aria-hidden className="fui-badge-dot" data-hollow={dot === "hollow" || undefined} /> : null}
-      {truncate ? <span className="fui-badge-text">{children}</span> : children}
+    <span {...attributes}>
+      {dotMark}
+      {words}
     </span>
   );
 }

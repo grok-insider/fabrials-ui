@@ -69,6 +69,10 @@ test("the block holds exactly the selectors of the four groups", () => {
     // 3. hairlines and pressed
     ".fui-avatar",
     ".fui-badge",
+    'a.fui-badge[aria-current]:not([aria-current="false"])',
+    'a.fui-badge[aria-current]:not([aria-current="false"])::after',
+    'button.fui-badge[aria-pressed="true"]',
+    'button.fui-badge[aria-pressed="true"]::after',
     '.fui-tabs-list[data-variant="segmented"]',
     '.fui-tabs-list[data-variant="segmented"] .fui-tab[data-active]',
     '.fui-tabs-list[data-variant="segmented"] .fui-tab[data-active]::after',

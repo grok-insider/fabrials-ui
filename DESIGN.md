@@ -79,7 +79,7 @@ Numbers use tabular figures. Headings wrap with `text-wrap: balance`. Copy is se
 - Controls are 40 px (`--fui-control-height`); small 32, extra small 28, large 44. `data-density="compact"` tightens controls to 32 px and collection rows, as a composition choice, not a stored preference. Narrow screens and coarse pointers keep 44 px targets.
 - **Soft corners, one scale.** 4 px for keys, kbd and small marks; 6 px for tags, chips and small controls; 8 px for controls (buttons, fields, selects, segments); 10 px for menus, popovers and the command palette; 12 px for plates (cards, stats, stat groups, tables, code panels, alerts, state panels, toasts); 16 px for dialogs and sheets (`--fui-radius-xs` to `--fui-radius-2xl`, `--fui-radius-plate`). Dots, avatars, switches and meter tracks are round. Nothing rounder than 16 px except those.
 - **Plates.** A plate is the surface, a hairline edge, 12 px corners and a soft resting elevation (`--fui-shadow-xs` and the top highlight). What belongs together shares one plate: a `StatGroup` is one plate whose figures are divided by soft lines that stop short of its edges; a table's head is an inset band inside its plate; a card's footer and caption sit on the plate with no line above them.
-- **Tags.** Badges are soft tags: 6 px corners, a tint of their tone and the tone's ink, a round dot. The outline variant is the only one with an edge; solid is for the rare tag that must shout.
+- **Tags.** Badges are soft tags: 6 px corners, a tint of their tone and the tone's ink, a round dot. The outline variant is the only one with an edge; solid is for the rare tag that must shout. Three sizes (18, 20 and 24 px); an icon is a 12 px glyph in the tag's ink before the word; a number on its own is a count, centred in a tag at least as wide as it is tall. A tag that is a link or a button deepens its tint under the pointer, and a pressed one keeps that tint with an edge in its colour.
 - Separate with space first, a tint second and a soft line third. Do not box every label and control, and never put a plate inside a plate.
 
 ## Material
@@ -139,6 +139,7 @@ The vocabulary (0.11, "instrument with life"), each tied to one cause:
 | --- | --- | --- |
 | A choice in a single-choice group | The plate slides to the new item, its leading edge first, and settles; a chosen theme's icon turns into place | `ToggleGroup`, `ThemeSwitcher`, segmented `Tabs`; the `Tabs` underline slides |
 | A filter cleared | The chip fades and shrinks a little before it goes; focus moves to the next chip | `FilterChip` |
+| Something is live | The dot ripples outward while it lasts, and stops with it | `StatusDot pulse`, `Badge dot pulse` |
 | A press | The key goes down 1 px while held | `Button` |
 | A check | The tick is drawn | `Checkbox` |
 | A level changes | The ruler inks its ticks in order and its mark travels | `Meter variant="ruler"`, `Stat meter` |
@@ -153,7 +154,7 @@ The vocabulary (0.11, "instrument with life"), each tied to one cause:
 | Holding a switch | The thumb stretches while held and springs across | `Switch` |
 | A tick | The check or dot pops in from 60 % | `Checkbox`, `Radio` |
 
-- Continuous motion is reserved for genuine loading indicators, an agent at work, and a `StatusDot` with `pulse` while something is live or in progress. Each stops when the work does.
+- Continuous motion is reserved for genuine loading indicators, an agent at work, and a `StatusDot` or `Badge` dot with `pulse` while something is live or in progress. Each stops when the work does.
 - A page may have one orchestrated moment: `DitherScene` and a large `DitherGem` accept `reveal`, so the storm rolls in or the gem fills with light once on first paint. Never again, and not under reduced motion.
 - A `TimelineItem` marked `fresh` highlights once when a live item arrives.
 - `MoonPhase` and `Starfield` are the sign-in exception inherited from Radiant; they stop under reduced motion.

@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Archive, Bell, Search, Trash2, WifiOff } from "lucide-react";
+import { Archive, Bell, CircleCheck, CloudOff, Lock, OctagonX, Search, Trash2, WifiOff } from "lucide-react";
 import {
   Alert,
   AlertAction,
@@ -473,11 +473,58 @@ const labelTones = [
 ] as const;
 
 function TagsPage() {
+  const [picked, setPicked] = useState<string | null>("Receipts");
   return (
     <Page
       title="Tags"
       description="A tag whose colour is data: --fui-badge-solid tints the tag and its dot, --fui-badge-ink is the text, dotColor recolours the dot alone, and truncate keeps a long name in its row."
     >
+      <Block title="Sizes, icons and counts" description="sm 18 px, the default 20 px, lg 24 px; an icon is a 12 px glyph (14 px in lg) in the tag's ink; a number on its own sits centred in a tag at least as wide as it is tall.">
+        <div className="catalogue-row" style={{ alignItems: "center" }}>
+          <Badge size="sm" variant="outline">Team</Badge>
+          <Badge>Team</Badge>
+          <Badge size="lg" tone="info">Beta</Badge>
+          <Badge size="sm">3</Badge>
+          <Badge>3</Badge>
+          <Badge size="lg">3</Badge>
+          <Badge variant="solid">12</Badge>
+          <Badge variant="solid" tone="danger">99+</Badge>
+          <Badge variant="outline">1,204</Badge>
+        </div>
+        <div className="catalogue-row" style={{ alignItems: "center" }}>
+          <Badge tone="success"><CircleCheck aria-hidden /> Connected</Badge>
+          <Badge tone="warning"><CloudOff aria-hidden /> Offline</Badge>
+          <Badge tone="danger"><OctagonX aria-hidden /> Failed</Badge>
+          <Badge><Lock aria-hidden /> Private</Badge>
+          <Badge size="sm" tone="success"><CircleCheck aria-hidden /> Connected</Badge>
+          <Badge size="lg" tone="success"><CircleCheck aria-hidden /> Connected</Badge>
+        </div>
+      </Block>
+      <Block title="A live dot" description="pulse ripples the dot while the state is live; it holds still under reduced motion and in a skeleton.">
+        <div className="catalogue-row">
+          <Badge dot pulse tone="info">Syncing</Badge>
+          <Badge dot pulse tone="danger">Recording</Badge>
+          <Badge dot="hollow" pulse>Waiting</Badge>
+          <Badge size="lg" dot pulse tone="success">Live</Badge>
+        </div>
+      </Block>
+      <Block title="Links and buttons" description="render makes the tag a link or a button: it takes the pointer, deepens its tint under it and shows the focus ring; a pressed or current one keeps the deeper tint and draws its edge in its colour.">
+        <div className="catalogue-row" role="group" aria-label="Labels">
+          {labelTones.slice(0, 3).map(({ name, tone }) => (
+            <Badge
+              key={name}
+              dot
+              render={<button type="button" aria-pressed={picked === name} onClick={() => setPicked(picked === name ? null : name)} />}
+              style={{ "--fui-badge-solid": tone } as React.CSSProperties}
+            >
+              {name}
+            </Badge>
+          ))}
+          <Badge render={<a href="#tags" aria-current="page" />} variant="outline">Current view</Badge>
+          <Badge render={<a href="#tags" />} tone="info">Open in Usage</Badge>
+          <Badge render={<button type="button" />} variant="solid" tone="info">New</Badge>
+        </div>
+      </Block>
       <Block title="--fui-badge-solid on a neutral tag" description="The tint, the hairline and the round dot follow the property; the ink stays neutral so the name reads on any colour.">
         <div className="catalogue-row">
           {labelTones.map(({ name, tone }) => (
@@ -530,7 +577,7 @@ function TagsPage() {
         <Loading when label="Loading labels">
           <div className="catalogue-row">
             {labelTones.slice(0, 3).map(({ name, tone }) => (
-              <Badge key={name} dot dotColor={tone} style={{ "--fui-badge-solid": tone } as React.CSSProperties}>{name}</Badge>
+              <Badge key={name} dot pulse dotColor={tone} style={{ "--fui-badge-solid": tone } as React.CSSProperties}>{name}</Badge>
             ))}
           </div>
         </Loading>

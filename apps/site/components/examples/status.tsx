@@ -1,7 +1,7 @@
 "use client";
 
-import type { CSSProperties } from "react";
-import { CircleCheck, CloudOff, Inbox, Info, OctagonX, RefreshCw } from "lucide-react";
+import { useState, type CSSProperties, type ReactNode } from "react";
+import { CircleCheck, CloudOff, Inbox, Info, Lock, OctagonX, RefreshCw } from "lucide-react";
 import {
   Alert,
   AlertAction,
@@ -9,6 +9,10 @@ import {
   AlertTitle,
   Badge,
   Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
   Spinner,
   StatePanel,
   StatusDot,
@@ -20,7 +24,140 @@ import type { ExampleSet } from "./types";
 const row = { display: "flex", flexWrap: "wrap", alignItems: "center", gap: "var(--fui-space-2)" } as const;
 const stack = { display: "grid", gap: "var(--fui-space-3)", width: "min(100%, 34rem)" } as const;
 
+type AccountState = "synced" | "syncing" | "stale" | "paused";
+
+const ACCOUNTS: { name: string; plan: string; status: AccountState }[] = [
+  { name: "North workspace", plan: "Team", status: "synced" },
+  { name: "Relay staging", plan: "Personal", status: "syncing" },
+  { name: "Harbour lab", plan: "Team", status: "stale" },
+  { name: "Archive", plan: "Team", status: "paused" },
+];
+
+const ACCOUNT_STATES: Record<AccountState, ReactNode> = {
+  synced: (
+    <Badge dot tone="success">
+      Synced
+    </Badge>
+  ),
+  syncing: (
+    <Badge dot pulse tone="info">
+      Syncing
+    </Badge>
+  ),
+  stale: (
+    <Badge dot tone="warning">
+      3 h old
+    </Badge>
+  ),
+  paused: <Badge dot="hollow">Paused</Badge>,
+};
+
+function ConnectedAccounts() {
+  return (
+    <Card style={{ width: "min(100%, 28rem)" }}>
+      <CardHeader>
+        <CardTitle style={{ display: "flex", alignItems: "center", gap: "var(--fui-space-2)" }}>
+          Connected accounts <Badge>{ACCOUNTS.length}</Badge>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ul style={{ display: "grid", gap: "var(--fui-space-1)", margin: 0, padding: 0, listStyle: "none" }}>
+          {ACCOUNTS.map((account) => (
+            <li key={account.name} style={{ display: "flex", alignItems: "center", gap: "var(--fui-space-2)", minHeight: "2rem" }}>
+              <span style={{ fontWeight: 500 }}>{account.name}</span>
+              <Badge size="sm" variant="outline">
+                {account.plan}
+              </Badge>
+              <span style={{ marginInlineStart: "auto" }}>{ACCOUNT_STATES[account.status]}</span>
+            </li>
+          ))}
+        </ul>
+      </CardContent>
+    </Card>
+  );
+}
+
+const LABELS = [
+  ["Travel", "var(--chart-2)"],
+  ["Receipts", "var(--chart-3)"],
+  ["Family", "var(--chart-5)"],
+] as const;
+
+function LabelFilter() {
+  const [picked, setPicked] = useState<string | null>(null);
+  return (
+    <div style={row}>
+      {LABELS.map(([name, colour]) => (
+        <Badge
+          dot
+          key={name}
+          render={<button aria-pressed={picked === name} onClick={() => setPicked(picked === name ? null : name)} type="button" />}
+          style={{ "--fui-badge-solid": colour } as CSSProperties}
+        >
+          {name}
+        </Badge>
+      ))}
+      <span style={{ color: "var(--muted-foreground)", fontSize: "var(--fui-text-sm)" }} role="status">
+        {picked ? `Showing ${picked}` : "Showing every label"}
+      </span>
+    </div>
+  );
+}
+
 export const badgeExamples: ExampleSet = {
+  preview: () => <ConnectedAccounts />,
+  previewCode: `import type { ReactNode } from "react";
+import { Badge, Card, CardContent, CardHeader, CardTitle } from "@fabrials/ui";
+
+type Status = "synced" | "syncing" | "stale" | "paused";
+
+const states: Record<Status, ReactNode> = {
+  synced: (
+    <Badge dot tone="success">
+      Synced
+    </Badge>
+  ),
+  syncing: (
+    <Badge dot pulse tone="info">
+      Syncing
+    </Badge>
+  ),
+  stale: (
+    <Badge dot tone="warning">
+      3 h old
+    </Badge>
+  ),
+  paused: <Badge dot="hollow">Paused</Badge>,
+};
+
+export function ConnectedAccounts({
+  accounts,
+}: {
+  accounts: { name: string; plan: string; status: Status }[];
+}) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          Connected accounts <Badge>{accounts.length}</Badge>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ul className="grid gap-1">
+          {accounts.map((account) => (
+            <li key={account.name} className="flex min-h-8 items-center gap-2">
+              <span className="font-medium">{account.name}</span>
+              <Badge size="sm" variant="outline">
+                {account.plan}
+              </Badge>
+              <span className="ms-auto">{states[account.status]}</span>
+            </li>
+          ))}
+        </ul>
+      </CardContent>
+    </Card>
+  );
+}`,
   examples: [
     {
       id: "tones",
@@ -43,22 +180,49 @@ export const badgeExamples: ExampleSet = {
       ),
     },
     {
+      id: "icons",
+      title: "With an icon",
+      description: "An icon goes before the word, at 12 px in the tag's ink. Mark it `aria-hidden`: the word says what it means.",
+      code: `<Badge tone="success"><CircleCheck aria-hidden /> Connected</Badge>
+<Badge tone="warning"><CloudOff aria-hidden /> Offline</Badge>
+<Badge tone="danger"><OctagonX aria-hidden /> Failed</Badge>
+<Badge><Lock aria-hidden /> Private</Badge>`,
+      render: () => (
+        <div style={row}>
+          <Badge tone="success">
+            <CircleCheck aria-hidden /> Connected
+          </Badge>
+          <Badge tone="warning">
+            <CloudOff aria-hidden /> Offline
+          </Badge>
+          <Badge tone="danger">
+            <OctagonX aria-hidden /> Failed
+          </Badge>
+          <Badge>
+            <Lock aria-hidden /> Private
+          </Badge>
+        </div>
+      ),
+    },
+    {
       id: "dot",
       title: "A state with a dot",
-      description: "`dot` adds a round light before the word, for a state that changes (synced, paused). `dot=\"hollow\"` is an archived or inactive one.",
-      code: `<Badge dot tone="success">Synced</Badge>
+      description:
+        "`dot` adds a round light before the word, for a state that changes (synced, paused); `dot=\"hollow\"` is an archived or inactive one. `pulse` makes the dot ripple while the state is live, and stops it when it is not; it holds still under reduced motion.",
+      code: `<Badge dot pulse tone="info">Syncing</Badge>
+<Badge dot tone="success">Synced</Badge>
 <Badge dot tone="warning">3 h old</Badge>
 <Badge dot="hollow">Archived</Badge>`,
       render: () => (
         <div style={row}>
+          <Badge dot pulse tone="info">
+            Syncing
+          </Badge>
           <Badge dot tone="success">
             Synced
           </Badge>
           <Badge dot tone="warning">
             3 h old
-          </Badge>
-          <Badge dot tone="danger">
-            Expired
           </Badge>
           <Badge dot="hollow">Archived</Badge>
         </div>
@@ -67,19 +231,48 @@ export const badgeExamples: ExampleSet = {
     {
       id: "variants",
       title: "Facts and counts",
-      description: "`variant=\"outline\"` is for a plain fact (a licence, a version) that is not a state. `variant=\"solid\"` is the rare tag that must shout: a count, a new item.",
+      description:
+        "`variant=\"outline\"` is for a plain fact (a licence, a version) that is not a state. A number on its own is a count: it sits centred in a tag at least as wide as it is tall. `variant=\"solid\"` is the rare tag that must shout: a new item, a count that needs attention.",
       code: `<Badge variant="outline">MIT</Badge>
 <Badge variant="outline">v0.11.0</Badge>
-<Badge variant="solid" tone="info">New</Badge>
-<Badge variant="solid">12</Badge>`,
+<Badge>3</Badge>
+<Badge variant="solid">12</Badge>
+<Badge variant="solid" tone="danger">99+</Badge>
+<Badge variant="solid" tone="info">New</Badge>`,
       render: () => (
         <div style={row}>
           <Badge variant="outline">MIT</Badge>
           <Badge variant="outline">v0.11.0</Badge>
+          <Badge>3</Badge>
+          <Badge variant="solid">12</Badge>
+          <Badge tone="danger" variant="solid">
+            99+
+          </Badge>
           <Badge tone="info" variant="solid">
             New
           </Badge>
-          <Badge variant="solid">12</Badge>
+        </div>
+      ),
+    },
+    {
+      id: "sizes",
+      title: "Sizes",
+      description: "`size=\"sm\"` (18 px) fits a dense row, the default (20 px) most places, `size=\"lg\"` (24 px) sits beside a heading or in a card's header.",
+      code: `<Badge size="sm" variant="outline">Team</Badge>
+<Badge>Team</Badge>
+<h3>Usage export <Badge size="lg" tone="info">Beta</Badge></h3>`,
+      render: () => (
+        <div style={{ ...row, gap: "var(--fui-space-4)" }}>
+          <Badge size="sm" variant="outline">
+            Team
+          </Badge>
+          <Badge>Team</Badge>
+          <h3 style={{ display: "inline-flex", alignItems: "center", gap: "var(--fui-space-2)", margin: 0, fontSize: "var(--fui-text-lg)" }}>
+            Usage export{" "}
+            <Badge size="lg" tone="info">
+              Beta
+            </Badge>
+          </h3>
         </div>
       ),
     },
@@ -87,22 +280,20 @@ export const badgeExamples: ExampleSet = {
       id: "data",
       title: "Colour that comes from data",
       description:
-        "A label whose colour is data (a mailbox label, a project) sets `--fui-badge-solid` on the badge: it tints the tag, its hairline and its dot while the text stays legible. `dotColor` recolours the dot alone; `truncate` keeps a long name on its row.",
-      code: `<Badge dot style={{ "--fui-badge-solid": label.colour }}>{label.name}</Badge>
+        "A label whose colour is data (a mailbox label, a project) sets `--fui-badge-solid` on the badge: it tints the tag, its hairline and its dot while the text stays legible. `render` makes the tag a link or a button, here one that filters by its label; `truncate` keeps a long name on its row.",
+      code: `<Badge
+  dot
+  render={<button type="button" aria-pressed={picked === label.name} onClick={() => pick(label.name)} />}
+  style={{ "--fui-badge-solid": label.colour }}
+>
+  {label.name}
+</Badge>
 <Badge truncate variant="outline" style={{ "--fui-badge-max": "9rem" }}>
   A label that is far too long for its row
 </Badge>`,
       render: () => (
-        <div style={row}>
-          {[
-            ["Travel", "var(--chart-2)"],
-            ["Receipts", "var(--chart-3)"],
-            ["Family", "var(--chart-5)"],
-          ].map(([name, colour]) => (
-            <Badge dot key={name} style={{ "--fui-badge-solid": colour } as CSSProperties}>
-              {name}
-            </Badge>
-          ))}
+        <div style={{ display: "grid", gap: "var(--fui-space-3)", justifyItems: "start" }}>
+          <LabelFilter />
           <Badge style={{ "--fui-badge-max": "9rem" } as CSSProperties} truncate variant="outline">
             A label that is far too long for its row
           </Badge>

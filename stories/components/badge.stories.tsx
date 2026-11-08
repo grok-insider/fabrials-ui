@@ -4,15 +4,21 @@ import { Showcase } from "../showcase";
 import { badgeExamples } from "../../apps/site/components/examples/status";
 
 const description =
-  "A short status or fact as a soft tag: tinted by its tone, inked in it, with a round dot for a state that changes.";
+  "A short status or fact as a soft tag: tinted by its tone, inked in it, with a round dot for a state that changes (rippling while it is live), an icon, or a count.";
 
 const meta = {
   title: "Components/Badge",
   component: Badge,
   tags: ["autodocs"],
   parameters: { docs: { description: { component: description } } },
-  args: { children: "Connected", tone: "success", variant: "soft", dot: true },
-  argTypes: { tone: { control: "select", options: ["neutral", "info", "success", "warning", "danger"] }, variant: { control: "inline-radio", options: ["soft", "outline", "solid"] }, dot: { control: "select", options: [false, true, "hollow"] } },
+  args: { children: "Connected", tone: "success", variant: "soft", size: "default", dot: true, pulse: false },
+  argTypes: {
+    tone: { control: "select", options: ["neutral", "info", "success", "warning", "danger"] },
+    variant: { control: "inline-radio", options: ["soft", "outline", "solid"] },
+    size: { control: "inline-radio", options: ["sm", "default", "lg"] },
+    dot: { control: "select", options: [false, true, "hollow"] },
+    pulse: { control: "boolean" },
+  },
 } satisfies Meta<typeof Badge>;
 
 export default meta;
