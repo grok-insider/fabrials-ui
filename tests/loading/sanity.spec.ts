@@ -44,7 +44,8 @@ test("filled shapes catch a switch thumb left white", async ({ page }) => {
 
 test("the colour check catches colour that is not blended away", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1600 });
-  await openPreview(page, "progress", { clock: true });
+  // A meter's fill keeps its colour unless the blend takes it away (a progress track is a neutral shape since 0.11).
+  await openPreview(page, "meter", { clock: true });
   await inline(page, ".fui-preview", { "mix-blend-mode": "normal" });
   expect(paintProblems(await paintReport(page)).colour.length).toBe(1);
 });

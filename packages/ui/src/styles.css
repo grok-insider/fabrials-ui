@@ -6196,6 +6196,10 @@
   [data-fui-loading] > .fui-loading-content :is(.fui-badge-dot, .fui-status-dot)::after {
     content: none !important;
   }
+  /* A skeleton draws every line whole: a scroll area's fade would thin the bars at its edges. */
+  [data-fui-loading] > .fui-loading-content .fui-scroll-area[data-fade] > .fui-scroll-area-viewport {
+    mask-image: none !important;
+  }
   /* A progress track is one neutral shape (listed below); its segments' fills are pseudo-elements, out of reach of the list. */
   [data-fui-loading] > .fui-loading-content .fui-progress-segment::before {
     background: transparent !important;

@@ -63,4 +63,6 @@ test("fade masks each edge as far as Base UI measures more behind it, at most 2r
   assert.match(fade, /--fui-scroll-fade: 2rem;/);
   assert.match(fade, /mask-composite: intersect;/);
   assert.match(rule(".fui-scroll-area[data-fade] > .fui-scroll-area-viewport:dir(rtl) {"), /--fui-scroll-fade-x: to left;/);
+  // A skeleton draws its lines whole.
+  assert.match(rule("[data-fui-loading] > .fui-loading-content .fui-scroll-area[data-fade] > .fui-scroll-area-viewport {"), /mask-image: none !important;/);
 });
