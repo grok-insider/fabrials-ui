@@ -112,7 +112,7 @@ Scale tokens: `--fui-text-label` 11, `xs` 12, `sm` 14, `md` 16, `lg` 18, `xl` 20
 - Motion answers what a person did, what the data did or what an agent is doing: opening, expanding, choosing (a sliding segment), pressing (1 px down), checking (a drawn tick), a level or number or reading changing (a sweeping ruler, rolling digits, a settling `Readout`), media arriving after the view (`data-fui-reveal`), things arriving after the view (`.fui-rise`, staggered with `--fui-stagger`), a card that is a link lifting 1 px under the pointer.
 - No enter animations on the first paint of a screen people repeat all day; no scroll-triggered reveals.
 - One orchestrated moment per page at most: `DitherScene` `reveal` (on by default) or a large `DitherGem` `reveal`. Painted once; never again on that page.
-- Continuous motion only for real loading and an agent at work: `Spinner` (the pixel ring), the `Loading` pulse, `Skeleton` shimmer, `ShimmerText`, `Button loading`, `WorkingLight`, the agent indicators of `@fabrials/ai-ui`. `StatusDot pulse` only while something is live or in progress. `MoonPhase` and `Starfield` only on sign-in and landing.
+- Continuous motion only for real loading and an agent at work: `Spinner` (the pixel ring), the `Loading` pulse, `Skeleton` shimmer, `ShimmerText`, `Button loading`, `WorkingLight`, a `Progress` with no value yet, the agent indicators of `@fabrials/ai-ui`. `StatusDot pulse` only while something is live or in progress. `MoonPhase` and `Starfield` only on sign-in and landing.
 - Custom keyframes sit inside `@media (prefers-reduced-motion: no-preference)` or stop under `reduce`.
 
 ## Dithering

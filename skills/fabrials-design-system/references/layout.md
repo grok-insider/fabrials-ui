@@ -296,7 +296,7 @@ Every collection and panel has these states. Put them where the content would be
 | --- | --- | --- |
 | First load | The real components with placeholder data inside `<Loading when label>` (0.7): it paints them as their own skeleton with no layout shift. Older versions: `Skeleton` blocks; `SidebarMenuSkeleton` in a sidebar | Not a centred spinner on an empty page, not hand-drawn grey boxes |
 | Refresh | Keep the last value and show when it was read (`RelativeTime`) | A stale value says so: `StatePanel state="stale"` or a hint |
-| Long wait with unknown duration | `Spinner` or `Button loading` with text that says what is happening | `Progress` only when the fraction is real |
+| Long wait with unknown duration | `Spinner` or `Button loading` with text that says what is happening | `Progress` only when the fraction is real; without a value only while a total is on its way (the bar then fills in place) |
 | Empty | `StatePanel state="empty"` with the next action | Title says what is missing, description what to do |
 | No results | `StatePanel state="empty"` with "Clear filters" | Keep the toolbar visible |
 | Error | `StatePanel state="error"` (role alert) or an inline `Alert variant="destructive"` | What happened, what is unchanged, how to retry; no apology |

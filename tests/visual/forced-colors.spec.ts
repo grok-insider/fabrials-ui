@@ -177,9 +177,9 @@ for (const scheme of ["light", "dark"] as const) {
         expect(await style(page, selector, ["backgroundColor", "color"])).toEqual({ backgroundColor: system.Highlight, color: system.HighlightText });
       }
 
-      expect(await style(page, ".fui-progress", ["borderTopStyle", "borderTopColor"])).toEqual({ borderTopStyle: "solid", borderTopColor: system.CanvasText });
+      expect(await style(page, ".fui-progress-track", ["borderTopStyle", "borderTopColor"])).toEqual({ borderTopStyle: "solid", borderTopColor: system.CanvasText });
       // 42 %: the filled part is painted (Highlight over Canvas), the rest is Canvas.
-      const [filled, empty] = await paintedAt(page, ".fui-progress", [0.2, 0.9]);
+      const [filled, empty] = await paintedAt(page, ".fui-progress-track", [0.2, 0.9]);
       expect(empty).toBe(`${system.Canvas.match(/\d+/g)!.slice(0, 3).join(",")},255`);
       expect(filled).not.toBe(empty);
 
@@ -228,6 +228,20 @@ for (const scheme of ["light", "dark"] as const) {
       expect(hollow.forcedColorAdjust).toBe("none");
       expect(hollow.outlineColor).toBe(system.CanvasText);
       expect(hollow.backgroundColor).toBe("rgba(0, 0, 0, 0)");
+    });
+
+    test("progress: segments and a ring in Highlight; work of unknown length is a still dashed line, even with motion", async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "no-preference" });
+      await open(page, "tests-feedback--progress-bars", scheme);
+      const system = await palette(page);
+      expect(await style(page, ".fui-progress-segment", ["borderTopColor"])).toEqual({ borderTopColor: system.CanvasText });
+      expect(await style(page, '.fui-progress-segment[data-filled="true"]', ["backgroundColor"], "::before")).toEqual({ backgroundColor: system.Highlight });
+      expect(await style(page, ".fui-progress-ring-fill", ["stroke"])).toEqual({ stroke: system.Highlight });
+      expect(await style(page, ".fui-progress-ring-track", ["stroke"])).toEqual({ stroke: system.GrayText });
+      const unknown = await style(page, ".fui-progress-indicator[data-indeterminate]", ["forcedColorAdjust", "animationName", "position", "backgroundImage"]);
+      expect(unknown).toMatchObject({ forcedColorAdjust: "none", animationName: "none", position: "static" });
+      expect(unknown.backgroundImage).toContain(system.Highlight);
+      expect(await style(page, ".fui-progress-ring-light", ["display"])).toEqual({ display: "none" });
     });
 
     test("charts: the legend keys keep the series' colours (the plot's SVG already does) and the axis text is CanvasText", async ({ page }) => {

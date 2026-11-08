@@ -63,6 +63,26 @@ Changed, visibly:
 - **`Badge`** gains `size` (`sm` 18 px, `default` 20 px, `lg` 24 px), `pulse` (a live dot ripples; still under reduced motion and in a skeleton) and `render` (a link or a button: the pointer, a deeper tint under it, the focus ring; `aria-pressed` or `aria-current` keeps the deeper tint with an edge in its colour). An icon child is now a 12 px glyph (14 px in `lg`); before, an icon kept its own size, 24 px for a lucide icon. A number on its own (`3`, `99+`, `1,204`) is a count: centred in a tag at least as wide as it is tall (`data-count`). The markup of a badge without these is unchanged.
 - **`FieldGroup layout="columns"`** fills its row with as many 15rem columns as fit (`auto-fill`, was `auto-fit`): in a wide form two fields keep a field's width and the free room stays at the end, instead of each taking half the row. In a pane narrower than about 31rem nothing changes.
 
+## Progress
+
+`Progress` is built on Base UI's progress, like `Meter`, and gains its variants. A bar with a `value` and an `aria-label` looks as before; what a host has to check is in the list after this one.
+
+- `label` names the bar and puts the value at the end of its row; `hint` is the line under it (counts, the time left) and describes the bar; `showValue` shows or hides the value (shown with a label). `format` and `getAriaValueText` write the value another way, and `locale` (default `"en"`) is the language it is written in, so the server and the browser agree.
+- `size` `sm`, `default`, `lg`: a 4, 6 or 8 px track.
+- No `value`, or `null`: work whose total is not known yet. The working light crosses the track (a still dashed line under reduced motion and in forced colors); `success`, `warning` and `danger` paint it in their colour.
+- `steps`: the track becomes that many segments that ink in order.
+- `variant="ring"`: a circle of 16, 24 or 48 px that closes clockwise, with the label and hint beside it; at `lg` the value sits inside.
+- shadcn's parts, `ProgressLabel`, `ProgressValue`, `ProgressTrack` and `ProgressIndicator`, are exported, so ui.fabrials.com now has a `progress` shim.
+
+What a host checks:
+
+- **The default `max` is 100** (a native `<progress>` defaulted to 1). `value={42}` without a `max` is now 42 %; before, it was a full bar. A bar that passes a fraction keeps working only with `max={1}`.
+- **A bar without a value moves.** It was an empty track (a full one in Firefox). Leave the value out only while a total is on its way; a quota whose value is unknown is not work in progress: show the word ("Not reported") and no bar, or a `Meter`.
+- **`<label for>` no longer names it**: it is a `div` with `role="progressbar"`. Use `label`, `ProgressLabel` or `aria-label`.
+- **The markup changed**: `.fui-progress` is the whole part (label row, track, hint), the track is `.fui-progress-track` and the fill `.fui-progress-indicator`. A host rule that sized `.fui-progress` or styled `::-webkit-progress-value` moves to those.
+
+`Meter` gains `locale` too, default `"en"`: before, its value was written in the runtime's language, which differed between the server and a browser in another language and broke hydration ("42%" against "42 %").
+
 ## New tokens
 
 `--fui-radius-2xl`, `--fui-ease-spring`, `--fui-tint-strength`, `--fui-tint-strong`, `--fui-tint-edge`, `--fui-surface-inset`, `--fui-surface-hover`, `--fui-separator`, `--fui-sidebar-active`, `--fui-switch-thumb`, `--fui-light-1`, `--fui-light-2`, `--fui-light-3`. The derived ones are declared on every theme scope, so a nested theme island computes them from its own surface.

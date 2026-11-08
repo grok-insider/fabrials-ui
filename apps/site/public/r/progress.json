@@ -1,0 +1,27 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "progress",
+  "type": "registry:ui",
+  "title": "Progress",
+  "description": "shadcn's progress, backed by @fabrials/ui. How far a task has gone: a bar or a ring, with its label, value and hint; steps; and the working light while the total is not known yet.",
+  "author": "Fabrials <admin@grokinsider.net>",
+  "dependencies": [
+    "@fabrials/ui@^0.11.0"
+  ],
+  "registryDependencies": [
+    "https://ui.fabrials.com/r/styles.json"
+  ],
+  "files": [
+    {
+      "path": "registry/shims/progress.tsx",
+      "type": "registry:ui",
+      "content": "export { Progress, ProgressIndicator, ProgressLabel, ProgressTrack, ProgressValue } from \"@fabrials/ui\";\n\n// Fabrials UI shim for shadcn's progress: https://ui.fabrials.com/docs/shims\n// The names match shadcn; the control is @fabrials/ui's. Import from\n// \"@fabrials/ui\" directly in new code.\n"
+    }
+  ],
+  "meta": {
+    "source": "shim",
+    "license": "MIT",
+    "category": "Shims",
+    "shadcn": "progress"
+  }
+}

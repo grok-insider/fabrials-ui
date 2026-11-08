@@ -131,17 +131,26 @@ test("material: gradients exist only as the sheen tokens, and every theme define
 
 test("the working light is the only light: painted from the three light tokens, in its own rules, still under reduced motion", () => {
   const life = styles.slice(styles.indexOf('/* 0.11 "Instrument with life"'));
-  // Every gradient of the block is either a mask (an opaque fill whose colour does not matter) or lives in a light rule.
+  // Every gradient of the block is either a mask (an opaque fill whose colour does not matter) or lives in a light rule: the
+  // working light, light in words, and the light Progress carries while its total is not known.
   const css = life.replace(/\/\*[\s\S]*?\*\//g, "");
   for (const match of css.matchAll(/([^{}]+)\{([^{}]*gradient\([^{}]*)\}/g)) {
     const selector = match[1]!.trim();
-    const body = match[2]!.replace(/linear-gradient\(var\(--foreground\) 0 0\)/g, "");
+    const body = match[2]!.replace(/linear-gradient\(var\(--foreground\) 0 0\)/g, "").replace(/\bmask:[^;]*;/g, "");
     if (!/gradient\(/.test(body)) continue;
-    assert.match(selector, /\.fui-working-light(-bloom)?::before|\.fui-shimmer-text\[data-tone="light"\]/, selector);
+    assert.match(
+      selector,
+      /\.fui-working-light(-bloom)?::before|\.fui-shimmer-text\[data-tone="light"\]|^\.fui-progress-indicator\[data-indeterminate\](:dir\(rtl\))?$|^\.fui-progress-ring-light$/,
+      selector,
+    );
     for (const colour of body.match(/var\(--[a-z0-9-]+\)/g) ?? []) {
-      assert.match(colour, /--fui-light-[123]|--fui-light-angle|--fui-shimmer-spread|--muted-foreground/, `${selector}: ${colour}`);
+      assert.match(colour, /--fui-light-[123]|--fui-progress-light-[123]|--fui-light-angle|--fui-shimmer-spread|--muted-foreground/, `${selector}: ${colour}`);
     }
   }
+  // Progress's light is the working light unless a tone that says an outcome paints it in its own colour.
+  const progress = styles.slice(styles.indexOf("  .fui-progress {"), styles.indexOf("}", styles.indexOf("  .fui-progress {")));
+  for (const n of [1, 2, 3]) assert.match(progress, new RegExp(`--fui-progress-light-${n}: var\\(--fui-light-${n}\\);`));
+  assert.equal((styles.match(/--fui-progress-light-1: /g) ?? []).length, 2);
   assert.match(life, /@media \(prefers-reduced-motion: no-preference\) \{[\s\S]*?\.fui-working-light::before,\n    \.fui-working-light-bloom::before \{\n      animation: fui-light-turn/);
   assert.match(life, /@media \(forced-colors: active\) \{\s*\.fui-working-light \{\s*display: none;/);
   for (const scope of [":root", ".dark", '[data-theme="system"]']) assert.ok(tokens.includes(scope));

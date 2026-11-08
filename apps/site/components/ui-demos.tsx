@@ -125,7 +125,6 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-  Progress,
   ScrollArea,
   SectionHeader,
   Select,
@@ -452,12 +451,6 @@ const demos: Record<string, () => ReactNode> = {
         <Skeleton className="h-4 w-64" />
       </div>
       <p className="sr-only">Loading account summary</p>
-    </Frame>
-  ),
-  progress: () => (
-    <Frame width="field">
-      <Label htmlFor="sync-progress">Sync progress</Label>
-      <Progress id="sync-progress" value={0.4} max={1} />
     </Frame>
   ),
   combobox: () => (
@@ -1328,6 +1321,7 @@ const previewWidths: Record<string, FrameWidth> = {
   "working-light": "field",
   alert: "form",
   badge: "form",
+  progress: "form",
 };
 
 export function UiDemo({ slug }: { slug: string }) {

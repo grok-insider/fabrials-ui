@@ -85,7 +85,7 @@ export default function Page() {
 ## When to use something else
 
 - A **spinner** or a button's `loading` state for an action the person just started, such as saving.
-- **Progress** when you know how far along the work is.
+- **Progress** when you know how far along the work is; without a value while the total is on its way.
 - The standalone **Skeleton** block only for a region with no component to paint yet.
 
 Keep the control that starts a refresh outside `Loading`: the content is inert while loading, so focus inside it is lost.

@@ -308,6 +308,16 @@ export const shimIndex: { name: string; exports: string[] }[] = [
     ]
   },
   {
+    "name": "progress",
+    "exports": [
+      "Progress",
+      "ProgressIndicator",
+      "ProgressLabel",
+      "ProgressTrack",
+      "ProgressValue"
+    ]
+  },
+  {
     "name": "radio-group",
     "exports": [
       "RadioGroup",

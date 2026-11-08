@@ -2203,17 +2203,34 @@
     border-radius: var(--fui-radius-sm);
     background: var(--fui-skeleton-surface);
   }
+  /* Progress: a label row (what, and how far), the track, and a hint under it. The track and its fill are round by nature;
+     segments are steps; a ring closes clockwise. Without a value the track carries the working light (0.11 block). */
   .fui-progress {
     --fui-progress-fill: var(--chart-1);
-    display: block;
-    width: 100%;
-    height: 0.375rem;
-    border: 0;
-    border-radius: var(--fui-radius-full);
-    overflow: hidden;
-    appearance: none;
-    accent-color: var(--fui-progress-fill);
-    background: var(--muted);
+    --fui-progress-thickness: 0.375rem;
+    --fui-progress-gap: 3px;
+    --fui-progress-light-1: var(--fui-light-1);
+    --fui-progress-light-2: var(--fui-light-2);
+    --fui-progress-light-3: var(--fui-light-3);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--fui-space-1-5) var(--fui-space-3);
+    min-width: 0;
+    font-size: 0.8125rem;
+    line-height: 1.35;
+  }
+  .fui-progress[data-size="sm"] {
+    --fui-progress-thickness: 0.25rem;
+    --fui-progress-gap: 2px;
+    row-gap: var(--fui-space-1);
+    font-size: var(--fui-text-xs);
+  }
+  .fui-progress[data-size="lg"] {
+    --fui-progress-thickness: 0.5rem;
+    --fui-progress-gap: 4px;
+    row-gap: var(--fui-space-2);
+    font-size: var(--fui-text-sm);
   }
   .fui-progress[data-tone="success"] {
     --fui-progress-fill: var(--success);
@@ -2227,17 +2244,164 @@
   .fui-progress[data-tone="info"] {
     --fui-progress-fill: var(--brand);
   }
-  .fui-progress::-webkit-progress-bar {
+  /* A tone that says an outcome (done, slow, failing) paints work of unknown length in its own colour, not the light. */
+  .fui-progress:is([data-tone="success"], [data-tone="warning"], [data-tone="danger"]) {
+    --fui-progress-light-1: var(--fui-progress-fill);
+    --fui-progress-light-2: var(--fui-progress-fill);
+    --fui-progress-light-3: var(--fui-progress-fill);
+  }
+  .fui-progress-label {
+    flex: 1 1 0;
+    min-width: 0;
+    font-weight: var(--fui-weight-medium);
+  }
+  .fui-progress-value {
+    flex: none;
+    margin-inline-start: auto;
+    color: var(--muted-foreground);
+    font-variant-numeric: tabular-nums;
+  }
+  .fui-progress[data-tone="success"] .fui-progress-value {
+    color: var(--fui-success-ink);
+  }
+  .fui-progress[data-tone="warning"] .fui-progress-value {
+    color: var(--fui-warning-ink);
+  }
+  .fui-progress[data-tone="danger"] .fui-progress-value {
+    color: var(--fui-danger-ink);
+  }
+  .fui-progress-track {
+    position: relative;
+    flex: 0 0 100%;
+    height: var(--fui-progress-thickness);
+    overflow: hidden;
+    border-radius: var(--fui-radius-full);
     background: var(--muted);
-    border-radius: var(--fui-radius-full);
   }
-  .fui-progress::-webkit-progress-value {
+  .fui-progress-indicator {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
     background: var(--fui-progress-fill);
-    border-radius: var(--fui-radius-full);
+    transition: width var(--fui-duration-slow) var(--fui-ease);
   }
-  .fui-progress::-moz-progress-bar {
-    background: var(--fui-progress-fill);
+  /* Work whose amount is not known yet, held still (reduced motion): a dashed line in the light. It moves in the 0.11 block. */
+  .fui-progress-indicator[data-indeterminate] {
+    width: 100%;
+    border-radius: 0;
+    background: repeating-linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--fui-progress-light-1) 60%, transparent) 0 0.375rem,
+      transparent 0.375rem 0.625rem
+    );
+  }
+  .fui-progress-hint {
+    flex: 0 0 100%;
+    min-width: 0;
+    margin: 0;
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+  }
+  .fui-progress[data-size="lg"] .fui-progress-hint {
+    font-size: 0.8125rem;
+  }
+  /* Steps: the track is a row of segments that fill in turn. */
+  .fui-progress-track[data-steps] {
+    display: flex;
+    gap: var(--fui-progress-gap);
+    overflow: visible;
+    border-radius: 0;
+    background: none;
+  }
+  /* An empty segment and the rest of a ring are drawn like a ruler's ticks: their count and extent must read. */
+  .fui-progress-segment {
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
     border-radius: var(--fui-radius-full);
+    background: var(--border);
+  }
+  .fui-progress-segment::before {
+    content: "";
+    display: block;
+    width: calc(var(--fill, 0) * 100%);
+    height: 100%;
+    border-radius: inherit;
+    background: var(--fui-progress-fill);
+    transition: width var(--fui-duration-slow) var(--fui-ease) calc(var(--i, 0) * 40ms);
+  }
+  /* The ring: the circle beside its label and hint; at lg the value sits inside it. */
+  .fui-progress[data-variant="ring"] {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-rows: 1fr auto auto 1fr;
+    grid-template-areas:
+      "track . ."
+      "track label value"
+      "track hint hint"
+      "track . .";
+    align-items: baseline;
+    gap: 0;
+    width: fit-content;
+    max-width: 100%;
+  }
+  /* Padding, not margin, keeps the words off the ring when a host resets the margins of its paragraphs. */
+  .fui-progress[data-variant="ring"] > .fui-progress-label {
+    grid-area: label;
+    padding-inline-start: 0.625rem;
+  }
+  .fui-progress[data-variant="ring"] > .fui-progress-value {
+    grid-area: value;
+    padding-inline-start: var(--fui-space-2);
+  }
+  .fui-progress[data-variant="ring"] > .fui-progress-hint {
+    grid-area: hint;
+    padding-block-start: 0.125rem;
+    padding-inline-start: 0.625rem;
+  }
+  .fui-progress[data-variant="ring"][data-size="lg"] > .fui-progress-value {
+    grid-area: track;
+    place-self: center;
+    margin: 0;
+    padding: 0;
+    color: var(--foreground);
+    font-size: var(--fui-text-xs);
+    font-weight: var(--fui-weight-medium);
+  }
+  .fui-progress-track.fui-progress-ring {
+    grid-area: track;
+    align-self: center;
+    flex: none;
+    width: var(--fui-progress-ring-size);
+    height: var(--fui-progress-ring-size);
+    overflow: visible;
+    border-radius: var(--fui-radius-full);
+    background: none;
+  }
+  .fui-progress-ring svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    rotate: -90deg;
+  }
+  .fui-progress-ring-track {
+    fill: none;
+    stroke: var(--border);
+  }
+  .fui-progress-ring-fill {
+    fill: none;
+    stroke: var(--fui-progress-fill);
+    stroke-linecap: round;
+    stroke-dasharray: 100;
+    transition: stroke-dashoffset var(--fui-duration-slow) var(--fui-ease);
+  }
+  .fui-progress-ring[data-indeterminate] .fui-progress-ring-track {
+    stroke: color-mix(in oklab, var(--fui-progress-light-1) 75%, transparent);
+    stroke-dasharray: 6 4;
+  }
+  .fui-progress-ring-light {
+    display: none;
   }
   .fui-meter {
     --fui-meter-fill: var(--chart-1);
@@ -5988,6 +6152,10 @@
   [data-fui-loading] > .fui-loading-content :is(.fui-badge-dot, .fui-status-dot)::after {
     content: none !important;
   }
+  /* A progress track is one neutral shape (listed below); its segments' fills are pseudo-elements, out of reach of the list. */
+  [data-fui-loading] > .fui-loading-content .fui-progress-segment::before {
+    background: transparent !important;
+  }
   /* Colour goes by blending each top-level part's luminosity onto the neutral
      surface behind it. Not a filter: filter makes an element the containing
      block of its fixed and absolute descendants, and they would move. */
@@ -6028,6 +6196,7 @@
       .fui-radio,
       .fui-nav-tab-count,
       .fui-sidebar-menu-badge,
+      .fui-progress-track,
       [data-skeleton="fill"]
     ):not(:where([data-skeleton="keep"], [data-skeleton="keep"] *)) {
     background-color: var(--fui-skeleton-surface) !important;
@@ -6057,6 +6226,7 @@
       .fui-radio,
       .fui-nav-tab-count,
       .fui-sidebar-menu-badge,
+      .fui-progress-track,
       [data-skeleton="fill"]
     ):not(:where([data-skeleton="keep"], [data-skeleton="keep"] *))
     * {
@@ -7033,17 +7203,21 @@
 
     /* 2. Fills that say a state or an amount: Highlight, on an edged track. */
     .fui-meter-track,
-    .fui-progress {
+    .fui-progress-track:not([data-steps]):not(.fui-progress-ring),
+    .fui-progress-segment {
       border: 1px solid CanvasText;
     }
-    .fui-meter-indicator {
+    .fui-meter-indicator,
+    .fui-progress-indicator,
+    .fui-progress-segment::before {
       background: Highlight;
     }
-    .fui-progress::-webkit-progress-value {
-      background: Highlight;
+    /* A ring: the rest of the circle in GrayText, the part done in Highlight. */
+    .fui-progress-ring-track {
+      stroke: GrayText;
     }
-    .fui-progress::-moz-progress-bar {
-      background: Highlight;
+    .fui-progress-ring-fill {
+      stroke: Highlight;
     }
     /* The thumb is a fill: CanvasText when off (a dot at the start), HighlightText on a Highlight track when on. */
     .fui-switch-thumb {
@@ -9546,5 +9720,104 @@
   /* A view that is loading is a skeleton: there is no work in it to light. */
   [data-fui-loading] > .fui-loading-content .fui-working-light {
     visibility: hidden !important;
+  }
+}
+
+/* 0.11: Progress in motion. A value that changes eases the fill to it, and segments ink in order (base rules); work whose amount
+   is not known yet carries the working light across its track, and a ring turns the light round. Under reduced motion and in
+   forced colors the same state holds still: a dashed line, a dashed ring. */
+@layer components {
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes fui-progress-sweep {
+      from {
+        translate: -100% 0;
+      }
+      to {
+        translate: 240% 0;
+      }
+    }
+    @keyframes fui-progress-sweep-rtl {
+      from {
+        translate: 100% 0;
+      }
+      to {
+        translate: -240% 0;
+      }
+    }
+    @keyframes fui-progress-turn {
+      to {
+        --fui-light-angle: 360deg;
+      }
+    }
+    .fui-progress-indicator[data-indeterminate] {
+      position: absolute;
+      inset-block: 0;
+      inset-inline-start: 0;
+      width: 42%;
+      border-radius: inherit;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        var(--fui-progress-light-1) 38%,
+        var(--fui-progress-light-2) 68%,
+        var(--fui-progress-light-3) 92%,
+        transparent
+      );
+      animation: fui-progress-sweep 1.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+    }
+    .fui-progress-indicator[data-indeterminate]:dir(rtl) {
+      background: linear-gradient(
+        270deg,
+        transparent,
+        var(--fui-progress-light-1) 38%,
+        var(--fui-progress-light-2) 68%,
+        var(--fui-progress-light-3) 92%,
+        transparent
+      );
+      animation-name: fui-progress-sweep-rtl;
+    }
+    .fui-progress-ring[data-indeterminate] .fui-progress-ring-track {
+      stroke: var(--border);
+      stroke-dasharray: none;
+    }
+    .fui-progress-ring-light {
+      display: block;
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: conic-gradient(
+        from var(--fui-light-angle),
+        transparent 0% 46%,
+        var(--fui-progress-light-1) 64%,
+        var(--fui-progress-light-2) 78%,
+        var(--fui-progress-light-3) 90%,
+        transparent 100%
+      );
+      mask: radial-gradient(
+        farthest-side,
+        transparent calc(100% - var(--fui-progress-ring-stroke) - 0.5px),
+        var(--foreground) calc(100% - var(--fui-progress-ring-stroke)),
+        var(--foreground) calc(100% - 0.5px),
+        transparent
+      );
+      animation: fui-progress-turn 1.4s linear infinite;
+    }
+  }
+  @media (forced-colors: active) {
+    .fui-progress-indicator[data-indeterminate] {
+      forced-color-adjust: none;
+      position: static;
+      width: 100%;
+      border-radius: 0;
+      background: repeating-linear-gradient(90deg, Highlight 0 0.5rem, transparent 0.5rem 0.875rem);
+      animation: none;
+    }
+    .fui-progress-ring[data-indeterminate] .fui-progress-ring-track {
+      stroke: Highlight;
+      stroke-dasharray: 6 4;
+    }
+    .fui-progress-ring-light {
+      display: none;
+    }
   }
 }

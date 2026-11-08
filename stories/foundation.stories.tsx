@@ -183,8 +183,7 @@ function ControlsDemo() {
             <Badge tone="warning">Stale</Badge>
             <Badge tone="danger">Needs attention</Badge>
           </div>
-          <Label htmlFor="quota-progress">Quota usage · 42%</Label>
-          <Progress id="quota-progress" max={100} value={42} />
+          <Progress label="Quota usage" value={42} />
         </Card>
       </section>
       <section>

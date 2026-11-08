@@ -10,6 +10,7 @@ import { contextMeterExamples, workingLightExamples } from "./context-meter";
 import { buttonExamples, iconButtonExamples, kbdExamples, toggleGroupExamples } from "./actions";
 import { alertExamples, badgeExamples, spinnerExamples, statePanelExamples, statusDotExamples, toasterExamples } from "./status";
 import { avatarExamples, cardExamples, meterExamples, statExamples, tableExamples } from "./data";
+import { progressExamples } from "./progress";
 import { checkboxExamples, fieldExamples, radioGroupExamples, selectExamples, sliderExamples, switchExamples } from "./forms";
 import { accordionExamples, dialogExamples, dropdownMenuExamples, itemExamples, tabsExamples, tooltipExamples } from "./structure";
 
@@ -36,6 +37,7 @@ export const exampleSets: Record<string, ExampleSet> = {
   card: cardExamples,
   stat: statExamples,
   meter: meterExamples,
+  progress: progressExamples,
   table: tableExamples,
   avatar: avatarExamples,
   field: fieldExamples,

@@ -79,6 +79,7 @@ const stories: Record<string, string> = {
   "feedback-keys": "tests-feedback--keys",
   "feedback-notices": "tests-feedback--notices",
   "feedback-tags": "tests-feedback--tags",
+  "feedback-progress": "tests-feedback--progress-bars",
   "feedback-text": "tests-feedback--text",
   "structure-items": "tests-structure--items",
   "structure-header": "tests-structure--application-header",

@@ -269,20 +269,6 @@ export function Skeleton({ className, ...props }: ComponentProps<"div">) {
   );
 }
 
-export function Progress({
-  className,
-  tone = "neutral",
-  ...props
-}: ComponentProps<"progress"> & { tone?: Tone }) {
-  return (
-    <progress
-      data-tone={tone}
-      className={classes("fui-progress", className)}
-      {...props}
-    />
-  );
-}
-
 export function Table({
   className,
   children,

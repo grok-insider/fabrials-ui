@@ -81,6 +81,7 @@ Namespace: add "registries": { "@fabrials": "https://ui.fabrials.com/r/{name}.js
 - navigation-menu: npx shadcn@latest add https://ui.fabrials.com/r/navigation-menu.json
 - pagination: npx shadcn@latest add https://ui.fabrials.com/r/pagination.json
 - popover: npx shadcn@latest add https://ui.fabrials.com/r/popover.json
+- progress: npx shadcn@latest add https://ui.fabrials.com/r/progress.json
 - radio-group: npx shadcn@latest add https://ui.fabrials.com/r/radio-group.json
 - resizable: npx shadcn@latest add https://ui.fabrials.com/r/resizable.json
 - scroll-area: npx shadcn@latest add https://ui.fabrials.com/r/scroll-area.json

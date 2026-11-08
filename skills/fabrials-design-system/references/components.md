@@ -175,7 +175,8 @@ Triggers take `render` to become a Fabrials button: `<DialogTrigger render={<But
 | `Accordion`, `Collapsible` | Short answers in place; reasoning, sources or long detail behind a named trigger. `Accordion variant="rows"` with `AccordionTrigger` `icon`, `aside` (tags outside the trigger), `headingLevel`, `headingRef` is a stack of independent tools whose bodies stay mounted |
 | `ScrollArea` | A region that scrolls without moving the page |
 | `Loading`, `placeholderText`, `placeholderList`, `useLoading` | Paints the real components it wraps as their skeleton while `when` is true; placeholder copy and records; a hook for "inside a loading view" |
-| `Skeleton`, `Progress`, `Separator` | A block only where no component exists yet; a known fraction; a decorative break |
+| `Skeleton`, `Separator` | A block only where no component exists yet; a decorative break |
+| `Progress` (`ProgressLabel`, `ProgressValue`, `ProgressTrack`, `ProgressIndicator`) | A task that finishes: `label` names it and shows the value, `hint` gives counts and the time left, `tone` says how it ended; `size` `sm`, `default`, `lg` (4, 6, 8 px); `steps` for a task of known steps; `variant="ring"` (16, 24, 48 px) for a small place; no `value` while the total is on its way (the working light crosses it). 0 to 100 by default; pass `locale` with the page's language |
 | `Avatar` (`AvatarImage`, `AvatarFallback`), `avatarInitials` | A person or account; `avatarInitials(name or address)` is the fallback text |
 | `FileSize`, `formatBytes` | A byte count as people read it ("25 MB"); `FileSize` never throws while rendering |
 | `FileThumb`, `fileTypeLabel` | File previews and type tiles |

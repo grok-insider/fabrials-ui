@@ -19,6 +19,9 @@ import {
   KbdGroup,
   Loading,
   PageHeader,
+  Progress,
+  ProgressLabel,
+  ProgressValue,
   RelativeTime,
   SectionHeader,
   StatePanel,
@@ -637,10 +640,123 @@ function TextPage() {
   );
 }
 
+function ProgressPage() {
+  return (
+    <Page
+      title="Progress"
+      description="How far a task has gone: a label row, the track and a hint; three sizes, the tones, work whose total is not known yet, steps, a ring, and shadcn's parts."
+    >
+      <Block title="Label, value and hint" description="label names the bar and shows the value at the end of its row; hint is the line under it and describes the bar. Without a label, aria-label names it.">
+        <Frame width={480}>
+          <div className="catalogue-stack" style={{ gridTemplateColumns: "minmax(0, 1fr)" }}>
+            <Progress label="Indexing headers" value={62} hint="1,204 of 1,940 messages · about 1 min left" />
+            <Progress label="Sync progress" value={0.4} max={1} />
+            <Progress aria-label="Quota used" value={42} />
+          </div>
+        </Frame>
+      </Block>
+      <Block title="Sizes" description="sm 4 px for a row, the default 6 px, lg 8 px for a page's one task; the label row follows the size.">
+        <Frame width={480}>
+          <div className="catalogue-stack" style={{ gridTemplateColumns: "minmax(0, 1fr)" }}>
+            <Progress label="Small" size="sm" value={30} hint="In a list row" />
+            <Progress label="Default" value={55} hint="Under a card's title" />
+            <Progress label="Large" size="lg" value={80} hint="The task a page is about" />
+          </div>
+        </Frame>
+      </Block>
+      <Block title="Tones and outcomes" description="The tone repeats what the words say: done, slow, failed. A failed task keeps its bar where it stopped.">
+        <Frame width={480}>
+          <div className="catalogue-stack" style={{ gridTemplateColumns: "minmax(0, 1fr)" }}>
+            <Progress label="North workspace" value={48} hint="Indexing headers" />
+            <Progress label="Preview build" tone="info" value={70} hint="Rendering pages" />
+            <Progress label="Archive" tone="success" value={100} hint="3,412 messages · synced 2 min ago" />
+            <Progress label="Relay staging" tone="warning" value={33} hint="Slow: the server asked us to wait 30 s" />
+            <Progress label="Harbour lab" tone="danger" value={48} hint="Stopped at 48 %: the password was refused" />
+          </div>
+        </Frame>
+      </Block>
+      <Block title="Total not known yet" description="Without a value the track carries the working light (a dashed line under reduced motion); a tone that says an outcome paints it in its colour.">
+        <Frame width={480}>
+          <div className="catalogue-stack" style={{ gridTemplateColumns: "minmax(0, 1fr)" }}>
+            <Progress label="Counting messages" hint="The total arrives with the first page" />
+            <Progress aria-label="Preparing the upload" size="sm" />
+            <Progress label="Retrying" tone="warning" size="lg" hint="Attempt 2 of 5" />
+          </div>
+        </Frame>
+      </Block>
+      <Block title="Steps" description="steps cuts the bar into segments that ink in order: a form in steps, the files of a batch. A value between two steps fills part of a segment.">
+        <Frame width={480}>
+          <div className="catalogue-stack" style={{ gridTemplateColumns: "minmax(0, 1fr)" }}>
+            <Progress label="Step 2 of 4" max={4} showValue={false} steps={4} value={2} hint="Account, then workspace, then billing" />
+            <Progress label="Uploading" max={8} showValue={false} steps={8} value={3} hint="3 of 8 files" />
+            <Progress aria-label="Half a step" size="sm" steps={5} value={50} />
+            <Progress aria-label="Large steps" size="lg" steps={3} value={100} tone="success" />
+          </div>
+        </Frame>
+      </Block>
+      <Block title="Ring" description='variant="ring" closes clockwise, with its label and hint beside it; at lg the value sits inside. 16, 24 and 48 px.'>
+        <Frame width={480}>
+          <div className="catalogue-stack" style={{ gridTemplateColumns: "minmax(0, 1fr)" }}>
+            <div className="catalogue-row" style={{ alignItems: "center" }}>
+              <Progress aria-label="Small ring" size="sm" value={25} variant="ring" />
+              <Progress aria-label="Ring" value={60} variant="ring" />
+              <Progress aria-label="Large ring" size="lg" value={85} variant="ring" />
+              <Progress aria-label="Done" size="lg" tone="success" value={100} variant="ring" />
+              <Progress aria-label="Small ring, unknown" size="sm" variant="ring" />
+              <Progress aria-label="Ring, unknown" variant="ring" />
+              <Progress aria-label="Large ring, unknown" size="lg" variant="ring" />
+            </div>
+            <Progress label="report-q3.pdf" size="sm" value={40} variant="ring" />
+            <Progress label="Uploading 3 files" hint="2.4 of 6 MB · about 20 s left" value={40} variant="ring" />
+            <Progress label="Profile" size="lg" hint="Add a photo and a time zone to finish" value={60} variant="ring" />
+          </div>
+        </Frame>
+      </Block>
+      <Block title="shadcn's parts" description="ProgressLabel and ProgressValue go inside Progress, before its track; a function child writes the value, and getAriaValueText says the same.">
+        <Frame width={480}>
+          <Progress getAriaValueText={(_, value) => `${value ?? 0} of 3,000 messages`} max={3000} value={1204}>
+            <ProgressLabel>Importing</ProgressLabel>
+            <ProgressValue>{(_, value) => `${(value ?? 0).toLocaleString("en")} of 3,000`}</ProgressValue>
+          </Progress>
+        </Frame>
+      </Block>
+      <Block title="A phone pane and right to left" description="The label wraps before the value moves; in right to left the fill, the light and the segments start at the right.">
+        <Frame width={358}>
+          <div className="catalogue-stack" style={{ gridTemplateColumns: "minmax(0, 1fr)" }}>
+            <Progress label="A label long enough to wrap in a phone pane, beside its value" value={62} hint="1,204 of 1,940 messages · about 1 min left" />
+            <Progress label="Ring with a long label that wraps beside it" value={30} variant="ring" hint="And a hint under it" />
+          </div>
+        </Frame>
+        <Frame dir="rtl" width={480}>
+          <div className="catalogue-stack" style={{ gridTemplateColumns: "minmax(0, 1fr)" }}>
+            <Progress label="مزامنة البريد" value={62} hint="١٬٢٠٤ من ١٬٩٤٠ رسالة" />
+            <Progress label="عدّ الرسائل" />
+            <Progress aria-label="خطوات" max={4} steps={4} value={2.5} />
+            <Progress label="رفع الملفات" value={40} variant="ring" />
+          </div>
+        </Frame>
+      </Block>
+      <Block title="Loading" description="In a skeleton the track is one neutral shape and its words are bars.">
+        <Frame width={480}>
+          <Loading label="Loading imports" when>
+            <div className="catalogue-stack" style={{ gridTemplateColumns: "minmax(0, 1fr)" }}>
+              <Progress label="Indexing headers" value={62} hint="1,204 of 1,940 messages" />
+              <Progress label="Counting messages" />
+              <Progress label="Step 2 of 4" max={4} steps={4} value={2} />
+              <Progress label="Uploading 3 files" value={40} variant="ring" />
+            </div>
+          </Loading>
+        </Frame>
+      </Block>
+    </Page>
+  );
+}
+
 export const StatePanels: Story = { render: () => <StatePanelsPage /> };
 export const Confirmations: Story = { render: () => <ConfirmationsPage /> };
 export const Times: Story = { render: () => <TimesPage /> };
 export const Keys: Story = { render: () => <KeysPage /> };
 export const Notices: Story = { render: () => <NoticesPage /> };
 export const Tags: Story = { render: () => <TagsPage /> };
+export const ProgressBars: Story = { name: "Progress", render: () => <ProgressPage /> };
 export const Text: Story = { render: () => <TextPage /> };

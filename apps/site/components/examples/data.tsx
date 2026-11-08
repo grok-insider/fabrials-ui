@@ -18,7 +18,6 @@ import {
   CardHeader,
   CardTitle,
   Meter,
-  Progress,
   SeriesChart,
   Stat,
   StatGroup,
@@ -212,21 +211,6 @@ export const meterExamples: ExampleSet = {
       render: () => (
         <div style={{ width: "min(100%, 24rem)" }}>
           <Meter label="Header index" max={2048} value={412} variant="ruler" />
-        </div>
-      ),
-    },
-    {
-      id: "progress",
-      title: "Progress of a task",
-      description: "`Progress` is for work with a known end (a sync, an upload): a rounded track filled to `value` of `max`. Name it with a label.",
-      code: `<Label htmlFor="sync">Sync progress</Label>
-<Progress id="sync" value={0.4} max={1} />`,
-      render: () => (
-        <div style={{ display: "grid", gap: "var(--fui-space-2)", width: "min(100%, 24rem)" }}>
-          <label className="fui-label" htmlFor="example-sync">
-            Sync progress
-          </label>
-          <Progress id="example-sync" max={1} value={0.4} />
         </div>
       ),
     },

@@ -166,6 +166,8 @@ export type MeterProps = Omit<BaseMeter.Root.Props, "className" | "children"> & 
   variant?: "bar" | "ruler";
   /** Ticks on the ruler. */
   ticks?: number;
+  /** The language the value is written in ("42%", "42 %"). Default `"en"`, so the server and the browser write it alike; pass the page's. */
+  locale?: Intl.LocalesArgument;
 };
 
 export function Meter({
@@ -181,6 +183,7 @@ export function Meter({
   value,
   min = 0,
   max = 100,
+  locale = "en",
   ...props
 }: MeterProps) {
   const percent = ((value - min) / (max - min || 1)) * 100;
@@ -192,6 +195,7 @@ export function Meter({
       value={value}
       min={min}
       max={max}
+      locale={locale}
       data-tone={resolved}
       data-variant={variant === "ruler" ? "ruler" : undefined}
       className={classes("fui-meter", className)}

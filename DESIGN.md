@@ -143,6 +143,8 @@ The vocabulary (0.11, "instrument with life"), each tied to one cause:
 | A press | The key goes down 1 px while held | `Button` |
 | A check | The tick is drawn | `Checkbox` |
 | A level changes | The ruler inks its ticks in order and its mark travels | `Meter variant="ruler"`, `Stat meter` |
+| A task advances | The fill eases to the new amount; segments ink in order; a ring closes | `Progress` (`steps`, `variant="ring"`) |
+| Work whose total is not known yet | The working light crosses the track, or turns round the ring; a dashed line or ring holds still under reduced motion | `Progress` without a value |
 | A number changes | The digits roll like an odometer | `NumberTicker` |
 | A reading changes | The characters cycle for 240 ms and settle left to right | `Readout` |
 | Something arrives after the view is shown | It rises 4 px out of a slight blur; a list staggers its items by 45 ms, up to the eighth | `.fui-rise` with `--fui-stagger`; an agent's steps, search results, attachment tiles |
@@ -154,7 +156,7 @@ The vocabulary (0.11, "instrument with life"), each tied to one cause:
 | Holding a switch | The thumb stretches while held and springs across | `Switch` |
 | A tick | The check or dot pops in from 60 % | `Checkbox`, `Radio` |
 
-- Continuous motion is reserved for genuine loading indicators, an agent at work, and a `StatusDot` or `Badge` dot with `pulse` while something is live or in progress. Each stops when the work does.
+- Continuous motion is reserved for genuine loading indicators, an agent at work, a `Progress` whose total is not known yet, and a `StatusDot` or `Badge` dot with `pulse` while something is live or in progress. Each stops when the work does.
 - A page may have one orchestrated moment: `DitherScene` and a large `DitherGem` accept `reveal`, so the storm rolls in or the gem fills with light once on first paint. Never again, and not under reduced motion.
 - A `TimelineItem` marked `fresh` highlights once when a live item arrives.
 - `MoonPhase` and `Starfield` are the sign-in exception inherited from Radiant; they stop under reduced motion.
@@ -170,7 +172,7 @@ A loading view is the finished view painted as its own skeleton. Wrap the real c
 - The content is inert while loading and a status message names what loads (`label`). Keep the control that starts a refresh outside `Loading`.
 - The pulse is the one continuous motion and stops under reduced motion.
 - Tune a part with `data-skeleton`: `keep` (paint as usual), `hide`, `block`, `fill`.
-- Use a Spinner or a button's `loading` for an action in progress, Progress when the amount is known, and the standalone Skeleton block only where no component exists yet.
+- Use a Spinner or a button's `loading` for an action in progress, Progress when the amount is known (and, without a value, for the moment before a total arrives), and the standalone Skeleton block only where no component exists yet.
 
 ## Layout and composition
 

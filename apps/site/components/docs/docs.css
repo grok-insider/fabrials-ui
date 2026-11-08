@@ -259,7 +259,8 @@
 .docs-section-first {
   padding-top: 0;
 }
-.docs-section p {
+/* Prose only: the paragraphs a component draws inside a preview or an example keep its own type and spacing. */
+.docs-section p:not(:where(.docs-preview-stage *, .docs-example-stage *)) {
   margin: 0;
   max-width: 80ch;
   color: color-mix(in oklab, var(--foreground) 82%, var(--muted-foreground));
@@ -887,7 +888,7 @@ h3.docs-heading {
     --docs-toc: 17rem;
   }
   .docs-prose,
-  .docs-section p {
+  .docs-section p:not(:where(.docs-preview-stage *, .docs-example-stage *)) {
     font-size: 1rem;
   }
   .docs-article .fui-page-heading h1 {

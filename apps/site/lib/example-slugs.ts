@@ -22,6 +22,7 @@ export const exampleSlugs = [
   "card",
   "stat",
   "meter",
+  "progress",
   "table",
   "avatar",
   "field",
