@@ -5,6 +5,18 @@ import AxeBuilder from "@axe-core/playwright";
 const STORY = "/iframe.html?id=tests-agents--pieces&viewMode=story";
 const NOW = new Date("2026-11-07T10:00:00Z");
 
+// Storybook's own accessibility panel may be running axe in the same frame: wait for it rather than fail.
+async function audit(page: Page) {
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      return await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
+    } catch (error) {
+      if (!String(error).includes("Axe is already running") || attempt === 3) throw error;
+      await page.waitForTimeout(200);
+    }
+  }
+}
+
 async function open(page: Page, theme = "light") {
   await page.clock.setFixedTime(NOW);
   await page.goto(`${STORY}&globals=theme:${theme}`);
@@ -19,7 +31,7 @@ for (const theme of ["light", "dark"]) {
       await open(page, theme);
       await expect(page.locator("html")).toHaveClass(theme === "dark" ? /dark/ : /^(?!.*dark).*$/);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-      const result = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
+      const result = await audit(page);
       expect(result.violations).toEqual([]);
       await expect(page).toHaveScreenshot(`agents-${theme}-${width}.png`, { fullPage: true });
     });
