@@ -244,6 +244,16 @@ for (const scheme of ["light", "dark"] as const) {
       expect(await style(page, ".fui-progress-ring-light", ["display"])).toEqual({ display: "none" });
     });
 
+    test("a scroll area's thumb is CanvasText, and the region draws its focus ring", async ({ page }) => {
+      await open(page, "tests-catalogue--gallery", scheme);
+      const system = await palette(page);
+      await expect(page.locator(".fui-scrollbar-thumb").first()).toBeVisible();
+      expect(await style(page, ".fui-scrollbar-thumb", ["backgroundColor"])).toEqual({ backgroundColor: system.CanvasText });
+      await page.getByRole("region", { name: "Suggestions" }).focus();
+      await page.keyboard.press("ArrowDown");
+      expect(await style(page, ".fui-scroll-area", ["outlineStyle"])).toEqual({ outlineStyle: "solid" });
+    });
+
     test("charts: the legend keys keep the series' colours (the plot's SVG already does) and the axis text is CanvasText", async ({ page }) => {
       await open(page, "tests-catalogue--charts", scheme);
       const system = await palette(page);

@@ -5690,9 +5690,44 @@
     border-radius: inherit;
     outline: none;
   }
+  /* While it overflows, the ends of the lines keep clear of the bar that sits over them. */
+  .fui-scroll-area-viewport[data-has-overflow-y] {
+    padding-inline-end: 0.75rem;
+  }
+  /* The viewport is a tab stop while it overflows. Its ring is drawn on the region, inside its edge: the region clips what is
+     outside it, and a faded viewport would fade its own ring. */
+  .fui-scroll-area:has(> .fui-scroll-area-viewport:focus-visible) {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: -2px;
+  }
+  /* fade: the edges with more behind them fade out, up to 2rem and only as far as there is more (Base UI measures it). */
+  .fui-scroll-area[data-fade] > .fui-scroll-area-viewport {
+    --fui-scroll-fade: 2rem;
+    --fui-scroll-fade-x: to right;
+    mask-image:
+      linear-gradient(
+        to bottom,
+        transparent,
+        var(--foreground) min(var(--fui-scroll-fade), var(--scroll-area-overflow-y-start, 0px)),
+        var(--foreground) calc(100% - min(var(--fui-scroll-fade), var(--scroll-area-overflow-y-end, 0px))),
+        transparent
+      ),
+      linear-gradient(
+        var(--fui-scroll-fade-x),
+        transparent,
+        var(--foreground) min(var(--fui-scroll-fade), var(--scroll-area-overflow-x-start, 0px)),
+        var(--foreground) calc(100% - min(var(--fui-scroll-fade), var(--scroll-area-overflow-x-end, 0px))),
+        transparent
+      );
+    mask-composite: intersect;
+  }
+  .fui-scroll-area[data-fade] > .fui-scroll-area-viewport:dir(rtl) {
+    --fui-scroll-fade-x: to left;
+  }
+  /* A slim round thumb, quiet at rest; it deepens while the pointer is over the region or it scrolls, and again under the pointer. */
   .fui-scrollbar {
     display: flex;
-    padding: 1px;
+    padding: 2px;
     touch-action: none;
     user-select: none;
     transition: opacity var(--fui-duration) var(--fui-ease);
@@ -5706,9 +5741,18 @@
     height: 0.625rem;
   }
   .fui-scrollbar-thumb {
+    --fui-scrollbar-ink: 18%;
     position: relative;
     flex: 1;
-    background: color-mix(in oklab, var(--foreground) 20%, transparent);
+    border-radius: var(--fui-radius-full);
+    background: color-mix(in oklab, var(--foreground) var(--fui-scrollbar-ink), transparent);
+    transition: background-color var(--fui-duration) var(--fui-ease);
+  }
+  .fui-scrollbar:is([data-hovering], [data-scrolling]) > .fui-scrollbar-thumb {
+    --fui-scrollbar-ink: 30%;
+  }
+  .fui-scrollbar > .fui-scrollbar-thumb:is(:hover, :active) {
+    --fui-scrollbar-ink: 44%;
   }
   .fui-spinner {
     flex-shrink: 0;
@@ -7211,6 +7255,10 @@
     .fui-progress-indicator,
     .fui-progress-segment::before {
       background: Highlight;
+    }
+    /* A scrollbar's thumb says where the view is: CanvasText (its tint would be forced to nothing). */
+    .fui-scrollbar-thumb {
+      background: CanvasText;
     }
     /* A ring: the rest of the circle in GrayText, the part done in Highlight. */
     .fui-progress-ring-track {

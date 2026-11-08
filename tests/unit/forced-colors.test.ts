@@ -62,6 +62,7 @@ test("the block holds exactly the selectors of the four groups", () => {
     ".fui-progress-segment::before",
     ".fui-progress-track:not([data-steps]):not(.fui-progress-ring)",
     ".fui-radio-indicator",
+    ".fui-scrollbar-thumb",
     ".fui-radio[data-checked]",
     ".fui-switch-thumb",
     ".fui-switch[data-checked]",

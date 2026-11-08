@@ -1594,7 +1594,7 @@
       "name": "scroll-area",
       "type": "registry:ui",
       "title": "Scroll area",
-      "description": "shadcn's scroll-area, backed by @fabrials/ui. A region that scrolls without moving the page.",
+      "description": "shadcn's scroll-area, backed by @fabrials/ui. A region that scrolls without moving the page: a slim round thumb, its own focus ring, and edges that fade where there is more.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
         "@fabrials/ui@^0.11.0"

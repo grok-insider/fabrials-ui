@@ -125,7 +125,6 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-  ScrollArea,
   SectionHeader,
   Select,
   SelectContent,
@@ -489,15 +488,6 @@ const demos: Record<string, () => ReactNode> = {
           Three synthetic sources, read 4 minutes ago. Nothing was sent.
         </CollapsibleContent>
       </Collapsible>
-    </Frame>
-  ),
-  "scroll-area": () => (
-    <Frame width="fit">
-      <ScrollArea aria-label="Suggestions" className="h-28 max-w-sm rounded-md border p-3">
-        {["Compare usage", "Open accounts", "Refresh the pool", "Read the last sync"].map((item) => (
-          <p key={item} className="py-1 text-sm">{item}</p>
-        ))}
-      </ScrollArea>
     </Frame>
   ),
   "navigation-menu": () => (
@@ -1322,6 +1312,7 @@ const previewWidths: Record<string, FrameWidth> = {
   alert: "form",
   badge: "form",
   progress: "form",
+  "scroll-area": "form",
 };
 
 export function UiDemo({ slug }: { slug: string }) {

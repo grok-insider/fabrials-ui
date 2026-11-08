@@ -83,6 +83,15 @@ What a host checks:
 
 `Meter` gains `locale` too, default `"en"`: before, its value was written in the runtime's language, which differed between the server and a browser in another language and broke hydration ("42%" against "42 %").
 
+## Scroll area
+
+- The thumb is round and slimmer (6 px in a 10 px bar, was 8 px and square), quiet at rest (`--fui-scrollbar-ink`, 18 %); it deepens while the pointer is over the region or it scrolls (30 %) and under the pointer (44 %).
+- The region draws a focus ring when its viewport takes keyboard focus; before, the viewport removed its outline and a keyboard user saw nothing. The ring is the region's `outline`, inside its edge.
+- `aria-label` and `aria-labelledby` name the viewport, which takes focus while the content overflows, and make it a `region`. Before, they went to Base UI's root, which is presentational, and the name was lost.
+- While the content overflows vertically the viewport keeps 0.75rem clear at the end of its lines, so the bar no longer sits over words. A host that pads the viewport itself keeps its own padding.
+- `fade` (new) fades the edges that have more behind them, up to 2rem and only as far as there is more, from Base UI's overflow measures; vertical and horizontal.
+- In forced colors the thumb is CanvasText; before, its tint was forced away and it disappeared.
+
 ## New tokens
 
 `--fui-radius-2xl`, `--fui-ease-spring`, `--fui-tint-strength`, `--fui-tint-strong`, `--fui-tint-edge`, `--fui-surface-inset`, `--fui-surface-hover`, `--fui-separator`, `--fui-sidebar-active`, `--fui-switch-thumb`, `--fui-light-1`, `--fui-light-2`, `--fui-light-3`. The derived ones are declared on every theme scope, so a nested theme island computes them from its own surface.
