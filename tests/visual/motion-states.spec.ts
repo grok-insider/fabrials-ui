@@ -88,3 +88,40 @@ test("a streaming caret blinks only once the answer pauses", async ({ browser })
   await close();
 });
 
+// A panel open on first paint used to replay its opening (a fade from nothing) when it was closed the first time.
+for (const [name, story, trigger, panel] of [
+  ["sources", "tests-ai-chat--citations-and-sources", ".fui-sources-trigger", ".fui-sources-grid"],
+  ["search steps", "tests-agents--pieces", ".fui-search-activity .fui-activity-trigger", ".fui-search-activity .fui-activity-body"],
+] as const) {
+  test(`closing ${name} open on first paint fades it out once, like any later close`, async ({ browser }) => {
+    const { page, close } = await moving(browser, `http://127.0.0.1:${port}/iframe.html?id=${story}&viewMode=story&globals=theme:dark`);
+    await expect(page.locator(panel).first()).toBeVisible();
+    const fade = () =>
+      page.evaluate(
+        ([button, body]) =>
+          new Promise<number[]>((resolve) => {
+            const seen: number[] = [];
+            const start = performance.now();
+            const tick = () => {
+              const node = document.querySelector(body);
+              seen.push(node ? Number(getComputedStyle(node).opacity) : 0);
+              if (node && performance.now() - start < 600) requestAnimationFrame(tick);
+              else resolve(seen);
+            };
+            (document.querySelector(button) as HTMLElement).click();
+            requestAnimationFrame(tick);
+          }),
+        [trigger, panel] as const,
+      );
+    for (const round of ["first", "second"]) {
+      const seen = await fade();
+      // It only ever fades: no frame is brighter than the one before, and it is gone within the close.
+      for (let index = 1; index < seen.length; index += 1) expect(seen[index], `${round} close, frame ${index}: ${seen.join(" ")}`).toBeLessThanOrEqual(seen[index - 1]! + 0.001);
+      expect(seen.at(-1)).toBe(0);
+      await page.locator(trigger).first().click();
+      await expect(page.locator(panel).first()).toBeVisible();
+      await page.waitForTimeout(400);
+    }
+    await close();
+  });
+}

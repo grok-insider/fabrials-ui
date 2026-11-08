@@ -1866,9 +1866,21 @@
     .fui-voice-button[data-status="recording"] .fui-voice-dot {
       animation: fui-ai-blink 1.4s ease-in-out infinite;
     }
+    /* A panel rises into place as it opens and goes the same way, faster, as it closes, through the starting and ending
+       styles of its Collapsible. Not a mount animation: a panel already open on first paint shows at once, and closing it
+       the first time must not replay its opening. */
     .fui-activity-body,
     .fui-sources-grid {
-      animation: fui-ai-slide-in var(--fui-duration-slow) var(--fui-ease);
+      transition:
+        opacity var(--fui-duration-slow) var(--fui-ease-out),
+        translate var(--fui-duration-slow) var(--fui-ease-out);
+    }
+    :is(.fui-activity-body, .fui-sources-grid):is([data-starting-style], [data-ending-style]) {
+      opacity: 0;
+      translate: 0 -0.25rem;
+    }
+    :is(.fui-activity-body, .fui-sources-grid)[data-ending-style] {
+      transition-duration: var(--fui-duration);
     }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -1890,12 +1902,6 @@
     100% {
       opacity: 0;
       transform: scale(2.6);
-    }
-  }
-  @keyframes fui-ai-slide-in {
-    from {
-      opacity: 0;
-      transform: translateY(-0.25rem);
     }
   }
   @keyframes fui-ai-blink {
