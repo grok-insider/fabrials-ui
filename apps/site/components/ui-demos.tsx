@@ -1313,6 +1313,7 @@ const previewWidths: Record<string, FrameWidth> = {
   badge: "form",
   progress: "form",
   "scroll-area": "form",
+  "avatar-group": "form",
 };
 
 export function UiDemo({ slug }: { slug: string }) {

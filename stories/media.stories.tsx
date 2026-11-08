@@ -26,7 +26,7 @@ const TEAM = ["Ana Lopez", "Kai Nakamura", "Priya Shah", "Tom Adeyemi", "Lena Fi
 
 function PeoplePage() {
   return (
-    <Page title="People" description="Avatars in five sizes, a presence badge that is never the only signal, and groups that overlap with a ring in the page colour and fold the rest into a count.">
+    <Page title="People" description="Avatars in five sizes with initials on a colour of their own, a presence badge that is never the only signal, and groups cut out of the surface under them that fold the rest into a count.">
       <Block title="Sizes">
         <div className="catalogue-row">
           {(["xs", "sm", "md", "lg", "xl"] as const).map((size) => (

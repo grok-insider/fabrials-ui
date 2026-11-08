@@ -23,3 +23,22 @@ export const QUARRY = scene({ width: 768, height: 1024, sky: ["#2a1b26", "#9c6f8
 
 /** A small picture attachment. */
 export const PHOTO = scene({ width: 320, height: 240, sky: ["#121826", "#5a6b8a"], ground: "#0b0f17", sun: "#dfe6f2" });
+
+type Sitter = { background: string; skin: string; hair: string; shirt: string };
+
+/** A synthetic portrait for an avatar: a head and shoulders on a soft ground. Drawn, not a person. */
+export function portrait({ background, skin, hair, shirt }: Sitter): string {
+  return encode(`<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96">
+<rect width="96" height="96" fill="${background}"/>
+<path d="M12 96c3-21 17-31 36-31s33 10 36 31z" fill="${shirt}"/>
+<rect x="41" y="52" width="14" height="14" rx="6" fill="${skin}"/>
+<ellipse cx="48" cy="40" rx="16" ry="18" fill="${skin}"/>
+<path d="M31 40c-2-15 6-25 17-25s20 9 17 25c-3-8-9-12-17-12s-14 4-17 12z" fill="${hair}"/>
+</svg>`);
+}
+
+export const PORTRAITS = {
+  ana: portrait({ background: "#c9d8e8", skin: "#d9a37f", hair: "#3a2a22", shirt: "#3d5a80" }),
+  rafael: portrait({ background: "#dbe7d4", skin: "#8d5b3e", hair: "#1d1a17", shirt: "#4f6d4a" }),
+  lena: portrait({ background: "#efe0cf", skin: "#f0c7a6", hair: "#b8863b", shirt: "#7a4b6e" }),
+};

@@ -8783,7 +8783,7 @@
     min-width: 0.625rem;
     height: 0.625rem;
     padding: 0;
-    border: 2px solid var(--background);
+    border: 2px solid var(--fui-avatar-ring, var(--background));
     border-radius: var(--fui-radius-full);
     background: var(--success);
     color: var(--brand-foreground);
@@ -8818,20 +8818,48 @@
     isolation: isolate;
   }
   .fui-avatar-group > .fui-avatar {
-    box-shadow: 0 0 0 2px var(--background);
+    box-shadow: 0 0 0 2px var(--fui-avatar-ring, var(--background));
   }
   .fui-avatar-group > .fui-avatar + .fui-avatar {
     margin-inline-start: -0.5rem;
   }
-  .fui-avatar-group[data-size="sm"] > .fui-avatar + .fui-avatar,
-  .fui-avatar-group[data-size="xs"] > .fui-avatar + .fui-avatar {
+  .fui-avatar-group[data-size="sm"] > .fui-avatar + .fui-avatar {
     margin-inline-start: -0.375rem;
+  }
+  .fui-avatar-group[data-size="xs"] > .fui-avatar + .fui-avatar {
+    margin-inline-start: -0.25rem;
   }
   .fui-avatar-group-count {
     background: var(--secondary);
     color: var(--foreground);
     font-family: var(--fui-font-label);
     letter-spacing: var(--fui-tracking-label);
+  }
+  /* 0.11: initials on a tint of one of the five data hues, picked from the initials (AvatarFallback), inked and edged in it, so
+     the people of a group tell apart. A card is the surface its avatars cut their ring and their badge's edge out of. */
+  .fui-avatar-fallback[data-tint="1"] {
+    --fui-avatar-hue: var(--chart-1);
+  }
+  .fui-avatar-fallback[data-tint="2"] {
+    --fui-avatar-hue: var(--chart-2);
+  }
+  .fui-avatar-fallback[data-tint="3"] {
+    --fui-avatar-hue: var(--chart-3);
+  }
+  .fui-avatar-fallback[data-tint="4"] {
+    --fui-avatar-hue: var(--chart-4);
+  }
+  .fui-avatar-fallback[data-tint="5"] {
+    --fui-avatar-hue: var(--chart-5);
+  }
+  .fui-avatar-fallback[data-tint] {
+    --fui-avatar-ink: var(--fui-avatar-tint, var(--fui-avatar-hue));
+    background: color-mix(in oklab, var(--fui-avatar-ink) var(--fui-tint-edge), var(--card));
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--fui-avatar-ink) 24%, transparent);
+    color: color-mix(in oklab, var(--fui-avatar-ink) 62%, var(--foreground));
+  }
+  .fui-card {
+    --fui-avatar-ring: var(--card);
   }
 
   .fui-aspect-ratio {

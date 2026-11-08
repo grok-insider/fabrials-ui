@@ -64,7 +64,7 @@ import { ChatMessage, ChatComposer } from "@fabrials/ai-ui";         // needs @f
 | Files dropped or chosen | `Dropzone` (`accept`, `maxSize`, `onFilesRejected`) | `react-dropzone`, a `div` that only listens to drops |
 | A picture in the page | `Image` (`ratio`, `fit`, `caption`) or `AspectRatio` for other content | A bare `img` that jumps when it loads and leaves a broken icon |
 | The pictures of a post or a message | `MediaGrid` + `ImageViewer` | A grid of identical cards, a lightbox library |
-| People on a record | `AvatarGroup max` (+N), `AvatarBadge` for presence, the names beside it | A row of faces with no names, a coloured ring as the only status |
+| People on a record | `AvatarGroup max` (+N; `size` sizes its avatars), `AvatarBadge` for presence, the names beside it (then the badge is decorative) | A row of faces with no names, a coloured ring as the only status |
 | A video | `VideoPlayer` (`label`, `poster`, `tracks`; inside `ImageViewer` through `renderMedia`) | `<video controls>` (its controls cannot be styled or translated), a player library |
 | A recording | `AudioPlayer` | `<audio controls>` |
 | A GIF or a short silent loop | `AnimatedImage` (`type="video"` for MP4 or WebM, `"image"` for a GIF) | An `img` of a GIF that moves forever and cannot be paused |
@@ -177,7 +177,7 @@ Triggers take `render` to become a Fabrials button: `<DialogTrigger render={<But
 | `Loading`, `placeholderText`, `placeholderList`, `useLoading` | Paints the real components it wraps as their skeleton while `when` is true; placeholder copy and records; a hook for "inside a loading view" |
 | `Skeleton`, `Separator` | A block only where no component exists yet; a decorative break |
 | `Progress` (`ProgressLabel`, `ProgressValue`, `ProgressTrack`, `ProgressIndicator`) | A task that finishes: `label` names it and shows the value, `hint` gives counts and the time left, `tone` says how it ended; `size` `sm`, `default`, `lg` (4, 6, 8 px); `steps` for a task of known steps; `variant="ring"` (16, 24, 48 px) for a small place; no `value` while the total is on its way (the working light crosses it). 0 to 100 by default; pass `locale` with the page's language |
-| `Avatar` (`AvatarImage`, `AvatarFallback`), `avatarInitials` | A person or account; `avatarInitials(name or address)` is the fallback text |
+| `Avatar` (`AvatarImage`, `AvatarFallback`), `avatarInitials`, `avatarTint` | A person or account; `avatarInitials(name or address)` is the fallback text, on a tint of one of the five data hues picked from it (`tint={false}` for the neutral surface) |
 | `FileSize`, `formatBytes` | A byte count as people read it ("25 MB"); `FileSize` never throws while rendering |
 | `FileThumb`, `fileTypeLabel` | File previews and type tiles |
 | `TruncatedText` | One line that shows its full text in a tooltip only when cut |

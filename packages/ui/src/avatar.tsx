@@ -1,20 +1,24 @@
 "use client";
 
-import { Children, isValidElement, type ComponentProps, type ReactElement, type ReactNode } from "react";
+import { Children, createContext, isValidElement, useContext, type ComponentProps, type ReactElement, type ReactNode } from "react";
 import { Avatar as BaseAvatar } from "@base-ui/react/avatar";
 import { classes, type StyledProps } from "./shared";
 
 export type AvatarSize = "xs" | "sm" | "md" | "lg" | "xl";
 
+const GroupSize = createContext<AvatarSize | undefined>(undefined);
+
+/** A person or an account. Inside an `AvatarGroup` with a `size`, it takes the group's size unless it has its own. */
 export function Avatar({
   className,
-  size = "md",
+  size,
   ...props
 }: StyledProps<BaseAvatar.Root.Props> & { size?: AvatarSize }) {
+  const groupSize = useContext(GroupSize);
   return (
     <BaseAvatar.Root
       data-slot="avatar"
-      data-size={size}
+      data-size={size ?? groupSize ?? "md"}
       className={classes("fui-avatar", className)}
       {...props}
     />
@@ -34,16 +38,37 @@ export function AvatarImage({
   );
 }
 
+/** One of the five data hues for a fallback's text, the same on the server and in the browser (FNV-1a over its code points). */
+export function avatarTint(text: string): 1 | 2 | 3 | 4 | 5 {
+  let hash = 0x811c9dc5;
+  for (const char of text.trim().toLocaleUpperCase("en")) {
+    hash ^= char.codePointAt(0) ?? 0;
+    hash = Math.imul(hash, 0x01000193) >>> 0;
+  }
+  return ((hash % 5) + 1) as 1 | 2 | 3 | 4 | 5;
+}
+
+/**
+ * What shows until the picture loads, and if it fails: usually `avatarInitials(name)`. Initials sit on a tint of one of the
+ * five data hues, picked from the initials themselves, so the people in a group tell apart (0.11); `tint={false}` keeps the
+ * neutral surface, and `--fui-avatar-tint` on the avatar sets the hue yourself.
+ */
 export function AvatarFallback({
   className,
+  tint = true,
+  children,
   ...props
-}: StyledProps<BaseAvatar.Fallback.Props>) {
+}: StyledProps<BaseAvatar.Fallback.Props> & { tint?: boolean }) {
+  const hue = tint && typeof children === "string" && children.trim() ? avatarTint(children) : undefined;
   return (
     <BaseAvatar.Fallback
       data-slot="avatar-fallback"
+      data-tint={hue}
       className={classes("fui-avatar-fallback", className)}
       {...props}
-    />
+    >
+      {children}
+    </BaseAvatar.Fallback>
   );
 }
 
@@ -101,8 +126,10 @@ export function AvatarGroupCount({ className, ...props }: ComponentProps<"span">
 }
 
 /**
- * Avatars that overlap, each ringed in the page colour. With `max`, the rest become a count ("+3", named in full by
- * `countLabel`). Put the names somewhere readable: a group of faces is not a list of people.
+ * Avatars that overlap, each ringed in the colour of the surface they sit on (`--fui-avatar-ring`: the page, or a card). With
+ * `max`, the rest become a count ("+3", named in full by `countLabel`); a count of one would take a face's place, so that face
+ * is shown instead. `size` sizes the avatars inside it. Put the names somewhere readable: a group of faces is not a list of
+ * people.
  */
 export function AvatarGroup({
   max,
@@ -113,16 +140,18 @@ export function AvatarGroup({
   ...props
 }: ComponentProps<"div"> & { max?: number; size?: AvatarSize; countLabel?: (hidden: number) => string }) {
   const all = Children.toArray(children).filter((child): child is ReactElement => isValidElement(child));
-  const shown = max !== undefined && all.length > max ? all.slice(0, Math.max(1, max)) : all;
+  const shown = max !== undefined && all.length > Math.max(1, max) + 1 ? all.slice(0, Math.max(1, max)) : all;
   const hidden = all.length - shown.length;
   return (
-    <div data-slot="avatar-group" data-size={size} className={classes("fui-avatar-group", className)} {...props}>
-      {shown as ReactNode}
-      {hidden > 0 ? (
-        <AvatarGroupCount data-size={size} aria-label={countLabel(hidden)} role="img">
-          +{hidden}
-        </AvatarGroupCount>
-      ) : null}
-    </div>
+    <GroupSize.Provider value={size}>
+      <div data-slot="avatar-group" data-size={size} className={classes("fui-avatar-group", className)} {...props}>
+        {shown as ReactNode}
+        {hidden > 0 ? (
+          <AvatarGroupCount data-size={size} aria-label={countLabel(hidden)} role="img">
+            +{hidden}
+          </AvatarGroupCount>
+        ) : null}
+      </div>
+    </GroupSize.Provider>
   );
 }

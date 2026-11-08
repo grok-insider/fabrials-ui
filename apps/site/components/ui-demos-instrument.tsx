@@ -7,9 +7,7 @@ import {
   AspectRatio,
   AudioPlayer,
   Avatar,
-  AvatarBadge,
   AvatarFallback,
-  AvatarGroup,
   Image,
   ImageViewer,
   MediaGrid,
@@ -277,24 +275,6 @@ export const instrumentDemos: Record<string, () => ReactNode> = {
       <div className="grid gap-4 sm:grid-cols-2">
         <AnimatedImage src="/media/loop.webm" alt="Colour drifting across a dusk sky" width={320} height={180} />
         <AnimatedImage src="/media/loop.gif" alt="Green copper light rippling" type="image" width={240} height={135} />
-      </div>
-    </Frame>
-  ),
-  "avatar-group": () => (
-    <Frame width="fit">
-      <div className="flex flex-wrap items-center gap-6">
-        <AvatarGroup max={3}>
-          {PEOPLE.map((person) => (
-            <Avatar key={person.id}>
-              <AvatarFallback>{avatarInitials(person.name)}</AvatarFallback>
-            </Avatar>
-          ))}
-        </AvatarGroup>
-        <Avatar size="lg">
-          <AvatarFallback>KN</AvatarFallback>
-          <AvatarBadge tone="success" label="Online" />
-        </Avatar>
-        <span className="text-sm">Kai Nakamura · Online</span>
       </div>
     </Frame>
   ),

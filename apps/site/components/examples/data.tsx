@@ -29,7 +29,7 @@ import {
   TableRow,
 } from "@fabrials/ui";
 import type { ExampleSet } from "./types";
-import { scene } from "./fixtures";
+import { PORTRAITS } from "./fixtures";
 
 const WEEK = [
   { day: "Mon", requests: 412 },
@@ -48,7 +48,7 @@ const SENDERS = [
 ];
 
 const grouped = new Intl.NumberFormat("en");
-const PORTRAIT = scene({ width: 160, height: 160, sky: ["#22314a", "#5d7fa8"], ground: "#141c2a", sun: "#f2e3c2" });
+const PORTRAIT = PORTRAITS.ana;
 
 export const cardExamples: ExampleSet = {
   examples: [
@@ -334,7 +334,7 @@ export const avatarExamples: ExampleSet = {
     {
       id: "group",
       title: "A team",
-      description: "`AvatarGroup` overlaps faces, each ringed in the page colour; with `max` the rest become a count named in full. Write the names somewhere readable too.",
+      description: "`AvatarGroup` overlaps faces, each ringed in the colour of the surface under it; with `max` the rest become a count named in full. Initials sit on a colour of their own, picked from the initials. Write the names somewhere readable too.",
       code: `<AvatarGroup max={4}>
   {team.map((person) => (
     <Avatar key={person.id}><AvatarFallback>{person.initials}</AvatarFallback></Avatar>

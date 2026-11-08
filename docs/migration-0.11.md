@@ -92,6 +92,13 @@ What a host checks:
 - `fade` (new) fades the edges that have more behind them, up to 2rem and only as far as there is more, from Base UI's overflow measures; vertical and horizontal.
 - In forced colors the thumb is CanvasText; before, its tint was forced away and it disappeared.
 
+## Avatars
+
+- **Initials on a colour of their own.** `AvatarFallback` sits its initials on a tint of one of the five data hues (`--chart-1` to `-5`), inked and edged in it, picked from the initials by `avatarTint` (new, FNV-1a, the same on the server and in the browser). Before, every fallback was the same grey on grey. `tint={false}` keeps the neutral surface; `--fui-avatar-tint` on the avatar sets a hue of your own. A fallback whose children are not a string is not tinted.
+- **A group sizes its avatars.** `AvatarGroup size` now sizes the avatars inside it (it sized only the overlap and the count before); an avatar with its own `size` keeps it. The overlap of an `xs` group is 4 px (was 6 px), so its initials stay readable.
+- **A count of one shows the face.** With `max`, a group that would hide a single person draws that face instead of "+1" (the same width).
+- **The ring is the surface's colour.** Each face in a group, and a badge's edge, is ringed in `--fui-avatar-ring`: the page by default and the card's colour inside a `Card` (before, the page colour drew a visible ring on a card). Set it on a surface of your own.
+
 ## New tokens
 
 `--fui-radius-2xl`, `--fui-ease-spring`, `--fui-tint-strength`, `--fui-tint-strong`, `--fui-tint-edge`, `--fui-surface-inset`, `--fui-surface-hover`, `--fui-separator`, `--fui-sidebar-active`, `--fui-switch-thumb`, `--fui-light-1`, `--fui-light-2`, `--fui-light-3`. The derived ones are declared on every theme scope, so a nested theme island computes them from its own surface.

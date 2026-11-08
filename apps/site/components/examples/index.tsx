@@ -12,6 +12,7 @@ import { alertExamples, badgeExamples, spinnerExamples, statePanelExamples, stat
 import { avatarExamples, cardExamples, meterExamples, statExamples, tableExamples } from "./data";
 import { progressExamples } from "./progress";
 import { scrollAreaExamples } from "./scroll-area";
+import { avatarGroupExamples } from "./avatar-group";
 import { checkboxExamples, fieldExamples, radioGroupExamples, selectExamples, sliderExamples, switchExamples } from "./forms";
 import { accordionExamples, dialogExamples, dropdownMenuExamples, itemExamples, tabsExamples, tooltipExamples } from "./structure";
 
@@ -40,6 +41,7 @@ export const exampleSets: Record<string, ExampleSet> = {
   meter: meterExamples,
   progress: progressExamples,
   "scroll-area": scrollAreaExamples,
+  "avatar-group": avatarGroupExamples,
   table: tableExamples,
   avatar: avatarExamples,
   field: fieldExamples,
