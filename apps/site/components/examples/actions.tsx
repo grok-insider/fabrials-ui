@@ -232,7 +232,7 @@ export const toggleGroupExamples: ExampleSet = {
       id: "single",
       title: "One choice",
       description:
-        "A segmented choice: the group sits in a well and the chosen segment is raised; when it changes, the indicator slides to it. `value` is an array, also for a single choice.",
+        "A segmented choice: the group sits in a well and the chosen segment is a raised plate; when the choice changes, the plate slides to it, its leading edge first. `value` is an array, also for a single choice.",
       code: `const [range, setRange] = useState(["7d"]);
 
 <ToggleGroup aria-label="Range" value={range} onValueChange={setRange}>

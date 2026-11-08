@@ -51,17 +51,14 @@ import {
   SearchInput,
   Slider,
 } from "@fabrials/ui";
-
-function Frame({ children }: { children: ReactNode }) {
-  return <div className="fui-preview grid grid-cols-[minmax(0,1fr)] gap-4">{children}</div>;
-}
+import { Frame } from "@/components/demo-frame";
 
 function SearchDemo() {
   const [query, setQuery] = useState("");
   const accounts = ["North workspace", "Harbour lab", "Field office", "Night shift"];
   const shown = accounts.filter((name) => name.toLowerCase().includes(query.trim().toLowerCase()));
   return (
-    <Frame>
+    <Frame width="field">
       <SearchInput aria-label="Search accounts" placeholder="Search accounts" value={query} onValueChange={setQuery} shortcut={<Kbd>/</Kbd>} />
       <p className="fui-description" role="status">
         {shown.length ? shown.join(", ") : "No account matches."}
@@ -73,7 +70,7 @@ function SearchDemo() {
 function SliderDemo() {
   const [range, setRange] = useState<number | readonly number[]>([20, 80]);
   return (
-    <Frame>
+    <Frame width="field">
       <div className="grid gap-2">
         <Label>Volume</Label>
         <Slider aria-label="Volume" defaultValue={64} showValue />
@@ -90,11 +87,14 @@ function SliderDemo() {
   );
 }
 
+// A fixed day: the server and the reader's browser must draw the same month and the same today, whatever their time zones.
+const CALENDAR_TODAY = new Date(2026, 10, 12);
+
 function CalendarDemo() {
-  const [day, setDay] = useState<Date | undefined>(() => new Date());
+  const [day, setDay] = useState<Date | undefined>(CALENDAR_TODAY);
   return (
-    <Frame>
-      <Calendar mode="single" selected={day} onSelect={setDay} required />
+    <Frame width="fit">
+      <Calendar mode="single" selected={day} onSelect={setDay} required today={CALENDAR_TODAY} />
       <p className="fui-description" role="status">
         {day ? `Chosen: ${day.toDateString()}` : "No day chosen."}
       </p>
@@ -106,7 +106,7 @@ function DatePickerDemo() {
   const [due, setDue] = useState<Date | null>(null);
   const [trip, setTrip] = useState<DateRange | null>(null);
   return (
-    <Frame>
+    <Frame width="field">
       <Field label="Due date">{(control) => <DatePicker {...control} value={due} onValueChange={setDue} clearable />}</Field>
       <Field label="Trip">{(control) => <DateRangePicker {...control} value={trip} onValueChange={setTrip} clearable />}</Field>
     </Frame>
@@ -139,7 +139,7 @@ function PersonRow({ person }: { person: (typeof PEOPLE)[number] }) {
 function ListBoxDemo() {
   const [picked, setPicked] = useState<string[]>(["kai"]);
   return (
-    <Frame>
+    <Frame width="field">
       <ListBox aria-label="People" items={PEOPLE} getKey={(person) => person.id} getTextValue={(person) => person.name} selected={picked} onSelectedChange={setPicked} renderItem={(person) => <PersonRow person={person} />} />
     </Frame>
   );
@@ -148,8 +148,10 @@ function ListBoxDemo() {
 const LINES = Array.from({ length: 5000 }, (_, index) => ({ id: String(index), text: `Event ${index + 1}: mailbox synced in ${(index * 37) % 900} ms` }));
 
 function SidePanelDemo() {
-  // The preview follows the window: open where the panel docks, closed where it would be a modal sheet over the docs page
-  // (that one opens when asked). A layout effect, so it hears a resize before the panel does and no sheet flashes open.
+  // The preview follows the window: open where the panel docks, closed
+  // where it would be a modal sheet over the docs page (that one opens when
+  // asked). A layout effect: it hears a resize before the panel does, so no
+  // sheet flashes open.
   const [open, setOpen] = useState(false);
   useLayoutEffect(() => {
     const docks = window.matchMedia("(min-width: 560px)");
@@ -182,7 +184,7 @@ function DropzoneDemo() {
   const [files, setFiles] = useState<string[]>([]);
   const [error, setError] = useState<string | undefined>();
   return (
-    <Frame>
+    <Frame width="form">
       <Dropzone
         description="PDF or images, up to 2 MB."
         accept=".pdf,image/*"
@@ -221,7 +223,7 @@ function GalleryDemo({ count }: { count: number }) {
   const [index, setIndex] = useState<number | null>(null);
   const items = SCENES.slice(0, count);
   return (
-    <Frame>
+    <Frame width="wide">
       <MediaGrid items={items} onOpen={setIndex} />
       <ImageViewer items={items} index={index} onIndexChange={setIndex} onClose={() => setIndex(null)} label="Photos" />
     </Frame>
@@ -246,7 +248,7 @@ const LEDGER = {
 
 export const instrumentDemos: Record<string, () => ReactNode> = {
   direction: () => (
-    <Frame>
+    <Frame width="field">
       <div dir="rtl" lang="ar" className="grid gap-2">
         <DirectionProvider direction="rtl">
           <Label>مستوى الصوت</Label>
@@ -261,12 +263,12 @@ export const instrumentDemos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   "video-player": () => (
-    <Frame>
+    <Frame width="wide">
       <VideoPlayer src="/media/harbour.webm" label="The harbour at dusk" poster={POSTER} width={640} height={360} tracks={[{ src: "/media/harbour.en.vtt", srcLang: "en", label: "English" }]} />
     </Frame>
   ),
   "audio-player": () => (
-    <Frame>
+    <Frame width="form">
       <AudioPlayer src="/media/chime.webm" label="Three-note chime" title="Three-note chime · 0:05" />
     </Frame>
   ),
@@ -279,7 +281,7 @@ export const instrumentDemos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   "avatar-group": () => (
-    <Frame>
+    <Frame width="fit">
       <div className="flex flex-wrap items-center gap-6">
         <AvatarGroup max={3}>
           {PEOPLE.map((person) => (
@@ -297,7 +299,7 @@ export const instrumentDemos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   image: () => (
-    <Frame>
+    <Frame width="form">
       <Image src={SCENES[0]!.src} alt={SCENES[0]!.alt} ratio="16 / 9" caption="The harbour at dusk. Synthetic." />
       <AspectRatio ratio={3} className="grid place-items-center rounded-md bg-muted font-mono text-xs text-muted-foreground">
         3 / 1
@@ -308,12 +310,12 @@ export const instrumentDemos: Record<string, () => ReactNode> = {
   "image-viewer": () => <GalleryDemo count={3} />,
   "list-box": () => <ListBoxDemo />,
   "virtual-list": () => (
-    <Frame>
+    <Frame width="form">
       <VirtualList aria-label="Sync events" items={LINES} getKey={(line) => line.id} estimateSize={36} height={240} renderItem={(line) => <p className="border-b py-2 font-mono text-xs">{line.text}</p>} />
     </Frame>
   ),
   "context-menu": () => (
-    <Frame>
+    <Frame width="form">
       <ContextMenu>
         <ContextMenuTrigger tabIndex={0} className="grid min-h-28 place-items-center rounded-md border border-dashed text-sm text-muted-foreground">Right-click here, or focus and press Shift+F10</ContextMenuTrigger>
         <ContextMenuContent>
@@ -331,21 +333,21 @@ export const instrumentDemos: Record<string, () => ReactNode> = {
   "date-picker": () => <DatePickerDemo />,
   "search-input": () => <SearchDemo />,
   "password-input": () => (
-    <Frame>
+    <Frame width="field">
       <Field label="Password" description="At least 12 characters.">
         {(control) => <PasswordInput {...control} autoComplete="new-password" defaultValue="correct horse battery" />}
       </Field>
     </Frame>
   ),
   "number-field": () => (
-    <Frame>
+    <Frame width="field">
       <Field label="Seats">{(control) => <NumberField {...control} defaultValue={12} min={1} max={500} />}</Field>
       <Field label="Timeout">{(control) => <NumberField {...control} defaultValue={1500} min={0} step={100} unit="ms" />}</Field>
     </Frame>
   ),
   slider: () => <SliderDemo />,
   "input-otp": () => (
-    <Frame>
+    <Frame width="fit">
       <Field label="Verification code" description="Enter the 6-digit code we sent to your phone.">
         {(control) => (
           <InputOTP {...control} length={6}>

@@ -1,8 +1,9 @@
 /**
  * Writes lib/demo-code.generated.ts: for every preview on a component's docs page (the demos in components/ui-demos*.tsx), the
  * code that makes it, as the page shows it under Code. The code is the demo's own source: the imports it uses, the helpers it
- * calls (data, state, small components) and the preview itself. The docs stage's layout wrapper (Frame) is left out: its
- * single child stands alone, several children sit in a plain grid. Prettier formats the result.
+ * calls (data, state, small components) and the preview itself. The docs stage's layout wrapper (Frame, components/demo-frame)
+ * becomes the layout it stands for: a single child stands alone unless the frame sets its width, several children sit in a
+ * plain grid or row (frameLayout). Prettier formats the result.
  *
  *   bun scripts/generate-demo-code.ts           write the file
  *   bun scripts/generate-demo-code.ts --check   fail if it is stale
@@ -11,6 +12,7 @@ import { execFileSync } from "node:child_process";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import * as prettier from "prettier";
 import ts from "typescript";
+import { frameLayout, type FrameWidth } from "../components/demo-frame";
 
 const check = process.argv.includes("--check");
 const OUT = "lib/demo-code.generated.ts";
@@ -69,7 +71,9 @@ async function demosOf(file: string, mapName: string) {
     while (current.parent && current.parent !== sf) current = current.parent;
     return current.parent === sf ? (current as ts.Statement) : undefined;
   };
-  const isFrame = (statement: ts.Statement) => ts.isFunctionDeclaration(statement) && statement.name?.text === FRAME;
+  const isFrame = (statement: ts.Statement) =>
+    (ts.isFunctionDeclaration(statement) && statement.name?.text === FRAME) ||
+    (ts.isImportDeclaration(statement) && (statement.moduleSpecifier as ts.StringLiteral).text.endsWith("/demo-frame"));
 
   /** The top-level helpers and the imported names a node uses. */
   const references = (root: ts.Node, self: ts.Statement | undefined) => {
@@ -85,7 +89,7 @@ async function demosOf(file: string, mapName: string) {
         const declaration = symbol?.declarations?.[0];
         if (declaration) {
           if (ts.isImportSpecifier(declaration) || ts.isImportClause(declaration) || ts.isNamespaceImport(declaration)) {
-            if (imports.has(node.text)) used.add(node.text);
+            if (imports.has(node.text) && node.text !== FRAME) used.add(node.text);
           } else {
             const statement = topStatement(declaration);
             if (statement && statement !== self && statement !== mapStatement && !ts.isImportDeclaration(statement)) helpers.add(statement);
@@ -106,15 +110,25 @@ async function demosOf(file: string, mapName: string) {
       if (ts.isJsxElement(child) && child.openingElement.tagName.getText(sf) === FRAME) {
         const kids = child.children.filter((kid) => !(ts.isJsxText(kid) && kid.containsOnlyTriviaWhiteSpaces));
         const only = kids.length === 1 ? kids[0]! : undefined;
+        const attribute = (name: string) =>
+          child.openingElement.attributes.properties.find((item): item is ts.JsxAttribute => ts.isJsxAttribute(item) && item.name.getText(sf) === name);
+        const inline = Boolean(attribute("inline"));
+        const widthValue = attribute("width")?.initializer;
+        if (widthValue && !ts.isStringLiteral(widthValue)) throw new Error(`${file}: a Frame's width must be a string literal`);
+        const width = widthValue ? frameLayout.widths[widthValue.text as FrameWidth] : "";
+        if (width === undefined) throw new Error(`${file}: unknown Frame width ${widthValue!.getText(sf)}`);
         if (only && (ts.isJsxElement(only) || ts.isJsxSelfClosingElement(only) || ts.isJsxFragment(only))) {
-          edits.push({ from: child.getStart(sf), to: child.getEnd(), text: render(only) });
+          edits.push({
+            from: child.getStart(sf),
+            to: child.getEnd(),
+            text: width && !inline ? `<div className="${width}">${render(only)}</div>` : render(only),
+          });
           return;
         }
-        const inline = child.openingElement.attributes.properties.some((attribute) => ts.isJsxAttribute(attribute) && attribute.name.getText(sf) === "inline");
         edits.push({
           from: child.openingElement.getStart(sf),
           to: child.openingElement.getEnd(),
-          text: inline ? '<div className="flex flex-wrap items-center gap-3">' : '<div className="grid gap-4">',
+          text: `<div className="${inline ? frameLayout.inline : [frameLayout.stack.split(" ")[0], width, ...frameLayout.stack.split(" ").slice(1)].filter(Boolean).join(" ")}">`,
         });
         edits.push({ from: child.closingElement.getStart(sf), to: child.closingElement.getEnd(), text: "</div>" });
         child.children.forEach(visit);

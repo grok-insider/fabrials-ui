@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { moreDemos } from "@/components/ui-demos-more";
 import { instrumentDemos } from "@/components/ui-demos-instrument";
 import { exampleSets } from "@/components/examples";
+import { Frame, type FrameWidth } from "@/components/demo-frame";
 import {
   BookOpen,
   ChevronDown,
@@ -184,55 +185,39 @@ const series = [
   { month: "Aug", requests: 540, cost: 21 },
 ];
 
-/**
- * The preview box. Stacked by default; `inline` lays controls out in a row at
- * their own width, so a lone trigger or group is not stretched across the stage.
- */
 const grouped = new Intl.NumberFormat("en");
-
-function Frame({ children, inline = false }: { children: ReactNode; inline?: boolean }) {
-  return <div className={inline ? "fui-preview flex flex-wrap items-center gap-3" : "fui-preview grid grid-cols-[minmax(0,1fr)] gap-4"}>{children}</div>;
-}
 
 const demos: Record<string, () => ReactNode> = {
   button: () => (
-    <Frame>
-      <div className="flex flex-wrap items-center gap-3">
-        <Button>Add account</Button>
-        <Button variant="outline">View details</Button>
-        <Button variant="ghost">Cancel</Button>
-        <Button variant="destructive">Remove</Button>
-        <Button disabled>Unavailable</Button>
-      </div>
+    <Frame inline>
+      <Button>Add account</Button>
+      <Button variant="outline">View details</Button>
+      <Button variant="ghost">Cancel</Button>
+      <Button variant="destructive">Remove</Button>
+      <Button disabled>Unavailable</Button>
     </Frame>
   ),
   input: () => (
-    <Frame>
+    <Frame width="field">
       <Label htmlFor="account-alias">Account alias</Label>
       <Input id="account-alias" name="alias" placeholder="Engineering" />
     </Frame>
   ),
   textarea: () => (
-    <Frame>
+    <Frame width="field">
       <Label htmlFor="note">Note</Label>
       <Textarea id="note" name="note" autoResize minRows={2} maxRows={8} placeholder="What should the operator know?" />
     </Frame>
   ),
   label: () => (
-    <Frame>
+    <Frame width="field">
       <Label htmlFor="workspace-name">Workspace name</Label>
       <Input id="workspace-name" name="workspace" defaultValue="North" />
     </Frame>
   ),
-  field: () => (
-    <Frame>
-      <Field label="Account alias" description="Shown in the account list." error="Enter an alias.">
-        {(props) => <Input {...props} name="alias" defaultValue="" />}
-      </Field>
-    </Frame>
-  ),
+  field: () => <FieldDemo />,
   checkbox: () => (
-    <Frame>
+    <Frame width="fit">
       <Label className="flex items-center gap-2">
         <Checkbox defaultChecked />
         Include archived records
@@ -241,9 +226,9 @@ const demos: Record<string, () => ReactNode> = {
   ),
   switch: () => <SwitchDemo />,
   select: () => (
-    <Frame>
+    <Frame width="fit">
       <Label htmlFor="density">Density</Label>
-      <Select defaultValue="standard">
+      <Select defaultValue="standard" items={{ standard: "Standard", compact: "Compact" }}>
         <SelectTrigger id="density" className="w-48">
           <SelectValue />
         </SelectTrigger>
@@ -428,7 +413,7 @@ const demos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   badge: () => (
-    <Frame>
+    <Frame width="fit">
       <div className="flex flex-wrap gap-2">
         <Badge>Draft</Badge>
         <Badge tone="success">Current</Badge>
@@ -456,7 +441,7 @@ const demos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   card: () => (
-    <Frame>
+    <Frame width="form">
       <Card>
         <CardHeader>
           <CardTitle as="h3">North workspace</CardTitle>
@@ -482,14 +467,14 @@ const demos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   separator: () => (
-    <Frame>
+    <Frame width="field">
       <p className="text-sm">Accounts</p>
       <Separator />
       <p className="text-sm">Keys</p>
     </Frame>
   ),
   skeleton: () => (
-    <Frame>
+    <Frame width="field">
       <div className="grid gap-2" aria-hidden="true">
         <Skeleton className="h-4 w-40" />
         <Skeleton className="h-4 w-64" />
@@ -498,13 +483,13 @@ const demos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   progress: () => (
-    <Frame>
+    <Frame width="field">
       <Label htmlFor="sync-progress">Sync progress</Label>
       <Progress id="sync-progress" value={0.4} max={1} />
     </Frame>
   ),
   combobox: () => (
-    <Frame>
+    <Frame width="field">
       <Combobox.Root items={["North", "South", "East"]}>
         <Label htmlFor="workspace-filter">Workspace</Label>
         <Combobox.Input id="workspace-filter" placeholder="Filter workspaces" className="fui-input mt-2 w-full max-w-xs" />
@@ -526,7 +511,7 @@ const demos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   collapsible: () => (
-    <Frame>
+    <Frame width="field">
       <Collapsible className="group/collapsible max-w-md rounded-lg border bg-card">
         <CollapsibleTrigger className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-sm font-medium">
           Sources checked
@@ -542,7 +527,7 @@ const demos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   "scroll-area": () => (
-    <Frame>
+    <Frame width="fit">
       <ScrollArea aria-label="Suggestions" className="h-28 max-w-sm rounded-md border p-3">
         {["Compare usage", "Open accounts", "Refresh the pool", "Read the last sync"].map((item) => (
           <p key={item} className="py-1 text-sm">{item}</p>
@@ -551,7 +536,7 @@ const demos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   "navigation-menu": () => (
-    <Frame>
+    <Frame width="fit">
       <div className="max-w-full overflow-x-auto">
         <NavigationMenu>
           <NavigationMenuList>
@@ -603,7 +588,7 @@ const demos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   command: () => (
-    <Frame>
+    <Frame width="field">
       <Command className="max-w-sm rounded-lg border" label="Command palette">
         <CommandInput aria-label="Search destinations" placeholder="Search destinations" />
         <CommandList>
@@ -620,7 +605,7 @@ const demos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   kbd: () => (
-    <Frame>
+    <Frame width="fit">
       <p className="text-sm">
         Open the palette with <KbdGroup><Kbd mod /><Kbd>K</Kbd></KbdGroup>, or go to the inbox with{" "}
         <KbdGroup sequence><Kbd>g</Kbd><Kbd>i</Kbd></KbdGroup>
@@ -628,7 +613,7 @@ const demos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   "button-group": () => (
-    <Frame>
+    <Frame width="fit">
       <ButtonGroup aria-label="Range">
         <Button variant="outline">Day</Button>
         <Button variant="outline">Week</Button>
@@ -637,7 +622,7 @@ const demos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   "input-group": () => (
-    <Frame>
+    <Frame width="field">
       <InputGroup className="max-w-sm">
         <InputGroupAddon>https://</InputGroupAddon>
         <InputGroupInput aria-label="Host" placeholder="fabrials.com" />
@@ -662,7 +647,7 @@ const demos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   spinner: () => (
-    <Frame>
+    <Frame width="fit">
       <p className="flex items-center gap-2 text-sm">
         <Spinner />
         Refreshing the pool
@@ -681,7 +666,7 @@ const demos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   "number-ticker": () => (
-    <Frame>
+    <Frame width="fit">
       <p className="text-3xl font-medium tabular-nums">
         <NumberTicker value={12840} startOnView={false} format={(n) => grouped.format(Math.round(n))} />
       </p>
@@ -743,7 +728,7 @@ const demos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   "state-panel": () => (
-    <Frame>
+    <Frame width="form">
       <StatePanel
         state="empty"
         title="No accounts yet"
@@ -757,7 +742,7 @@ const demos: Record<string, () => ReactNode> = {
   "filter-chip": () => <FilterChipDemo />,
   "truncated-text": () => <TruncatedDemo />,
   "shimmer-text": () => (
-    <Frame>
+    <Frame width="fit">
       <ShimmerText>Thinking</ShimmerText>
       <ShimmerText as="span" duration={1.4} className="text-xs">
         Generating image
@@ -766,7 +751,7 @@ const demos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   "file-thumb": () => (
-    <Frame>
+    <Frame width="fit">
       <ul className="grid gap-3">
         {fileRows.map((file) => (
           <li key={`${file.name}-${file.mime}`} className="flex min-w-0 items-center gap-3 text-sm">
@@ -848,7 +833,7 @@ const demos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   "chat-message": () => (
-    <Frame>
+    <Frame width="wide">
       <CitationProvider sources={citationSources.slice(0, 2)}>
         <div className="grid min-w-0 gap-6">
           <ChatMessage from="user" actions={<TurnActions copy="How should hosts import the shared styles?" user />}>
@@ -913,7 +898,7 @@ const demos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   citations: () => (
-    <Frame>
+    <Frame width="wide">
       <CitationProvider sources={citationSources}>
         <div className="fui-markdown">
           <p>
@@ -946,7 +931,7 @@ const demos: Record<string, () => ReactNode> = {
   ),
   attachments: () => <AttachmentsDemo />,
   "voice-input": () => (
-    <Frame>
+    <Frame width="fit">
       <div className="flex flex-wrap items-center gap-2">
         <VoiceInputButtonView status="idle" />
         <VoiceInputButtonView status="requesting" />
@@ -959,10 +944,21 @@ const demos: Record<string, () => ReactNode> = {
   ),
 };
 
+function FieldDemo() {
+  const [alias, setAlias] = useState("");
+  return (
+    <Frame width="field">
+      <Field label="Account alias" description="Shown in the account list." error={alias.trim() ? undefined : "Enter an alias."}>
+        {(props) => <Input {...props} name="alias" value={alias} onChange={(event) => setAlias(event.currentTarget.value)} />}
+      </Field>
+    </Frame>
+  );
+}
+
 function SwitchDemo() {
   const [on, setOn] = useState(true);
   return (
-    <Frame>
+    <Frame width="fit">
       <Label className="flex items-center gap-2">
         <Switch checked={on} onCheckedChange={setOn} />
         Email a stale-sync notice
@@ -998,7 +994,7 @@ function ConfirmDemo() {
   const [open, setOpen] = useState(false);
   const [removed, setRemoved] = useState(0);
   return (
-    <Frame>
+    <Frame width="fit">
       <div className="flex flex-wrap items-center gap-3">
         <ConfirmActionButton
           buttonProps={{ variant: "outline" }}
@@ -1060,28 +1056,50 @@ function ConfirmDemo() {
   );
 }
 
+const activeFilters = [
+  { field: "owner", label: "Owner", value: "ada@example.org" },
+  { field: "type", label: "Type", value: "image/png" },
+  { field: "workspace", label: "Workspace", value: "The quarterly planning workspace for the storage migration and the retention review" },
+];
+
 function FilterChipDemo() {
-  const [filters, setFilters] = useState([
-    { label: "Owner", value: "ada@example.org" },
-    { label: "Type", value: "image/png" },
-    { label: "Workspace", value: "A remarkably long workspace name that should truncate inside the chip" },
-  ]);
+  const [filters, setFilters] = useState(activeFilters);
+  const group = useRef<HTMLDivElement>(null);
+  const acted = useRef(false);
+  const update = (next: (current: typeof activeFilters) => typeof activeFilters) => {
+    acted.current = true;
+    setFilters(next);
+  };
+  // A chip passes focus to the next one itself. When the focused button
+  // goes (the last chip, Clear all, Restore), focus lands on the group's
+  // first button instead of the page.
+  useEffect(() => {
+    if (acted.current && document.activeElement === document.body) group.current?.querySelector("button")?.focus();
+  }, [filters]);
   return (
-    <Frame>
-      <div className="flex min-w-0 flex-wrap gap-2">
-        <FilterChip href="/docs/filter-chip" label="Owner" value="ada@example.org" />
-        <FilterChip href="/docs/filter-chip" label="Type" value="application/pdf" />
-      </div>
-      <div className="flex min-w-0 max-w-lg flex-wrap gap-2">
+    <Frame width="form">
+      <div aria-label="Active filters" className="flex min-w-0 flex-wrap items-center gap-2" ref={group} role="group">
         {filters.map((filter) => (
           <FilterChip
-            key={filter.label}
+            key={filter.field}
             label={filter.label}
             value={filter.value}
-            onRemove={() => setFilters((current) => current.filter((item) => item !== filter))}
+            onRemove={() => update((current) => current.filter((item) => item.field !== filter.field))}
           />
         ))}
-        {filters.length === 0 && <span className="text-sm text-muted-foreground">No active filters</span>}
+        {filters.length > 1 ? (
+          <Button onClick={() => update(() => [])} size="sm" variant="ghost">
+            Clear all
+          </Button>
+        ) : null}
+        {filters.length === 0 ? (
+          <>
+            <span className="text-sm text-muted-foreground">No filters: every file is listed.</span>
+            <Button onClick={() => update(() => activeFilters)} size="sm" variant="outline">
+              Restore filters
+            </Button>
+          </>
+        ) : null}
       </div>
     </Frame>
   );
@@ -1096,7 +1114,7 @@ const truncatedRows = [
 function TruncatedDemo() {
   const [clicked, setClicked] = useState<string | null>(null);
   return (
-    <Frame>
+    <Frame width="fit">
       <ul className="grid max-w-72 gap-2">
         {truncatedRows.map((row) => (
           <li key={row} className="flex min-h-10 min-w-0 items-center gap-2 rounded-lg border pl-3 pr-1 text-sm">
@@ -1141,7 +1159,7 @@ const recencyHistory = [
 function RecencyDemo() {
   const groups = groupByRecency(recencyHistory, (item) => item.at, recencyNow);
   return (
-    <Frame>
+    <Frame width="field">
       <nav aria-label="Synthetic history" className="grid max-w-64 gap-3">
         {groups.map((group) => (
           <section aria-label={group.label} key={group.key}>
@@ -1326,8 +1344,28 @@ function VoiceDemo() {
   );
 }
 
+// The width an example set's own preview is shown at, centred on the stage like the demos' frames.
+const previewWidths: Record<string, FrameWidth> = {
+  "agent-thinking": "wide",
+  "task-list": "form",
+  "activity-disclosure": "form",
+  "chat-composer": "wide",
+  attachments: "form",
+  "generation-frame": "field",
+  "context-meter": "field",
+  "working-light": "field",
+  alert: "form",
+};
+
 export function UiDemo({ slug }: { slug: string }) {
-  const Demo = exampleSets[slug]?.preview ?? demos[slug] ?? moreDemos[slug] ?? instrumentDemos[slug];
+  const Preview = exampleSets[slug]?.preview;
+  if (Preview)
+    return (
+      <Frame width={previewWidths[slug] ?? "wide"}>
+        <Preview />
+      </Frame>
+    );
+  const Demo = demos[slug] ?? moreDemos[slug] ?? instrumentDemos[slug];
   if (!Demo) return <p className="text-sm">This preview is not available.</p>;
   return <Demo />;
 }

@@ -389,31 +389,13 @@ h3.docs-heading {
   color: var(--muted-foreground);
   font-size: var(--fui-text-sm);
 }
+/* The package's segmented tabs: a well whose plate slides between Preview and Code. */
 .docs .fui-tabs-list.docs-segmented {
   justify-self: start;
-  gap: 2px;
-  padding: 3px;
-  border: 1px solid var(--border);
-  border-radius: var(--fui-radius-md);
-  background: var(--muted);
-}
-.docs .docs-segmented .fui-tab {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--fui-space-2);
-  min-height: 2rem;
-  padding: var(--fui-space-1) var(--fui-space-3);
-  border: 0;
-  border-radius: calc(var(--fui-radius-md) - 3px);
-  background: transparent;
 }
 .docs .docs-segmented .fui-tab svg {
   width: 0.875rem;
   height: 0.875rem;
-}
-.docs .docs-segmented .fui-tab[data-active] {
-  background: var(--card);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
 }
 .docs .fui-tab-panel.docs-preview-code {
   padding-top: 0;
@@ -433,8 +415,9 @@ h3.docs-heading {
   border-radius: var(--fui-radius-lg);
   background: var(--background);
 }
-/* The preview may sit inside Loading's display: contents wrappers. */
-.docs-preview-stage :where(.fui-preview) {
+/* The preview may sit inside Loading's display: contents wrappers. A preview that sets its own width (data-width, from
+   components/demo-frame) keeps it. Not in a cascade layer: this file can reach the page before Tailwind's layer order. */
+.docs-preview-stage :where(.fui-preview):not([data-width]) {
   width: 100%;
 }
 

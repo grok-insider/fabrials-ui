@@ -30,7 +30,7 @@ export function ComponentPreview({
   return (
     <Tabs value={tab} onValueChange={(next) => setTab(next as string)} className="docs-preview">
       <div className="docs-preview-bar">
-        <TabsList className="docs-segmented" aria-label="Example view">
+        <TabsList variant="segmented" className="docs-segmented" aria-label="Example view">
           <TabsTrigger value="preview">
             <Eye aria-hidden="true" /> Preview
           </TabsTrigger>

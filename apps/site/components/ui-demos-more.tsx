@@ -132,14 +132,12 @@ import {
   type ThemePreference,
 } from "@fabrials/ui";
 import { fbm } from "@fabrials/ui/dither";
+import { Frame } from "@/components/demo-frame";
 
 /**
  * The preview box. Stacked by default; `inline` lays controls out in a row at
  * their own width, so a lone trigger or group is not stretched across the stage.
  */
-function Frame({ children, inline = false }: { children: ReactNode; inline?: boolean }) {
-  return <div className={inline ? "fui-preview flex flex-wrap items-center gap-3" : "fui-preview grid grid-cols-[minmax(0,1fr)] gap-4"}>{children}</div>;
-}
 
 const GEMS: [GemName, string][] = [
   ["stormlight", "Radiant"],
@@ -210,7 +208,7 @@ function NativeChoicesDemo() {
 }
 
 function MultiSelectDemo() {
-  const [value, setValue] = useState<string[]>(["grok"]);
+  const [value, setValue] = useState<string[]>(["grok", "codex"]);
   return (
     <MultiSelect
       id="providers-filter"
@@ -307,11 +305,11 @@ function useRepoCounts(repository: string) {
 function RepoInfoDemo() {
   const fabrials = useRepoCounts("grok-insider/fabrials-ui");
   return (
-    <div className="grid w-full max-w-md gap-3">
+    <Frame width="form">
       <RepoInfo owner="grok-insider" repo="fabrials-ui" stars={fabrials.stars} forks={fabrials.forks} description="The Fabrials design system" />
       <RepoInfo owner="example" repo="instrument-kit" stars={1840} forks={96} description="Counts given by the host" />
       <RepoInfo owner="example" repo="field-notes" description="Counts not given: the link stays, the numbers are left out" />
-    </div>
+    </Frame>
   );
 }
 
@@ -333,7 +331,7 @@ function LoadingDemo() {
   const [loading, setLoading] = useState(false);
   const rows = loading ? ACCOUNT_PLACEHOLDERS : ACCOUNTS;
   return (
-    <div className="grid w-full max-w-lg gap-3">
+    <Frame width="form">
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm font-medium">Accounts</p>
         <Button
@@ -367,7 +365,7 @@ function LoadingDemo() {
         </ul>
       </Loading>
       <p className="text-xs text-muted-foreground">Synthetic data. Refresh shows the same list as its skeleton for two seconds.</p>
-    </div>
+    </Frame>
   );
 }
 
@@ -375,7 +373,7 @@ function ReadoutDemo() {
   const times = ["14:32 UTC", "14:47 UTC", "15:02 UTC"];
   const [step, setStep] = useState(0);
   return (
-    <Frame>
+    <Frame width="fit">
       <div className="flex flex-wrap items-center gap-4">
         <Button variant="outline" size="sm" onClick={() => setStep((n) => n + 1)}>
           Sync now
@@ -428,23 +426,25 @@ export const moreDemos: Record<string, () => ReactNode> = {
     </div>
   ),
   files: () => (
-    <Files className="w-full max-w-md">
-      <Folder name="app" defaultOpen>
-        <File name="layout.tsx" highlighted note="edited" />
-        <File name="page.tsx" />
-        <File name="globals.css" note="Fabrials styles" />
-      </Folder>
-      <Folder name="components" defaultOpen>
-        <Folder name="ui" defaultOpen note="shims">
-          <File name="button.tsx" />
-          <File name="dialog.tsx" />
+    <Frame width="form">
+      <Files>
+        <Folder name="app" defaultOpen>
+          <File name="layout.tsx" highlighted note="edited" />
+          <File name="page.tsx" />
+          <File name="globals.css" note="Fabrials styles" />
         </Folder>
-        <Folder name="webmcp">
-          <File name="mcp-dashboard.tsx" />
+        <Folder name="components" defaultOpen>
+          <Folder name="ui" defaultOpen note="shims">
+            <File name="button.tsx" />
+            <File name="dialog.tsx" />
+          </Folder>
+          <Folder name="webmcp">
+            <File name="mcp-dashboard.tsx" />
+          </Folder>
         </Folder>
-      </Folder>
-      <File name="components.json" />
-    </Files>
+        <File name="components.json" />
+      </Files>
+    </Frame>
   ),
   "repo-info": () => <RepoInfoDemo />,
   "dither-scene": () => (
@@ -511,7 +511,8 @@ export const moreDemos: Record<string, () => ReactNode> = {
         cell={3}
         field={(_theme, { width, height }) =>
           (u, v) => {
-            // A telemetry ridge: noise shaped by a slow wave, brightest along the crest.
+            // A telemetry ridge: noise shaped by a slow wave,
+            // brightest along the crest.
             const crest = 0.55 + 0.18 * Math.sin(u * 7) - 0.1 * fbm(u * 3, 1, 5);
             const distance = Math.abs(v - crest);
             return Math.max(0, 1 - distance * 6) * (0.45 + 0.55 * fbm((u * width) / height * 3, v * 3, 9));
@@ -521,7 +522,7 @@ export const moreDemos: Record<string, () => ReactNode> = {
     </div>
   ),
   "product-lockup": () => (
-    <Frame>
+    <Frame width="fit">
       <div className="flex flex-wrap items-center gap-8">
         <ProductLockup product="Spanreed" gem="ruby" size="lg" tagline="Usage and cost" />
         <ProductLockup product="Syl" gem="sapphire" />
@@ -530,7 +531,7 @@ export const moreDemos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   "radio-group": () => (
-    <Frame>
+    <Frame width="fit">
       <RadioGroup defaultValue="balanced" aria-label="Routing mode">
         <Label className="fui-choice">
           <RadioGroupItem value="balanced" /> Balanced across accounts
@@ -559,7 +560,7 @@ export const moreDemos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   toolbar: () => (
-    <Frame>
+    <Frame width="wide">
       <Toolbar aria-label="Message actions" variant="bar">
         <ToolbarGroup aria-label="Respond">
           <ToolbarButton label="Reply" variant="secondary" reveal="early"><Reply aria-hidden /></ToolbarButton>
@@ -581,12 +582,12 @@ export const moreDemos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   "file-input": () => (
-    <Frame>
+    <Frame width="field">
       <FileInputDemo />
     </Frame>
   ),
   disclosure: () => (
-    <Frame>
+    <Frame width="form">
       <Disclosure>
         <DisclosureSummary>Advanced options</DisclosureSummary>
         <DisclosurePanel>Options that most people never change.</DisclosurePanel>
@@ -598,7 +599,7 @@ export const moreDemos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   item: () => (
-    <Frame>
+    <Frame width="wide">
       <ItemGroup bordered aria-label="Messages" className="rounded-md border-x">
         {[
           { id: "a", from: "Ana Ruiz", subject: "Quarterly planning notes", preview: "Attached are the notes from Tuesday.", unread: true },
@@ -653,8 +654,8 @@ export const moreDemos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   "nav-switcher": () => (
-    <Frame>
-      <div className="grid max-w-72 gap-3 rounded-md bg-sidebar p-2">
+    <Frame width="fit">
+      <div className="grid w-72 max-w-full gap-3 rounded-md bg-sidebar p-2">
         <NavSwitcher>
           <NavSwitcherTrigger label="Switch mailbox" mark={<Avatar size="sm"><AvatarFallback>A</AvatarFallback></Avatar>} title="ana@example.test" description="Personal" />
           <NavSwitcherContent label="Switch mailbox">
@@ -692,7 +693,7 @@ export const moreDemos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   "field-set": () => (
-    <Frame>
+    <Frame width="form">
       <form onSubmit={(event) => event.preventDefault()} className="grid gap-5">
         <FieldSet>
           <FieldLegend>Name</FieldLegend>
@@ -709,12 +710,12 @@ export const moreDemos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   "native-radio": () => (
-    <Frame>
+    <Frame width="fit">
       <NativeChoicesDemo />
     </Frame>
   ),
   "file-size": () => (
-    <Frame>
+    <Frame width="field">
       <ul className="grid gap-1 text-sm">
         {[812, 1536, 25 * 1024 * 1024].map((bytes) => (
           <li key={bytes} className="flex justify-between gap-3">
@@ -732,19 +733,19 @@ export const moreDemos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   "theme-switcher": () => (
-    <Frame>
+    <Frame width="fit">
       <ThemeSwitcherDemo />
     </Frame>
   ),
   "multi-select": () => (
-    <Frame>
+    <Frame width="fit">
       <MultiSelectDemo />
     </Frame>
   ),
   "native-select": () => (
-    <Frame>
+    <Frame width="fit">
       <Label htmlFor="region">Region</Label>
-      <NativeSelect id="region" name="region" defaultValue="fra" className="max-w-64">
+      <NativeSelect id="region" name="region" defaultValue="fra" className="w-64 max-w-full">
         <NativeSelectOptGroup label="Europe">
           <NativeSelectOption value="fra">Frankfurt</NativeSelectOption>
           <NativeSelectOption value="hel">Helsinki</NativeSelectOption>
@@ -756,8 +757,8 @@ export const moreDemos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   accordion: () => (
-    <Frame>
-      <Accordion defaultValue={["keys"]} className="max-w-xl">
+    <Frame width="wide">
+      <Accordion defaultValue={["keys"]}>
         <AccordionItem value="keys">
           <AccordionTrigger>Where are keys stored?</AccordionTrigger>
           <AccordionContent>In the operating system&apos;s secret store, never in the browser.</AccordionContent>
@@ -767,7 +768,7 @@ export const moreDemos: Record<string, () => ReactNode> = {
           <AccordionContent>Daily totals per provider. No prompts, files or account names.</AccordionContent>
         </AccordionItem>
       </Accordion>
-      <Accordion variant="rows" multiple defaultValue={["reminders"]} className="max-w-xl overflow-hidden rounded-md border">
+      <Accordion variant="rows" multiple defaultValue={["reminders"]} className="overflow-hidden rounded-md border">
         <AccordionItem value="reminders">
           <AccordionTrigger headingLevel={3} icon={<Bell aria-hidden />} aside={<><Badge tone="warning" dot>Needs review</Badge><Badge>3</Badge></>}>Reminders</AccordionTrigger>
           <AccordionContent><Input aria-label="Remind me about" defaultValue="Renewal quote" /></AccordionContent>
@@ -780,7 +781,7 @@ export const moreDemos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   breadcrumb: () => (
-    <Frame>
+    <Frame width="fit">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -799,7 +800,7 @@ export const moreDemos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   pagination: () => (
-    <Frame>
+    <Frame width="fit">
       <Pagination>
         <PaginationContent>
           <PaginationItem>
@@ -827,7 +828,7 @@ export const moreDemos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   "nav-tabs": () => (
-    <Frame>
+    <Frame width="fit">
       <NavTabs label="Account sections">
         <NavTab href="#preview" current count={128}>
           Feed
@@ -841,8 +842,8 @@ export const moreDemos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   "description-list": () => (
-    <Frame>
-      <DescriptionList layout="auto" className="max-w-xl">
+    <Frame width="form">
+      <DescriptionList layout="auto">
         <DescriptionItem>
           <DescriptionTerm>Relay ID</DescriptionTerm>
           <DescriptionDetails>
@@ -865,7 +866,7 @@ export const moreDemos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   avatar: () => (
-    <Frame>
+    <Frame width="fit">
       <div className="flex items-center gap-3">
         <Avatar size="sm">
           <AvatarFallback>{avatarInitials("Ada Lovelace")}</AvatarFallback>
@@ -889,7 +890,7 @@ export const moreDemos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   sparkline: () => (
-    <Frame>
+    <Frame width="fit">
       <div className="flex items-center gap-4">
         <span className="font-display text-2xl font-semibold tabular-nums">$41.20</span>
         <Sparkline data={[12, 18, 14, 22, 19, 27, 31, 29, 34]} label="Cost rose over the week" className="h-8 w-32" />
@@ -897,7 +898,7 @@ export const moreDemos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   meter: () => (
-    <Frame>
+    <Frame width="form">
       <div className="grid max-w-md gap-4">
         <Meter label="Weekly quota" value={42} hint="Resets Friday at 09:00" />
         <Meter label="Session" value={81} hint="Resets in 2 h 10 min" />
@@ -906,7 +907,7 @@ export const moreDemos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   "status-dot": () => (
-    <Frame>
+    <Frame width="fit">
       <div className="grid gap-2">
         <StatusDot tone="success" label="Relay online" pulse />
         <StatusDot tone="warning" label="Observation is 3 h old" />
@@ -922,7 +923,7 @@ export const moreDemos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   timeline: () => (
-    <Frame>
+    <Frame width="wide">
       <Timeline>
         <TimelineItem icon={<Eye aria-hidden />} tone="info" title="@fixture posted" time={<RelativeTime date={ago(4)} />} fresh>
           A new post about Spanreed 0.8.
@@ -934,7 +935,7 @@ export const moreDemos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   "relative-time": () => (
-    <Frame>
+    <Frame width="fit">
       <p className="text-sm">
         Updated <RelativeTime date={ago(3)} />, published <RelativeTime date={ago(60 * 26)} />, in Spanish{" "}
         <RelativeTime date={ago(60 * 26)} locale="es" />.
@@ -950,7 +951,7 @@ export const moreDemos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   snippet: () => (
-    <Frame>
+    <Frame width="wide">
       <Snippet label="Linux and macOS install">{"curl -fsSL https://fabrials.com/install/spanreed.sh | sh"}</Snippet>
       <Snippet label="Windows install" prompt=">">{"irm https://fabrials.com/install/spanreed.ps1 | iex"}</Snippet>
     </Frame>
@@ -983,7 +984,8 @@ export const moreDemos: Record<string, () => ReactNode> = {
         footer="We read your X handle and avatar, nothing else."
         actions={<Button variant="ghost" size="sm">English</Button>}
         headingLevel={2}
-        // The docs page already has its <main>; the layout's default landmark would be a second one.
+        // The docs page already has its <main>; the layout's default
+        // landmark would be a second one.
         as="div"
       >
         <Button>Continue with X</Button>
@@ -991,7 +993,7 @@ export const moreDemos: Record<string, () => ReactNode> = {
     </div>
   ),
   "command-trigger": () => (
-    <Frame>
+    <Frame width="field">
       <div className="grid max-w-sm gap-3">
         <CommandTrigger label="Search or run a command" keys={["mod", "K"]} />
         <div style={{ width: "3rem" }}>
@@ -1013,7 +1015,7 @@ export const moreDemos: Record<string, () => ReactNode> = {
     </Frame>
   ),
   "provider-icon": () => (
-    <Frame>
+    <Frame width="fit">
       <ul className="flex flex-wrap gap-5 text-sm">
         {["openai", "anthropic", "xai", "cursor", "github", "nous", "google", "zai"].map((provider) => (
           <li key={provider} className="flex items-center gap-2">

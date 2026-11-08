@@ -152,9 +152,12 @@ html {
   }
 }
 
-.fui-preview {
-  min-width: 0;
-  max-width: 100%;
+/* In the components layer, so a preview's own width utilities (max-w-sm, w-fit) win. */
+@layer components {
+  .fui-preview {
+    min-width: 0;
+    max-width: 100%;
+  }
 }
 
 .fui-carousel-frame {
