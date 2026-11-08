@@ -58,6 +58,7 @@ export * from "./truncated-text";
 export * from "./settings-section";
 export * from "./filter-chip";
 export * from "./suggestion-card";
+export * from "./scramble-text";
 export * from "./shimmer-text";
 export * from "./working-light";
 export * from "./recency";

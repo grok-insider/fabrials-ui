@@ -15,8 +15,6 @@ import {
   Lightbulb,
   MoreHorizontal,
   Paperclip,
-  Pencil,
-  RotateCcw,
   Search,
   Terminal,
   Users,
@@ -26,16 +24,11 @@ import {
   AttachmentChip,
   Attachments,
   ChatComposer,
-  ChatMessage,
   CitationChip,
   CitationProvider,
   CodeBlock,
   ComposerButton,
   ComposerToggle,
-  CopyMessageAction,
-  MessageAction,
-  MessageActions,
-  MessageTimestamp,
   ReasoningDisclosure,
   SearchStepsDisclosure,
   Sources,
@@ -696,15 +689,6 @@ const demos: Record<string, () => ReactNode> = {
   "confirm-dialog": () => <ConfirmDemo />,
   "filter-chip": () => <FilterChipDemo />,
   "truncated-text": () => <TruncatedDemo />,
-  "shimmer-text": () => (
-    <Frame width="fit">
-      <ShimmerText>Thinking</ShimmerText>
-      <ShimmerText as="span" duration={1.4} className="text-xs">
-        Generating image
-      </ShimmerText>
-      <ShimmerText className="text-xl font-semibold">Searching 14 sources for recent coverage</ShimmerText>
-    </Frame>
-  ),
   "file-thumb": () => (
     <Frame width="fit">
       <ul className="grid gap-3">
@@ -785,30 +769,6 @@ const demos: Record<string, () => ReactNode> = {
           <Button variant="outline">Continue with email</Button>
         </div>
       </div>
-    </Frame>
-  ),
-  "chat-message": () => (
-    <Frame width="wide">
-      <CitationProvider sources={citationSources.slice(0, 2)}>
-        <div className="grid min-w-0 gap-6">
-          <ChatMessage from="user" actions={<TurnActions copy="How should hosts import the shared styles?" user />}>
-            How should hosts import the shared styles?
-          </ChatMessage>
-          <ChatMessage
-            from="assistant"
-            pinActions
-            actions={<TurnActions copy="Import tokens, fonts and styles once, in that order." latest />}
-          >
-            <div className="fui-markdown">
-              <p>
-                Import tokens, fonts and styles once, in that order
-                <CitationChip href={citationSources[0]!.url} number={1} />. Tailwind hosts add the bridge last
-                <CitationChip href={citationSources[1]!.url} number={2} />.
-              </p>
-            </div>
-          </ChatMessage>
-        </div>
-      </CitationProvider>
     </Frame>
   ),
   "chat-composer": () => <ComposerDemo />,
@@ -1315,6 +1275,10 @@ const previewWidths: Record<string, FrameWidth> = {
   "scroll-area": "form",
   "avatar-group": "form",
   image: "form",
+  "source-tally": "form",
+  "chat-message": "wide",
+  "scramble-text": "field",
+  "shimmer-text": "field",
 };
 
 export function UiDemo({ slug }: { slug: string }) {

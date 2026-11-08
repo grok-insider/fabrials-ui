@@ -4,15 +4,15 @@ import { Showcase } from "../showcase";
 import { spinnerExamples } from "../../apps/site/components/examples/status";
 
 const description =
-  "The busy mark: a ring of square cells lighting in turn, named for assistive technology and paired with words.";
+  "The busy mark in square cells (a ring, dots, bars, a grid or a line), named for assistive technology and paired with words.";
 
 const meta = {
   title: "Components/Spinner",
   component: Spinner,
   tags: ["autodocs"],
   parameters: { docs: { description: { component: description } } },
-  args: { label: "Loading" },
-  argTypes: {},
+  args: { label: "Loading", variant: "ring" },
+  argTypes: { variant: { control: "inline-radio", options: ["ring", "dots", "bars", "grid", "line"] } },
 } satisfies Meta<typeof Spinner>;
 
 export default meta;

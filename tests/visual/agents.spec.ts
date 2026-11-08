@@ -87,11 +87,68 @@ test("the context meter is one meter that reads in full", async ({ page }) => {
 
 test("a picture being made says what it does, and a failure is an alert", async ({ page }) => {
   await open(page);
-  const working = page.locator('.fui-generation[data-status="generating"]');
+  const working = page.locator('.fui-generation[data-status="generating"]').first();
   await expect(working.getByRole("status")).toContainText("Making the image");
   await expect(working.getByRole("status")).toContainText("42%");
   await expect(page.locator('.fui-generation[data-status="failed"]').getByRole("alert")).toContainText("The image could not be made");
   await expect(page.locator('.fui-generation[data-status="done"]').getByRole("img", { name: "Orchard terraces" })).toBeVisible();
+});
+
+test("each kind of work has its own mark, a settled line keeps its status and its time, and a step shows its kind", async ({ page }) => {
+  await open(page);
+  const block = page.locator("section").filter({ has: page.getByRole("heading", { name: "Each kind of work", exact: true }) }).last();
+  const variants = await block.locator(".fui-agent-thinking:not([data-status]) svg.fui-agent-mark").evaluateAll((marks) => marks.map((mark) => mark.getAttribute("data-variant")));
+  expect(variants).toEqual(["wave", "scan", "lines", "type", "orbit", "raster", "fill"]);
+  const done = block.locator('.fui-agent-thinking[data-status="done"]');
+  await expect(done).toHaveAttribute("role", "status");
+  await expect(done).toContainText("Searched 12 sources");
+  await expect(done.locator(".fui-agent-thinking-time")).toHaveText("12s");
+  await expect(done.locator('svg.fui-agent-mark[data-outcome="done"] rect[data-on]')).toHaveCount(4);
+  await expect(block.locator('.fui-agent-thinking[data-status="failed"] .fui-agent-thinking-time')).toHaveText("41s");
+  // Settled, the light is out: no shimmer on the label.
+  await expect(done.locator(".fui-shimmer-text")).toHaveCount(0);
+  const plan = page.getByRole("region", { name: "Research plan" });
+  await expect(plan.locator('[aria-current="step"] svg.fui-agent-mark')).toHaveAttribute("data-variant", "scan");
+});
+
+test("a search is a strip of cells and its sources are counted once; an answer ends in a caret that is never read", async ({ page }) => {
+  await open(page);
+  const scan = page.getByRole("progressbar", { name: "Searching the docs" });
+  await expect(scan).not.toHaveAttribute("aria-valuenow", /.*/);
+  expect(await scan.locator(".fui-progress-scan > span").count()).toBeGreaterThan(20);
+  const tally = page.locator(".fui-source-tally");
+  await expect(tally).toContainText("Reviewing sources");
+  await expect(tally.locator(".fui-readout .fui-sr-only")).toHaveText("4");
+  await expect(tally.locator(".fui-source-tally-tile")).toHaveCount(4);
+  for (const variant of ["ring", "dots", "bars", "grid", "line"]) await expect(page.getByRole("status", { name: `Loading (${variant})` })).toBeVisible();
+  const answer = page.locator('.fui-chat-message[data-streaming]');
+  await expect(answer).toHaveAttribute("aria-busy", "true");
+  const caret = answer.locator(".fui-stream-caret");
+  await expect(caret).toHaveAttribute("aria-hidden", "true");
+  // The caret sits just after the last character of the text, on its line.
+  const placement = await answer.evaluate((node) => {
+    const text = node.querySelector(".fui-markdown p")!.firstChild as Text;
+    const range = document.createRange();
+    range.setStart(text, text.length - 1);
+    range.setEnd(text, text.length);
+    const letter = range.getBoundingClientRect();
+    const mark = node.querySelector(".fui-stream-caret")!.getBoundingClientRect();
+    return { gap: mark.left - letter.right, middle: Math.abs(mark.top + mark.height / 2 - (letter.top + letter.height / 2)) };
+  });
+  expect(placement.gap).toBeGreaterThanOrEqual(0);
+  expect(placement.gap).toBeLessThan(6);
+  expect(placement.middle).toBeLessThan(3);
+});
+
+test("a picture can refine or scan and a page is written; each says what it does", async ({ page }) => {
+  await open(page);
+  const block = page.locator("section").filter({ has: page.getByRole("heading", { name: "Pictures and pages being made", exact: true }) }).last();
+  await expect(block.locator('.fui-generation[data-effect="refine"] .fui-generation-refine > [data-layer]')).toHaveCount(2);
+  await expect(block.locator('.fui-generation[data-effect="scan"]').getByRole("status")).toContainText("62%");
+  const pages = block.locator('.fui-generation[data-kind="document"]');
+  await expect(pages).toHaveCount(2);
+  await expect(pages.first().getByRole("status")).toContainText("Writing the document");
+  await expect(pages.nth(1).getByRole("status")).toContainText("35%");
 });
 
 test("reduced motion stills the light; without it, the light turns", async ({ page, browser }) => {

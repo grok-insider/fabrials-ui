@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useId, useRef, useState, type ComponentProps, type CSSProperties, type ReactNode } from "react";
-import { ShimmerText, WorkingLight } from "@fabrials/ui";
+import { ShimmerText, WorkingLight, useScramble } from "@fabrials/ui";
 
 function join(...values: Array<string | false | null | undefined>) {
   return values.filter(Boolean).join(" ");
@@ -49,8 +49,26 @@ export function useWorkTime(startedAt?: number | Date, running = true): number |
 
 /* ------------------------------------------------------------------ mark */
 
-export type AgentMarkVariant = "wave" | "orbit" | "dither";
+export type AgentMarkVariant = "wave" | "orbit" | "dither" | "scan" | "lines" | "type" | "raster" | "fill";
 export type AgentTone = "light" | "ink";
+/** How work ended: the mark settles on a tick or a cross drawn in its cells. */
+export type AgentOutcome = "done" | "failed";
+/** The kind of work an agent is doing. Each has its own mark, moving in its own direction, and its own words. */
+export type AgentActivity = "thinking" | "searching" | "reading" | "writing" | "running" | "rendering" | "uploading";
+
+/**
+ * The mark and the words of each kind of work. Thinking stays in place, searching sweeps sideways, reading runs down the
+ * lines, writing fills in reading order, a tool runs round, rendering resolves from the top and an upload fills up.
+ */
+export const agentActivities: Record<AgentActivity, { variant: AgentMarkVariant; label: string }> = {
+  thinking: { variant: "wave", label: "Thinking" },
+  searching: { variant: "scan", label: "Searching" },
+  reading: { variant: "lines", label: "Reading" },
+  writing: { variant: "type", label: "Writing" },
+  running: { variant: "orbit", label: "Running" },
+  rendering: { variant: "raster", label: "Rendering" },
+  uploading: { variant: "fill", label: "Uploading" },
+};
 
 // The 3x3 grid of the busy mark (11 px, cells of 3 with 1 px between), by diagonal.
 const GRID = [0, 4, 8].flatMap((y) => [0, 4, 8].map((x) => ({ x, y, step: x / 4 + y / 4 })));
@@ -65,6 +83,18 @@ const RING = [
   [0, 8],
   [0, 4],
 ] as const;
+// A 4x4 grid of 2 px cells on a 3 px pitch, in reading order, banded by diagonal for the working light's gems.
+const QUAD = [0, 1, 2, 3].flatMap((row) =>
+  [0, 1, 2, 3].map((col) => ({ col, row, index: row * 4 + col, band: col + row < 3 ? 1 : col + row < 5 ? 2 : 3 })),
+);
+// The settled marks in the same cells: a tick, and a cross.
+const OUTCOME_CELLS: Record<AgentOutcome, ReadonlySet<number>> = {
+  done: new Set([7, 8, 10, 13]),
+  failed: new Set([0, 3, 5, 6, 9, 10, 12, 15]),
+};
+// The still frame of a mark whose cells take turns: the head, then a fading trail.
+const TRAIL = [1, 0.5, 0.25];
+const trail = (distance: number) => TRAIL[distance] ?? 0.14;
 // A 4x4 ordered dither: the order in which the cells light.
 const BAYER = [
   [0, 8, 2, 10],
@@ -74,17 +104,46 @@ const BAYER = [
 ] as const;
 
 export type AgentMarkProps = Omit<ComponentProps<"svg">, "children"> & {
-  /** `wave`: a diagonal wave crosses a 3x3 grid. `orbit`: a head with a fading tail runs round the ring. `dither`: a 4x4
-   * ordered dither fills with light and empties again. */
+  /**
+   * `wave`: a diagonal wave crosses a 3x3 grid (thinking). `orbit`: a head with a fading tail runs round the ring (a tool
+   * running). `dither`: a 4x4 ordered dither fills with light and empties again. `scan`: a column sweeps sideways with a
+   * trail (searching). `lines`: a head runs along each of four lines, top to bottom, and the lines it has read go faint
+   * (reading). `type`: the cells fill in reading order and stay (writing). `raster`: rows resolve from the top behind a
+   * bright band (rendering). `fill`: rows fill up from the bottom (uploading).
+   */
   variant?: AgentMarkVariant;
   /** `light`: the cells take the working light's gems. `ink`: the current text colour. */
   tone?: AgentTone;
+  /** The work has ended: the cells hold a tick (`done`) or a cross (`failed`) in the success or danger ink, still. */
+  outcome?: AgentOutcome;
 };
 
 /** The agent at work, as a mark: square cells in the dither's voice. Decorative; pair it with words (see `AgentThinking`). */
-export function AgentMark({ variant = "wave", tone = "light", className, ...props }: AgentMarkProps) {
+export function AgentMark({ variant = "wave", tone = "light", outcome, className, ...props }: AgentMarkProps) {
   let cells: ReactNode;
-  if (variant === "orbit") {
+  if (outcome) {
+    const shape = OUTCOME_CELLS[outcome];
+    cells = QUAD.map(({ col, row, index }) => (
+      <rect data-on={shape.has(index) || undefined} height={2} key={index} width={2} x={col * 3} y={row * 3} />
+    ));
+  } else if (variant === "scan" || variant === "lines" || variant === "type" || variant === "raster" || variant === "fill") {
+    cells = QUAD.map(({ col, row, index, band }) => {
+      // Which cell (or column, or row) each one is in the order the variant lights them; a scan's cells hold a still frame.
+      const step = variant === "scan" ? col : variant === "lines" || variant === "type" ? index : variant === "raster" ? row : 3 - row;
+      const extra: Record<string, number> = variant === "scan" ? { "--fui-agent-still": trail((2 - col + 4) % 4) } : variant === "lines" ? { "--fui-agent-row": row } : {};
+      return (
+        <rect
+          data-band={band}
+          height={2}
+          key={index}
+          style={{ "--fui-agent-step": step, ...extra } as CSSProperties}
+          width={2}
+          x={col * 3}
+          y={row * 3}
+        />
+      );
+    });
+  } else if (variant === "orbit") {
     cells = (
       <>
         {RING.map(([x, y], index) => (
@@ -117,8 +176,9 @@ export function AgentMark({ variant = "wave", tone = "light", className, ...prop
     <svg
       aria-hidden="true"
       className={join("fui-agent-mark", className)}
+      data-outcome={outcome}
       data-tone={tone}
-      data-variant={variant}
+      data-variant={outcome ? undefined : variant}
       focusable="false"
       shapeRendering="crispEdges"
       viewBox="0 0 11 11"
@@ -132,9 +192,14 @@ export function AgentMark({ variant = "wave", tone = "light", className, ...prop
 /* -------------------------------------------------------------- thinking */
 
 export type AgentThinkingProps = Omit<ComponentProps<"div">, "children"> & {
+  /**
+   * The kind of work: `thinking` (default), `searching`, `reading`, `writing`, `running`, `rendering` or `uploading`. It
+   * picks the mark, each moving its own way, and the words when there is no `label`.
+   */
+  activity?: AgentActivity;
   /** What the agent is doing, in words ("Thinking", "Searching the docs"). Read out when it changes. */
   label?: string;
-  /** The mark: `wave` (default), `orbit` or `dither`. */
+  /** The mark, when it should differ from the activity's: `wave`, `orbit`, `dither`, `scan`, `lines`, `type`, `raster`, `fill`. */
   variant?: AgentMarkVariant;
   /** `light` (default): the mark and the label carry the working light. `ink`: a quieter, muted line. */
   tone?: AgentTone;
@@ -144,40 +209,94 @@ export type AgentThinkingProps = Omit<ComponentProps<"div">, "children"> & {
   timer?: boolean;
   /** When the work began. Defaults to when the indicator first appeared. */
   startedAt?: number | Date;
+  /**
+   * `working` (default), or how it ended: `done` or `failed`. Settled, the light goes out, the mark holds a tick or a cross,
+   * the label is still and the time stops. Say it in the past tense ("Searched 12 sources").
+   */
+  status?: "working" | AgentOutcome;
+  /** When the work ended, so the time beside a settled line reads the same after a reload. */
+  endedAt?: number | Date;
 };
 
 /**
  * The line that says an agent is working on a reply: a mark, a label and the time it has taken. It is a polite status, so
- * the label is announced when it changes and the ticking time is not. Under reduced motion the mark holds still, the label
- * is plain and the time counts in whole seconds.
+ * the label is announced when it changes and the ticking time is not. Each kind of work (`activity`) has its own mark, so a
+ * person can tell searching from thinking at a glance; when the work ends the line settles. Under reduced motion the mark
+ * holds a still pattern, the label is plain and the time counts in whole seconds.
  */
 export function AgentThinking({
-  label = "Thinking",
-  variant = "wave",
+  activity = "thinking",
+  label,
+  variant,
   tone = "light",
   shimmer = true,
   timer = true,
   startedAt,
+  status = "working",
+  endedAt,
   className,
   ...props
 }: AgentThinkingProps) {
-  const elapsed = useWorkTime(startedAt, timer);
+  const working = status === "working";
+  const kind = agentActivities[activity] ?? agentActivities.thinking;
+  const words = label ?? kind.label;
+  // A line that worked here counts its own time; one that arrives settled shows a time only when it was given one.
+  const worked = useRef(working);
+  if (working) worked.current = true;
+  const elapsed = useWorkTime(startedAt, timer && working);
+  const start = toTime(startedAt);
+  const end = toTime(endedAt);
+  const time = !working && start !== undefined && end !== undefined ? Math.max(0, end - start) : working || worked.current || start !== undefined ? elapsed : null;
+  // A new label (the next step, or the words of the end) scrambles into place; the light on it waits until it has settled.
+  const frame = useScramble(words);
   return (
-    <div className={join("fui-agent-thinking", className)} data-tone={tone} role="status" {...props}>
-      <AgentMark tone={tone} variant={variant} />
-      {shimmer ? (
-        <ShimmerText as="span" className="fui-agent-thinking-label" duration={1.8} tone={tone === "light" ? "light" : "ink"}>
-          {label}
-        </ShimmerText>
-      ) : (
-        <span className="fui-agent-thinking-label">{label}</span>
-      )}
+    <div className={join("fui-agent-thinking", className)} data-status={working ? undefined : status} data-tone={tone} role="status" {...props}>
+      <AgentMark outcome={working ? undefined : status} tone={tone} variant={variant ?? kind.variant} />
+      <WorkLabel className="fui-agent-thinking-label" duration={1.8} frame={frame} shimmer={shimmer && working} tone={tone}>
+        {words}
+      </WorkLabel>
       {timer ? (
         <span aria-hidden="true" className="fui-agent-thinking-time">
-          {elapsed === null ? "" : formatWorkTime(elapsed)}
+          {time === null ? "" : formatWorkTime(time)}
         </span>
       ) : null}
     </div>
+  );
+}
+
+/**
+ * The words of a piece at work: the light crosses them while it works (`shimmer`), and a new text scrambles into place
+ * (`frame`, from `useScramble`). One element throughout, so a label that changes as the work ends still settles in.
+ */
+export function WorkLabel({
+  children,
+  frame,
+  shimmer,
+  tone = "light",
+  duration = 1.8,
+  className,
+}: {
+  children: string;
+  frame: string | null;
+  shimmer: boolean;
+  tone?: AgentTone;
+  duration?: number;
+  className?: string;
+}) {
+  return (
+    <span
+      className={join(className, "fui-scramble-text", shimmer && "fui-shimmer-text")}
+      data-scrambling={frame !== null || undefined}
+      data-tone={shimmer && tone === "light" ? "light" : undefined}
+      style={shimmer ? ({ "--fui-shimmer-spread": `${children.length * 2}px`, "--fui-shimmer-duration": `${duration}s` } as CSSProperties) : undefined}
+    >
+      {children}
+      {frame !== null ? (
+        <span aria-hidden="true" className="fui-scramble-text-frame">
+          {frame}
+        </span>
+      ) : null}
+    </span>
   );
 }
 
@@ -217,6 +336,8 @@ export type TaskItem = {
   detail?: ReactNode;
   /** A short reading at the end of the row ("3 files", "1.2s"). */
   meta?: ReactNode;
+  /** The kind of work the step is (`searching`, `reading`, `writing`…): its mark while it runs. A tool's orbit by default. */
+  activity?: AgentActivity;
 };
 
 export type TaskListLabels = {
@@ -240,8 +361,8 @@ const TASK_LABELS: TaskListLabels = {
   complete: (total) => `All ${total} ${total === 1 ? "task" : "tasks"} settled`,
 };
 
-function TaskMark({ status }: { status: TaskStatus }) {
-  if (status === "running") return <AgentMark className="fui-task-mark-running" variant="orbit" />;
+function TaskMark({ status, activity }: { status: TaskStatus; activity?: AgentActivity }) {
+  if (status === "running") return <AgentMark className="fui-task-mark-running" variant={activity ? (agentActivities[activity]?.variant ?? "orbit") : "orbit"} />;
   return (
     <svg aria-hidden="true" className="fui-task-mark-icon" focusable="false" viewBox="0 0 16 16">
       <circle className="fui-task-mark-disc" cx={8} cy={8} r={7.25} />
@@ -315,7 +436,7 @@ export function TaskList({ tasks, title, label = "Tasks", labels: labelOverrides
             style={arrival(stagger, task.id)}
           >
             <span className="fui-task-mark">
-              <TaskMark status={task.status} />
+              <TaskMark activity={task.activity} status={task.status} />
             </span>
             <span className="fui-task-body">
               <span className="fui-task-title">
@@ -452,9 +573,21 @@ export function ContextMeter({
 
 export type GenerationStatus = "queued" | "generating" | "done" | "failed";
 
+/** The rows of a page being written: how far across each one reaches; 0 is the gap between paragraphs. */
+const PAGE_ROWS = [0.46, 0, 0.94, 0.9, 0.97, 0.58, 0, 0.92, 0.88, 0.95, 0.9, 0.36, 0, 0.6, 0.93, 0.86, 0.71];
+
 export type GenerationFrameProps = Omit<ComponentProps<"figure">, "children"> & {
   /** `queued` and `generating` show the field and the working light, `done` the image, `failed` the error. */
   status: GenerationStatus;
+  /** `image` (default), or `document`: a page whose rows are written from the top, the row being written in the light. */
+  kind?: "image" | "document";
+  /**
+   * How a picture being made looks: `ripple` (default), light rippling through a field of square dots; `refine`, square
+   * cells that grow finer, pass after pass, behind a band moving down; `scan`, a band of light sweeping down the field.
+   */
+  effect?: "ripple" | "refine" | "scan";
+  /** What shows in the frame when it is done and there is no `src`: the document itself, a preview of it. */
+  children?: ReactNode;
   /** Known progress, 0 to 1. Without it the frame says how long it has been working instead. */
   progress?: number;
   /** The finished image. */
@@ -476,12 +609,16 @@ export type GenerationFrameProps = Omit<ComponentProps<"figure">, "children"> & 
 };
 
 /**
- * A picture being made. While it works, light ripples across a field of square dots inside the frame and the working light
- * turns along its edge; a polite status says what it is doing and how far it got. The finished image arrives through the
- * dither. Under reduced motion the field and the edge hold still and the image appears at once.
+ * A picture (or a document) being made. While it works, the field inside the frame moves (`effect`: light ripples through
+ * square dots, cells grow finer behind a band, or a band sweeps down; a document's rows are written from the top) and the
+ * working light turns along its edge; a polite status says what it is doing and how far it got. The finished image arrives
+ * through the dither. Under reduced motion the field and the edge hold still and the image appears at once.
  */
 export function GenerationFrame({
   status,
+  kind = "image",
+  effect = "ripple",
+  children,
   progress,
   src,
   alt,
@@ -489,25 +626,47 @@ export function GenerationFrame({
   label,
   caption,
   error,
-  doneLabel = "Image ready",
+  doneLabel,
   startedAt,
   className,
   style,
   ...props
 }: GenerationFrameProps) {
   const working = status === "queued" || status === "generating";
+  const page = kind === "document";
   const elapsed = useWorkTime(startedAt, working);
   // An image still on its way when it mounts waits hidden and arrives through the dither; one that is already there (cached,
   // or loaded before hydration) just shows. Set on the element, not rendered, so the server's markup never hides it.
   const watchImage = useCallback((node: HTMLImageElement | null) => {
     if (node && !node.complete) node.dataset.fuiReveal = "pending";
   }, []);
-  const percent = progress === undefined ? undefined : Math.round(Math.min(1, Math.max(0, progress)) * 100);
-  const words = label ?? (status === "queued" ? "Waiting to start" : status === "failed" ? "The image could not be made" : "Making the image");
+  const share = progress === undefined ? undefined : Math.min(1, Math.max(0, progress));
+  const percent = share === undefined ? undefined : Math.round(share * 100);
+  const words =
+    label ??
+    (status === "queued"
+      ? "Waiting to start"
+      : status === "failed"
+        ? page
+          ? "The document could not be written"
+          : "The image could not be made"
+        : page
+          ? "Writing the document"
+          : "Making the image");
+  // A known progress places the field instead of the clock: how far down the page, or which pass and how far down it.
+  const pass = share === undefined ? undefined : Math.min(2, Math.floor(share * 3));
+  const field: CSSProperties | undefined =
+    share === undefined
+      ? undefined
+      : page
+        ? ({ "--fui-page-t": share * PAGE_ROWS.length } as CSSProperties)
+        : ({ "--fui-refine-pass": pass, "--fui-refine-band": `${(share * 3 - pass!) * 100}%`, "--fui-scan-band": `${share * 100}%` } as CSSProperties);
   const reading = working ? (percent !== undefined ? `${percent}%` : elapsed === null ? "" : formatWorkTime(elapsed)) : "";
   return (
     <figure
       className={join("fui-generation", className)}
+      data-effect={page || effect === "ripple" ? undefined : effect}
+      data-kind={page ? "document" : undefined}
       data-status={status}
       style={{ "--fui-generation-ratio": String(aspectRatio), ...style } as CSSProperties}
       {...props}
@@ -529,17 +688,39 @@ export function GenerationFrame({
             src={src}
           />
         ) : null}
+        {status === "done" && !src && children ? <div className="fui-generation-content">{children}</div> : null}
         {working ? (
           <>
-            <span aria-hidden="true" className="fui-generation-field" />
-            <span aria-hidden="true" className="fui-generation-ripple" />
+            {page ? (
+              <span aria-hidden="true" className="fui-generation-page" data-progress={share !== undefined || undefined} style={field}>
+                {PAGE_ROWS.map((length, index) => (
+                  <span key={index} style={{ "--i": index, "--length": length } as CSSProperties} />
+                ))}
+              </span>
+            ) : effect === "refine" ? (
+              <span aria-hidden="true" className="fui-generation-refine" data-progress={share !== undefined || undefined} style={field}>
+                <span data-layer="coarse" />
+                <span data-layer="fine" />
+                <span className="fui-generation-band" />
+              </span>
+            ) : effect === "scan" ? (
+              <>
+                <span aria-hidden="true" className="fui-generation-field" />
+                <span aria-hidden="true" className="fui-generation-scan" data-progress={share !== undefined || undefined} style={field} />
+              </>
+            ) : (
+              <>
+                <span aria-hidden="true" className="fui-generation-field" />
+                <span aria-hidden="true" className="fui-generation-ripple" />
+              </>
+            )}
             <WorkingLight />
           </>
         ) : null}
         <span className={working ? "fui-generation-status" : "fui-sr-only"} role="status">
           {working ? (
             <>
-              <AgentMark variant="dither" />
+              <AgentMark variant={page ? "type" : effect === "ripple" ? "dither" : "raster"} />
               <span className="fui-generation-words">{words}</span>
               <span aria-hidden="true" className="fui-generation-reading">
                 {reading}
@@ -554,7 +735,7 @@ export function GenerationFrame({
               ) : null}
             </>
           ) : status === "done" ? (
-            doneLabel
+            (doneLabel ?? (page ? "Document ready" : "Image ready"))
           ) : null}
         </span>
         {status === "failed" ? (

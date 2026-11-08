@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger, ShimmerText } from "@fabrials/ui";
+import { useEffect, useId, useRef, useState, type ComponentProps, type CSSProperties, type ReactNode } from "react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger, Readout, ShimmerText, useScramble } from "@fabrials/ui";
 import {
   BrainIcon,
   ChevronDownIcon,
@@ -11,7 +11,7 @@ import {
   SearchIcon,
 } from "./chat-icons";
 import { SourceFavicon, hostnameFromUrl, sourcePath, type FaviconResolver } from "./citations";
-import { formatWorkTime, useArrivals, useWorkTime } from "./agent";
+import { WorkLabel, formatWorkTime, useArrivals, useWorkTime } from "./agent";
 
 function join(...values: Array<string | false | null | undefined>) {
   return values.filter(Boolean).join(" ");
@@ -75,17 +75,12 @@ export function ActivityDisclosure({
   className,
 }: ActivityDisclosureProps) {
   const [open, setOpen] = useControllable(openProp, defaultOpen, onOpenChange);
+  const frame = useScramble(label);
   const text = (
     <>
-      <span className="fui-activity-label" key={label}>
-        {live ? (
-          <ShimmerText as="span" duration={1.6} tone="light">
-            {label}
-          </ShimmerText>
-        ) : (
-          label
-        )}
-      </span>
+      <WorkLabel className="fui-activity-label" duration={1.6} frame={frame} shimmer={live}>
+        {label}
+      </WorkLabel>
       {live && timer ? <WorkTime startedAt={startedAt} /> : null}
     </>
   );
@@ -473,5 +468,44 @@ export function SearchStepsDisclosure({
         <SearchStepList faviconUrl={faviconUrl} live={phase !== "done"} steps={steps} titleFor={titleFor} />
       ) : null}
     </ActivityDisclosure>
+  );
+}
+
+export type SourceTallyProps = Omit<ComponentProps<"div">, "children"> & {
+  /** The sources found so far, as URLs, in the order they arrived: each is a tile, and the count says how many. */
+  sources: readonly string[];
+  /** What the agent is doing with them: "Reviewing sources" while it searches, "Read" once it has. */
+  label?: string;
+  /** How many tiles to draw; the count covers the rest. 8 by default. */
+  max?: number;
+  faviconUrl?: FaviconResolver;
+};
+
+/**
+ * The sources a search has found so far, as Perplexity shows them: what the agent is doing with them, how many (a reading
+ * whose digits settle when it changes) and a tile for each, its site's mark or initial. A tile that arrives after the line is
+ * shown rises into place; nothing moves between arrivals. Not a live region: say the state in an `AgentThinking` beside it.
+ */
+export function SourceTally({ sources, label = "Reviewing sources", max = 8, faviconUrl, className, ...props }: SourceTallyProps) {
+  const unique = uniqueUrls(sources);
+  const stagger = useArrivals(unique);
+  return (
+    <div className={join("fui-source-tally", className)} {...props}>
+      <span className="fui-source-tally-label">{label}</span>
+      <Readout className="fui-source-tally-count" value={String(unique.length)} />
+      {unique.length > 0 ? (
+        <span aria-hidden="true" className="fui-source-tally-tiles">
+          {unique.slice(0, Math.max(0, max)).map((url) => (
+            <span
+              className={stagger.has(url) ? "fui-source-tally-tile fui-rise" : "fui-source-tally-tile"}
+              key={url}
+              style={stagger.has(url) ? ({ "--fui-stagger": stagger.get(url) } as CSSProperties) : undefined}
+            >
+              <SourceFavicon faviconUrl={faviconUrl} url={url} />
+            </span>
+          ))}
+        </span>
+      ) : null}
+    </div>
   );
 }

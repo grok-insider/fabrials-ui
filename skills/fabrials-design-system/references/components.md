@@ -208,8 +208,9 @@ Triggers take `render` to become a Fabrials button: `<DialogTrigger render={<But
 
 | Component | Use for |
 | --- | --- |
-| `Spinner` | An indeterminate wait, with text saying what is happening; drawn as a ring of square cells that light in turn |
-| `ShimmerText` | A short pending label (plain text under reduced motion); `tone="light"` crosses it with the working light for an agent at work |
+| `Spinner` (`variant` `ring`, `dots`, `bars`, `grid`, `line`) | An indeterminate wait, with text saying what is happening; square cells that light in turn, and a `line` as wide as a word for a row or a table cell |
+| `ShimmerText` (`tone`, `variant` `band`, `letters`) | A short pending label (plain text under reduced motion); `tone="light"` crosses it with the working light for an agent at work; `letters` steps the light a letter at a time, for reading and indexing |
+| `ScrambleText`, `useScramble` | Words that change in place (a step, a status, a heading): the new text scrambles into place once, never looping |
 | `Toaster`, `toast` | A completed action; mount `Toaster` once |
 | `Snippet`, `CopyButton` | Commands with copy; long lines wrap with a hanging indent |
 | `Carousel` (`CarouselContent`, `CarouselItem`, `CarouselPrevious`, `CarouselNext`) | A sideways list of peers such as citations |
@@ -315,14 +316,15 @@ Presentational only: the host supplies data, rendering, uploads, transcription a
 
 | Component | Use for |
 | --- | --- |
-| `ChatMessage` (`from` `user`, `assistant`, `system`; `actions`), `MessageActions`, `MessageAction`, `CopyMessageAction`, `MessageTimestamp` | A turn with its actions |
+| `ChatMessage` (`from` `user`, `assistant`, `system`; `actions`; `streaming`), `MessageActions`, `MessageAction`, `CopyMessageAction`, `MessageTimestamp` | A turn with its actions; while an answer arrives, `streaming` ends it in a caret of the working light and makes it `aria-busy` |
 | `ChatComposer` (`onSubmit`, `status` `ready`, `submitting`, `streaming`, `onStop`, `tools`, `attachments`, `working`), `ComposerToggle`, `ComposerButton` | The message field; the working light runs along its edge while the agent answers |
 | `CodeBlock` and the `.fui-markdown` class | Styles for rendered markdown and code with copy and download |
 | `CitationProvider`, `CitationChip`, `Sources`, `SourceCard`, `SourceFavicon`, `LinkWithPreview`, `LinkPreviewCard` | Numbered citations and their sources |
 | `ActivityDisclosure`, `ReasoningDisclosure`, `SearchStepsDisclosure`, `ActivityIcon` | Reasoning, search steps and tool activity inside an answer; while live the label carries the working light and the time counts (`timer`, `startedAt`) |
-| `AgentThinking` (`label`, `variant` `wave`, `orbit`, `dither`, `tone`, `timer`, `startedAt`), `AgentMark` | The line that says an agent is working on a reply; the mark alone for a dense row |
-| `TaskList` (`tasks` with `status` `pending`, `running`, `done`, `failed`, `skipped`, `detail`, `meta`; `title`, `labels`) | The steps of an agent's plan as they are worked through |
-| `GenerationFrame` (`status` `queued`, `generating`, `done`, `failed`; `progress`, `src`, `alt`, `aspectRatio`, `error`) | A picture being made, and the picture when it arrives |
+| `AgentThinking` (`activity` `thinking`, `searching`, `reading`, `writing`, `running`, `rendering`, `uploading`; `label`, `status` `working`, `done`, `failed`, `tone`, `timer`, `startedAt`, `endedAt`), `AgentMark` (`variant`, `outcome`) | The line that says an agent is working on a reply, with a mark per kind of work so the states read apart at a glance, settling on a tick or a cross; the mark alone for a dense row |
+| `TaskList` (`tasks` with `status` `pending`, `running`, `done`, `failed`, `skipped`, `detail`, `meta`, `activity`; `title`, `labels`) | The steps of an agent's plan as they are worked through; the running step shows the mark of its kind of work |
+| `SourceTally` (`sources`, `label`, `max`, `faviconUrl`) | The sources a search has found so far, with an `AgentThinking activity="searching"` beside it; `Progress variant="scan"` under a search field while results load |
+| `GenerationFrame` (`status` `queued`, `generating`, `done`, `failed`; `effect` `ripple`, `refine`, `scan`; `kind` `image`, `document`; `progress`, `src`, `alt`, `aspectRatio`, `error`, `children`) | A picture or a document being made, and what arrives |
 | `ContextMeter` (`parts`, `limit`, `warnAt`, `dangerAt`, `format`, `unit`) | How full an agent's context window (or any budget) is |
 | `Attachments` (`variant`, `size`), `AttachmentChip` | Files on a message or in a composer; an upload with `progress` draws its ring and counts |
 | `VoiceInputButton`, `VoiceInputButtonView` | Dictation; the microphone is requested only after a press |

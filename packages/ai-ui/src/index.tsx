@@ -94,6 +94,7 @@ export {
   ReasoningDisclosure,
   SearchStepList,
   SearchStepsDisclosure,
+  SourceTally,
   countSearches,
   reasoningLabel,
   searchDoneLabel,
@@ -106,6 +107,7 @@ export {
   type SearchPhase,
   type SearchStep,
   type SearchStepsDisclosureProps,
+  type SourceTallyProps,
 } from "./activity";
 export {
   AttachmentChip,
@@ -146,6 +148,7 @@ export {
 export {
   AgentMark,
   AgentThinking,
+  agentActivities,
   ContextMeter,
   GenerationFrame,
   TaskList,
@@ -153,8 +156,10 @@ export {
   formatWorkTime,
   useArrivals,
   useWorkTime,
+  type AgentActivity,
   type AgentMarkProps,
   type AgentMarkVariant,
+  type AgentOutcome,
   type AgentThinkingProps,
   type AgentTone,
   type ContextMeterProps,

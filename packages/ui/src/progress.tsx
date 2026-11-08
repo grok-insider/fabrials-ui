@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, type CSSProperties, type ReactNode } from "react";
+import { useId, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { Progress as BaseProgress } from "@base-ui/react/progress";
 import type { Tone } from "./display";
 import { classes, type StyledProps } from "./shared";
@@ -23,8 +23,12 @@ export type ProgressProps = Omit<BaseProgress.Root.Props, "className" | "childre
   tone?: Tone;
   /** `sm` 4 px for a row, `default` 6 px, `lg` 8 px for a page's task; a ring of 16, 24 or 48 px. */
   size?: "sm" | "default" | "lg";
-  /** `bar` (default), or `ring`: a circle that closes clockwise, with the label and hint beside it. */
-  variant?: "bar" | "ring";
+  /**
+   * `bar` (default); `ring`: a circle that closes clockwise, with the label and hint beside it; `scan`: while the total is
+   * not known (a search), a strip of square cells where a head of the working light hops across with a trail. With a value,
+   * a scan is a bar.
+   */
+  variant?: "bar" | "ring" | "scan";
   /** Cuts the bar into that many segments, for a task of known steps (a form in steps, the files of a batch); they ink in order. A bar with a value only. */
   steps?: number;
   /** Parts placed before the track, the way shadcn composes it: `ProgressLabel` and `ProgressValue`. */
@@ -56,6 +60,7 @@ export function Progress({
   const known = value != null && Number.isFinite(value);
   const percent = known ? clamp(((value - min) / (max - min || 1)) * 100, 0, 100) : null;
   const ring = variant === "ring";
+  const scan = variant === "scan" && percent == null;
   const segments = !ring && percent != null && steps != null && steps >= 2 ? Math.min(48, Math.round(steps)) : undefined;
   const valueShown = showValue ?? (label != null || (ring && size === "lg"));
   return (
@@ -67,7 +72,7 @@ export function Progress({
       data-slot="progress"
       data-tone={tone}
       data-size={size === "default" ? undefined : size}
-      data-variant={ring ? "ring" : undefined}
+      data-variant={ring ? "ring" : scan ? "scan" : undefined}
       aria-describedby={[describedBy, hint != null ? hintId : undefined].filter(Boolean).join(" ") || undefined}
       className={classes("fui-progress", className)}
       {...props}
@@ -77,6 +82,10 @@ export function Progress({
       {children}
       {ring ? (
         <ProgressRing percent={percent} size={size} />
+      ) : scan ? (
+        <ProgressTrack>
+          <ProgressScan />
+        </ProgressTrack>
       ) : (
         <ProgressTrack data-steps={segments}>
           {segments ? <ProgressSegments count={segments} percent={percent ?? 0} /> : <ProgressIndicator />}
@@ -88,6 +97,40 @@ export function Progress({
         </p>
       ) : null}
     </BaseProgress.Root>
+  );
+}
+
+/**
+ * The scan's strip: as many square cells as fit the track (each as wide as the track is tall, 2 px apart), measured once
+ * mounted and again when the track changes width. The head's place is one number for the whole strip (--fui-scan-p).
+ */
+function ProgressScan() {
+  const strip = useRef<HTMLSpanElement | null>(null);
+  const [count, setCount] = useState(0);
+  useLayoutEffect(() => {
+    const node = strip.current;
+    if (!node) return;
+    const measure = () => {
+      const cell = node.clientHeight;
+      if (!cell) return;
+      setCount(Math.max(4, Math.floor((node.clientWidth + 2) / (cell + 2))));
+    };
+    measure();
+    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(measure);
+    observer?.observe(node);
+    return () => observer?.disconnect();
+  }, []);
+  return (
+    <span
+      aria-hidden
+      className="fui-progress-scan"
+      ref={strip}
+      style={{ "--fui-scan-count": count, "--fui-scan-steps": count + 4, "--fui-scan-duration": `${(count + 4) * 60}ms` } as CSSProperties}
+    >
+      {Array.from({ length: count }, (_, index) => (
+        <span key={index} style={{ "--i": index } as CSSProperties} />
+      ))}
+    </span>
   );
 }
 

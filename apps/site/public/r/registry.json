@@ -1794,7 +1794,7 @@
       "name": "spinner",
       "type": "registry:ui",
       "title": "Spinner",
-      "description": "shadcn's spinner, backed by @fabrials/ui. An indeterminate wait.",
+      "description": "shadcn's spinner, backed by @fabrials/ui. An indeterminate wait, in square cells: a ring, dots, bars, a grid or a line.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
         "@fabrials/ui@^0.11.0"

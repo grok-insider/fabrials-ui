@@ -1083,6 +1083,7 @@
     color: var(--foreground);
   }
   .fui-activity-label {
+    position: relative;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1862,9 +1863,6 @@
       background: var(--brand);
       animation: fui-ai-live-ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
     }
-    .fui-activity-label {
-      animation: fui-ai-fade-in var(--fui-duration-slow) var(--fui-ease);
-    }
     .fui-voice-button[data-status="recording"] .fui-voice-dot {
       animation: fui-ai-blink 1.4s ease-in-out infinite;
     }
@@ -1894,11 +1892,6 @@
       transform: scale(2.6);
     }
   }
-  @keyframes fui-ai-fade-in {
-    from {
-      opacity: 0;
-    }
-  }
   @keyframes fui-ai-slide-in {
     from {
       opacity: 0;
@@ -1919,6 +1912,34 @@
   syntax: "<percentage>";
   inherits: false;
   initial-value: 0%;
+}
+/* A picture being refined: which pass (0 to 2, the cells halving each time) and how far down the band is. A scan's band,
+   and how far a page being written has gone, in rows. All registered so they can be animated. */
+@property --fui-refine-pass {
+  syntax: "<integer>";
+  inherits: true;
+  initial-value: 1;
+}
+@property --fui-refine-band {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 45%;
+}
+@property --fui-scan-band {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 40%;
+}
+@property --fui-page-t {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 9;
+}
+/* How far a filling mark has gone: one cell, or one row, per step. Registered so it can be animated in steps. */
+@property --fui-agent-t {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
 }
 @layer components {
   /* ------------------------------------------------------------ the mark */
@@ -1954,6 +1975,55 @@
   }
   .fui-agent-mark[data-variant="dither"] rect[data-on] {
     opacity: 1;
+  }
+  /* A scan's columns take turns and hold their head and trail. The other new marks read how far the work has gone from one
+     number, --fui-agent-t, that steps through the cycle a cell or a row at a time: writing keeps what it has filled, the
+     newest cell brightest; reading lights the line it is on up to its head, and the lines it has read go faint; raster dims
+     the rows behind its band; an upload fills from the bottom. */
+  .fui-agent-mark[data-variant="scan"] rect {
+    opacity: var(--fui-agent-still);
+  }
+  .fui-agent-mark[data-variant="type"] {
+    --fui-agent-t: 9;
+  }
+  .fui-agent-mark[data-variant="lines"] {
+    --fui-agent-t: 6;
+  }
+  .fui-agent-mark[data-variant="lines"] rect {
+    --fui-agent-passed: clamp(0, (var(--fui-agent-t) - var(--fui-agent-step) - 0.5) * 1000, 1);
+    --fui-agent-head: calc(var(--fui-agent-passed) - clamp(0, (var(--fui-agent-t) - var(--fui-agent-step) - 1.5) * 1000, 1));
+    --fui-agent-on-line: calc(
+      clamp(0, (var(--fui-agent-t) - var(--fui-agent-row) * 4 - 0.5) * 1000, 1) *
+        clamp(0, (var(--fui-agent-row) * 4 + 4.5 - var(--fui-agent-t)) * 1000, 1)
+    );
+    --fui-agent-read: clamp(0, (var(--fui-agent-t) - var(--fui-agent-row) * 4 - 4.5) * 1000, 1);
+    opacity: calc(
+      0.14 + var(--fui-agent-read) * 0.12 + var(--fui-agent-passed) * var(--fui-agent-on-line) * 0.5 + var(--fui-agent-head) * 0.36
+    );
+  }
+  .fui-agent-mark:is([data-variant="raster"], [data-variant="fill"]) {
+    --fui-agent-t: 2;
+  }
+  .fui-agent-mark:is([data-variant="type"], [data-variant="raster"], [data-variant="fill"]) rect {
+    --fui-agent-lit: clamp(0, (var(--fui-agent-t) - var(--fui-agent-step) - 0.5) * 1000, 1);
+    --fui-agent-behind: clamp(0, (var(--fui-agent-t) - var(--fui-agent-step) - 1.5) * 1000, 1);
+    opacity: calc(0.14 + var(--fui-agent-lit) * 0.86 - var(--fui-agent-behind) * 0.3);
+  }
+  .fui-agent-mark[data-variant="raster"] rect {
+    opacity: calc(0.14 + var(--fui-agent-lit) * 0.86 - var(--fui-agent-behind) * 0.46);
+  }
+  /* Settled: a tick or a cross in the cells, in the success or danger ink. The light has gone out. */
+  .fui-agent-mark[data-outcome] rect {
+    opacity: 0.12;
+  }
+  .fui-agent-mark[data-outcome] rect[data-on] {
+    opacity: 1;
+  }
+  .fui-agent-mark[data-outcome="done"] {
+    color: var(--fui-success-ink);
+  }
+  .fui-agent-mark[data-outcome="failed"] {
+    color: var(--fui-danger-ink);
   }
   @media (prefers-reduced-motion: no-preference) {
     @keyframes fui-agent-wave {
@@ -2009,6 +2079,59 @@
       animation: fui-agent-dither 2.4s linear infinite;
       animation-delay: calc(var(--fui-agent-step) * 75ms - 2.4s);
     }
+    /* The head hops a whole cell at a time, leaving a trail of two. */
+    @keyframes fui-agent-hop {
+      0% {
+        opacity: 1;
+      }
+      25% {
+        opacity: 0.5;
+      }
+      50% {
+        opacity: 0.25;
+      }
+      75%,
+      100% {
+        opacity: 0.14;
+      }
+    }
+    @keyframes fui-agent-cells {
+      from {
+        --fui-agent-t: 0;
+      }
+      to {
+        --fui-agent-t: 20;
+      }
+    }
+    @keyframes fui-agent-rows {
+      from {
+        --fui-agent-t: 0;
+      }
+      to {
+        --fui-agent-t: 6;
+      }
+    }
+    @keyframes fui-agent-lines {
+      from {
+        --fui-agent-t: 0;
+      }
+      to {
+        --fui-agent-t: 17;
+      }
+    }
+    .fui-agent-mark[data-variant="scan"] rect {
+      animation: fui-agent-hop 1s steps(1, end) infinite;
+      animation-delay: calc(var(--fui-agent-step) * 250ms - 1s);
+    }
+    .fui-agent-mark[data-variant="lines"] {
+      animation: fui-agent-lines 1.62s steps(18, jump-none) infinite;
+    }
+    .fui-agent-mark[data-variant="type"] {
+      animation: fui-agent-cells 2.1s steps(21, jump-none) infinite;
+    }
+    .fui-agent-mark:is([data-variant="raster"], [data-variant="fill"]) {
+      animation: fui-agent-rows 1.68s steps(7, jump-none) infinite;
+    }
   }
 
   /* ------------------------------------------------------------ thinking */
@@ -2026,10 +2149,14 @@
     height: 0.875rem;
   }
   .fui-agent-thinking-label {
+    position: relative;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  .fui-agent-thinking[data-status="failed"] .fui-agent-thinking-label {
+    color: var(--fui-danger-ink);
   }
   .fui-agent-thinking-time,
   .fui-activity-time {
@@ -2390,6 +2517,106 @@
     );
     opacity: 0.85;
   }
+  /* Refine: square cells in the working light that grow finer, pass after pass (16, 8, 4 and 2 px), behind a band moving
+     down: finer above it, coarser below. Still, the second pass rests near the middle. */
+  .fui-generation-refine,
+  .fui-generation-scan,
+  .fui-generation-page,
+  .fui-generation-content {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: inherit;
+  }
+  .fui-generation-refine,
+  .fui-generation-scan,
+  .fui-generation-page {
+    pointer-events: none;
+  }
+  .fui-generation-refine {
+    --fui-refine-cell: calc(16px / (1 + var(--fui-refine-pass) + var(--fui-refine-pass) * (var(--fui-refine-pass) - 1) / 2));
+  }
+  /* The cells are an ordered dither (a 4x4 Bayer tile, ten cells of sixteen lit), so the field reads as a picture's grain
+     and grows finer with it, not as a grid. */
+  .fui-generation-refine > [data-layer],
+  .fui-generation-band {
+    --fui-cell-gap: max(1px, var(--fui-cell) / 8);
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--fui-light-1), var(--fui-light-2) 55%, var(--fui-light-3));
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 4'%3E%3Cpath d='M0.1 0.1h.8v.8h-.8zM1.1 0.1h.8v.8h-.8zM2.1 0.1h.8v.8h-.8zM1.1 1.1h.8v.8h-.8zM3.1 1.1h.8v.8h-.8zM0.1 2.1h.8v.8h-.8zM2.1 2.1h.8v.8h-.8zM3.1 2.1h.8v.8h-.8zM1.1 3.1h.8v.8h-.8zM3.1 3.1h.8v.8h-.8z'/%3E%3C/svg%3E") 0 0 / calc(var(--fui-cell) * 4) calc(var(--fui-cell) * 4);
+    opacity: 0.42;
+  }
+  .fui-generation-band {
+    mask: conic-gradient(
+        at calc(var(--fui-cell) - var(--fui-cell-gap)) calc(var(--fui-cell) - var(--fui-cell-gap)),
+        transparent 75%,
+        var(--foreground) 0
+      )
+      0 0 / var(--fui-cell) var(--fui-cell);
+  }
+  .fui-generation-refine > [data-layer="coarse"] {
+    --fui-cell: var(--fui-refine-cell);
+    clip-path: inset(var(--fui-refine-band) 0 0 0);
+  }
+  .fui-generation-refine > [data-layer="fine"] {
+    --fui-cell: calc(var(--fui-refine-cell) / 2);
+    clip-path: inset(0 0 calc(100% - var(--fui-refine-band)) 0);
+  }
+  .fui-generation-band {
+    --fui-cell: calc(var(--fui-refine-cell) / 2);
+    inset: auto 0;
+    top: var(--fui-refine-band);
+    height: var(--fui-refine-cell);
+    translate: 0 -50%;
+    opacity: 1;
+  }
+  /* Scan: a band of the light sweeps down the field of dots, the dots it passes still lit a little behind it. */
+  .fui-generation-scan {
+    background: conic-gradient(at 2px 2px, transparent 75%, var(--fui-light-1) 0) 2px 2px / 6px 6px;
+    mask: linear-gradient(
+      to bottom,
+      transparent calc(var(--fui-scan-band) - 26%),
+      var(--foreground) var(--fui-scan-band),
+      transparent calc(var(--fui-scan-band) + 1%)
+    );
+  }
+  .fui-generation-scan::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    top: var(--fui-scan-band);
+    height: 2px;
+    translate: 0 -100%;
+    background: linear-gradient(90deg, transparent, var(--fui-light-1) 18%, var(--fui-light-3) 82%, transparent);
+  }
+  /* A document: the rows of a page, written from the top in square cells; the row being written is in the light, the rows
+     written are ink. Still, half the page is written. */
+  .fui-generation-page {
+    inset: 10% 10% 24%;
+    display: grid;
+    grid-template-rows: repeat(17, minmax(0, 1fr));
+    align-items: center;
+    justify-items: start;
+  }
+  .fui-generation-page > span {
+    --fui-fill: clamp(0, var(--fui-page-t) - var(--i), 1);
+    --fui-active: calc(
+      clamp(0, (var(--fui-page-t) - var(--i)) * 1000, 1) - clamp(0, (var(--fui-page-t) - var(--i) - 1) * 1000, 1)
+    );
+    width: calc(var(--length) * var(--fui-fill) * 100%);
+    width: round(down, var(--length) * var(--fui-fill) * 100%, 6px);
+    height: 4px;
+    background: repeating-linear-gradient(90deg, currentColor 0 4px, transparent 4px 6px);
+    color: color-mix(
+      in oklab,
+      var(--fui-light-1) calc(var(--fui-active) * 100%),
+      color-mix(in oklab, var(--muted-foreground) 42%, transparent)
+    );
+  }
+  .fui-generation-page > span:first-child {
+    height: 6px;
+  }
   .fui-generation-status {
     position: absolute;
     z-index: 2;
@@ -2480,6 +2707,63 @@
     }
     .fui-generation-ripple {
       animation: fui-generation-ripple 2.2s var(--fui-ease-out) infinite;
+    }
+    @keyframes fui-refine-pass {
+      0% {
+        --fui-refine-pass: 0;
+      }
+      33.333% {
+        --fui-refine-pass: 1;
+      }
+      66.666%,
+      100% {
+        --fui-refine-pass: 2;
+      }
+    }
+    @keyframes fui-refine-band {
+      from {
+        --fui-refine-band: 0%;
+      }
+      to {
+        --fui-refine-band: 100%;
+      }
+    }
+    @keyframes fui-scan-band {
+      from {
+        --fui-scan-band: -4%;
+      }
+      to {
+        --fui-scan-band: 104%;
+      }
+    }
+    @keyframes fui-page-write {
+      from {
+        --fui-page-t: 0;
+      }
+      to {
+        --fui-page-t: 19;
+      }
+    }
+    .fui-generation-refine:not([data-progress]) {
+      animation:
+        fui-refine-pass 4.8s steps(1, end) infinite,
+        fui-refine-band 1.6s linear infinite;
+    }
+    .fui-generation-scan:not([data-progress]) {
+      animation: fui-scan-band 2.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+    }
+    .fui-generation-page:not([data-progress]) {
+      animation: fui-page-write 10.45s steps(229, jump-none) infinite;
+    }
+    /* A known progress moves the field to its new place instead of running on its own. */
+    .fui-generation-refine[data-progress] {
+      transition: --fui-refine-band var(--fui-duration-slow) var(--fui-ease-out);
+    }
+    .fui-generation-scan[data-progress] {
+      transition: --fui-scan-band var(--fui-duration-slow) var(--fui-ease-out);
+    }
+    .fui-generation-page[data-progress] {
+      transition: --fui-page-t var(--fui-duration-slow) var(--fui-ease-out);
     }
     .fui-generation-image[data-fui-reveal="in"] {
       animation-duration: 480ms;
@@ -2590,9 +2874,70 @@
     margin-inline-start: -0.25rem;
   }
 
+  /* ------------------------------------------------- an answer arriving */
+  /* A block caret of the working light at the end of the text while it streams: solid while words arrive, blinking only
+     when the stream waits, still under reduced motion. The script places it; it never moves the text. */
+  .fui-chat-message[data-streaming] .fui-chat-message-body {
+    position: relative;
+  }
+  .fui-stream-caret {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0.5em;
+    height: 1em;
+    border-radius: 1px;
+    background: var(--fui-light-1);
+    pointer-events: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes fui-caret-blink {
+      50% {
+        opacity: 0;
+      }
+    }
+    .fui-stream-caret[data-stalled] {
+      animation: fui-caret-blink 1.06s steps(1, end) infinite;
+    }
+  }
+
+  /* ------------------------------------------- search: the sources so far */
+  .fui-source-tally {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--fui-space-1) var(--fui-space-2);
+    min-width: 0;
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+    line-height: var(--fui-leading-xs);
+  }
+  .fui-source-tally-count {
+    min-inline-size: 2ch;
+    color: var(--foreground);
+  }
+  .fui-source-tally-tiles {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 3px;
+  }
+  .fui-source-tally-tile {
+    display: inline-flex;
+  }
+
   /* Inside Loading the pieces are skeletons too: the dot field, the ripple and the upload ring go, and the parts of a bar
      become one neutral bone. */
-  [data-fui-loading] > .fui-loading-content :is(.fui-generation-field, .fui-generation-ripple, .fui-attachment-ring) {
+  [data-fui-loading]
+    > .fui-loading-content
+    :is(
+      .fui-generation-field,
+      .fui-generation-ripple,
+      .fui-generation-refine,
+      .fui-generation-scan,
+      .fui-generation-page,
+      .fui-attachment-ring,
+      .fui-stream-caret
+    ) {
     visibility: hidden !important;
   }
   [data-fui-loading]
@@ -2620,11 +2965,18 @@
     }
     .fui-generation-field,
     .fui-generation-ripple,
+    .fui-generation-refine,
+    .fui-generation-scan,
+    .fui-generation-page,
     .fui-attachment-ring {
       display: none;
     }
     .fui-generation-status {
       border: 1px solid CanvasText;
+    }
+    .fui-stream-caret {
+      forced-color-adjust: none;
+      background: Highlight;
     }
   }
 }

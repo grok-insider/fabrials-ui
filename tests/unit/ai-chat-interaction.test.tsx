@@ -64,7 +64,7 @@ test("activity without a body is a plain status row with a live dot and shimmer"
   assert.match(html, /role="status"/);
   assert.match(html, /aria-live="polite"/);
   assert.match(html, /fui-activity-icon" data-live="true"/);
-  assert.match(html, /<span class="fui-shimmer-text"[^>]*>Working it out…<\/span>/);
+  assert.match(html, /<span class="fui-activity-label fui-scramble-text fui-shimmer-text" data-tone="light"[^>]*>Working it out…<\/span>/);
   assert.doesNotMatch(html, /<button/);
 });
 

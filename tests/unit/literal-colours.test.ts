@@ -73,6 +73,8 @@ function allowed(hit: Hit) {
   if (/shadow/.test(hit.property) && /^oklch\((?:0|1) 0 0 \/ \d+%\)$/.test(hit.literal)) return true;
   // @fabrials/ai-ui defines the muted syntax inks in its own sheet; they are tokens, not component paint.
   if (/^--fui-syntax-/.test(hit.property)) return true;
+  // A mask is alpha only: the colour of an SVG drawn as a mask (the refine field's dither tile) is never seen.
+  if (/^mask(-image)?$/.test(hit.property) && hit.literal === "data:image") return true;
   return false;
 }
 

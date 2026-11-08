@@ -2295,6 +2295,43 @@
       transparent 0.375rem 0.625rem
     );
   }
+  /* A scan (0.11): square cells as wide as the track is tall, 2 px apart. A head of the working light hops across them with a
+     trail of two, shifting from Stormlight on the left to amethyst on the right; still, it rests a third of the way. */
+  .fui-progress[data-variant="scan"] .fui-progress-track {
+    overflow: visible;
+    border-radius: 0;
+    background: none;
+  }
+  .fui-progress-scan {
+    display: flex;
+    gap: 2px;
+    height: 100%;
+  }
+  .fui-progress-scan > span {
+    position: relative;
+    flex: none;
+    height: 100%;
+    aspect-ratio: 1;
+    border-radius: 1px;
+    background: color-mix(in oklab, var(--muted-foreground) 22%, transparent);
+  }
+  .fui-progress-scan > span::after {
+    --d: calc(var(--fui-scan-p) * (var(--fui-scan-count) + 3) - var(--i));
+    --on-0: clamp(0, (var(--d) + 0.5) * 1000, 1);
+    --on-1: clamp(0, (var(--d) - 0.5) * 1000, 1);
+    --on-2: clamp(0, (var(--d) - 1.5) * 1000, 1);
+    --on-3: clamp(0, (var(--d) - 2.5) * 1000, 1);
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: color-mix(
+      in oklab,
+      var(--fui-progress-light-1),
+      var(--fui-progress-light-3) calc(var(--i) / max(1, var(--fui-scan-count) - 1) * 100%)
+    );
+    opacity: calc(var(--on-0) - var(--on-1) + (var(--on-1) - var(--on-2)) * 0.5 + (var(--on-2) - var(--on-3)) * 0.25);
+  }
   .fui-progress-hint {
     flex: 0 0 100%;
     min-width: 0;
@@ -7510,6 +7547,15 @@
     width: 0.875rem;
     height: 0.875rem;
   }
+  /* The other busy marks hold a still frame (what reduced motion shows); the line is five cells, as wide as a word. */
+  .fui-pixel-spinner[data-variant] rect {
+    opacity: var(--fui-spinner-still);
+  }
+  .fui-pixel-spinner[data-variant="line"] {
+    width: 1.75rem;
+    height: auto;
+    aspect-ratio: 19 / 3;
+  }
 
   /* One plate under the pressed item of a single-choice group (a toggle group, a theme switcher) or the active tab of a
      segmented list. It is placed by its four edges, so each edge can move on its own (0.11). */
@@ -7600,6 +7646,80 @@
     .fui-pixel-spinner rect:first-child {
       animation: fui-pixel 800ms steps(1, end) infinite;
       animation-timing-function: linear;
+    }
+    @keyframes fui-pixel-dot {
+      0% {
+        opacity: 1;
+      }
+      33.333% {
+        opacity: 0.22;
+      }
+    }
+    @keyframes fui-pixel-bar-2 {
+      0% {
+        opacity: 0.22;
+      }
+      25%,
+      100% {
+        opacity: 1;
+      }
+    }
+    @keyframes fui-pixel-bar-3 {
+      0%,
+      75%,
+      100% {
+        opacity: 0.22;
+      }
+      50% {
+        opacity: 1;
+      }
+    }
+    @keyframes fui-pixel-grid {
+      0% {
+        opacity: 1;
+      }
+      20% {
+        opacity: 0.5;
+      }
+      40%,
+      100% {
+        opacity: 0.22;
+      }
+    }
+    @keyframes fui-pixel-line {
+      from {
+        --fui-spinner-t: 0;
+      }
+      to {
+        --fui-spinner-t: 7;
+      }
+    }
+    .fui-pixel-spinner[data-variant="dots"] rect {
+      animation: fui-pixel-dot 1.05s steps(1, end) infinite;
+      animation-delay: calc(var(--fui-spinner-step) * 350ms - 1.05s);
+    }
+    .fui-pixel-spinner[data-variant="bars"] rect[data-level="1"] {
+      animation: none;
+      opacity: 1;
+    }
+    .fui-pixel-spinner[data-variant="bars"] rect[data-level="2"] {
+      animation: fui-pixel-bar-2 1s steps(1, end) infinite;
+      animation-delay: calc(var(--fui-spinner-step) * -250ms);
+    }
+    .fui-pixel-spinner[data-variant="bars"] rect[data-level="3"] {
+      animation: fui-pixel-bar-3 1s steps(1, end) infinite;
+      animation-delay: calc(var(--fui-spinner-step) * -250ms);
+    }
+    .fui-pixel-spinner[data-variant="grid"] rect {
+      animation: fui-pixel-grid 1.25s steps(1, end) infinite;
+      animation-delay: calc(var(--fui-spinner-step) * 125ms - 1.25s);
+    }
+    .fui-pixel-spinner[data-variant="line"] {
+      animation: fui-pixel-line 1.2s steps(8, jump-none) infinite;
+    }
+    .fui-pixel-spinner[data-variant="line"] rect {
+      animation: none;
+      opacity: calc(0.22 + clamp(0, (var(--fui-spinner-t) - var(--fui-spinner-step) - 0.5) * 1000, 1) * 0.78);
     }
 
     /* A key goes down when it is pressed. */
@@ -9704,6 +9824,24 @@
      time, it is painted from three gems (--fui-light-1, -2 and -3), and it is gone under reduced motion (a still edge in the
      first gem says the same) and in forced colors. A surface carries it with <WorkingLight> as its last child; the surface
      must be positioned (and must not clip its overflow, or the bloom is cut), and the light takes its corners. */
+/* Where the light of a letter-by-letter ShimmerText is, from 0 to 1 across the text; -1 lights nothing. */
+@property --fui-shimmer-p {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: -1;
+}
+/* Where the head of a scanning Progress is, from 0 to 1 across its strip. Registered so it can be animated in steps. */
+@property --fui-scan-p {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0.3;
+}
+/* How far the line spinner has filled: one cell per step. Registered so it can be animated in steps. */
+@property --fui-spinner-t {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
 @property --fui-light-angle {
   syntax: "<angle>";
   inherits: false;
@@ -9749,6 +9887,84 @@
         ),
         linear-gradient(var(--muted-foreground), var(--muted-foreground));
     }
+  }
+
+  /* Letter by letter (0.11): the light steps one letter at a time with a trail of two, like a cursor reading the line. The
+     place of the light is one number for the whole text; still, it lights nothing. */
+  .fui-shimmer-text[data-variant="letters"] {
+    --fui-letter-head: var(--foreground);
+    --fui-letter-trail: var(--foreground);
+    --fui-shimmer-p: -1;
+    background-image: none;
+    -webkit-background-clip: border-box;
+    background-clip: border-box;
+    color: var(--muted-foreground);
+    animation: none;
+  }
+  .fui-shimmer-text[data-variant="letters"][data-tone="light"] {
+    --fui-letter-head: var(--fui-light-1);
+    --fui-letter-trail: var(--fui-light-3);
+  }
+  .fui-shimmer-text[data-variant="letters"] > [aria-hidden] > span {
+    --d: calc(var(--fui-shimmer-p) * (var(--fui-shimmer-count) + 2) - var(--i));
+    --on-0: clamp(0, (var(--d) + 0.5) * 1000, 1);
+    --on-1: clamp(0, (var(--d) - 0.5) * 1000, 1);
+    --on-2: clamp(0, (var(--d) - 1.5) * 1000, 1);
+    --on-3: clamp(0, (var(--d) - 2.5) * 1000, 1);
+    color: color-mix(
+      in oklab,
+      var(--fui-letter-head) calc((var(--on-0) - var(--on-1)) * 100%),
+      color-mix(
+        in oklab,
+        var(--fui-letter-trail) calc((var(--on-1) - var(--on-2)) * 70% + (var(--on-2) - var(--on-3)) * 35%),
+        var(--muted-foreground)
+      )
+    );
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes fui-shimmer-letters {
+      from {
+        --fui-shimmer-p: 0;
+      }
+      to {
+        --fui-shimmer-p: 1;
+      }
+    }
+    .fui-shimmer-text[data-variant="letters"] {
+      animation: fui-shimmer-letters var(--fui-shimmer-duration, 2s) steps(var(--fui-shimmer-steps), jump-none) infinite;
+    }
+  }
+  @media (forced-colors: active) {
+    .fui-shimmer-text[data-variant="letters"] > [aria-hidden] > span {
+      color: CanvasText;
+    }
+  }
+
+  /* A text that scrambles into place (0.11): the real text keeps its place and width, unseen, and the scramble is drawn over
+     it, clipped to it. In a shimmer the light waits until the text has settled. */
+  .fui-scramble-text {
+    position: relative;
+  }
+  :is(.fui-scramble-text, .fui-shimmer-text, [data-fui-scramble])[data-scrambling] {
+    -webkit-text-fill-color: transparent;
+  }
+  .fui-shimmer-text[data-scrambling] {
+    background-image: none;
+  }
+  .fui-scramble-text-frame {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    color: inherit;
+    -webkit-text-fill-color: currentColor;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .fui-shimmer-text > .fui-scramble-text-frame {
+    color: var(--muted-foreground);
+  }
+  .fui-shimmer-text[data-tone="light"] > .fui-scramble-text-frame {
+    color: var(--fui-light-1);
   }
 
   .fui-working-light,
@@ -9873,6 +10089,17 @@
       stroke: var(--border);
       stroke-dasharray: none;
     }
+    @keyframes fui-progress-scan {
+      from {
+        --fui-scan-p: 0;
+      }
+      to {
+        --fui-scan-p: 1;
+      }
+    }
+    .fui-progress-scan {
+      animation: fui-progress-scan var(--fui-scan-duration) steps(var(--fui-scan-steps), jump-none) infinite;
+    }
     .fui-progress-ring-light {
       display: block;
       position: absolute;
@@ -9911,6 +10138,15 @@
     }
     .fui-progress-ring-light {
       display: none;
+    }
+    .fui-progress-scan {
+      forced-color-adjust: none;
+    }
+    .fui-progress-scan > span {
+      background: GrayText;
+    }
+    .fui-progress-scan > span::after {
+      background: Highlight;
     }
   }
 }

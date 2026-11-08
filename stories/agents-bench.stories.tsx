@@ -1,13 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Button, ShimmerText, WorkingLight } from "@fabrials/ui";
+import { Button, Progress, ScrambleText, ShimmerText, Spinner, WorkingLight } from "@fabrials/ui";
 import {
   AgentMark,
   AgentThinking,
   Attachments,
   ChatComposer,
+  ChatMessage,
   ContextMeter,
   GenerationFrame,
   SearchStepsDisclosure,
+  SourceTally,
   TaskList,
 } from "@fabrials/ai-ui";
 import { Block, Frame, Page } from "./story-frame";
@@ -29,6 +31,28 @@ function Bench() {
             <span style={{ display: "inline-flex", alignItems: "center", gap: "var(--fui-space-2)" }}>
               <AgentMark variant="orbit" /> Release notes
             </span>
+          </div>
+        </Frame>
+      </Block>
+      <Block title="Each kind of work" description="The mark of each activity in its still frame, then a line settled on a tick and one on a cross, and a plan whose running step is a search.">
+        <Frame width={480}>
+          <div style={{ display: "grid", gap: "var(--fui-space-2)" }}>
+            {(["thinking", "searching", "reading", "writing", "running", "rendering", "uploading"] as const).map((activity) => (
+              <AgentThinking activity={activity} key={activity} startedAt={started} />
+            ))}
+            <AgentThinking activity="searching" endedAt={started + 12_000} label="Searched 12 sources" startedAt={started} status="done" />
+            <AgentThinking activity="running" endedAt={started + 41_000} label="The tests failed" startedAt={started} status="failed" />
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "var(--fui-space-3)" }}>
+              <AgentMark outcome="done" /> <AgentMark outcome="failed" /> <AgentMark tone="ink" variant="type" />
+            </span>
+            <TaskList
+              label="Research plan"
+              tasks={[
+                { id: "a", title: "Read the issue", status: "done", activity: "reading" },
+                { id: "b", title: "Search the changelog", status: "running", activity: "searching" },
+                { id: "c", title: "Write the answer", status: "pending", activity: "writing" },
+              ]}
+            />
           </div>
         </Frame>
       </Block>
@@ -122,6 +146,43 @@ function Bench() {
             <ContextMeter label="Almost full" legend={false} limit={200_000} parts={[{ label: "Files", value: 121_000 }, { label: "Conversation", value: 72_400 }]} />
           </div>
         </Frame>
+      </Block>
+      <Block title="Busy, searching and words at work" description="The five busy marks, a search's strip and its sources, a label read letter by letter, a scramble at rest and an answer arriving with its caret.">
+        <Frame width={520}>
+          <div style={{ display: "grid", gap: "var(--fui-space-4)" }}>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "var(--fui-space-5)" }}>
+              {(["ring", "dots", "bars", "grid", "line"] as const).map((variant) => (
+                <Spinner key={variant} label={`Loading (${variant})`} variant={variant} />
+              ))}
+            </span>
+            <Progress aria-label="Searching the docs" variant="scan" />
+            <SourceTally
+              sources={[
+                "https://www.postgresql.org/docs/current/sql-altertable.html",
+                "https://wiki.postgresql.org/wiki/Lock_Monitoring",
+                "https://reorg.github.io/pg_repack/",
+                "https://docs.example.org/guides/zero-downtime",
+              ]}
+            />
+            <ShimmerText as="span" tone="light" variant="letters">
+              Reading the release notes
+            </ShimmerText>
+            <ScrambleText>Comparing the two migrations</ScrambleText>
+            <ChatMessage from="assistant" streaming>
+              <div className="fui-markdown">
+                <p>Import the tokens, the fonts and the styles once, in that order</p>
+              </div>
+            </ChatMessage>
+          </div>
+        </Frame>
+      </Block>
+      <Block title="Pictures and pages being made" description="Refine and scan at rest, and a page half written, with a known progress and without one.">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 12rem), 1fr))", gap: "var(--fui-space-6)" }}>
+          <GenerationFrame alt="A harbour at dusk" effect="refine" startedAt={started} status="generating" />
+          <GenerationFrame alt="A harbour at dusk" effect="scan" progress={0.62} status="generating" />
+          <GenerationFrame alt="Release notes" aspectRatio="3 / 4" kind="document" startedAt={started} status="generating" />
+          <GenerationFrame alt="Release notes" aspectRatio="3 / 4" kind="document" progress={0.35} status="generating" />
+        </div>
       </Block>
       <Block title="Working light" description="On a plate and in a label; still under reduced motion.">
         <Frame width={420}>

@@ -103,6 +103,21 @@ What a host checks:
 
 - A frame whose `src` is not there yet (left out or empty) no longer renders an `<img>`: browsers drew their broken-image mark in its corner while it waited. It shows the quiet plate, and the picture comes in through the dither when the `src` arrives.
 
+## Agents in motion
+
+The agent pieces got a mark for each kind of work, words that settle into place and new ways to show a search, a picture or a document being made. Nothing changes without the new props; written from scratch, with ideas from other libraries' AI states (prompt-kit, motion-primitives, Magic UI, AI Elements, Perplexity, Claude Code), not their code.
+
+- **`AgentThinking activity`**: `thinking` (default), `searching`, `reading`, `writing`, `running`, `rendering`, `uploading`. It picks the mark and, without a `label`, the words. `variant` still overrides the mark, and `AgentMark` gains `scan`, `lines`, `type`, `raster` and `fill`. `agentActivities` maps each activity to its mark and words.
+- **Settling**: `AgentThinking status="done"` or `"failed"` (with `endedAt`) puts the light out, holds a tick or a cross drawn in the mark's cells (`AgentMark outcome`) and stops the time. Write the label in the past tense.
+- **Words that change scramble into place** in `AgentThinking` and `ActivityDisclosure` (never on first paint, never looping, not under reduced motion). The activity label no longer fades in on every change. New in `@fabrials/ui`: `ScrambleText`, `useScramble`, `scrambleFrame`.
+- **`TaskItem.activity`**: the running step's mark is its kind of work (a tool's orbit by default).
+- **`ShimmerText variant="letters"`**: the light steps a letter at a time. Its letters are decoration; the words are read once from a visually hidden copy.
+- **`ChatMessage streaming`**: a block caret of the working light at the end of the text, solid while words arrive and blinking when the stream waits; the message is `aria-busy` while it streams.
+- **`Progress variant="scan"`** and **`SourceTally`** for a search: a strip of cells where the light hops across while results are not in, and the sources found so far as tiles with a count that settles.
+- **`GenerationFrame effect`** (`ripple` by default, `refine`, `scan`) and **`kind="document"`** (rows written from the top). `children` show when it is done without a `src`; `doneLabel` now defaults to "Document ready" for a document.
+- **`Spinner variant`**: `ring` (default), `dots`, `bars`, `grid`, `line`.
+- The marks, the strips and the page that fill a cell at a time read one registered number (`@property`), as the working light already did. A browser without `@property` (Firefox before 128) flips them between two frames instead of stepping.
+
 ## Image viewer
 
 - **The wheel zooms by steps around the pointer**, in and out, from fitted to twice the real size (never less than four times fitted, so a small picture can be looked into). A notch of a mouse wheel is a quarter more or less; a trackpad moves smoothly and a pinch follows the fingers. Before, the wheel only went to the real size and a plain wheel at real size scrolled. A sideways scroll still scrolls a zoomed picture.

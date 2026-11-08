@@ -6,6 +6,7 @@ import { ShimmerText, WorkingLight } from "../../packages/ui/src";
 import {
   AgentMark,
   AgentThinking,
+  agentActivities,
   AttachmentChip,
   Attachments,
   ChatComposer,
@@ -54,11 +55,48 @@ test("agent thinking is a polite status whose time is hidden from assistive tech
 });
 
 test("each mark is square cells in the dither's voice", () => {
-  const count = (variant: "wave" | "orbit" | "dither") => (renderToStaticMarkup(<AgentMark variant={variant} />).match(/<rect /g) ?? []).length;
+  const count = (variant: Parameters<typeof AgentMark>[0]["variant"]) => (renderToStaticMarkup(<AgentMark variant={variant} />).match(/<rect /g) ?? []).length;
   assert.equal(count("wave"), 9);
   assert.equal(count("orbit"), 9);
   assert.equal(count("dither"), 16);
+  for (const variant of ["scan", "lines", "type", "raster", "fill"] as const) assert.equal(count(variant), 16, variant);
   assert.match(renderToStaticMarkup(<AgentMark />), /shape-rendering="crispEdges"/);
+});
+
+test("each kind of work has its own mark and words, and a step that runs shows its kind", () => {
+  assert.deepEqual(
+    Object.fromEntries(Object.entries(agentActivities).map(([activity, kind]) => [activity, kind.variant])),
+    { thinking: "wave", searching: "scan", reading: "lines", writing: "type", running: "orbit", rendering: "raster", uploading: "fill" },
+  );
+  const searching = renderToStaticMarkup(<AgentThinking activity="searching" />);
+  assert.match(searching, /data-variant="scan"/);
+  assert.match(searching, />Searching</);
+  assert.match(renderToStaticMarkup(<AgentThinking activity="reading" label="Reading 14 files" variant="dither" />), /data-variant="dither"[\s\S]*Reading 14 files/);
+  // Every cell of a scan holds a still frame; a filling mark's cells carry their place in the order.
+  const scan = renderToStaticMarkup(<AgentMark variant="scan" />);
+  assert.equal((scan.match(/--fui-agent-still:1"/g) ?? []).length, 4);
+  assert.match(renderToStaticMarkup(<AgentMark variant="fill" />), /<rect data-band="1" height="2" style="--fui-agent-step:3"/);
+  assert.match(renderToStaticMarkup(<AgentMark variant="lines" />), /--fui-agent-step:5;--fui-agent-row:1/);
+  const plan = renderToStaticMarkup(<TaskList label="Plan" tasks={[{ id: "a", title: "Search the docs", status: "running", activity: "searching" }]} />);
+  assert.match(plan, /class="fui-agent-mark fui-task-mark-running"[^>]*data-variant="scan"/);
+  assert.match(renderToStaticMarkup(<TaskList label="Plan" tasks={[{ id: "a", title: "Copy", status: "running" }]} />), /data-variant="orbit"/);
+});
+
+test("a settled line keeps its status, puts the light out and holds a tick or a cross with its time", () => {
+  const done = renderToStaticMarkup(
+    <AgentThinking activity="searching" endedAt={Date.UTC(2026, 10, 8, 9, 0, 12)} label="Searched 12 sources" startedAt={Date.UTC(2026, 10, 8, 9, 0, 0)} status="done" />,
+  );
+  assert.match(done, /^<div class="fui-agent-thinking" data-status="done" data-tone="light" role="status">/);
+  assert.match(done, /<svg aria-hidden="true" class="fui-agent-mark" data-outcome="done" data-tone="light" focusable="false"/);
+  assert.doesNotMatch(done, /data-variant|fui-shimmer-text/);
+  assert.match(done, /<span class="fui-agent-thinking-label fui-scramble-text">Searched 12 sources<\/span>/);
+  assert.match(done, /<span aria-hidden="true" class="fui-agent-thinking-time">12s<\/span>/);
+  // The tick and the cross are drawn in the same 16 cells.
+  const lit = (outcome: "done" | "failed") => (renderToStaticMarkup(<AgentMark outcome={outcome} />).match(/data-on="true"/g) ?? []).length;
+  assert.equal(lit("done"), 4);
+  assert.equal(lit("failed"), 8);
+  // Settled without a start, it shows no invented time.
+  assert.match(renderToStaticMarkup(<AgentThinking label="Done" status="done" />), /<span aria-hidden="true" class="fui-agent-thinking-time"><\/span>/);
 });
 
 test("a task list says each state in words, marks the running step and announces it", () => {
@@ -138,7 +176,17 @@ test("the composer carries the working light while busy, unless told not to", ()
 
 test("the agent pieces move only without reduced motion and keep a form in forced colors", () => {
   const block = aiStyles.slice(aiStyles.indexOf("/* 0.11 agent pieces."));
-  for (const animation of ["fui-agent-wave", "fui-agent-orbit", "fui-agent-dither", "fui-generation-ripple", "fui-task-running"]) {
+  for (const animation of [
+    "fui-agent-wave",
+    "fui-agent-orbit",
+    "fui-agent-dither",
+    "fui-agent-hop",
+    "fui-agent-lines",
+    "fui-agent-cells",
+    "fui-agent-rows",
+    "fui-generation-ripple",
+    "fui-task-running",
+  ]) {
     const at = block.indexOf(`animation: ${animation}`);
     assert.ok(at > 0, animation);
     const before = block.slice(0, at);
@@ -147,6 +195,6 @@ test("the agent pieces move only without reduced motion and keep a form in force
   assert.match(block, /@media \(forced-colors: active\) \{[\s\S]*\.fui-agent-mark rect \{\s*fill: CanvasText;/);
   // Gradients in the agent pieces are the dot field, the ripple and a mask: all working light, all in the light tokens.
   for (const match of block.replace(/\/\*[\s\S]*?\*\//g, "").matchAll(/([^{}]+)\{([^{}]*gradient\([^{}]*)\}/g)) {
-    assert.match(match[1]!.trim(), /\.fui-generation-(field|ripple)/, match[1]);
+    assert.match(match[1]!.trim(), /\.fui-generation-(field|ripple|refine|band|scan|page)|\.fui-generation-refine > \[data-layer\]/, match[1]);
   }
 });

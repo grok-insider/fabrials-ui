@@ -14,6 +14,7 @@ import {
   Progress,
   ProgressLabel,
   ProgressValue,
+  SearchInput,
 } from "@fabrials/ui";
 import type { ExampleSet } from "./types";
 import { ReplayButton, useScript, type Frame } from "./replay";
@@ -76,6 +77,37 @@ function ImportDemo() {
         value={state.total === null ? null : state.done}
       />
       <ReplayButton onClick={replay} />
+    </div>
+  );
+}
+
+type Search = { searching: boolean; results: string[] };
+
+const SEARCH: readonly Frame<Search>[] = [
+  { at: 0, state: { searching: true, results: [] } },
+  { at: 2400, state: { searching: false, results: ["Rotate a virtual key", "Key budgets and limits", "Revoking a key"] } },
+];
+
+function SearchDemo() {
+  const { state, replay } = useScript(SEARCH);
+  return (
+    <div style={stack}>
+      <div style={{ display: "grid", gap: "var(--fui-space-1-5)" }}>
+        <SearchInput aria-label="Search the docs" defaultValue="virtual keys" />
+        {state.searching ? <Progress aria-label="Searching the docs" size="sm" variant="scan" /> : null}
+      </div>
+      {state.results.length ? (
+        <ItemGroup>
+          {state.results.map((result) => (
+            <Item key={result}>
+              <ItemContent>{result}</ItemContent>
+            </Item>
+          ))}
+        </ItemGroup>
+      ) : null}
+      <div style={row}>
+        <ReplayButton label="Search again" onClick={replay} />
+      </div>
     </div>
   );
 }
@@ -211,6 +243,16 @@ export function Imports({ mailboxes }: { mailboxes: Mailbox[] }) {
   hint={job.total === null ? "Counting messages" : \`\${job.done} of \${job.total} messages\`}
 />`,
       render: () => <ImportDemo />,
+    },
+    {
+      id: "scan",
+      title: "A search",
+      description:
+        "`variant=\"scan\"` turns the track into square cells where a head of the working light hops across with a trail, for a search whose results have not arrived: under a search field, above a list that is filling. It runs in reading order, rests a third of the way under reduced motion, and becomes a bar if a value arrives. Name it with an `aria-label`.",
+      code: `<SearchInput aria-label="Search the docs" value={query} onValueChange={setQuery} />
+{searching ? <Progress aria-label="Searching the docs" size="sm" variant="scan" /> : null}`,
+      render: () => <SearchDemo />,
+      align: "start",
     },
     {
       id: "steps",

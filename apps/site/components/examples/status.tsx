@@ -513,6 +513,38 @@ export const spinnerExamples: ExampleSet = {
       ),
     },
     {
+      id: "variants",
+      title: "Five busy marks",
+      description:
+        "`variant` picks the mark, all in square cells: `ring` (the default), `dots` lighting one after another, `bars` rising and falling a cell at a time, a `grid` crossed by a diagonal wave, and a `line` of five cells that fill in order, as wide as a word, for a row or a table cell. Each holds a still frame under reduced motion.",
+      code: `<Spinner variant="ring" label="Loading" />
+<Spinner variant="dots" label="Loading" />
+<Spinner variant="bars" label="Loading" />
+<Spinner variant="grid" label="Loading" />
+<Spinner variant="line" label="Loading" />`,
+      render: () => (
+        <div style={{ display: "flex", alignItems: "center", gap: "var(--fui-space-6)" }}>
+          {(["ring", "dots", "bars", "grid", "line"] as const).map((variant) => (
+            <Spinner key={variant} label={`Loading (${variant})`} variant={variant} />
+          ))}
+        </div>
+      ),
+    },
+    {
+      id: "row",
+      title: "A line in a row",
+      description: "The `line` sits on the baseline of a row's text, where a ring would look like an icon: a table cell still counting, a sync in a list.",
+      code: `<td>
+  <Spinner variant="line" label="Counting" />
+</td>`,
+      render: () => (
+        <p style={{ display: "flex", alignItems: "center", gap: "var(--fui-space-3)", margin: 0, fontSize: "var(--fui-text-sm)" }}>
+          <span>Invoices this month</span>
+          <Spinner label="Counting" variant="line" />
+        </p>
+      ),
+    },
+    {
       id: "button",
       title: "In a button",
       description: "For an action in progress, use the button's own `loading` instead: it keeps the button's size and blocks repeated presses.",

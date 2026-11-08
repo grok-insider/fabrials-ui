@@ -8,6 +8,40 @@ import { ReplayButton, useScript, type Frame } from "./replay";
 
 type Picture = { status: GenerationStatus; progress?: number };
 
+type Draft = { status: GenerationStatus; progress?: number };
+
+const DRAFT: Frame<Draft>[] = [
+  { at: 0, state: { status: "generating", progress: 0 } },
+  { at: 700, state: { status: "generating", progress: 0.18 } },
+  { at: 1500, state: { status: "generating", progress: 0.41 } },
+  { at: 2300, state: { status: "generating", progress: 0.66 } },
+  { at: 3100, state: { status: "generating", progress: 0.9 } },
+  { at: 3700, state: { status: "done" } },
+];
+
+function Draft() {
+  const { state, replay, done } = useScript(DRAFT);
+  return (
+    <div style={{ display: "grid", gap: "var(--fui-space-3)", width: "min(100%, 18rem)" }}>
+      <GenerationFrame alt="Release notes for 0.11" aspectRatio="3 / 4" caption="release-notes-0.11.md" kind="document" progress={state.progress} status={state.status}>
+        <div className="fui-markdown" style={{ padding: "var(--fui-space-4)", fontSize: "var(--fui-text-xs)" }}>
+          <h4>Release notes, 0.11</h4>
+          <p>The agent pieces move their own way for each kind of work, and settle on a tick or a cross.</p>
+          <ul>
+            <li>Marks for searching, reading, writing, rendering and uploads.</li>
+            <li>Labels that scramble into place when they change.</li>
+          </ul>
+        </div>
+      </GenerationFrame>
+      {done ? (
+        <div>
+          <ReplayButton label="Write it again" onClick={replay} />
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 const FRAMES: Frame<Picture>[] = [
   { at: 0, state: { status: "queued" } },
   { at: 900, state: { status: "generating", progress: 0.04 } },
@@ -85,6 +119,32 @@ export function Picture({
           <GenerationFrame alt="An orchard" status="queued" />
         </div>
       ),
+    },
+    {
+      id: "effects",
+      title: "Three ways to make a picture",
+      description:
+        "`effect` sets how the field moves while it works. `ripple` (the default): light ripples through square dots. `refine`: square cells in the working light grow finer, pass after pass, behind a band moving down, as a picture resolves. `scan`: a band of light sweeps down the dots. With a `progress`, the band and the passes follow it instead of running on their own. All three hold still under reduced motion.",
+      code: `<GenerationFrame status="generating" effect="ripple" alt={prompt} />
+<GenerationFrame status="generating" effect="refine" alt={prompt} />
+<GenerationFrame status="generating" effect="scan" alt={prompt} />`,
+      render: () => (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(9rem, 1fr))", gap: "var(--fui-space-4)", width: "min(100%, 34rem)" }}>
+          <GenerationFrame alt="A harbour at dusk" effect="ripple" label="Ripple" status="generating" />
+          <GenerationFrame alt="A harbour at dusk" effect="refine" label="Refine" status="generating" />
+          <GenerationFrame alt="A harbour at dusk" effect="scan" label="Scan" status="generating" />
+        </div>
+      ),
+    },
+    {
+      id: "document",
+      title: "A document being written",
+      description:
+        "`kind=\"document\"` makes the frame a page whose rows are written from the top in square cells, the row being written in the light; a `progress` says how far down it is. When it is done without a `src`, `children` take the frame: the document itself or a preview of it.",
+      code: `<GenerationFrame kind="document" status={job.status} progress={job.progress} alt="Release notes for 0.11" aspectRatio="3 / 4">
+  <Markdown>{job.text}</Markdown>
+</GenerationFrame>`,
+      render: () => <Draft />,
     },
     {
       id: "done",
