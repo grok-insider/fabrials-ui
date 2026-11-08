@@ -9,9 +9,7 @@ export type UiGroup =
   | "Patterns"
   | "Documentation"
   | "Effects"
-  | "AI chat"
-  | "AI at work"
-  | "AI providers";
+  | "AI";
 
 export type UiPackage = "@fabrials/ui" | "@fabrials/ai-ui";
 
@@ -69,17 +67,9 @@ export const uiGroups: { name: UiGroup; description: string }[] = [
     description: "Decorative moonlight for sign-in and landing pages only.",
   },
   {
-    name: "AI chat",
-    description: "Presentational chat pieces from @fabrials/ai-ui. The host supplies the data.",
-  },
-  {
-    name: "AI at work",
+    name: "AI",
     description:
-      "What an agent is doing while it works: thinking, its plan, the picture it is making and how full its context is. They carry the working light, and only while they work.",
-  },
-  {
-    name: "AI providers",
-    description: "Provider marks and account presentation from @fabrials/ai-ui.",
+      "The conversation and the agent at work, from @fabrials/ai-ui: messages and the composer, what an agent is doing while it works, the answer it gives and the providers' marks. The host supplies the data; the pieces at work carry the working light, and only while they work.",
   },
 ];
 
@@ -117,8 +107,7 @@ function aiUi(
   props: UiCatalogItem["props"],
   note: string,
 ): UiCatalogItem {
-  const group = slug === "provider-icon" ? "AI providers" : "AI chat";
-  return ui(slug, title, group, description, exports, props, note, "@fabrials/ai-ui");
+  return ui(slug, title, "AI", description, exports, props, note, "@fabrials/ai-ui");
 }
 
 export const uiCatalog: UiCatalogItem[] = [
@@ -1244,48 +1233,21 @@ export const uiCatalog: UiCatalogItem[] = [
     "Presentational. The host sends the message, uploads pasted files and owns the tool state.",
   ),
   aiUi(
-    "code-block",
-    "Code block and markdown",
-    "Answer styles for rendered markdown and a code block with copy and download.",
-    ["CodeBlock"],
+    "voice-input",
+    "Voice input",
+    "A microphone button that records a clip and hands it to the host for transcription.",
+    ["VoiceInputButton", "VoiceInputButtonView"],
     [
-      ["code", "string", "Raw code used by copy and download."],
-      ["language", "string", "Shown in the header and used for the download name."],
-      ["children", "ReactNode", "Highlighted lines. Without it the raw code is shown."],
-      ["lineNumbers", "boolean", "Numbers each line."],
-      ["download", "boolean", "Adds a download action named after filename. A function replaces it."],
-      ["fui-markdown", "class", "Styles headings, lists, quotes, tables and code, including Streamdown data-streamdown output."],
+      ["onRecorded", "(blob) => Promise", "Host transcription. Resolves to the text."],
+      ["onTranscript", "(text) => void", "Receives the text to insert."],
+      ["maxDurationMs", "number", "Stops recording at this length."],
+      ["showLevel", "boolean", "Shows the input level while recording."],
+      ["status", "VoiceInputStatus", "idle, requesting, recording, transcribing or error. The stateless view uses it for custom recorders."],
     ],
-    "Presentational. The host supplies the markdown renderer and syntax highlighting; these pieces only style the result.",
+    "Presentational. The microphone is only requested after a press. The host supplies transcription; nothing is sent by the component.",
   ),
-  aiUi(
-    "citations",
-    "Citations and sources",
-    "Numbered citation chips linked to a list of source cards.",
-    ["CitationProvider", "CitationChip", "Sources", "SourceCard", "SourceFavicon"],
-    [
-      ["sources", "CitationSource[]", "CitationProvider sources by number. Hovering a chip highlights its card."],
-      ["number", "number", "CitationChip number and href. Shows a source preview."],
-      ["Sources", "component", "Collapsible list of SourceCard links."],
-      ["faviconUrl", "(url) => string", "Host resolver for favicons. Without it a letter mark is shown."],
-    ],
-    "Presentational. The host supplies the sources and any favicon service; nothing is fetched by these components.",
-  ),
-  aiUi(
-    "activity-disclosure",
-    "Activity disclosure",
-    "Collapsible reasoning, search steps and tool activity inside an answer.",
-    ["ActivityDisclosure", "ActivityIcon", "ReasoningDisclosure", "SearchStepsDisclosure"],
-    [
-      ["streaming", "boolean", "ReasoningDisclosure shows Thinking, then Thought for durationSeconds."],
-      ["phase", "SearchPhase", "For search steps: searching, reading or done, with steps and sourceCount."],
-      ["live", "boolean", "ActivityDisclosure for any other activity. ActivityIcon marks the live state; the label carries the working light."],
-      ["timer / startedAt", "boolean / number | Date", "While live, the time taken beside the label, never read out on every tick. On by default for reasoning and search; startedAt counts from the server's start."],
-      ["steps", "SearchStep[]", "Searches (query and the sources found) and pages read. The first four sources' marks stack beside the count; faviconUrl gives their icons."],
-      ["open", "boolean", "Controlled open state. defaultOpen works uncontrolled."],
-    ],
-    "Presentational. The host maps its stream events to these props. Steps that arrive after the list is shown rise into place. Live indicators stop under reduced motion.",
-  ),
+
+  // ---------------------------------------------------------------- 0.5–0.7 additions
   aiUi(
     "attachments",
     "Attachments",
@@ -1304,7 +1266,7 @@ export const uiCatalog: UiCatalogItem[] = [
   ui(
     "agent-thinking",
     "Agent thinking",
-    "AI at work",
+    "AI",
     "The line that says an agent is working on a reply: a mark, a label in the working light and the time it has taken.",
     ["AgentThinking", "AgentMark"],
     [
@@ -1318,10 +1280,25 @@ export const uiCatalog: UiCatalogItem[] = [
     "A role=status line. Under reduced motion the mark holds a still pattern, the label is plain and the time counts in whole seconds.",
     "@fabrials/ai-ui",
   ),
+  aiUi(
+    "activity-disclosure",
+    "Activity disclosure",
+    "Collapsible reasoning, search steps and tool activity inside an answer.",
+    ["ActivityDisclosure", "ActivityIcon", "ReasoningDisclosure", "SearchStepsDisclosure"],
+    [
+      ["streaming", "boolean", "ReasoningDisclosure shows Thinking, then Thought for durationSeconds."],
+      ["phase", "SearchPhase", "For search steps: searching, reading or done, with steps and sourceCount."],
+      ["live", "boolean", "ActivityDisclosure for any other activity. ActivityIcon marks the live state; the label carries the working light."],
+      ["timer / startedAt", "boolean / number | Date", "While live, the time taken beside the label, never read out on every tick. On by default for reasoning and search; startedAt counts from the server's start."],
+      ["steps", "SearchStep[]", "Searches (query and the sources found) and pages read. The first four sources' marks stack beside the count; faviconUrl gives their icons."],
+      ["open", "boolean", "Controlled open state. defaultOpen works uncontrolled."],
+    ],
+    "Presentational. The host maps its stream events to these props. Steps that arrive after the list is shown rise into place. Live indicators stop under reduced motion.",
+  ),
   ui(
     "task-list",
     "Task list",
-    "AI at work",
+    "AI",
     "The steps of an agent's plan as they are worked through, with the running step in the working light.",
     ["TaskList"],
     [
@@ -1333,10 +1310,38 @@ export const uiCatalog: UiCatalogItem[] = [
     "Each state is said in words to assistive technology; the running step is aria-current=step and a polite status announces the step that starts, fails or the end. Steps that arrive rise into place; a settled step draws its tick.",
     "@fabrials/ai-ui",
   ),
+  aiUi(
+    "citations",
+    "Citations and sources",
+    "Numbered citation chips linked to a list of source cards.",
+    ["CitationProvider", "CitationChip", "Sources", "SourceCard", "SourceFavicon"],
+    [
+      ["sources", "CitationSource[]", "CitationProvider sources by number. Hovering a chip highlights its card."],
+      ["number", "number", "CitationChip number and href. Shows a source preview."],
+      ["Sources", "component", "Collapsible list of SourceCard links."],
+      ["faviconUrl", "(url) => string", "Host resolver for favicons. Without it a letter mark is shown."],
+    ],
+    "Presentational. The host supplies the sources and any favicon service; nothing is fetched by these components.",
+  ),
+  aiUi(
+    "code-block",
+    "Code block and markdown",
+    "Answer styles for rendered markdown and a code block with copy and download.",
+    ["CodeBlock"],
+    [
+      ["code", "string", "Raw code used by copy and download."],
+      ["language", "string", "Shown in the header and used for the download name."],
+      ["children", "ReactNode", "Highlighted lines. Without it the raw code is shown."],
+      ["lineNumbers", "boolean", "Numbers each line."],
+      ["download", "boolean", "Adds a download action named after filename. A function replaces it."],
+      ["fui-markdown", "class", "Styles headings, lists, quotes, tables and code, including Streamdown data-streamdown output."],
+    ],
+    "Presentational. The host supplies the markdown renderer and syntax highlighting; these pieces only style the result.",
+  ),
   ui(
     "generation-frame",
     "Generation frame",
-    "AI at work",
+    "AI",
     "A picture being made: light ripples through a field of square dots, then the image arrives through the dither.",
     ["GenerationFrame"],
     [
@@ -1353,7 +1358,7 @@ export const uiCatalog: UiCatalogItem[] = [
   ui(
     "context-meter",
     "Context meter",
-    "AI at work",
+    "AI",
     "How full an agent's context window is: a stacked bar of what fills it, a legend and a reading.",
     ["ContextMeter"],
     [
@@ -1369,7 +1374,7 @@ export const uiCatalog: UiCatalogItem[] = [
   ui(
     "working-light",
     "Working light",
-    "AI at work",
+    "AI",
     "A band of light that turns along the edge of what an agent works on, with a soft bloom. Only while it works.",
     ["WorkingLight"],
     [
@@ -1378,21 +1383,16 @@ export const uiCatalog: UiCatalogItem[] = [
     "Decorative (aria-hidden): say the state in words too. A still edge under reduced motion; hidden in forced colors. The composer, the generation frame and the agent pieces carry it for you.",
   ),
   aiUi(
-    "voice-input",
-    "Voice input",
-    "A microphone button that records a clip and hands it to the host for transcription.",
-    ["VoiceInputButton", "VoiceInputButtonView"],
+    "provider-icon",
+    "Provider icon",
+    "The mark of an AI provider or coding agent.",
+    ["ProviderIcon", "providerBrand"],
     [
-      ["onRecorded", "(blob) => Promise", "Host transcription. Resolves to the text."],
-      ["onTranscript", "(text) => void", "Receives the text to insert."],
-      ["maxDurationMs", "number", "Stops recording at this length."],
-      ["showLevel", "boolean", "Shows the input level while recording."],
-      ["status", "VoiceInputStatus", "idle, requesting, recording, transcribing or error. The stateless view uses it for custom recorders."],
+      ["provider", "string", "openai, anthropic, xai, cursor, github, nous and more; aliases such as codex, claude and grok resolve."],
+      ["size", "number", "CSS pixels, 24 by default."],
     ],
-    "Presentational. The microphone is only requested after a press. The host supplies transcription; nothing is sent by the component.",
+    "Third-party marks keep their own colours and shapes. Unknown providers fall back to a neutral tile.",
   ),
-
-  // ---------------------------------------------------------------- 0.5–0.7 additions
   ui(
     "dither-scene",
     "Dither scene",
@@ -1993,17 +1993,6 @@ export const uiCatalog: UiCatalogItem[] = [
       ["description", "ReactNode", "A line under the name."],
     ],
     "Presentational: it never calls GitHub itself, so pages stay fast and rate limits stay the host's concern.",
-  ),
-  aiUi(
-    "provider-icon",
-    "Provider icon",
-    "The mark of an AI provider or coding agent.",
-    ["ProviderIcon", "providerBrand"],
-    [
-      ["provider", "string", "openai, anthropic, xai, cursor, github, nous and more; aliases such as codex, claude and grok resolve."],
-      ["size", "number", "CSS pixels, 24 by default."],
-    ],
-    "Third-party marks keep their own colours and shapes. Unknown providers fall back to a neutral tile.",
   ),
 ];
 

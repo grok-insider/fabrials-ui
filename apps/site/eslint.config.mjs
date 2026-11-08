@@ -18,4 +18,10 @@ export default defineConfig([
       "react-hooks/preserve-manual-memoization": "off",
     },
   },
+  {
+    files: ["components/examples/**"],
+    rules: {
+      "@next/next/no-img-element": "off",
+    },
+  },
 ]);

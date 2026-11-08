@@ -7,7 +7,6 @@ import {
   AudioPlayer,
   Avatar,
   AvatarFallback,
-  Image,
   ImageViewer,
   MediaGrid,
   avatarInitials,
