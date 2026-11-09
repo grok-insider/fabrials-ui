@@ -272,7 +272,7 @@ test.describe("a toolbar on a phone keeps its targets at 44 px", () => {
       // An icon button (a ToolbarButton and a class-only back link) stays square, and the row stays one row.
       const touch = bars.find((bar) => bar.label === "Message actions, touch")!;
       expect(touch.height).toBe(44);
-      expect(touch.boxes.filter(([width]) => width === 44).length).toBeGreaterThanOrEqual(4);
+      expect(touch.boxes.filter(([width]) => width === 44).length).toBe(3);
       // Outside a toolbar the touch rule is untouched: a Button asks for 2.75rem.
       const outside = await page.evaluate(() => {
         const button = document.createElement("button");

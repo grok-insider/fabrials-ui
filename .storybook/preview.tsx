@@ -1,6 +1,7 @@
 import { useEffect, type ReactNode } from "react";
 import type { Preview } from "@storybook/react-vite";
 import { fabrialsTheme } from "./theme";
+import "../stories/reset.css";
 import "@fabrials/ui/tokens.css";
 import "@fabrials/ui/fonts.css";
 import "@fabrials/ui/styles.css";

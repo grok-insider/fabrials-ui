@@ -5,11 +5,6 @@ body {
   font: 400 14px/1.5 var(--fui-font-sans);
   font-variant-numeric: tabular-nums;
 }
-button,
-input,
-select {
-  font: inherit;
-}
 .catalogue {
   max-width: 76rem;
   min-width: 0;

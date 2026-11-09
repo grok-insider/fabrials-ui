@@ -290,7 +290,6 @@ function ToolbarsPage() {
             <Button variant="outline" size="sm">Reply</Button>
             <ToolbarButton label="Archive"><Archive aria-hidden /></ToolbarButton>
             <ToolbarButton label="Delete"><Trash2 aria-hidden /></ToolbarButton>
-            <ToolbarButton label="More"><Ellipsis aria-hidden /></ToolbarButton>
           </Toolbar>
         </Frame>
       </Block>

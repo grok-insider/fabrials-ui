@@ -1,0 +1,14 @@
+/* Storybook's form reset, in the base layer below the components, where Tailwind's preflight puts it in a product. Loaded
+   before the packages' styles so the layer order is base, then components: an unlayered reset beats every layered rule and
+   drew buttons and fields at the body's weight and line height instead of their own. */
+@layer base, components;
+
+@layer base {
+  button,
+  input,
+  optgroup,
+  select,
+  textarea {
+    font: inherit;
+  }
+}
