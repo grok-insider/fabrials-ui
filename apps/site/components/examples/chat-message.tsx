@@ -35,8 +35,11 @@ function Answer() {
     <div style={{ display: "grid", gap: "var(--fui-space-5)", width: "min(100%, 36rem)" }}>
       <ChatMessage from="user">How should a product import the shared styles?</ChatMessage>
       <ChatMessage from="assistant" streaming={!done}>
-        <div className="fui-markdown">
-          <p>{shown}</p>
+        <div className="fui-markdown" style={{ display: "grid" }}>
+          <p aria-hidden="true" style={{ gridArea: "1 / 1", visibility: "hidden" }}>
+            {ANSWER}
+          </p>
+          <p style={{ gridArea: "1 / 1" }}>{shown}</p>
         </div>
       </ChatMessage>
       <div>
