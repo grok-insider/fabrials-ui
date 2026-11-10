@@ -104,7 +104,7 @@ export function Slider({
       min={min}
       max={max}
       step={step}
-      locale={ownLocale}
+      locale={locale}
       format={formatOptions}
       orientation={orientation}
       onValueCommitted={onValueCommitted}

@@ -4,6 +4,7 @@ import { useId, useLayoutEffect, useRef, useState, type CSSProperties, type Keyb
 import { Progress as BaseProgress } from "@base-ui/react/progress";
 import { Toolbar as BaseToolbar } from "@base-ui/react/toolbar";
 import { canonicalSize } from "./canonical-size";
+import { useLocale } from "./labels";
 import type { Tone } from "./display";
 import { classes, type StyledProps } from "./shared";
 
@@ -109,7 +110,7 @@ export function Progress({
   value = null,
   min = 0,
   max = 100,
-  locale = "en",
+  locale: ownLocale,
   label,
   hint,
   showValue,
@@ -125,6 +126,7 @@ export function Progress({
   "aria-describedby": describedBy,
   ...props
 }: ProgressProps) {
+  const locale = useLocale(ownLocale);
   const hintId = useId();
   const scale = canonicalSize(size, "default") ?? "default";
   if (parts != null && variant !== "ring") {

@@ -256,7 +256,7 @@ export function isDateFormat(code: string): boolean {
 }
 
 /** A number as the format code shows it, for the common codes: decimals, grouping, percent, currency, exponent. */
-export function formatNumber(value: number, code: string, locale?: string): string {
+export function formatNumber(value: number, code: string, locale: string = "en"): string {
   const sections = code.split(";");
   const section = (value < 0 && sections[1] ? sections[1] : sections[0]) ?? "General";
   if (/^General$/i.test(section.trim()) || section.trim() === "") return new Intl.NumberFormat(locale, { maximumSignificantDigits: 11, useGrouping: false }).format(value);
@@ -287,7 +287,7 @@ export function serialToDate(serial: number, date1904 = false): Date {
   return new Date(Math.round((days - 25569) * 86_400_000));
 }
 
-function formatDate(date: Date, code: string, locale?: string): string {
+function formatDate(date: Date, code: string, locale: string = "en"): string {
   const bare = code.replace(/"[^"]*"/g, "").replace(/\[[^\]]*\]/g, "");
   const hasDate = /[dy]/i.test(bare) || /m{3,}/i.test(bare) || (/m/i.test(bare) && !/[hs]/i.test(bare));
   const hasTime = /[hs]/i.test(bare);
@@ -314,14 +314,14 @@ function resolveTarget(target: string) {
 }
 
 export type ReadOptions = {
-  /** For formatted numbers and dates. */
+  /** For formatted numbers and dates. English when it is not given. */
   locale?: string;
   /** Cells read per sheet before the rest is cut (the sheet is marked `truncated`). */
   maxCells?: number;
 };
 
 /** Reads an .xlsx (or .xlsm) workbook. Throws a SpreadsheetError the host can say in words. */
-export async function readXlsx(data: ArrayBuffer | Uint8Array, { locale, maxCells = 1_000_000 }: ReadOptions = {}): Promise<Workbook & { sheets: (Worksheet & { truncated?: boolean })[] }> {
+export async function readXlsx(data: ArrayBuffer | Uint8Array, { locale = "en", maxCells = 1_000_000 }: ReadOptions = {}): Promise<Workbook & { sheets: (Worksheet & { truncated?: boolean })[] }> {
   const bytes = data instanceof Uint8Array ? data : new Uint8Array(data);
   const files = await unzip(bytes, (name) => /^xl\/(workbook\.xml|_rels\/workbook\.xml\.rels|sharedStrings\.xml|styles\.xml|worksheets\/[^/]+\.xml)$/i.test(name));
   const text = (name: string) => {

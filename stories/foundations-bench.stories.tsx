@@ -418,6 +418,30 @@ function ReaderTimes() {
   );
 }
 
+/** The same times with no locale at all: English by default, the reader's zone after hydration. */
+function DefaultReaderTimes() {
+  return (
+    <dl style={rowStyle}>
+      <dt style={termStyle}>reader, time</dt>
+      <dd style={{ margin: 0 }}>
+        <LocalTime data-testid="reader-time" value={SENT} format="time" />
+      </dd>
+      <dt style={termStyle}>reader, date and time</dt>
+      <dd style={{ margin: 0 }}>
+        <LocalTime data-testid="reader-date-time" value={SENT} format="dateTime" />
+      </dd>
+      <dt style={termStyle}>fixed, Madrid</dt>
+      <dd style={{ margin: 0 }}>
+        <LocalTime data-testid="fixed-time" value={SENT} format="time" timeZone={ZONE} />
+      </dd>
+      <dt style={termStyle}>after it</dt>
+      <dd data-testid="after" style={{ margin: 0 }}>
+        the next line
+      </dd>
+    </dl>
+  );
+}
+
 type Box = { text: string; width: number; height: number; hidden: boolean; title: string | null };
 type Report = { before: Record<string, Box>; after: Record<string, Box>; afterTop: [number, number]; errors: string[] };
 
@@ -425,7 +449,7 @@ type Report = { before: Record<string, Box>; after: Record<string, Box>; afterTo
  * A real server render and a real hydration, inside the story: the markup is made by `renderToString`, measured while it is
  * still the server's, then hydrated. What it finds is written on the page for the test to read.
  */
-function Hydration() {
+function Hydration({ times = <ReaderTimes /> }: { times?: ReactNode }) {
   const host = useRef<HTMLDivElement>(null);
   const [report, setReport] = useState<Report | null>(null);
   useEffect(() => {
@@ -442,7 +466,7 @@ function Hydration() {
   }, []);
   const run = () => {
     const container = host.current!;
-    container.innerHTML = renderToString(<ReaderTimes />);
+    container.innerHTML = renderToString(times);
     const read = () =>
       Object.fromEntries(
         [...container.querySelectorAll<HTMLElement>("time")].map((time) => {
@@ -454,7 +478,7 @@ function Hydration() {
     const before = read();
     const beforeTop = top();
     const errors: string[] = [];
-    const root = hydrateRoot(container, <ReaderTimes />, { onRecoverableError: (error) => errors.push(String(error)) });
+    const root = hydrateRoot(container, times, { onRecoverableError: (error) => errors.push(String(error)) });
     const timer = window.setTimeout(() => setReport({ before, after: read(), afterTop: [beforeTop, top()], errors }), 300);
     return () => {
       window.clearTimeout(timer);
@@ -476,3 +500,7 @@ function Hydration() {
 }
 
 export const LocalTimeHydration: Story = { render: () => <Hydration /> };
+
+// The same, with no locale anywhere: a reader whose language would write the hour differently sees the same shape before and
+// after hydration, in English, with the reader's zone arriving on hydration.
+export const LocalTimeDefaultHydration: Story = { render: () => <Hydration times={<DefaultReaderTimes />} /> };

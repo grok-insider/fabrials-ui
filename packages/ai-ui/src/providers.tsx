@@ -8,6 +8,7 @@ import {
   Label,
   NativeCheckbox,
   Progress,
+  useLocale,
 } from "@fabrials/ui";
 
 import * as React from "react";
@@ -164,7 +165,8 @@ export function ResetInventory({
   observation,
   now: fixedNow,
   labels,
-  locale,
+  locale: ownLocale,
+  timeZone,
   className,
   ["aria-label"]: ariaLabel,
   ...props
@@ -173,8 +175,12 @@ export function ResetInventory({
   /** The moment the credits are counted from. By default the shared clock, which the server cannot read. */
   now?: number | null;
   labels?: Partial<ResetInventoryLabels>;
+  /** The language of the numbers and dates: this prop, else a `LabelsProvider`'s, else English. */
   locale?: Intl.LocalesArgument;
+  /** The zone the tooltips print. Default: the browser's, which differs from the server's. */
+  timeZone?: string;
 }) {
+  const locale = useLocale(ownLocale);
   const clockNow = useClock();
   const now = fixedNow === undefined ? clockNow : fixedNow;
   const text = {
@@ -225,7 +231,7 @@ export function ResetInventory({
               <li key={`${expiry}-${index}`}>
                 <time
                   dateTime={new Date(expiry).toISOString()}
-                  title={new Date(expiry).toLocaleString(locale ?? [])}
+                  title={new Date(expiry).toLocaleString(locale, { timeZone })}
                 >
                   {resetExpiryLabel(expiry, now, text.expiry)}
                 </time>
@@ -267,7 +273,7 @@ export function ResetInventory({
                         title={
                           now === null
                             ? undefined
-                            : new Date(expiry).toLocaleString(locale ?? [])
+                            : new Date(expiry).toLocaleString(locale, { timeZone })
                         }
                       >
                         {resetExpiryLabel(expiry, now, text.expiry)}
@@ -287,6 +293,7 @@ export function ResetInventory({
         observation={observation}
         labels={text.status}
         locale={locale}
+        timeZone={timeZone}
       />
     </section>
   );
@@ -295,14 +302,19 @@ export function ResetInventory({
 export function ObservationStatus({
   observation,
   labels,
-  locale,
+  locale: ownLocale,
+  timeZone,
   className,
   ...props
 }: React.ComponentProps<"div"> & {
   observation: Observation<unknown>;
   labels?: Partial<ObservationStatusLabels>;
+  /** The language of the numbers and dates: this prop, else a `LabelsProvider`'s, else English. */
   locale?: Intl.LocalesArgument;
+  /** The zone the time is written in. Default: the browser's, which differs from the server's. */
+  timeZone?: string;
 }) {
+  const locale = useLocale(ownLocale);
   const text = { ...observationStatusLabels, ...labels };
   return (
     <div
@@ -313,10 +325,11 @@ export function ObservationStatus({
       {validTimestamp(observation.observedAtMs) && (
         <time dateTime={new Date(observation.observedAtMs).toISOString()}>
           {text.updated(
-            new Date(observation.observedAtMs).toLocaleTimeString(
-              locale ?? [],
-              { hour: "2-digit", minute: "2-digit" },
-            ),
+            new Date(observation.observedAtMs).toLocaleTimeString(locale, {
+              hour: "2-digit",
+              minute: "2-digit",
+              timeZone,
+            }),
           )}
         </time>
       )}
@@ -328,21 +341,26 @@ export function ObservationStatus({
 export function BalanceCard({
   observation,
   labels,
-  locale,
+  locale: ownLocale,
+  timeZone,
   className,
   ["aria-label"]: ariaLabel,
   ...props
 }: React.ComponentProps<"section"> & {
   observation?: Observation<CreditBalance> | null;
   labels?: Partial<BalanceCardLabels>;
+  /** The language of the numbers and dates: this prop, else a `LabelsProvider`'s, else English. */
   locale?: Intl.LocalesArgument;
+  /** The zone the time is written in. Default: the browser's, which differs from the server's. */
+  timeZone?: string;
 }) {
+  const locale = useLocale(ownLocale);
   const text = {
     ...balanceCardLabels,
     ...labels,
     status: { ...balanceCardLabels.status, ...labels?.status },
   };
-  const money = new Intl.NumberFormat(locale ?? "en-US", {
+  const money = new Intl.NumberFormat(locale, {
     style: "currency",
     currency: "USD",
   });
@@ -381,6 +399,7 @@ export function BalanceCard({
         observation={observation}
         labels={text.status}
         locale={locale}
+        timeZone={timeZone}
       />
     </section>
   );
@@ -396,24 +415,29 @@ function metricText(line: MetricLine): string {
 export function ProviderCard({
   provider,
   labels,
-  locale,
+  locale: ownLocale,
+  timeZone,
   headingLevel = 2,
   className,
   ...props
 }: React.ComponentProps<"section"> & {
   provider: ProviderOutput;
   labels?: Partial<ProviderCardLabels>;
+  /** The language of the numbers and dates: this prop, else a `LabelsProvider`'s, else English. */
   locale?: Intl.LocalesArgument;
+  /** The zone the reset times are written in. Default: the browser's, which differs from the server's. */
+  timeZone?: string;
   /** The card's title. Nested headings follow it; every level looks the same. */
   headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
 }) {
+  const locale = useLocale(ownLocale);
   const text = {
     ...providerCardLabels,
     ...labels,
     reset: { ...providerCardLabels.reset, ...labels?.reset },
   };
   const Heading = `h${headingLevel}` as "h2";
-  const money = new Intl.NumberFormat(locale ?? "en-US", {
+  const money = new Intl.NumberFormat(locale, {
     style: "currency",
     currency: "USD",
   });
@@ -462,7 +486,7 @@ export function ProviderCard({
                 <p className="fb-muted">
                   {text.resets}{" "}
                   <time dateTime={line.resetsAt}>
-                    {new Date(line.resetsAt).toLocaleString(locale ?? [])}
+                    {new Date(line.resetsAt).toLocaleString(locale, { timeZone })}
                   </time>
                 </p>
               )}
@@ -483,6 +507,7 @@ export function ProviderCard({
           observation={provider.resetInventory}
           labels={text.reset}
           locale={locale}
+          timeZone={timeZone}
         />
       </CardContent>
     </Card>

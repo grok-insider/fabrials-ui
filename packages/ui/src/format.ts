@@ -13,10 +13,10 @@ function isEnglish(locale: string) {
 
 /**
  * A size as people read it: 1024 steps and short unit labels in the given locale ("25 MB", "2,4 MB"); a whole number
- * for bytes and from 100 up, one decimal otherwise. Throws a `RangeError` for a negative or non-finite count: use
- * `FileSize` when the value may be unknown.
+ * for bytes and from 100 up, one decimal otherwise. English when `locale` is not given, so a server and a browser write
+ * the same. Throws a `RangeError` for a negative or non-finite count: use `FileSize` when the value may be unknown.
  */
-export function formatBytes(locale: string, bytes: number): string {
+export function formatBytes(locale: string | undefined = "en", bytes: number): string {
   if (!Number.isFinite(bytes) || bytes < 0) throw new RangeError("Invalid byte count");
   let value = bytes;
   let index = 0;
@@ -47,13 +47,13 @@ const UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
 export type RelativeTimeStyle = "long" | "short" | "narrow";
 
 /**
- * "3 minutes ago" in the given locale. Under 45 seconds reads as "now";
+ * "3 minutes ago" in the given locale, English when there is none. Under 45 seconds reads as "now";
  * beyond `absoluteAfterDays` it becomes a date.
  */
 export function formatRelativeTime(
   date: Date | string | number,
   now: number,
-  locale: string,
+  locale: string | undefined = "en",
   opts: { style?: RelativeTimeStyle; absoluteAfterDays?: number; timeZone?: string } = {},
 ): string {
   const time = new Date(date).getTime();
@@ -81,13 +81,13 @@ export type AbsoluteTimeFormat =
   | ((date: Date, now: number) => Intl.DateTimeFormatOptions);
 
 /**
- * A date as an absolute, deterministic string ("29 Sept, 09:41"). It reads no clock unless the format is a function,
- * which receives `opts.now` (default: the current time). Returns "" for an invalid date. Pass a `timeZone` (in the
- * format or in `opts`) for a string that is the same on the server and in the browser.
+ * A date as an absolute, deterministic string ("29 Sept, 09:41"). English when `locale` is not given. It reads no clock
+ * unless the format is a function, which receives `opts.now` (default: the current time). Returns "" for an invalid
+ * date. Pass a `timeZone` (in the format or in `opts`) for a string that is the same on the server and in the browser.
  */
 export function formatAbsoluteTime(
   date: Date | string | number,
-  locale: string,
+  locale: string | undefined = "en",
   format: AbsoluteTimeFormat,
   opts: { now?: number; timeZone?: string } = {},
 ): string {

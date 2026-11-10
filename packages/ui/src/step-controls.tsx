@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Toolbar as BaseToolbar } from "@base-ui/react/toolbar";
 import { ChevronLeft, ChevronRight, Pause, Play, RotateCcw } from "lucide-react";
+import { useLocale } from "./labels";
 import { classes } from "./shared";
 import { clampStep, lastStep, stepDelay, stepPlayerReducer, type StepPlayerAction, type StepPlayerState } from "./step-player";
 import { Toolbar, ToolbarButton, ToolbarGroup, type ToolbarProps } from "./toolbar";
@@ -214,7 +215,7 @@ export function StepControls({
   reset = false,
   speeds,
   disabled = false,
-  locale = "en",
+  locale: ownLocale,
   labels: ownLabels,
   children,
   "aria-label": ariaLabel,
@@ -226,6 +227,7 @@ export function StepControls({
   const at = clampStep(index, total);
   const first = atStart ?? at <= 0;
   const final = atEnd ?? at >= total - 1;
+  const locale = useLocale(ownLocale);
   const number = useMemo(() => new Intl.NumberFormat(locale), [locale]);
   const where = labels.step(number.format(total === 0 ? 0 : at + 1), number.format(total));
   const playable = toggle != null || (play != null && pause != null);

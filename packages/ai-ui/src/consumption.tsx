@@ -7,6 +7,7 @@ import {
   Label,
   NativeSelect,
   Table,
+  useLocale,
 } from "@fabrials/ui";
 import * as React from "react";
 
@@ -27,7 +28,7 @@ export function ConsumptionView({
   report,
   synchronized = false,
   labels,
-  locale,
+  locale: ownLocale,
   headingLevel = 2,
   className,
   ...props
@@ -35,10 +36,12 @@ export function ConsumptionView({
   report: ConsumptionReport;
   synchronized?: boolean;
   labels?: ConsumptionViewLabelOverrides;
+  /** The language of the numbers and dates: this prop, else a `LabelsProvider`'s, else English. */
   locale?: Intl.LocalesArgument;
   /** The title of each block. Two by default, as 0.11 wrote it. */
   headingLevel?: AccountsHeadingLevel;
 }) {
+  const locale = useLocale(ownLocale);
   const text: ConsumptionViewLabels = {
     ...consumptionViewLabels,
     ...labels,

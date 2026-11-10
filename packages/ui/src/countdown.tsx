@@ -16,6 +16,7 @@ import {
   type CountdownThresholds,
   type CountdownTone,
 } from "./countdown-logic";
+import { useLocale } from "./labels";
 import { classes } from "./shared";
 import { subscribeTick } from "./ticker";
 
@@ -155,12 +156,13 @@ export function Countdown({
   thresholds,
   onDone,
   labels,
-  locale = "en",
+  locale: ownLocale,
   size = "md",
   placeholder = "--:--",
   className,
   ...props
 }: CountdownProps) {
+  const locale = useLocale(ownLocale);
   const text = { ...defaultLabels, ...labels };
   const { seconds, done, tone: measured, crossed } = useCountdown(deadline, { offset, marks, now, thresholds });
   const tone = toneOverride ?? measured;

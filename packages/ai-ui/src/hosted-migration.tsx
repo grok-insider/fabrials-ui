@@ -7,6 +7,7 @@ import {
   Label,
   NativeCheckbox,
   NativeSelect,
+  useLocale,
   type HeadingLevel,
 } from "@fabrials/ui";
 
@@ -49,7 +50,8 @@ export function HostedMigration({
   authorize,
   heading = true,
   labels,
-  locale,
+  locale: ownLocale,
+  timeZone,
   headingLevel = 1,
   now: fixedNow,
   className,
@@ -61,12 +63,16 @@ export function HostedMigration({
   /** The host already shows the page title. */
   heading?: boolean;
   labels?: Partial<HostedMigrationLabels>;
+  /** The language of the numbers and dates: this prop, else a `LabelsProvider`'s, else English. */
   locale?: Intl.LocalesArgument;
+  /** The zone an invitation's expiry is written in. Default: the browser's, which differs from the server's. */
+  timeZone?: string;
   /** The page title. The sections inside it follow; every level looks the same. */
   headingLevel?: AccountsHeadingLevel;
   /** The moment invitations and sessions are compared to. By default the wall clock, one second at a time. */
   now?: number;
 }) {
+  const locale = useLocale(ownLocale);
   const text: HostedMigrationLabels = {
     ...hostedMigrationLabels,
     ...labels,
@@ -183,7 +189,7 @@ export function HostedMigration({
         {invitation && (
           <div className="fb-form">
             <p className="fb-muted">
-              {text.instructions(formatWhen(invitation.expiresAtMs, locale))}
+              {text.instructions(formatWhen(invitation.expiresAtMs, locale, timeZone))}
             </p>
             <Label>
               {text.hostedOrigin}
@@ -451,6 +457,6 @@ export function HostedMigration({
   );
 }
 
-function formatWhen(ms: number, locale?: Intl.LocalesArgument): string {
-  return new Intl.DateTimeFormat(locale ?? "en", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(ms);
+function formatWhen(ms: number, locale: Intl.LocalesArgument, timeZone?: string): string {
+  return new Intl.DateTimeFormat(locale, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone }).format(ms);
 }

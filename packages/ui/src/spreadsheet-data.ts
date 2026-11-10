@@ -52,8 +52,8 @@ export function parseAddress(address: string): { row: number; column: number } |
 export const asCell = (cell: SheetCell | CellValue | undefined): SheetCell | undefined =>
   cell === undefined || cell === null ? undefined : typeof cell === "object" && !(cell instanceof Date) ? cell : { value: cell };
 
-/** The text a cell shows: the file's own text, else the value formatted for the locale. */
-export function cellText(cell: SheetCell | CellValue | undefined, locale?: Intl.LocalesArgument): string {
+/** The text a cell shows: the file's own text, else the value formatted for the locale, English when there is none. */
+export function cellText(cell: SheetCell | CellValue | undefined, locale: Intl.LocalesArgument = "en"): string {
   const own = asCell(cell);
   if (!own) return "";
   if (own.error) return own.error;

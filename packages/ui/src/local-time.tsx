@@ -2,6 +2,7 @@
 // Origin: Fabrials, 0.12 (from Radiant's local-time).
 
 import type { ComponentProps, ReactNode } from "react";
+import { useLocale } from "./labels";
 import { classes } from "./shared";
 import { formatLocalTime, localTimeIso, type LocalTimeFormat, type LocalTimeValue } from "./time-format";
 import { useHydrated } from "./use-hydrated";
@@ -12,7 +13,7 @@ export type LocalTimeProps = Omit<ComponentProps<"time">, "children" | "dateTime
   value: LocalTimeValue;
   /** A named format or `Intl.DateTimeFormat` options. */
   format?: LocalTimeFormat;
-  /** Default: the reader's own locale, or "en" when `timeZone` fixes the zone. */
+  /** The language of the text: this prop, else a `LabelsProvider`'s, else English, so the stand-in has the reader's shape. */
   locale?: Intl.LocalesArgument;
   /**
    * Fixes the zone. The text is then the same on the server and in the browser, so it is rendered at once, with no
@@ -29,17 +30,18 @@ export type LocalTimeProps = Omit<ComponentProps<"time">, "children" | "dateTime
 };
 
 /**
- * A `<time>` in the reader's zone and locale. A server does not know either, so until the page has hydrated it renders a
- * hidden stand-in of the same shape (the same instant in UTC, in `locale` or English): nothing moves when the real text
+ * A `<time>` in the reader's zone and language. A server knows neither, so until the page has hydrated it renders a
+ * hidden stand-in of the same shape (the same instant in UTC, in the same language): nothing moves when the real text
  * arrives and the server's time is never shown. Renders nothing for an empty or invalid value.
  */
-export function LocalTime({ value, format = "dateTime", locale, timeZone, now, prefix, title, titleFormat = FULL, className, style, ...props }: LocalTimeProps) {
+export function LocalTime({ value, format = "dateTime", locale: ownLocale, timeZone, now, prefix, title, titleFormat = FULL, className, style, ...props }: LocalTimeProps) {
   const hydrated = useHydrated();
+  const locale = useLocale(ownLocale);
   const iso = localTimeIso(value);
   if (!iso) return null;
   const fixed = (timeZone ?? (typeof format === "string" ? undefined : format.timeZone)) !== undefined;
   const shown = fixed || hydrated;
-  const options = shown ? { locale: locale ?? (fixed ? "en" : undefined), timeZone, now } : { locale: locale ?? "en", timeZone: "UTC", now };
+  const options = shown ? { locale, timeZone, now } : { locale, timeZone: "UTC", now };
   return (
     <time
       data-slot="local-time"

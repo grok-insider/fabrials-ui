@@ -17,7 +17,7 @@ export type LocalTimeFormatName =
 export type LocalTimeFormat = LocalTimeFormatName | Intl.DateTimeFormatOptions;
 
 export type LocalTimeOptions = {
-  /** Default: the runtime's own locale. */
+  /** English by default, so a server and a browser write the same text; pass the reader's language for theirs. */
   locale?: Intl.LocalesArgument;
   /** An IANA zone ("Europe/Madrid"). Default: the runtime's own zone. */
   timeZone?: string;
@@ -43,7 +43,7 @@ function clockOf(locale: Intl.LocalesArgument): Intl.DateTimeFormatOptions {
   const key = String(locale ?? "");
   let clock = clocks.get(key);
   if (!clock) {
-    const cycle = new Intl.DateTimeFormat(locale, { hour: "numeric" }).resolvedOptions().hourCycle;
+    const cycle = new Intl.DateTimeFormat(locale ?? "en", { hour: "numeric" }).resolvedOptions().hourCycle;
     clock = { hour: cycle === "h12" || cycle === "h11" ? "numeric" : "2-digit", minute: "2-digit" };
     clocks.set(key, clock);
   }
@@ -69,11 +69,11 @@ export function localTimeIso(value: LocalTimeValue): string | null {
 }
 
 /**
- * A date as text in a given zone and locale. Pure: the zone, the locale and the clock are parameters, so the caller decides
- * where it runs (a server prints its own zone unless told another). Returns "" for an empty or invalid value. `format` is a
- * named format or `Intl.DateTimeFormat` options, whose own `timeZone` wins.
+ * A date as text in a given zone and locale, English when no locale is given. Pure: the zone, the locale and the clock
+ * are parameters, so the caller decides where it runs (a server prints its own zone unless told another). Returns "" for
+ * an empty or invalid value. `format` is a named format or `Intl.DateTimeFormat` options, whose own `timeZone` wins.
  */
-export function formatLocalTime(value: LocalTimeValue, format: LocalTimeFormat = "dateTime", { locale, timeZone, now }: LocalTimeOptions = {}): string {
+export function formatLocalTime(value: LocalTimeValue, format: LocalTimeFormat = "dateTime", { locale = "en", timeZone, now }: LocalTimeOptions = {}): string {
   const date = toDate(value);
   if (!date) return "";
   const clock = toDate(now) ?? new Date();

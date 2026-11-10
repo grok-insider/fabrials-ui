@@ -87,11 +87,11 @@ function project(snapshots: ConsumptionSnapshot[]): ConsumptionReport {
       last_success_ms: s.observed_at_ms,
     })),
     total,
-    daily: [...daily.values()].sort((a, b) => a.key.localeCompare(b.key)),
+    daily: [...daily.values()].sort((a, b) => a.key.localeCompare(b.key, "en")),
     period_totals: periods,
     clients,
     models: [...models.values()].sort(
-      (a, b) => b.tokens - a.tokens || a.key.localeCompare(b.key),
+      (a, b) => b.tokens - a.tokens || a.key.localeCompare(b.key, "en"),
     ),
     sessions: [],
     projects: [],
@@ -110,6 +110,7 @@ export function SynchronizedConsumption({
   labels?: Partial<SynchronizedConsumptionLabels>;
   /** The words of the breakdown under the device picker. */
   viewLabels?: ConsumptionViewLabelOverrides;
+  /** The language of the numbers and dates: this prop, else a `LabelsProvider`'s, else English. */
   locale?: Intl.LocalesArgument;
   /** The page title. Two by default, as 0.11 wrote it. */
   headingLevel?: AccountsHeadingLevel;

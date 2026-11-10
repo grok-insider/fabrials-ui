@@ -1,5 +1,5 @@
 "use client";
-import { Button, StatePanel } from "@fabrials/ui";
+import { Button, StatePanel, useLocale } from "@fabrials/ui";
 
 import * as React from "react";
 import type { PrivateRecentPage, PrivateStoredObservation, ProviderOutput } from "./contracts";
@@ -16,7 +16,8 @@ export function PrivateHistoryView({
   description,
   heading = true,
   labels,
-  locale,
+  locale: ownLocale,
+  timeZone,
   headingLevel = 2,
   className,
   ["aria-label"]: ariaLabel,
@@ -27,10 +28,14 @@ export function PrivateHistoryView({
   /** The host already shows the page title. */
   heading?: boolean;
   labels?: Partial<PrivateHistoryLabels>;
+  /** The language of the numbers and dates: this prop, else a `LabelsProvider`'s, else English. */
   locale?: Intl.LocalesArgument;
+  /** The zone the stamps are written in. Default: the browser's, which differs from the server's. */
+  timeZone?: string;
   /** The section's title. The empty state inside it follows; every level looks the same. */
   headingLevel?: AccountsHeadingLevel;
 }) {
+  const locale = useLocale(ownLocale);
   const text = { ...privateHistoryLabels, ...labels };
   const [pages, setPages] = React.useState<PrivateRecentPage[]>([]);
   const [busy, setBusy] = React.useState(true);
@@ -104,7 +109,7 @@ export function PrivateHistoryView({
       {observations.length > 0 ? (
         <ol className="fb-log">
           {observations.map((item) => (
-            <Observation item={item} key={item.cursor} labels={text} locale={locale} />
+            <Observation item={item} key={item.cursor} labels={text} locale={locale} timeZone={timeZone} />
           ))}
         </ol>
       ) : null}
@@ -125,7 +130,7 @@ export function PrivateHistoryView({
   );
 }
 
-function Observation({ item, labels, locale }: { item: PrivateStoredObservation; labels: PrivateHistoryLabels; locale?: Intl.LocalesArgument }) {
+function Observation({ item, labels, locale, timeZone }: { item: PrivateStoredObservation; labels: PrivateHistoryLabels; locale: Intl.LocalesArgument; timeZone?: string }) {
   const { event, source } = item.observation;
   const at = event.kind === "quota" ? event.at_ms : event.kind === "history" ? event.sample.ts_ms : event.record.ts_ms;
   const title = event.kind === "quota" ? event.output.displayName || source : source;
@@ -133,13 +138,13 @@ function Observation({ item, labels, locale }: { item: PrivateStoredObservation;
     event.kind === "quota"
       ? quotaDetail(event.output, labels, locale)
       : event.kind === "history"
-        ? historyDetail(event.sample.label, event.sample.used, event.sample.limit, event.sample.resets_at, labels, locale)
+        ? historyDetail(event.sample.label, event.sample.used, event.sample.limit, event.sample.resets_at, labels, locale, timeZone)
         : requestDetail(event.record.model, event.record.input_tokens, event.record.output_tokens, labels, locale);
   return (
     <li className="fb-log-item">
       <div className="fb-row">
         <strong>{title}</strong>
-        <time dateTime={new Date(at).toISOString()}>{formatStamp(at, locale)}</time>
+        <time dateTime={new Date(at).toISOString()}>{formatStamp(at, locale, timeZone)}</time>
       </div>
       <p>{detail}</p>
       <p className="fb-muted">
@@ -150,7 +155,7 @@ function Observation({ item, labels, locale }: { item: PrivateStoredObservation;
   );
 }
 
-function quotaDetail(output: ProviderOutput, labels: PrivateHistoryLabels, locale?: Intl.LocalesArgument): string {
+function quotaDetail(output: ProviderOutput, labels: PrivateHistoryLabels, locale: Intl.LocalesArgument): string {
   const plan = output.plan ? `${output.plan}. ` : "";
   const progress = output.lines.find((line) => line.type === "progress");
   if (progress && progress.type === "progress") {
@@ -173,14 +178,15 @@ function historyDetail(
   limit: number,
   resetsAt: string | null | undefined,
   labels: PrivateHistoryLabels,
-  locale?: Intl.LocalesArgument,
+  locale: Intl.LocalesArgument,
+  timeZone?: string,
 ): string {
   const amount =
     limit > 0
       ? labels.quotaOf(formatCount(used, labels, locale), formatCount(limit, labels, locale))
       : formatCount(used, labels, locale);
   const reset = resetsAt ? Date.parse(resetsAt) : Number.NaN;
-  const when = Number.isFinite(reset) ? formatStamp(reset, locale) : null;
+  const when = Number.isFinite(reset) ? formatStamp(reset, locale, timeZone) : null;
   return labels.historyLine(label, amount, when);
 }
 
@@ -189,7 +195,7 @@ function requestDetail(
   input: number,
   output: number,
   labels: PrivateHistoryLabels,
-  locale?: Intl.LocalesArgument,
+  locale: Intl.LocalesArgument,
 ): string {
   return labels.requestLine(
     model || labels.unknownModel,
@@ -198,20 +204,20 @@ function requestDetail(
   );
 }
 
-function formatCount(value: number, labels: PrivateHistoryLabels, locale?: Intl.LocalesArgument): string {
+function formatCount(value: number, labels: PrivateHistoryLabels, locale: Intl.LocalesArgument): string {
   if (!Number.isFinite(value)) return labels.zero;
   const abs = Math.abs(value);
   if (abs >= 1_000_000) return `${trimNumber(value / 1_000_000, locale)}M`;
   if (abs >= 10_000) return `${trimNumber(value / 1_000, locale)}k`;
-  return new Intl.NumberFormat(locale ?? "en", { maximumFractionDigits: 0 }).format(value);
+  return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(value);
 }
 
-function trimNumber(value: number, locale?: Intl.LocalesArgument): string {
-  return new Intl.NumberFormat(locale ?? "en", { maximumFractionDigits: 1 }).format(value);
+function trimNumber(value: number, locale: Intl.LocalesArgument): string {
+  return new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(value);
 }
 
-function formatStamp(ms: number, locale?: Intl.LocalesArgument): string {
-  return new Intl.DateTimeFormat(locale ?? "en", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(ms);
+function formatStamp(ms: number, locale: Intl.LocalesArgument, timeZone?: string): string {
+  return new Intl.DateTimeFormat(locale, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone }).format(ms);
 }
 
 function shortId(value: string): string {

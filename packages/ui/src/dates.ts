@@ -52,10 +52,11 @@ export function matchesDate(date: Date, matcher: DateMatcher | DateMatcher[] | u
   return false;
 }
 
-/** The first day of the week for a locale (0 is Sunday), from Intl's week data; Monday when the runtime has none. */
+/** The first day of the week for a locale (0 is Sunday), from Intl's week data; the week of English (Sunday) when no locale
+ * is given, so a server and a browser draw the same calendar; Monday when Intl has no data for it. */
 export function firstDayOfWeek(locale?: Intl.LocalesArgument): number {
   try {
-    const info = new Intl.Locale(locale ? localeTag(locale) : new Intl.DateTimeFormat().resolvedOptions().locale) as Intl.Locale & {
+    const info = new Intl.Locale(localeTag(locale ?? "en")) as Intl.Locale & {
       getWeekInfo?: () => { firstDay: number };
       weekInfo?: { firstDay: number };
     };

@@ -12,7 +12,7 @@ export function avatarTint(text: string): 1 | 2 | 3 | 4 | 5 {
 }
 
 const segmenter =
-  typeof Intl !== "undefined" && "Segmenter" in Intl ? new Intl.Segmenter(undefined, { granularity: "grapheme" }) : null;
+  typeof Intl !== "undefined" && "Segmenter" in Intl ? new Intl.Segmenter("en", { granularity: "grapheme" }) : null;
 
 function firstGrapheme(word: string): string {
   if (segmenter) for (const part of segmenter.segment(word)) return part.segment;
@@ -21,8 +21,9 @@ function firstGrapheme(word: string): string {
 
 /**
  * The text of an avatar fallback. A name gives the first letters of its first and last word; an address (no space) gives
- * the first letter of its local part. Grapheme-safe (an emoji or an accented letter is one) and upper-cased in `locale`;
- * `fallback` when there is nothing to show.
+ * the first letter of its local part. Grapheme-safe (an emoji or an accented letter is one) and upper-cased in `locale`,
+ * English by default (pass it for Turkish or Lithuanian names, whose letters grow differently); `fallback` when there is
+ * nothing to show.
  */
 export function avatarInitials(value: string, fallback = "?", locale?: string): string {
   const text = value.trim();
@@ -32,5 +33,5 @@ export function avatarInitials(value: string, fallback = "?", locale?: string): 
     words.length > 1
       ? [firstGrapheme(words[0]), firstGrapheme(words[words.length - 1])]
       : [firstGrapheme(words[0])];
-  return letters.join("").toLocaleUpperCase(locale) || fallback;
+  return letters.join("").toLocaleUpperCase(locale ?? "en") || fallback;
 }

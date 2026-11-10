@@ -1,7 +1,7 @@
 "use client";
 
 import type { ComponentProps } from "react";
-import { Card, CardContent, CardHeader, Table } from "@fabrials/ui";
+import { Card, CardContent, CardHeader, Table, useLocale } from "@fabrials/ui";
 import { ProviderCard, useClock } from "./providers";
 import type { SynchronizedAccount } from "./contracts";
 import {
@@ -16,19 +16,18 @@ import {
 const level = (value: AccountsHeadingLevel): AccountsHeadingLevel =>
   Math.min(6, value + 1) as AccountsHeadingLevel;
 
-const amount = (value: number, locale?: Intl.LocalesArgument) =>
-  locale === undefined
-    ? value.toFixed(2)
-    : new Intl.NumberFormat(locale, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }).format(value);
+const amount = (value: number, locale: Intl.LocalesArgument) =>
+  new Intl.NumberFormat(locale, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
 
 export function SynchronizedAccounts({
   accounts: allAccounts,
   includeLinked = false,
   labels,
-  locale,
+  locale: ownLocale,
+  timeZone,
   headingLevel = 2,
   providerHeadingLevel = 2,
   now: fixedNow,
@@ -39,7 +38,10 @@ export function SynchronizedAccounts({
   accounts: SynchronizedAccount[];
   includeLinked?: boolean;
   labels?: Partial<SynchronizedAccountsLabels>;
+  /** The language of the numbers and dates: this prop, else a `LabelsProvider`'s, else English. */
   locale?: Intl.LocalesArgument;
+  /** The zone the readings and the reset times are written in. Default: the browser's, which differs from the server's. */
+  timeZone?: string;
   /** The section's title. The log inside it follows; every level looks the same. */
   headingLevel?: AccountsHeadingLevel;
   /** The provider's name inside each account. Two by default, as 0.11 wrote it. */
@@ -47,6 +49,7 @@ export function SynchronizedAccounts({
   /** The moment the readings are compared to. By default the shared clock, which the server cannot read. */
   now?: number | null;
 }) {
+  const locale = useLocale(ownLocale);
   const clockNow = useClock();
   const now = fixedNow === undefined ? clockNow : fixedNow;
   const text = {
@@ -94,13 +97,14 @@ export function SynchronizedAccounts({
                 ? text.stale
                 : ""}
               <time dateTime={new Date(account.observed_at_ms).toISOString()}>
-                {new Date(account.observed_at_ms).toLocaleString(locale ?? [])}
+                {new Date(account.observed_at_ms).toLocaleString(locale, { timeZone })}
               </time>
             </p>
             <ProviderCard
               headingLevel={providerHeadingLevel}
               labels={text.provider}
               locale={locale}
+              timeZone={timeZone}
               provider={account.output}
             />
             {account.local_usage && (
@@ -114,7 +118,7 @@ export function SynchronizedAccounts({
                     {text.estimate(
                       account.local_usage.days
                         .reduce((sum, day) => sum + day.tokens, 0)
-                        .toLocaleString(locale ?? []),
+                        .toLocaleString(locale),
                       amount(
                         account.local_usage.days.reduce(
                           (sum, day) => sum + day.estimated_usd,
@@ -139,7 +143,7 @@ export function SynchronizedAccounts({
                         {account.local_usage.days.map((day) => (
                           <tr key={day.date}>
                             <td>{day.date}</td>
-                            <td>{day.tokens.toLocaleString(locale ?? [])}</td>
+                            <td>{day.tokens.toLocaleString(locale)}</td>
                             <td>${amount(day.estimated_usd, locale)}</td>
                           </tr>
                         ))}
@@ -161,6 +165,7 @@ export function LinkedAccountUsage({
   labels,
   accountsLabels,
   locale,
+  timeZone,
   className,
   ...props
 }: ComponentProps<"details"> & {
@@ -168,7 +173,10 @@ export function LinkedAccountUsage({
   labels?: Partial<LinkedAccountUsageLabels>;
   /** The words of the accounts under the summary. */
   accountsLabels?: Partial<SynchronizedAccountsLabels>;
+  /** The language of the numbers and dates: this prop, else a `LabelsProvider`'s, else English. */
   locale?: Intl.LocalesArgument;
+  /** The zone the readings and the reset times are written in. Default: the browser's, which differs from the server's. */
+  timeZone?: string;
 }) {
   const text = { ...linkedAccountUsageLabels, ...labels };
   if (!accounts.length) return null;
@@ -183,6 +191,7 @@ export function LinkedAccountUsage({
         includeLinked
         labels={accountsLabels}
         locale={locale}
+        timeZone={timeZone}
       />
     </details>
   );

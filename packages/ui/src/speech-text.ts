@@ -57,9 +57,11 @@ function sentencesOf(text: string): string[] {
 }
 
 type Segmenter = { segment: (text: string) => Iterable<{ index: number; segment: string }> };
+// English boundaries whatever the runtime's locale: the chunks a page reads aloud are then the same on a server and in a
+// browser (and the same in a test on any machine).
 const segmenter = (granularity: "word" | "grapheme"): Segmenter | null => {
-  const Maker = (Intl as unknown as { Segmenter?: new (locale: undefined, options: { granularity: string }) => Segmenter }).Segmenter;
-  return Maker ? new Maker(undefined, { granularity }) : null;
+  const Maker = (Intl as unknown as { Segmenter?: new (locale: "en", options: { granularity: string }) => Segmenter }).Segmenter;
+  return Maker ? new Maker("en", { granularity }) : null;
 };
 
 /** The last boundary of `kind` at or before `max`, never 0: a cut that keeps words (or at least written characters) whole. */

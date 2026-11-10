@@ -38,6 +38,7 @@ import {
   type RecorderStatus,
   type RecorderTake,
 } from "./recorder-logic";
+import { useLocale } from "./labels";
 import { classes } from "./shared";
 import { claimSound, releaseSound } from "./sound-bus";
 
@@ -492,7 +493,7 @@ export function RecorderPanelView({
   fallback,
   disabled = false,
   hint,
-  locale = "en",
+  locale: ownLocale,
   labels,
   recordRef,
   stopRef,
@@ -503,6 +504,7 @@ export function RecorderPanelView({
   ...props
 }: RecorderPanelViewProps) {
   const text = { ...RECORDER_LABELS, ...labels };
+  const locale = useLocale(ownLocale);
   const limit = formatRecordingClock(maxDurationMs, locale);
   const problem = status in FAILURE_LABEL ? text[FAILURE_LABEL[status as keyof typeof FAILURE_LABEL]] : null;
   const said =

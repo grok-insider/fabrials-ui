@@ -38,7 +38,7 @@ const segmenterOf = (granularity: "grapheme" | "word", locale?: Intl.LocalesArgu
   const constructor = (Intl as unknown as { Segmenter?: SegmenterConstructor }).Segmenter;
   if (typeof constructor !== "function") return null;
   try {
-    return new constructor(locale, { granularity });
+    return new constructor(locale ?? "en", { granularity });
   } catch {
     return null;
   }
