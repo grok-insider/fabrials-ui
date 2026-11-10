@@ -176,12 +176,21 @@ These need a decision or are new products of their own; each has a line in `docs
 
 ## Status
 
+Merged means: on `feat/0.12`, with `bun run check` green on the merged branch and the package's own spec run by its author. The whole visual suite runs on the merged branch after each wave.
+
 | Package | State |
 | --- | --- |
-| Phase 1 documents | in progress |
-| A1 to A4 | not started |
-| B1 to B4 | not started |
-| C1 to C4 | not started |
-| D1 to D3 | not started |
+| Phase 1 documents | merged, except 1.8 (the catalogue test) and the 0.12 pieces of `DESIGN.md` and the skill, which go with E3 |
+| A1 | merged |
+| A2 | merged (two parts: surfaces and targets; sidebar, carousel and right to left) |
+| A3 | merged; `Combobox` is also the root component, so its shim exists |
+| A4 | in progress |
+| B1 | merged |
+| B2 | merged |
+| B3, B4 | in progress |
+| C1, C2 | in progress |
+| C3, C4 | not started |
+| D1 | in progress (`ImageViewer`, `MediaGrid`; `GenerationFrame` after A4) |
+| D2, D3 | not started |
 | E1 to E3 | not started |
 | Phase 7 | not started |
