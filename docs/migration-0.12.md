@@ -297,3 +297,100 @@ Radiant can replace `targetTag` and `textTag` of `exercise/lang-text.ts` with `d
 `<Announcer>` near the root renders one polite and one assertive live region, always in the page and only clipped from view. `const announce = useAnnounce()` then says a sentence without moving focus: `announce("Draft saved")`, `announce("The connection was lost", { assertive: true })`. The same sentence twice is read twice (the region is emptied and filled a frame later), and a message leaves the region after `clearAfter` milliseconds (default 7000, 0 keeps it). Without an `Announcer` above, `useAnnounce` speaks through a pair of regions of its own at the end of the body.
 
 Radiant's step players can drop their own `aria-live` regions and call `announce`.
+
+## States and time
+
+Five pieces of `@fabrials/ui` for the moments a screen is in a state or on a clock: a question asked in place, a countdown, the theme choice, a page that is only a state, and the sticky bar of a step. All new; nothing existing changes.
+
+### `InlineConfirm` and `useInlineConfirm`
+
+A confirmation that is not a dialog: the question is rendered where you put it and the page stays usable around it. Use `ConfirmDialog` when everything must stop until the answer.
+
+- It is a `group` named by its `title` and described by its `description`. It is not an `alertdialog`: that role promises a modal, and this is not one.
+- When it opens, the safe answer (cancel) takes focus without the browser's own jump, then the block scrolls into view with the height of a sticky `ActionBar` and of the on-screen keyboard kept free under it.
+- Escape is the safe answer, and it stops there: a sheet around the question stays open.
+- When it closes, on the next frame, focus goes back to the control that had it before, or to `returnFocusRef`. If the host moved focus somewhere itself, it is left there.
+- `onConfirm` may return a promise. While it is pending the answer shows its spinner and ignores a second press, the safe answer and Escape wait, and both buttons stay in the tab order. A rejection, or `{ ok: false, error }` (the `ConfirmResult` of `ConfirmDialog`), is shown as an alert inside the question, which stays open.
+- `acknowledgement` adds a box that must be ticked. The answer is never disabled: pressed with the box empty, it shows `acknowledgement.error` and moves focus to the box.
+
+| Prop | |
+| --- | --- |
+| `open`, `defaultOpen`, `onOpenChange` | Closed, it renders nothing |
+| `title`, `description` | The question and its detail. `headingLevel` makes the title a heading; without it the title is a paragraph |
+| `confirmLabel`, `pendingLabel`, `cancelLabel` | `cancelLabel` is "Cancel" by default |
+| `onConfirm({ acknowledged })`, `onCancel` | As above |
+| `destructive` | The danger tint, and the destructive button |
+| `pending`, `error`, `fallbackError` | For a host that owns the request: its state shown the same way as a promise's |
+| `acknowledgement` | `{ label, required = true, error = "Tick the box to continue", onCheckedChange }` |
+| `acknowledgementKey` | A new value empties the box (what is agreed to changed) |
+| `returnFocusRef` | Where focus goes on closing, when it is not the control that had it |
+| `autoFocus` | `false` for a question already on the page when it loads: no focus move, no scroll |
+| `children` | Extra content between the question and the answers (reasons, a choice) |
+
+`useInlineConfirm()` returns `{ open, setOpen, triggerProps, confirmProps }` for the usual case where the control that asks is somewhere else (in the bar) than the question (above it): spread `triggerProps` on the button (it gets `aria-expanded` and takes focus back) and `confirmProps` on `InlineConfirm`. There is no `InlineConfirmTrigger` component.
+
+Radiant can delete its copies (`session/confirm-finish.tsx`, `session/skip-step.tsx`, `placement/confirm.tsx`, `exam/exam-confirm.tsx`, the two questions of `conversation/end-controls.tsx`, the agreement part of `recordings/keep-recording.tsx`) and the `.lang-session-confirm` rules. What differs from them: the title and description are tied to the group by id in every case, focus returns on the next frame instead of in a microtask, and the block reads the bar's height from a CSS variable instead of measuring `.lang-session-bar`.
+
+### `Countdown`, `useCountdown` and the clock functions
+
+`<Countdown deadline={closesAt} offset={offset} onDone={close} />` counts to a deadline. Every reading is `deadline - now`, never a count, so a tab that slept, a slow phone or a clock that was set back shows the right time; `offset` corrects this device's clock against the server's.
+
+- The digits are a `timer` named by `label` ("Time left"); a timer is not announced as it ticks. A separate polite region speaks once when a mark is passed (ten, five, two and one minute by default: "5 minutes left") and once at the end ("Time is up"). Words come from `labels.left(seconds, locale)` and `labels.done`.
+- Seconds are rounded up: `0:00` means the time is up.
+- Tones `calm`, `low` (five minutes or less) and `urgent` (one minute or less) are a tint, an edge and an icon; `thresholds` moves them and `tone` overrides them. Nothing flashes. In forced colors the edge is plain, dashed and heavy.
+- The clock is pinned left to right, in tabular figures in the label voice, in the digits of `locale` (English digits by default, so a server and a browser write the same).
+- On a server and while hydrating it shows `placeholder` (`--:--`).
+- `onDone` is called once per deadline, also when the deadline had already passed on mount.
+- Other props: `format` (`"auto"`, `"mm:ss"`, `"h:mm:ss"` or a function of the seconds), `hideLabel`, `size` (`"md"`, `"sm"`), `marks`, `now` (a fixed moment: the clock holds still, for a paused exam, a story or a test).
+
+`useCountdown(deadline, { offset, marks, tick, precision, thresholds, now })` returns `{ remainingMs, seconds, done, tone, crossed }`. All countdowns share one timer; it also reads the clock when the page is shown again, when the window takes focus and on `pageshow`. It renders once a second; `precision` (with `tick`) makes it finer. `crossed` is the mark passed most recently while the hook was watching (0 for the end).
+
+The arithmetic is exported from a module without `"use client"`, for a server or a test: `deadlineTime`, `clockOffset(serverNow, receivedAt)`, `remainingMs(deadline, offset, now)`, `wholeSeconds`, `crossedMark(previous, current, marks)`, `toneOf(seconds, thresholds)`, `formatCountdown(ms, locale, { format, round })`, `COUNTDOWN_MARKS`, `COUNTDOWN_THRESHOLDS`. The formatter is `formatCountdown`, not `formatClock`: that name is the media player's, which takes seconds and rounds down.
+
+Radiant can delete `exam/exam-timer.tsx`, `exam/use-countdown.ts`, the countdown half of `exam/clock.ts` (`clockOffset`, `remainingMs`, `wholeSeconds`, `MARKS`, `crossedMark`, `toneOf`) and the `.lang-exam-timer` rules; the polling helpers of `clock.ts` are Radiant's own.
+
+### `ThemeProvider`, `useTheme` and `themeInitScript`
+
+The library had the control (`ThemeSwitcher`) and the CSS (`.dark`, `data-theme`); the host had to write the storage. Now:
+
+```tsx
+// app/layout.tsx (a Server Component)
+<head>
+  <meta name="theme-color" content="#f6f7f8" />
+  <script dangerouslySetInnerHTML={{ __html: themeInitScript({ themeColor }) }} />
+</head>
+<body>
+  <ThemeProvider themeColor={themeColor}>{children}</ThemeProvider>
+</body>
+
+// anywhere below
+const { theme, resolvedTheme, setTheme } = useTheme();
+<ThemeSwitcher value={theme} onValueChange={setTheme} />
+```
+
+- `theme` is the choice (`"system"`, `"light"`, `"dark"`); `resolvedTheme` is what is painted. On a server, "system" resolves to "light".
+- The choice is read from `localStorage` through `useSyncExternalStore`, never during render; a server renders `defaultTheme`. Other tabs follow through the `storage` event. While the choice is "system" the provider follows the device.
+- Applying a theme sets, on `<html>`: with `attribute="class"` (the default) the class `dark` or `light`; with `attribute="data-theme"` the choice itself, so "system" keeps following in CSS. It also sets `color-scheme`, and, when `themeColor` is given, the content of `<meta name="theme-color">` (the one without a `media` attribute; it is created when missing).
+- Storage that throws (private mode, a full quota) is swallowed: the choice lives in memory for the page.
+- Props: `defaultTheme` ("system"), `storageKey` ("theme"), `attribute`, `themeColor`, `disableTransitionOnChange`, `target` (a ref to the element that carries the theme instead of `<html>`).
+- `themeInitScript(options)` returns the text of a script that does the same before the first paint. It takes the same four options; put it in `<head>` after the `theme-color` meta. The script is the source text of `themeRuntime`, the function the provider calls, so the two cannot disagree. It comes from a module without `"use client"`, so a Server Component can call it. A host with a Content Security Policy gives the script element its nonce.
+- `useTheme` throws outside a provider.
+
+Radiant can delete `components/theme-provider.tsx` and `lib/theme-script.ts`. Two differences to check: Radiant's default was "dark" (pass `defaultTheme="dark"` to both), and the class mode now also sets `light` on the root in the light theme (the tokens treat it as the default theme).
+
+### `StatePage`, `ErrorState`, `BackButton`
+
+- `StatePage` is a whole page that is only a state, outside the app shell: not found, gone, a root error, offline. A `<main>` (`as="div"` where the host has one) at least the height of the viewport, clear of the safe areas, with `brand` (a link home) at the top start, then `code` (a short reading such as "404" in the label voice), `title` (`headingLevel`, 1 by default), `description`, `actions` and `children`. The content is anchored to the page gutter in the upper third, as the house layout rule asks; `align="center"` is there for a product that centres its states. `--fui-state-page-size` changes the minimum height.
+- `ErrorState` is a `StatePanel state="error"` for a route or a region that failed: `onRetry` shows "Try again" (`retrying` loads it), `homeHref` shows a link home (`homeLabel`), `actions` adds more, and `error` or `reference` shows "Reference abc123" with a copy key. Only `error.digest` is read; an error's message is never shown. Words come from `title`, `description` and `labels` (`title`, `description`, `retry`, `home`, `reference(id)`, `copyReference`, `copied`). The other `StatePanel` props (`headingLevel`, `size`, `variant`, `align`) pass through.
+- `BackButton` goes back in history and, when there is none (a page opened in a new tab), to `fallbackHref` ("/"): through `onNavigate(href)` when the host gives its router, else with a page load. With `render={<a href="…" />}` it is a link, the href is the fallback, and a modified click is left to the browser. Its arrow turns round in right to left. It takes `variant` ("outline" by default) and `size` like `Button`; its text is its children ("Go back").
+
+Radiant can delete `app/missing-page.tsx` (its night-sky backdrop stays Radiant's: pass it as a child or keep a wrapper), `app/route-error-state.tsx` and `app/history-back-button.tsx`.
+
+### `ActionBar` and `useViewportInsets`
+
+- `ActionBar` is the bar of a step, a form or a player. It sticks to the block end of the nearest scroll container, over a hairline, with the safe area in its padding. `start` and `end` are its two slots and `children` sit between them; when the bar is narrower than 26rem the `end` slot takes a full row and its buttons share it. With `aria-label` it is a `group`; it is never a toolbar by itself, because its controls keep their own tab stops (pass `role` to change that).
+- It measures itself and publishes `--fui-action-bar-size` on its parent (or `containerRef`), without rendering again. `InlineConfirm` reads it for its scroll margin; a host can use it the same way (`scroll-margin-block-end: var(--fui-action-bar-size)`).
+- A card around the bar must clip with `overflow: clip`, not `hidden`: `hidden` makes the card a scroll container and the bar would stick to the card instead of the page.
+- `useViewportInsets({ target, threshold })` publishes `--fui-keyboard-inset` on the root (or `target`): how much of the layout viewport the on-screen keyboard covers, from `visualViewport`. It is 0 where the browser shrinks the layout viewport itself; changes of 120 px or less are browser toolbars and are ignored. `ActionBar` rises by it and `InlineConfirm` scrolls clear of it. A bar inside a scroll container that does not reach the bottom of the window sets `--fui-keyboard-inset: 0px` on that container. `keyboardInset(innerHeight, viewportHeight, offsetTop, threshold)` is the arithmetic.
+
+Radiant can delete `conversation/use-dock.ts` and the `.lang-session-bar` rules, and read the two variables instead of `--lang-dock` and `--lang-keyboard`.
