@@ -481,7 +481,7 @@ test("backspace held down deletes a whole cluster at a time, and the release add
   const target = await box(back);
   await page.mouse.move(target.cx, target.cy);
   await page.mouse.down();
-  await page.waitForTimeout(720);
+  await page.waitForTimeout(900);
   await page.mouse.up();
   const held = await input.inputValue();
   expect("abcdefg".startsWith(held)).toBe(true);
