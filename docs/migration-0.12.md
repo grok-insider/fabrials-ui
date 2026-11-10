@@ -1,6 +1,6 @@
 # Migrating to 0.12
 
-0.12 is additive: nothing is removed and nothing is renamed. A product on 0.11 can take it without changing a line. This note says what is new, what a product can now delete, and the few places where something looks or behaves differently. Each section below was written with the change it describes; the plan they follow is `docs/plan-0.12.md`.
+0.12 is additive: nothing is removed and nothing is renamed. A product on 0.11 can take it without changing a line, except a product that relied on the browser's language for dates and numbers, which sets `LabelsProvider locale` once (see [Words and locale](#words-and-locale)). This note says what is new, what a product can now delete, and the few places where something looks or behaves differently. Each section below was written with the change it describes; the plan they follow is `docs/plan-0.12.md`.
 
 
 ## The chat pieces: right to left, forced colors, print
@@ -714,6 +714,172 @@ The exported helpers keep their signatures and add the words at the end: `search
 
 A code panel's copy result is no longer a sentence that its CSS inspects: `data-state` is `"copied"` or `"failed"`, and the words come from `labels.copied` and `labels.copyFailed`. A product that styled that status by its text can style it by the state.
 
+### One language, English, unless the host asks
+
+`locale?: Intl.LocalesArgument` everywhere: a tag, an `Intl.Locale`, or a list. **English is the default, and nothing reads the runtime's locale while it renders.** A server and a browser have different runtime locales, so text written with one is different on each side, and React reports a hydration mismatch. The rule, from 0.12:
+
+- in a client component: the component's own `locale` prop, else the `LabelsProvider`'s, else `"en"` (`useLocale(own)`);
+- in a pure helper or a Server Component: a parameter that defaults to `"en"`;
+- a zone is a separate matter and is not changed: a clock time is still written in the reader's zone unless a `timeZone` is given.
+
+A product that wants the reader's language says so once, with the same value on the server and in the browser (from the request, or from a cookie the server reads):
+
+```tsx
+<LabelsProvider locale={locale}>{children}</LabelsProvider>
+```
+
+or passes `locale` to the component that formats. What it must not do is read `navigator.language` while rendering: that is the mismatch.
+
+**What looks or behaves differently when a product passes no locale.** This is the whole list; everything else keeps the text 0.11 printed.
+
+| Piece | 0.11 wrote | 0.12 writes |
+| --- | --- | --- |
+| `Calendar`, `DatePicker`, `DateRangePicker` | month and weekday names, the day's number and the first day of the week in the runtime's language | English, and English's week (Sunday first) |
+| `Spreadsheet` | numbers and dates the file did not format in the runtime's language | English |
+| `cellText`, `readXlsx` / `readSpreadsheet` (`{ locale }`), `formatNumber` | the runtime's language | English unless the `locale` argument says otherwise |
+| `LocalTime`, `formatLocalTime`, and `MessageTimestamp date` | the runtime's language after hydration (before it, the stand-in was English, so the shape could change under the text) | English before and after, so the stand-in and the final text have the same shape; the zone is still the reader's |
+| `Slider` | the thumb's value text in the runtime's language | English, from its `locale` or the provider |
+| `ProviderCard`, `BalanceCard`, `ResetInventory`, `ObservationStatus` | money, counts, the hour and the reset dates in the runtime's language | English |
+| `SynchronizedAccounts`, `LinkedAccountUsage`, `ConsumptionView`, `PrivateHistoryView`, `HostedMigration` | the same | English |
+| `SynchronizedConsumption` | its rows sorted by the runtime's collation | sorted in English, the same on both sides |
+| `avatarInitials` with no `locale` | upper-cased in the runtime's language | upper-cased in English (pass `"tr"` or `"lt"` for names whose letters grow differently) |
+| `firstDayOfWeek()` | the runtime's week | English's week |
+| the grapheme and word boundaries of `MarkedText`, `TextDiff` and `avatarInitials` | the runtime's segmenter | English's segmenter (the boundaries are the same for every language the library supports) |
+
+Two places keep asking the runtime on purpose, and both say so: `NumberTicker locale={true}` (deprecated: the device's locale, which the server cannot know) and a value the host passes.
+
+Unchanged, for the record: `NumberTicker` with no locale still prints plain digits; `groupByRecency` and `recencyGroupFor` still default to `"en-US"`; `FileSize` still defaults to `"en"`; file sizes still print their old English text (`"1.5 KB"`) unless a locale is given. `Progress`, `Meter`, `Countdown`, `StepControls`, `Recorder`, `SeriesChart`, `ColorRamp`, `MultiSelect`, `Slider`, `FieldCount`, `MarkedText`, `ChoiceGroup`, `Files`, `Chart` and the chart legend now also read a `LabelsProvider`'s locale, which they ignored before; a page without a provider sees no change.
+
+### What a product can delete
+
+- Radiant's `components/lang/exercise/choice.tsx` and the option list of `features/quiz/view.tsx` (the radios there have no arrow keys; these do), its `placement/yesno.tsx` (two `ChoiceOption`s in a `ChoiceGroup` named `numbers`).
+- `components/lang/review/review-card.tsx` as the card's shell and the key handling of `review/review-session.tsx` (Space, the rating digits, the double-rate guard, focus back to the card): `RevealCard` + `RatingBar` + `useStepPlayer` keep the behaviour and the guards. The weaker `learn/review-session.tsx` has an `aria-label` over the whole card that hides its text from a screen reader; do not copy that.
+- The players of `features/algorithm/view.tsx` and `features/simulation/view.tsx`: `useStepPlayer` + `StepControls`.
+- `components/lang/session/progress.tsx`, `placement/progress.tsx` and the strip of `features/quiz/view.tsx`: `Progress` with `segments` (and `onSegmentSelect` for the strip).
+- `components/lang/write/marked-text.tsx`, the list of `correction-view.tsx`, and `Diff`/`Marked` in `exercise/feedback.tsx`.
+
+### Looks or behaves differently
+
+- Nothing in a product changes until it adopts a piece. The styles are one new block at the end of `styles.css`.
+- One bar answers to the digit keys at a time: two `RatingBar`s with `shortcuts` on the same screen each prevent the other's default, so the first in the document takes the key. Leave the keys off the bar that is not on screen.
+- `useHotkeys` (B1) will replace the private helper these pieces use for the same guards (modifiers, IME, key repeat, typing targets, `data-hotkeys="off"`); until then a key that acts from anywhere ignores fields, editable text and the roles that take text, and islands that opted out.
+
+## ImageViewer and MediaGrid
+
+The viewer is the same component it was; what is new is the wiring a page with many pictures would otherwise write, and a few things a phone gallery does that it did not. Nothing changes unless you ask for it: no existing prop, label or reference changed.
+
+```tsx
+<ImageViewerProvider label="Photos">
+  <ImageViewerGroup name="message-1">
+    {photos.map((photo) => (
+      <ZoomableImage key={photo.src} src={photo.thumb} full={photo.src} alt={photo.alt} ratio="4 / 3" />
+    ))}
+  </ImageViewerGroup>
+</ImageViewerProvider>
+```
+
+- **`ImageViewerProvider`** renders one viewer for everything below it. It takes the viewer's own props (`label`, `labels`, `thumbnails`, `renderMedia`, `actions`, `zoomOn`, `compact`, `dragToClose`, `onNearEnd`).
+- **`useImageViewer()`** gives `{ open(items, index = 0, { returnFocus }), close(), isOpen }`; it is `null` outside a provider, so a piece can fall back instead of drawing a control that does nothing.
+- **`ZoomableImage`** is an `Image` (same frame, ratio, dither reveal and error plate) that opens the provider's viewer when pressed. Inside a provider it is a real button named "Open {alt}" (`labels.open(alt)`).
+- **`ImageViewerGroup name="…"`**: every `ZoomableImage` in the same group opens the viewer at its own place, with the pictures of the group beside it. Use one per message or per result set. Without a group, a picture opens alone.
+- **Outside a provider `ZoomableImage` is a plain image**, not a disabled control.
+
+| `ImageViewer` prop | What it does |
+| --- | --- |
+| `dragToClose` (default `true`) | A finger or a pen on a fitted picture drags it down; past 96 px, or on a quick flick, letting go closes the viewer; under that it springs back. A sideways drag still moves to the neighbour, a mouse drag does not close. The stage takes the touch while the picture is fitted (`touch-action: none`). |
+| `zoomOn` (`"click"` by default, `"double"`) | With `"double"`, two taps or two clicks zoom around the point pressed and one click does nothing; a single tap of a finger shows and hides the bars. |
+| `actions` (`["download"]` by default) | Keys of the bar that act on the picture, in order. `"copy"` puts the picture on the clipboard (`copyImage` from `@fabrials/ui/export`) and says so in a polite region; it is drawn only where the browser can copy a picture. |
+| `compact` (default `false`) | Under 48rem the zoom level leaves the bar, and with eight items or fewer dots stand for the strip. Previous and Next stay for assistive technology. |
+| `returnFocus` | A ref to the element focus goes back to on close; what was focused on open is the default. |
+
+- **`ViewerItem`** gains `downloadName` (the name the download saves), `credit` (a node), `sourceUrl` and `sourceLabel`: the credit is a line in the label voice under the caption, with the source as a link ("Photo: Ada Rivera · unsplash.com"), `dir="auto"` and `rel="noreferrer noopener"`.
+- **`thumb`** now also stands under the picture while the full one loads, at the place and size the picture will take (from `width` and `height`, or as large as the stage allows), blurred by 6 px and at 60 % — the dither reveal of `Image` is for a picture arriving into a frame, not for one already framed. It is replaced without a jump. The spinner stays for an item with no thumbnail.
+- **The next and previous pictures are asked for once each** when an item is shown, and never on a connection that saves data.
+- **Safe areas**: the viewer pads by `env(safe-area-inset-*)` through `max()`, so nothing moves where the inset is 0.
+- The zoom, the swipe and the close gesture now decide their axis from the first 10 px (`dragAxis`): a drag that is more vertical is a drag down, otherwise a swipe.
+
+New pure helpers in `media-logic`: `dragAxis`, `dragDown`, `closesOnRelease`, `isDoubleTap`, `preloadTargets`, `galleryLayout`, `unbrokenSet`, with `AXIS_SLOP`, `CLOSE_DISTANCE`, `FLICK_SPEED`, `FLICK_DISTANCE`, `DOUBLE_TAP_TIME` and `DOUBLE_TAP_DISTANCE`.
+
+### `MediaGrid`
+
+The mosaic of four is unchanged. `layout="gallery"` draws up to eight tiles: one, two or three in a row; four as two by two; five around a large lead tile; six as three by two; seven and eight in four columns. In a container narrower than 30rem there are two columns, and an odd count lets the first tile span both.
+
+| `MediaGrid` prop | What it does |
+| --- | --- |
+| `layout` (`"grid"` by default, `"gallery"`) | The mosaic of four, or the gallery of up to eight. |
+| `max` | How many tiles are drawn: four in a grid, eight in a gallery. Past that the last tile says "+N". |
+| `caption` | The grid's name, for a screen reader; the grid becomes a `figure role="group"`. |
+| `footer` | A `figcaption` under the tiles: where they come from. |
+| `empty` | What to draw when every tile failed and `hideBroken` took them all. |
+| `hideBroken` (default `false`) | A tile whose picture fails leaves the grid, the "+N" count and the viewer's set. |
+| `onItemError(item, index)` | Called for each picture that fails. |
+| `referrerPolicy` | Passed to every picture. |
+| `openWith="viewer"` | Pressing a tile opens the nearest `ImageViewerProvider` on the unbroken set at that place. `onOpen` still wins when both are given. |
+
+- **`MediaGridItem`** gains `caption` (a line over the foot of the tile, in the label voice on a scrim, on hover and on keyboard focus, always on a touch screen), `credit`, `sourceUrl`, `sourceLabel`, `downloadName`, `download`, `width` and `height` — the whole item is what the viewer receives, so a gallery and its viewer say the same thing.
+- A tile that is a button describes itself with its caption (`aria-describedby`), and the caption is not part of its accessible name.
+
+Radiant can delete `components/chat/image-lightbox.tsx` and `components/chat/image-results.tsx` once it migrates (the gallery it built is `layout="gallery"` with `hideBroken`, its lightbox is the provider, and `messageGallery` in `chat-transcript.tsx` is the group), and every hand-rolled `MAX_SCALE`/`CLOSE_DRAG_PX`/`SWIPE_PX` in them. Its look stays its own.
+
+## Words and locale
+
+Every word a component says on its own is now a prop with the English default it always had, counts go through `Intl.PluralRules`, and a product can set the whole set once for its page. Nothing changes for a product that changes nothing: the defaults are the words 0.11 printed.
+
+### `plural`, `formatCount`, `localeTag`
+
+From `@fabrials/ui`, in `plural.ts` with no directive, so a Server Component can call them.
+
+- `plural(count, forms, locale = "en")` picks `zero`, `one`, `two`, `few`, `many` or `other` with the locale's `Intl.PluralRules` (cached per locale) and replaces `{count}` with the number in that locale's digits. A category a language does not have falls back to `other`. `plural(5, { one: "{count} source", other: "{count} sources" }, "ar")` gives the Arabic `many` form; `plural(1204, forms, "es")` writes `1.204`.
+- `formatCount(count, locale = "en")` is the number alone, grouped and in the locale's digits.
+- `localeTag(locale)` turns any `Intl.LocalesArgument` (a tag, an `Intl.Locale`, a list) into the one tag the APIs that insist on a string need, `"en"` when there is none.
+
+### `LabelsProvider`, `useLabels`, `useLocale`, `useProvidedLocale`
+
+```tsx
+<LabelsProvider locale="es" labels={{ chart: { only: "Solo" }, codePanel: { copy: "Copiar el código" } }}>
+  <App />
+</LabelsProvider>
+```
+
+| Piece | What it does |
+| --- | --- |
+| `LabelsProvider labels={…} locale={…}` | Sets the words, by component scope, and the locale for everything inside. Nested providers merge: a scope given again is merged key by key over the outer one, a key set to `undefined` is not given and never hides the layer below. |
+| `useLabels(scope, defaults, own?)` | What a component reads: `{ ...defaults, ...provider[scope], ...own }`, so the component's own `labels` prop always wins. The result keeps its identity while the three inputs do; pass `defaults` as a module constant. |
+| `useLocale(own?)` | The component's `locale` prop, else the provider's, else `"en"`. |
+| `useProvidedLocale(own?)` | The same, but `undefined` instead of `"en"`: for a component whose "no locale" is not a locale's (`NumberTicker` prints plain digits). |
+| `FabrialsLabels` (type) | The registry: one optional key per scope. `@fabrials/ai-ui` adds its own by declaration merging, so `labels={{ search: {…} }}` is typed wherever the token appears. |
+
+The provider is a client component, and a function cannot cross from a Server Component: render it in a client module of the product, next to the other providers. The components that already rendered on the server still do (they take plain props).
+
+### `labels` props
+
+Each one is `Partial<…>` of its scope, English by default, and reads the provider under itself.
+
+| Component | Scope and keys |
+| --- | --- |
+| `SeriesChart` | `chart`: `label`, `hide(series)`, `show(series)`, `showOnly(series)`, `only`, `showAll`, `noValue`, `total`. Plus `locale`, which formats the values when there is no `yFormat`. |
+| `CodePanel`, `CodeTabs`, `PackageInstall` | `codePanel`: `copy`, `copied`, `copyFailed`, `code`, `examples`, `packageManager`. |
+| `CopyButton`, `Snippet` | `copyButton`: `copy`, `copied`; `snippet`: `copy`. Their `label`/`copiedLabel`/`copyLabel` props still win. |
+| `MultiSelect` | `multiSelect`: `placeholder`, `more(count, locale)`, `clear(label)`. The `placeholder` prop wins; `clear` receives the caller's label as written (only the English default lowercases it) and `locale` sets the spoken count's digits. |
+| `RepoInfo` | `repoInfo`: `stars(count, locale)`, `forks(count, locale)`, both through `plural`. `locale` (default `"en"`) sets the compact number beside them. |
+| `FilterChip` | `filterChip`: `clear(label, value)`. `clearLabel` still wins. |
+| `Table` | `table`: `region(name?)`, the name of the scroll region. `regionLabel` still wins. |
+| `Calendar` | `calendar`: `previousMonth`, `nextMonth`. `previousMonthLabel` and `nextMonthLabel` still win. |
+| `DatePicker`, `DateRangePicker` | `datePicker`: `placeholder`, `clear`, `rangePlaceholder`, `clearRange`. The props still win. |
+| `ImageViewer`, `Spreadsheet`, `TaskList`, `ThemeSwitcher`, `ErrorBoundaryFallback` | `imageViewer`, `spreadsheet`, `taskList`, `themeSwitcher`, `errorBoundary`: their existing `labels` props now also read the provider, under the prop. |
+| `@fabrials/ai-ui` `SearchStepsDisclosure`, `SearchStepList`, `SourceTally` | `search`: `searching`, `reading`, `searched`, `searches(count, locale)`, `sources(count, locale)`, `searchedWeb`, `readPage`, `opened(host)`, `showQueries`, `hideQueries`, `reviewing`. |
+| `Sources`, `SourceCard`, `CitationChip` | `sources`: `source(number)`, `citation(number, title)`, `count(count, locale)`. |
+| `Attachments`, `AttachmentChip` | `attachments`: `label`, `uploading`, `uploadingName(name)`, `uploadingPercent(percent)`, `failed`, `remove(name)`. `removeLabel` and `label` still win. |
+| `AgentThinking` | `agent`: the word of each activity, used when it is given no `label`. |
+| `ReasoningDisclosure` | `reasoning`: `thinking`, `brief`, `thoughtFor(seconds)`. |
+| `ContextMeter` | `contextMeter`: `label`, `unit`, `free`, `of(used, limit)`. The `label` and `unit` props win. |
+| `GenerationFrame` | `generation`: `queued`, `image`, `document`, `imageFailed`, `documentFailed`, `imageReady`, `documentReady`. `label` and `doneLabel` win. |
+| `CodeBlock` | `codeBlock`: `copy`, `copied`, `download`, `region(name)`. `copyLabel`, `copiedLabel` and `downloadLabel` win. |
+
+The exported helpers keep their signatures and add the words at the end: `searchLabel(phase, sourceCount, searchCount, labels?, locale?)`, `searchDoneLabel(sourceCount, searchCount, labels?, locale?)`, `searchStepLabel(step, labels?)`, `searchStepKindLabel(step, labels?)`, `sourcesLabel(count, labels?, locale?)`, `attachmentDetail(item, locale?)`. `formatPercent(percent, locale)` (from `@fabrials/ai-ui`'s `format.ts`, and from `attachments`) writes a whole percentage in the locale's form, `"36%"`, `"36 %"`, `"٣٦٪"`.
+
+A code panel's copy result is no longer a sentence that its CSS inspects: `data-state` is `"copied"` or `"failed"`, and the words come from `labels.copied` and `labels.copyFailed`. A product that styled that status by its text can style it by the state.
+
 ### One locale, one default
 
 `locale?: Intl.LocalesArgument` everywhere: a tag, an `Intl.Locale`, or a list. Without one a component asks the provider and then uses `"en"`.
@@ -878,21 +1044,24 @@ Two components render several blocks side by side rather than one element: `Cons
 
 `ConsumptionView` also takes `viewLabels` from `SynchronizedConsumption`, and its three maps (`groupOptions`, `groupHeadings`, `states`) may be given in part.
 
-### Server and browser can disagree
+### The zone, and a page rendered on a server
 
-Some formatting reads the runtime locale — the language of the machine or the browser — and a server and a browser rarely agree on it. Those pieces write a date, a number or a time differently on the server and after hydration:
+A language is English by default now; a **zone** is not. A clock time is written in the reader's zone unless a `timeZone` is given, because only the browser knows it, and a page rendered on a server in UTC prints something else for a reader elsewhere.
 
-| Piece | What it writes with the runtime locale today |
+0.12 adds `timeZone?: string` to the pieces that print a clock hour, used by every date and time formatter inside them:
+
+| Piece | What it writes in the zone |
 | --- | --- |
-| `SynchronizedAccounts` | the reading's date and time (`toLocaleString`), the token counts, the daily table |
-| `ObservationStatus` | the hour of a reading (`toLocaleTimeString`) |
-| `ResetInventory`, `ProviderCard` | the `title` of a reset date |
-| `ConsumptionView` | every number and every currency amount |
-| `ProviderCard` | the date a quota resets |
+| `ObservationStatus` | the hour of a reading |
+| `ProviderCard`, `BalanceCard` | the reset dates and the reading's hour, down to the nested `ObservationStatus` and `ResetInventory` |
+| `ResetInventory` | the `title` of each reset date |
+| `SynchronizedAccounts`, `LinkedAccountUsage` | the reading's date and time, and everything in the provider cards under them |
+| `PrivateHistoryView` | the stamp of each reading |
+| `HostedMigration` | the invitation's expiry |
 
-Others are fixed to English and do not disagree: `BalanceCard` (US currency, `en-US`), `PrivateHistoryView` and `HostedMigration` (`en`). Passing `locale` makes a piece write in the language the page is in, on both sides, and is what a host with a translated `labels` object wants: `labels` and `locale` go together.
+`LocalTime`, `RelativeTime` and `MessageTimestamp` already took `timeZone` (and `RelativeTime` still wants one whenever it is rendered with a fixed `now` or an `absoluteFormat`). Without `timeZone`, behaviour is what 0.11 had.
 
-A clock is the other half of the same problem: `useClock` reads `Date.now()`, which a server cannot. `ResetInventory` and `SynchronizedAccounts` now take `now` and `HostedMigration` takes `now` too, so a test, a story or a server-rendered page can fix the moment instead of reading the wall clock.
+A clock is the other half of the same problem: `useClock` reads `Date.now()`, which a server cannot. `ResetInventory` and `SynchronizedAccounts` take `now`, and so does `HostedMigration`, so a test, a story or a server-rendered page can fix the moment instead of reading the wall clock.
 
 ### Markup changes
 

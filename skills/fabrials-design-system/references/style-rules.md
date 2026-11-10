@@ -143,6 +143,7 @@ Scale tokens: `--fui-text-label` 11, `xs` 12, `sm` 14, `md` 16, `lg` 18, `xl` 20
 - A right-to-left product sets both `dir="rtl"` on the root and `DirectionProvider direction="rtl"`, and `@fabrials/ai-ui` mirrors with them. Check: no `[dir="rtl"] .fui-…` overrides of your own; a fragment in another language is `ForeignText` (a `<bdi lang dir>`), never loose in a sentence.
 - A time that a server also renders is `LocalTime` (or `MessageTimestamp date`), not `toLocaleTimeString()` while rendering and not the server's own clock. Check: no `Intl.DateTimeFormat` in product render code; `timeZone` where a screenshot, a transcript or an export must be fixed.
 - Nothing reads the clock, `localStorage`, `matchMedia`, the viewport or the browser's locale while rendering. Check: `useSyncExternalStore` or an effect, `useHydrated` for what only the device knows, `now` props for a story or a test.
+- English is the default language of numbers, dates, times and case-changed words, and the runtime's locale is never read: a component falls back to the `LabelsProvider`'s `locale` and then to `"en"`, a pure helper defaults to `"en"`, and the host asks for the reader's language once. A zone is the exception: a clock time is the reader's unless `timeZone` says which.
 
 ## Confirmations
 

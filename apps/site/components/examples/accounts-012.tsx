@@ -4,7 +4,6 @@
 // is, the balance, and the consumption of the reader's own clients. Made-up providers, fixed dates, and text in Spanish to
 // show that every word and every number takes the page's language.
 import { useState, type ReactNode } from "react";
-import { useHydrated } from "@fabrials/ui";
 import {
   BalanceCard,
   ConsumptionView,
@@ -138,18 +137,8 @@ const esProvider = {
   reset: esReset,
 };
 
-/** The accounts pieces write a time in the reader's zone, which a server cannot know: the plate is drawn once the page is theirs. */
 function Plate({ children }: { children: ReactNode }) {
   return <div style={{ display: "grid", gap: "var(--fui-space-3)", inlineSize: "100%" }}>{children}</div>;
-}
-
-/** A reading whose time is in the reader's zone: nothing is drawn on the server, so the server's clock is never shown. */
-function InYourZone({ children }: { children: ReactNode }) {
-  const hydrated = useHydrated();
-  if (hydrated) return <Plate>{children}</Plate>;
-  return (
-    <div aria-hidden="true" style={{ border: "1px solid var(--border)", borderRadius: "var(--fui-radius-lg)", blockSize: "9rem" }} />
-  );
 }
 
 export const providerCardExamples: ExampleSet = {
@@ -164,8 +153,8 @@ export const providerCardExamples: ExampleSet = {
 <ProviderCard locale="en" provider={provider} />;`,
       render: () => (
         <Plate>
-          <ProviderCard locale="en" provider={GROK} />
-          <ProviderCard locale="en" provider={QUIET} />
+          <ProviderCard locale="en" provider={GROK} timeZone="UTC" />
+          <ProviderCard locale="en" provider={QUIET} timeZone="UTC" />
         </Plate>
       ),
       align: "start",
@@ -182,9 +171,9 @@ export const providerCardExamples: ExampleSet = {
   provider={{ ...provider, resetInventory: credits }}
 />;`,
       render: () => (
-        <InYourZone>
-          <ProviderCard locale="en" provider={{ ...GROK, resetInventory: CREDITS }} />
-        </InYourZone>
+        <Plate>
+          <ProviderCard locale="en" provider={{ ...GROK, resetInventory: CREDITS }} timeZone="UTC" />
+        </Plate>
       ),
       align: "start",
     },
@@ -199,11 +188,11 @@ export const providerCardExamples: ExampleSet = {
 <BalanceCard locale="en" observation={balance} />;
 <ObservationStatus locale="en" observation={balance} />;`,
       render: () => (
-        <InYourZone>
-          <ResetInventory locale="en" now={NOW} observation={CREDITS_STALE} />
-          <BalanceCard locale="en" observation={BALANCE} />
-          <ObservationStatus locale="en" observation={BALANCE} />
-        </InYourZone>
+        <Plate>
+          <ResetInventory locale="en" now={NOW} observation={CREDITS_STALE} timeZone="UTC" />
+          <BalanceCard locale="en" observation={BALANCE} timeZone="UTC" />
+          <ObservationStatus locale="en" observation={BALANCE} timeZone="UTC" />
+        </Plate>
       ),
       align: "start",
     },
@@ -223,9 +212,9 @@ export const providerCardExamples: ExampleSet = {
 />;`,
       render: () => (
         <div lang="es" style={{ display: "grid", gap: "var(--fui-space-3)", inlineSize: "100%" }}>
-          <InYourZone>
-            <ProviderCard labels={esProvider} locale="es" provider={{ ...GROK, resetInventory: CREDITS }} />
-          </InYourZone>
+          <Plate>
+            <ProviderCard labels={esProvider} locale="es" provider={{ ...GROK, resetInventory: CREDITS }} timeZone="UTC" />
+          </Plate>
           <p style={note}>Los mismos datos, en español: «Créditos de reinicio», «42 %» y las fechas de la tabla.</p>
         </div>
       ),

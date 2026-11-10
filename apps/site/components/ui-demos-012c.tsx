@@ -60,7 +60,6 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
-  useHydrated,
   useReducedMotion,
 } from "@fabrials/ui";
 import type { CreditBalance, PrivateRecentPage } from "@fabrials/ai-ui";
@@ -872,32 +871,19 @@ const MIGRATION_API: HostedMigrationApi = {
   cancel: async () => ({}),
 };
 
-/** The accounts pieces write a time in the reader's zone, which a server cannot know: a plate of the same size until the page is theirs. */
-function InTheBrowser({ children }: { children: ReactNode }) {
-  const hydrated = useHydrated();
-  if (hydrated) return <>{children}</>;
-  return <div aria-hidden="true" style={{ ...plate, blockSize: "9rem" }} />;
-}
-
 function ProviderCardDemo() {
   return (
     <Frame width="wide">
-      <InTheBrowser>
-        <ProviderCard locale="en" provider={GROK} />
-      </InTheBrowser>
+      <ProviderCard locale="en" provider={GROK} timeZone="UTC" />
       <div style={{ display: "grid", gap: "var(--fui-space-4)", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 18rem), 1fr))", alignItems: "start" }}>
-        <InTheBrowser>
-          <div style={{ display: "grid", gap: "var(--fui-space-4)" }}>
-            <ResetInventory locale="en" now={NOW} observation={CREDITS} />
-            <ResetInventory locale="en" now={NOW} observation={CREDITS_STALE} />
-          </div>
-        </InTheBrowser>
-        <InTheBrowser>
-          <div style={{ display: "grid", gap: "var(--fui-space-4)" }}>
-            <BalanceCard locale="en" observation={BALANCE} />
-            <ObservationStatus locale="en" observation={CREDITS} />
-          </div>
-        </InTheBrowser>
+        <div style={{ display: "grid", gap: "var(--fui-space-4)" }}>
+          <ResetInventory locale="en" now={NOW} observation={CREDITS} timeZone="UTC" />
+          <ResetInventory locale="en" now={NOW} observation={CREDITS_STALE} timeZone="UTC" />
+        </div>
+        <div style={{ display: "grid", gap: "var(--fui-space-4)" }}>
+          <BalanceCard locale="en" observation={BALANCE} timeZone="UTC" />
+          <ObservationStatus locale="en" observation={CREDITS} timeZone="UTC" />
+        </div>
       </div>
       <p style={note}>
         A provider with its quota and its plan, the credits that reset a limit (fresh, then stale), a balance, and how old the
@@ -931,16 +917,14 @@ function RoutingPolicyDemo() {
 function SynchronizedAccountsDemo() {
   return (
     <Frame width="wide">
-      <InTheBrowser>
-        <div style={{ display: "grid", gap: "var(--fui-space-4)" }}>
-          <SynchronizedAccounts accounts={ACCOUNTS} includeLinked locale="en" now={NOW} />
-          <LinkedAccountUsage accounts={ACCOUNTS} locale="en" />
-          <p style={note}>
-            Two machines, one of them last heard from a day ago. A linked installation is marked as a verified identity; the
-            local log of a machine is kept apart from the relay&apos;s own traffic.
-          </p>
-        </div>
-      </InTheBrowser>
+      <div style={{ display: "grid", gap: "var(--fui-space-4)" }}>
+        <SynchronizedAccounts accounts={ACCOUNTS} includeLinked locale="en" now={NOW} timeZone="UTC" />
+        <LinkedAccountUsage accounts={ACCOUNTS} locale="en" timeZone="UTC" />
+        <p style={note}>
+          Two machines, one of them last heard from a day ago. A linked installation is marked as a verified identity; the
+          local log of a machine is kept apart from the relay&apos;s own traffic.
+        </p>
+      </div>
     </Frame>
   );
 }
@@ -969,14 +953,13 @@ function ConsumptionViewDemo() {
 function PrivateHistoryDemo() {
   return (
     <Frame width="wide">
-      <InTheBrowser>
-        <PrivateHistoryView
-          description="Readings your installations shared with this relay, newest first."
-          fetchPage={async () => PRIVATE_PAGE}
-          heading={false}
-          locale="en"
-        />
-      </InTheBrowser>
+      <PrivateHistoryView
+        description="Readings your installations shared with this relay, newest first."
+        fetchPage={async () => PRIVATE_PAGE}
+        heading={false}
+        locale="en"
+        timeZone="UTC"
+      />
     </Frame>
   );
 }
