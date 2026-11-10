@@ -1,17 +1,32 @@
 import * as React from "react";
 import type { MigrationReview } from "./contracts";
+import {
+  accountsClasses,
+  migrationReviewLabels,
+  type MigrationReviewLabels,
+} from "./accounts-labels";
 
 export function MigrationReviewDetails({
   review,
-}: {
+  labels,
+  className,
+  ["aria-label"]: ariaLabel,
+  ...props
+}: React.ComponentProps<"section"> & {
   review: MigrationReview;
+  labels?: Partial<MigrationReviewLabels>;
 }) {
+  const text = { ...migrationReviewLabels, ...labels };
   return (
-    <section aria-label="Migration review" className="fb-form">
+    <section
+      {...props}
+      aria-label={ariaLabel ?? text.region}
+      className={accountsClasses("fb-form", className)}
+    >
       <p>
-        <strong>From</strong> <code>{review.sourceEnvironment}</code>
+        <strong>{text.from}</strong> <code>{review.sourceEnvironment}</code>
         <br />
-        <strong>To</strong> <code>{review.destinationEnvironment}</code>
+        <strong>{text.to}</strong> <code>{review.destinationEnvironment}</code>
       </p>
       <ul>
         {review.items.map((item) => (
@@ -21,17 +36,12 @@ export function MigrationReviewDetails({
               {item.provider}/{item.targetAlias}
             </strong>
             <p className="fb-muted">
-              {item.action === "copyApiKey"
-                ? "Copy API key. The imported account starts inactive."
-                : "Authorize a new OAuth connection in the destination. Existing tokens are never copied."}
+              {item.action === "copyApiKey" ? text.copyApiKey : text.authorizeOAuth}
             </p>
           </li>
         ))}
       </ul>
-      <p className="fb-muted">
-        Source accounts remain available. Imported accounts do not change your
-        active account or routing.
-      </p>
+      <p className="fb-muted">{text.note}</p>
     </section>
   );
 }

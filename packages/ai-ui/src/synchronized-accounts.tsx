@@ -1,33 +1,75 @@
 "use client";
 
+import type { ComponentProps } from "react";
 import { Card, CardContent, CardHeader, Table } from "@fabrials/ui";
 import { ProviderCard, useClock } from "./providers";
 import type { SynchronizedAccount } from "./contracts";
+import {
+  accountsClasses,
+  linkedAccountUsageLabels,
+  synchronizedAccountsLabels,
+  type AccountsHeadingLevel,
+  type LinkedAccountUsageLabels,
+  type SynchronizedAccountsLabels,
+} from "./accounts-labels";
+
+const level = (value: AccountsHeadingLevel): AccountsHeadingLevel =>
+  Math.min(6, value + 1) as AccountsHeadingLevel;
+
+const amount = (value: number, locale?: Intl.LocalesArgument) =>
+  locale === undefined
+    ? value.toFixed(2)
+    : new Intl.NumberFormat(locale, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(value);
 
 export function SynchronizedAccounts({
   accounts: allAccounts,
   includeLinked = false,
-}: {
+  labels,
+  locale,
+  headingLevel = 2,
+  providerHeadingLevel = 2,
+  now: fixedNow,
+  className,
+  ["aria-label"]: ariaLabel,
+  ...props
+}: ComponentProps<"section"> & {
   accounts: SynchronizedAccount[];
   includeLinked?: boolean;
+  labels?: Partial<SynchronizedAccountsLabels>;
+  locale?: Intl.LocalesArgument;
+  /** The section's title. The log inside it follows; every level looks the same. */
+  headingLevel?: AccountsHeadingLevel;
+  /** The provider's name inside each account. Two by default, as 0.11 wrote it. */
+  providerHeadingLevel?: AccountsHeadingLevel;
+  /** The moment the readings are compared to. By default the shared clock, which the server cannot read. */
+  now?: number | null;
 }) {
+  const clockNow = useClock();
+  const now = fixedNow === undefined ? clockNow : fixedNow;
+  const text = {
+    ...synchronizedAccountsLabels,
+    ...labels,
+    provider: { ...synchronizedAccountsLabels.provider, ...labels?.provider },
+  };
   const accounts = allAccounts.filter(
     (account) => includeLinked || !account.linked_account_id,
   );
-  const now = useClock();
   if (!accounts.length) return null;
+  const Heading = `h${headingLevel}` as "h2";
+  const SubHeading = `h${level(headingLevel)}` as "h3";
   return (
     <section
-      aria-label="Synchronized accounts"
-      className="fb-synchronized-accounts"
+      {...props}
+      aria-label={ariaLabel ?? text.region}
+      className={accountsClasses("fb-synchronized-accounts", className)}
     >
       {!includeLinked && (
         <header>
-          <h2>Accounts from your machines</h2>
-          <p className="fb-muted">
-            Your synchronized usage. Authorize a provider on ai-relay to use it
-            through the hosted proxy.
-          </p>
+          <Heading>{text.title}</Heading>
+          <p className="fb-muted">{text.description}</p>
         </header>
       )}
       <div
@@ -43,58 +85,62 @@ export function SynchronizedAccounts({
             <div className="fb-row">
               <strong>{account.source}</strong>
               <span>
-                {account.linked_account_id
-                  ? "Verified identity match"
-                  : "Usage synchronized"}
+                {account.linked_account_id ? text.verified : text.synchronized}
               </span>
             </div>
             <p className="fb-muted">
-              Installation {account.device.slice(0, 8)} ·{" "}
+              {text.installation(account.device.slice(0, 8))}{" · "}
               {now !== null && now - account.observed_at_ms > 900_000
-                ? "Last known reading · "
+                ? text.stale
                 : ""}
               <time dateTime={new Date(account.observed_at_ms).toISOString()}>
-                {new Date(account.observed_at_ms).toLocaleString()}
+                {new Date(account.observed_at_ms).toLocaleString(locale ?? [])}
               </time>
             </p>
-            <ProviderCard provider={account.output} />
+            <ProviderCard
+              headingLevel={providerHeadingLevel}
+              labels={text.provider}
+              locale={locale}
+              provider={account.output}
+            />
             {account.local_usage && (
               <Card className="fb-card-layout">
                 <CardHeader>
-                  <h3>Local log history</h3>
-                  <p className="fb-muted">
-                    These logs can contain several accounts and overlap relay
-                    requests. Totals are kept separate from relay traffic.
-                  </p>
+                  <SubHeading>{text.localHistory}</SubHeading>
+                  <p className="fb-muted">{text.localHistoryDescription}</p>
                 </CardHeader>
                 <CardContent className="fb-content-layout">
                   <p>
-                    {account.local_usage.days
-                      .reduce((sum, day) => sum + day.tokens, 0)
-                      .toLocaleString()}{" "}
-                    tokens · ~$
-                    {account.local_usage.days
-                      .reduce((sum, day) => sum + day.estimated_usd, 0)
-                      .toFixed(2)}{" "}
-                    API list-price estimate
-                    {account.local_usage.partial ? " (partial)" : ""}
+                    {text.estimate(
+                      account.local_usage.days
+                        .reduce((sum, day) => sum + day.tokens, 0)
+                        .toLocaleString(locale ?? []),
+                      amount(
+                        account.local_usage.days.reduce(
+                          (sum, day) => sum + day.estimated_usd,
+                          0,
+                        ),
+                        locale,
+                      ),
+                    )}
+                    {account.local_usage.partial ? text.partial : ""}
                   </p>
                   <details>
-                    <summary>Daily usage</summary>
+                    <summary>{text.dailyUsage}</summary>
                     <Table>
                       <thead>
                         <tr>
-                          <th>Date</th>
-                          <th>Tokens</th>
-                          <th>Estimated cost</th>
+                          <th>{text.date}</th>
+                          <th>{text.tokens}</th>
+                          <th>{text.estimatedCost}</th>
                         </tr>
                       </thead>
                       <tbody>
                         {account.local_usage.days.map((day) => (
                           <tr key={day.date}>
                             <td>{day.date}</td>
-                            <td>{day.tokens.toLocaleString()}</td>
-                            <td>${day.estimated_usd.toFixed(2)}</td>
+                            <td>{day.tokens.toLocaleString(locale ?? [])}</td>
+                            <td>${amount(day.estimated_usd, locale)}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -112,17 +158,32 @@ export function SynchronizedAccounts({
 
 export function LinkedAccountUsage({
   accounts,
-}: {
+  labels,
+  accountsLabels,
+  locale,
+  className,
+  ...props
+}: ComponentProps<"details"> & {
   accounts: SynchronizedAccount[];
+  labels?: Partial<LinkedAccountUsageLabels>;
+  /** The words of the accounts under the summary. */
+  accountsLabels?: Partial<SynchronizedAccountsLabels>;
+  locale?: Intl.LocalesArgument;
 }) {
+  const text = { ...linkedAccountUsageLabels, ...labels };
   if (!accounts.length) return null;
   return (
-    <details className="fb-linked-account-usage">
-      <summary>
-        Usage from {accounts.length} local{" "}
-        {accounts.length === 1 ? "source" : "sources"}
-      </summary>
-      <SynchronizedAccounts accounts={accounts} includeLinked />
+    <details
+      {...props}
+      className={accountsClasses("fb-linked-account-usage", className)}
+    >
+      <summary>{text.sources(accounts.length)}</summary>
+      <SynchronizedAccounts
+        accounts={accounts}
+        includeLinked
+        labels={accountsLabels}
+        locale={locale}
+      />
     </details>
   );
 }

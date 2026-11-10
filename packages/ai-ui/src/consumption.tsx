@@ -11,107 +11,129 @@ import {
 import * as React from "react";
 
 import type { ConsumptionReport as Report, SourceStatus } from "./contracts";
+import {
+  accountsClasses,
+  consumptionViewLabels,
+  type AccountsHeadingLevel,
+  type ConsumptionGroup,
+  type ConsumptionViewLabelOverrides,
+  type ConsumptionViewLabels,
+} from "./accounts-labels";
 export type { ConsumptionTotal } from "./contracts";
 export type ConsumptionSource = SourceStatus;
 export type ConsumptionReport = Omit<Report, "records" | "records_truncated">;
-const number = new Intl.NumberFormat();
-const money = new Intl.NumberFormat(undefined, {
-  style: "currency",
-  currency: "USD",
-  maximumFractionDigits: 2,
-});
 
 export function ConsumptionView({
   report,
   synchronized = false,
-}: {
+  labels,
+  locale,
+  headingLevel = 2,
+  className,
+  ...props
+}: Omit<React.ComponentProps<"div">, "children"> & {
   report: ConsumptionReport;
   synchronized?: boolean;
+  labels?: ConsumptionViewLabelOverrides;
+  locale?: Intl.LocalesArgument;
+  /** The title of each block. Two by default, as 0.11 wrote it. */
+  headingLevel?: AccountsHeadingLevel;
 }) {
-  const [group, setGroup] = React.useState<
-    "daily" | "period_totals" | "clients" | "models" | "sessions" | "projects"
-  >("daily");
-  return (
+  const text: ConsumptionViewLabels = {
+    ...consumptionViewLabels,
+    ...labels,
+    groupOptions: {
+      ...consumptionViewLabels.groupOptions,
+      ...labels?.groupOptions,
+    },
+    groupHeadings: {
+      ...consumptionViewLabels.groupHeadings,
+      ...labels?.groupHeadings,
+    },
+    states: { ...consumptionViewLabels.states, ...labels?.states },
+  };
+  const number = new Intl.NumberFormat(locale);
+  const money = new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 2,
+  });
+  const Heading = `h${headingLevel}` as "h2";
+  const [group, setGroup] = React.useState<ConsumptionGroup>("daily");
+  const body = (
     <>
       <div className="fb-grid">
         <Card className="fb-card-layout">
           <CardHeader>
-            <h2>Tokens</h2>
+            <Heading>{text.tokens}</Heading>
           </CardHeader>
           <CardContent className="fb-content-layout">
             <strong>{number.format(report.total.tokens)}</strong>
             <p className="fb-muted">
-              Recorded by your clients
-              {report.total.unknown_token_records > 0 &&
-                " · token counts incomplete"}
+              {text.recordedBy(report.total.unknown_token_records > 0)}
             </p>
           </CardContent>
         </Card>
         <Card className="fb-card-layout">
           <CardHeader>
-            <h2>Known cost</h2>
+            <Heading>{text.knownCost}</Heading>
           </CardHeader>
           <CardContent className="fb-content-layout">
             <strong>{money.format(report.total.known_usd)}</strong>
-            <p className="fb-muted">
-              {report.total.partial
-                ? "Partial · some data or prices are unavailable"
-                : "Reported costs and list-price estimates"}
-            </p>
+            <p className="fb-muted">{text.knownCostNote(report.total.partial)}</p>
           </CardContent>
         </Card>
         <Card className="fb-card-layout">
           <CardHeader>
-            <h2>Sources with data</h2>
+            <Heading>{text.sourcesWithData}</Heading>
           </CardHeader>
           <CardContent className="fb-content-layout">
             <strong>
               {report.sources.filter((source) => source.records > 0).length}
             </strong>
-            <p className="fb-muted">
-              Local consumption, separate from proxy traffic and quotas
-            </p>
+            <p className="fb-muted">{text.sourcesNote}</p>
           </CardContent>
         </Card>
       </div>
       <Card className="fb-card-layout">
         <CardHeader className="fb-row fb-consumption-filters">
-          <h2>Consumption breakdown</h2>
+          <Heading>{text.breakdown}</Heading>
           <Label>
-            Group by{" "}
+            {text.groupBy}{" "}
             <NativeSelect
               value={group}
               onChange={(event) => setGroup(event.target.value as typeof group)}
             >
-              <option value="daily">Day</option>
-              <option value="period_totals">Session / account totals</option>
-              <option value="clients">Client</option>
+              <option value="daily">{text.groupOptions.daily}</option>
+              <option value="period_totals">
+                {text.groupOptions.period_totals}
+              </option>
+              <option value="clients">{text.groupOptions.clients}</option>
               {(!synchronized || report.models.length > 0) && (
-                <option value="models">Model</option>
+                <option value="models">{text.groupOptions.models}</option>
               )}
               {!synchronized && (
                 <>
-                  <option value="sessions">Session</option>
-                  <option value="projects">Project</option>
+                  <option value="sessions">{text.groupOptions.sessions}</option>
+                  <option value="projects">{text.groupOptions.projects}</option>
                 </>
               )}
             </NativeSelect>
           </Label>
         </CardHeader>
         {group === "daily" && report.period_totals.length > 0 && (
-          <p className="fb-content-layout">
-            Some sources report session or account totals. See “Session /
-            account totals”; these are not split into estimated daily activity.
-          </p>
+          <p className="fb-content-layout">{text.sessionTotalsNote}</p>
         )}
         <div className="fb-table-wrap">
           <Table className="fb-table-layout">
             <thead>
               <tr>
-                <th scope="col">{group}</th>
-                {group === "models" && <th scope="col">Requests</th>}
-                <th scope="col">Tokens</th>
-                <th scope="col">Known cost</th>
+                <th scope="col">{text.groupHeadings[group]}</th>
+                {group === "models" && (
+                  <th scope="col">{text.requests}</th>
+                )}
+                <th scope="col">{text.tokensColumn}</th>
+                <th scope="col">{text.knownCostColumn}</th>
               </tr>
             </thead>
             <tbody>
@@ -124,7 +146,7 @@ export function ConsumptionView({
                   <td>{number.format(row.tokens)}</td>
                   <td>
                     {money.format(row.known_usd)}
-                    {row.partial ? " · partial" : ""}
+                    {row.partial ? text.partial : ""}
                   </td>
                 </tr>
               ))}
@@ -132,21 +154,29 @@ export function ConsumptionView({
           </Table>
         </div>
         {!report[group].length && (
-          <p className="fb-content-layout">No recorded usage in this period.</p>
+          <p className="fb-content-layout">{text.empty}</p>
         )}
       </Card>
       <details className="fb-card-layout">
-        <summary className="fb-content-layout">Source status</summary>
+        <summary className="fb-content-layout">{text.sourceStatus}</summary>
         <CardContent className="fb-content-layout">
           {report.sources.map((source) => (
             <p key={source.client}>
-              <strong>{source.client}</strong> ·{" "}
-              {source.state.replaceAll("_", " ")}
+              <strong>{source.client}</strong> · {text.states[source.state]}
               {source.detail && <> — {source.detail}</>}
             </p>
           ))}
         </CardContent>
       </details>
     </>
+  );
+  // Without a class name or any other prop the blocks sit where the host put them, as they did in 0.11; a host that passes one
+  // gets them inside a single element that carries it.
+  const carries = className !== undefined || Object.keys(props).length > 0;
+  if (!carries) return body;
+  return (
+    <div {...props} className={accountsClasses("fb-consumption", className)}>
+      {body}
+    </div>
   );
 }

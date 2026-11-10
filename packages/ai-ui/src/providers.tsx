@@ -19,13 +19,34 @@ import {
   upcomingResetExpiries,
   validTimestamp,
 } from "./reset-expiry";
+import {
+  accountsClasses,
+  balanceCardLabels,
+  observationStatusLabels,
+  providerCardLabels,
+  resetInventoryLabels,
+  routingExplanationLabels,
+  routingPolicyFormLabels,
+  type BalanceCardLabels,
+  type ObservationStatusLabels,
+  type ProviderCardLabels,
+  type ResetInventoryLabels,
+  type RoutingExplanationLabels,
+  type RoutingPolicyFormLabels,
+} from "./accounts-labels";
 
-export function RoutingExplanation() {
+export function RoutingExplanation({
+  labels,
+  className,
+  ...props
+}: React.ComponentProps<"p"> & {
+  /** The sentence. */
+  labels?: Partial<RoutingExplanationLabels>;
+}) {
+  const text = { ...routingExplanationLabels, ...labels };
   return (
-    <p className="fb-muted">
-      Autosteer selects an eligible account within the same provider. Pinned
-      account routes keep their selected account. It does not switch models or
-      providers.
+    <p {...props} className={accountsClasses("fb-muted", className)}>
+      {text.text}
     </p>
   );
 }
@@ -36,13 +57,18 @@ export function RoutingPolicyForm({
   threshold,
   pending,
   onSave,
-}: {
+  labels,
+  className,
+  ...props
+}: Omit<React.ComponentProps<"form">, "onSubmit"> & {
   provider: string;
   enabled: boolean;
   threshold: number;
   pending: boolean;
   onSave: (enabled: boolean, threshold: number) => Promise<void>;
+  labels?: Partial<RoutingPolicyFormLabels>;
 }) {
+  const text = { ...routingPolicyFormLabels, ...labels };
   const [on, setOn] = React.useState(enabled);
   const [limit, setLimit] = React.useState(String(threshold));
   const numeric = Number(limit);
@@ -54,7 +80,8 @@ export function RoutingPolicyForm({
   const changed = on !== enabled || numeric !== threshold;
   return (
     <form
-      className="fb-form"
+      {...props}
+      className={accountsClasses("fb-form", className)}
       onSubmit={(event) => {
         event.preventDefault();
         if (valid && !pending) void onSave(on, numeric);
@@ -68,16 +95,14 @@ export function RoutingPolicyForm({
             disabled={pending}
             onChange={(event) => setOn(event.target.checked)}
           />{" "}
-          Enable {provider} autosteer
+          {text.enable(provider)}
         </span>
       </Label>
       <p className="fb-muted">
-        {on
-          ? "The highest-ranked eligible account receives the next unpinned request."
-          : "Unpinned requests use the active account."}
+        {on ? text.enabledHint : text.disabledHint}
       </p>
       <Label>
-        Skip accounts at quota usage (%)
+        {text.threshold}
         <Input
           type="number"
           min="0.01"
@@ -94,7 +119,7 @@ export function RoutingPolicyForm({
         disabled={pending || !valid || !changed}
         type="submit"
       >
-        {pending ? "Saving…" : "Save routing preferences"}
+        {pending ? text.saving : text.save}
       </Button>
     </form>
   );
@@ -137,10 +162,26 @@ export function useClock() {
 
 export function ResetInventory({
   observation,
-}: {
+  now: fixedNow,
+  labels,
+  locale,
+  className,
+  ["aria-label"]: ariaLabel,
+  ...props
+}: React.ComponentProps<"section"> & {
   observation?: Observation<ResetCredits> | null;
+  /** The moment the credits are counted from. By default the shared clock, which the server cannot read. */
+  now?: number | null;
+  labels?: Partial<ResetInventoryLabels>;
+  locale?: Intl.LocalesArgument;
 }) {
-  const now = useClock();
+  const clockNow = useClock();
+  const now = fixedNow === undefined ? clockNow : fixedNow;
+  const text = {
+    ...resetInventoryLabels,
+    ...labels,
+    expiry: { ...resetInventoryLabels.expiry, ...labels?.expiry },
+  };
   if (!observation || observation.availability === "unsupported") return null;
   const inventory = observation.value;
   const expirySummary =
@@ -152,13 +193,17 @@ export function ResetInventory({
     expirySummary?.stale ||
     expirySummary?.expired;
   return (
-    <section className="fb-observation" aria-label="Limit reset credits">
+    <section
+      {...props}
+      className={accountsClasses("fb-observation", className)}
+      aria-label={ariaLabel ?? text.title}
+    >
       <div className="fb-row">
-        <span className="fb-label">Limit reset credits</span>
+        <span className="fb-label">{text.title}</span>
         <strong>
           {inventory
-            ? `${inventory.available} ${lastReported ? "last reported" : "available"}`
-            : "Unavailable"}
+            ? text.count(inventory.available, Boolean(lastReported))
+            : text.unavailable}
         </strong>
       </div>
       {upcoming.length > 0 && (
@@ -175,14 +220,14 @@ export function ResetInventory({
             <circle cx="12" cy="12" r="9" />
             <path d="M12 6v6H8" />
           </svg>
-          <ul aria-label="Next reported reset credit expiries">
+          <ul aria-label={text.expiries}>
             {upcoming.map((expiry, index) => (
               <li key={`${expiry}-${index}`}>
                 <time
                   dateTime={new Date(expiry).toISOString()}
-                  title={new Date(expiry).toLocaleString()}
+                  title={new Date(expiry).toLocaleString(locale ?? [])}
                 >
-                  {resetExpiryLabel(expiry, now)}
+                  {resetExpiryLabel(expiry, now, text.expiry)}
                 </time>
               </li>
             ))}
@@ -191,25 +236,20 @@ export function ResetInventory({
       )}
       {!!expirySummary?.expiring && (
         <p className="fb-reset-warning" role="status">
-          {expirySummary.expiring} reset credit
-          {expirySummary.expiring === 1 ? " expires" : "s expire"} within 24
-          hours.
+          {text.expiring(expirySummary.expiring)}
         </p>
       )}
       {!!expirySummary?.expired && (
         <p className="fb-muted" role="status">
-          A reported expiry has passed. Refresh inventory to check remaining
-          credits.
+          {text.expired}
         </p>
       )}
       {expirySummary?.stale && inventory && (
-        <p className="fb-muted">
-          Refresh inventory to check current availability.
-        </p>
+        <p className="fb-muted">{text.stale}</p>
       )}
       {inventory && inventory.credits.length > 0 && (
         <details className="fb-reset-details">
-          <summary>View expiry dates</summary>
+          <summary>{text.details}</summary>
           <ul>
             {inventory.credits.map((credit, index) => {
               const expiry = validTimestamp(credit.expiresAtMs)
@@ -217,20 +257,20 @@ export function ResetInventory({
                 : null;
               return (
                 <li key={index} className="fb-row">
-                  <span>Reset {index + 1}</span>
+                  <span>{text.credit(index + 1)}</span>
                   <span>
                     {expiry === null ? (
-                      "Expiry unavailable"
+                      text.expiryUnavailable
                     ) : (
                       <time
                         dateTime={new Date(expiry).toISOString()}
                         title={
                           now === null
                             ? undefined
-                            : new Date(expiry).toLocaleString()
+                            : new Date(expiry).toLocaleString(locale ?? [])
                         }
                       >
-                        {resetExpiryLabel(expiry, now)}
+                        {resetExpiryLabel(expiry, now, text.expiry)}
                       </time>
                     )}
                   </span>
@@ -241,28 +281,43 @@ export function ResetInventory({
         </details>
       )}
       {inventory && !inventory.detailsComplete && (
-        <p className="fb-muted">Some expiry dates are unavailable.</p>
+        <p className="fb-muted">{text.incomplete}</p>
       )}
-      <ObservationStatus observation={observation} />
+      <ObservationStatus
+        observation={observation}
+        labels={text.status}
+        locale={locale}
+      />
     </section>
   );
 }
 
 export function ObservationStatus({
   observation,
-}: {
+  labels,
+  locale,
+  className,
+  ...props
+}: React.ComponentProps<"div"> & {
   observation: Observation<unknown>;
+  labels?: Partial<ObservationStatusLabels>;
+  locale?: Intl.LocalesArgument;
 }) {
+  const text = { ...observationStatusLabels, ...labels };
   return (
-    <div className="fb-observation-status">
-      {observation.freshness === "stale" && <span>Last known reading · </span>}
+    <div
+      {...props}
+      className={accountsClasses("fb-observation-status", className)}
+    >
+      {observation.freshness === "stale" && <span>{text.stale}</span>}
       {validTimestamp(observation.observedAtMs) && (
         <time dateTime={new Date(observation.observedAtMs).toISOString()}>
-          Updated{" "}
-          {new Date(observation.observedAtMs).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
+          {text.updated(
+            new Date(observation.observedAtMs).toLocaleTimeString(
+              locale ?? [],
+              { hour: "2-digit", minute: "2-digit" },
+            ),
+          )}
         </time>
       )}
       {observation.error && <p>{observation.error}</p>}
@@ -270,29 +325,44 @@ export function ObservationStatus({
   );
 }
 
-const dollars = (value: number | null) =>
-  value === null
-    ? "Not reported"
-    : new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(value);
 export function BalanceCard({
   observation,
-}: {
+  labels,
+  locale,
+  className,
+  ["aria-label"]: ariaLabel,
+  ...props
+}: React.ComponentProps<"section"> & {
   observation?: Observation<CreditBalance> | null;
+  labels?: Partial<BalanceCardLabels>;
+  locale?: Intl.LocalesArgument;
 }) {
+  const text = {
+    ...balanceCardLabels,
+    ...labels,
+    status: { ...balanceCardLabels.status, ...labels?.status },
+  };
+  const money = new Intl.NumberFormat(locale ?? "en-US", {
+    style: "currency",
+    currency: "USD",
+  });
+  const dollars = (value: number | null) =>
+    value === null ? text.notReported : money.format(value);
   if (!observation) return null;
   const value = observation.value;
   return (
-    <section className="fb-observation" aria-label="Credit balance">
+    <section
+      {...props}
+      className={accountsClasses("fb-observation", className)}
+      aria-label={ariaLabel ?? text.title}
+    >
       <div className="fb-row">
-        <span className="fb-label">Available balance</span>
+        <span className="fb-label">{text.available}</span>
         <strong>{dollars(value?.remainingUsd ?? null)}</strong>
       </div>
       {value?.subscriptionRemainingUsd != null && (
         <div className="fb-row fb-muted">
-          <span>Subscription</span>
+          <span>{text.subscription}</span>
           <span>
             {dollars(value.subscriptionRemainingUsd)}
             {value.subscriptionLimitUsd != null
@@ -303,11 +373,15 @@ export function BalanceCard({
       )}
       {value?.purchasedRemainingUsd != null && (
         <div className="fb-row fb-muted">
-          <span>Purchased credits</span>
+          <span>{text.purchased}</span>
           <span>{dollars(value.purchasedRemainingUsd)}</span>
         </div>
       )}
-      <ObservationStatus observation={observation} />
+      <ObservationStatus
+        observation={observation}
+        labels={text.status}
+        locale={locale}
+      />
     </section>
   );
 }
@@ -319,7 +393,32 @@ function metricText(line: MetricLine): string {
       ? line.text
       : "";
 }
-export function ProviderCard({ provider }: { provider: ProviderOutput }) {
+export function ProviderCard({
+  provider,
+  labels,
+  locale,
+  headingLevel = 2,
+  className,
+  ...props
+}: React.ComponentProps<"section"> & {
+  provider: ProviderOutput;
+  labels?: Partial<ProviderCardLabels>;
+  locale?: Intl.LocalesArgument;
+  /** The card's title. Nested headings follow it; every level looks the same. */
+  headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
+}) {
+  const text = {
+    ...providerCardLabels,
+    ...labels,
+    reset: { ...providerCardLabels.reset, ...labels?.reset },
+  };
+  const Heading = `h${headingLevel}` as "h2";
+  const money = new Intl.NumberFormat(locale ?? "en-US", {
+    style: "currency",
+    currency: "USD",
+  });
+  const dollars = (value: number | null) =>
+    value === null ? balanceCardLabels.notReported : money.format(value);
   const lines = provider.lines.filter(
     (line) =>
       line.type !== "barChart" &&
@@ -329,11 +428,11 @@ export function ProviderCard({ provider }: { provider: ProviderOutput }) {
       ),
   );
   return (
-    <Card className="fb-card-layout">
+    <Card {...props} className={accountsClasses("fb-card-layout", className)}>
       <CardHeader className="fb-row">
         <div>
-          <h2>{provider.displayName}</h2>
-          <Badge>{provider.plan || "Connected provider"}</Badge>
+          <Heading>{provider.displayName}</Heading>
+          <Badge>{provider.plan || text.connectedProvider}</Badge>
         </div>
         <ProviderIcon provider={provider.providerId} />
       </CardHeader>
@@ -346,7 +445,9 @@ export function ProviderCard({ provider }: { provider: ProviderOutput }) {
                 <strong>
                   {line.format?.kind === "dollars"
                     ? dollars(line.used ?? null)
-                    : `${Math.round(line.used ?? 0)}${line.format?.kind === "percent" ? "%" : ""}`}
+                    : line.format?.kind === "percent"
+                      ? text.percent(line.used ?? 0)
+                      : String(Math.round(line.used ?? 0))}
                 </strong>
               </div>
               <Progress
@@ -356,9 +457,9 @@ export function ProviderCard({ provider }: { provider: ProviderOutput }) {
               />
               {line.resetsAt && (
                 <p className="fb-muted">
-                  Resets{" "}
+                  {text.resets}{" "}
                   <time dateTime={line.resetsAt}>
-                    {new Date(line.resetsAt).toLocaleString()}
+                    {new Date(line.resetsAt).toLocaleString(locale ?? [])}
                   </time>
                 </p>
               )}
@@ -374,10 +475,12 @@ export function ProviderCard({ provider }: { provider: ProviderOutput }) {
             </div>
           ),
         )}
-        {!lines.length && (
-          <p className="fb-muted">No quota reported by this provider.</p>
-        )}
-        <ResetInventory observation={provider.resetInventory} />
+        {!lines.length && <p className="fb-muted">{text.noQuota}</p>}
+        <ResetInventory
+          observation={provider.resetInventory}
+          labels={text.reset}
+          locale={locale}
+        />
       </CardContent>
     </Card>
   );

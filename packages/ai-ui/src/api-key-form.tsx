@@ -10,6 +10,15 @@ import {
 } from "@fabrials/ui";
 
 import * as React from "react";
+import {
+  accountsClasses,
+  accountsReason,
+  apiKeyFieldsLabels,
+  apiKeyFormLabels,
+  type AccountsHeadingLevel,
+  type ApiKeyFieldsLabels,
+  type ApiKeyFormLabels,
+} from "./accounts-labels";
 
 export interface ApiKeyEnrollment {
   provider: string;
@@ -29,7 +38,10 @@ export function ApiKeyFields({
     { id: "openai", label: "OpenAI API" },
     { id: "nous", label: "Nous API" },
   ],
-}: {
+  labels,
+  className,
+  ...props
+}: React.ComponentProps<"div"> & {
   provider: string;
   alias: string;
   secret?: string;
@@ -39,11 +51,13 @@ export function ApiKeyFields({
   pending?: boolean;
   lockedIdentity?: boolean;
   providers?: readonly { id: string; label: string }[];
+  labels?: Partial<ApiKeyFieldsLabels>;
 }) {
+  const text = { ...apiKeyFieldsLabels, ...labels };
   return (
-    <div className="fb-form">
+    <div {...props} className={accountsClasses("fb-form", className)}>
       <Label>
-        Provider
+        {text.provider}
         <NativeSelect
           name="provider"
           value={provider}
@@ -58,7 +72,7 @@ export function ApiKeyFields({
         </NativeSelect>
       </Label>
       <Label>
-        Account name
+        {text.account}
         <Input
           name="alias"
           required
@@ -71,7 +85,7 @@ export function ApiKeyFields({
         />
       </Label>
       <Label>
-        API key
+        {text.secret}
         <Input
           name="api_key"
           type="password"
@@ -96,10 +110,22 @@ export function ApiKeyFields({
 export function ApiKeyForm({
   onSave,
   accounts,
-}: {
+  labels,
+  fieldsLabels,
+  headingLevel = 2,
+  className,
+  ...props
+}: React.ComponentProps<"section"> & {
   onSave: (input: ApiKeyEnrollment) => Promise<void>;
   accounts?: readonly { provider: string; alias: string }[];
+  labels?: Partial<ApiKeyFormLabels>;
+  /** The words of the three fields inside the form. */
+  fieldsLabels?: Partial<ApiKeyFieldsLabels>;
+  /** The form's title. Two by default, as 0.11 wrote it. */
+  headingLevel?: AccountsHeadingLevel;
 }) {
+  const text = { ...apiKeyFormLabels, ...labels };
+  const Heading = `h${headingLevel}` as "h2";
   const [provider, setProvider] = React.useState("openai");
   const [alias, setAlias] = React.useState("");
   const [key, setKey] = React.useState("");
@@ -127,23 +153,21 @@ export function ApiKeyForm({
       setKey("");
       setSaved({ provider, alias: alias.trim() });
     } catch (error) {
-      setError(String(error));
+      setError(accountsReason(error));
     } finally {
       setBusy(false);
     }
   }
   return (
-    <Card className="fb-card-layout">
+    <Card {...props} className={accountsClasses("fb-card-layout", className)}>
       <CardHeader>
-        <h2>Connect with an API key</h2>
-        <p className="fb-muted">
-          Use an existing provider key. Requests use that provider’s API
-          billing.
-        </p>
+        <Heading>{text.title}</Heading>
+        <p className="fb-muted">{text.description}</p>
       </CardHeader>
       <CardContent className="fb-content-layout">
         <form className="fb-form" onSubmit={(event) => void save(event)}>
           <ApiKeyFields
+            labels={fieldsLabels}
             provider={provider}
             alias={alias}
             secret={key}
@@ -163,7 +187,7 @@ export function ApiKeyForm({
             }}
           />
           <Button className=" " type="submit" disabled={busy}>
-            {busy ? "Saving…" : "Save API key"}
+            {busy ? text.saving : text.save}
           </Button>
           {error && (
             <p className="fb-error" role="alert">
@@ -171,10 +195,7 @@ export function ApiKeyForm({
             </p>
           )}
           {showSaved && (
-            <p role="status">
-              Saved {saved.provider}/{saved.alias}. The key has not been
-              verified with the provider.
-            </p>
+            <p role="status">{text.saved(saved.provider, saved.alias)}</p>
           )}
         </form>
       </CardContent>

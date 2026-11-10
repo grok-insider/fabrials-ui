@@ -6,6 +6,7 @@ import {
   Label,
   NativeCheckbox,
   NativeSelect,
+  type HeadingLevel,
 } from "@fabrials/ui";
 
 import * as React from "react";
@@ -15,6 +16,13 @@ import type {
   MigrationInvitation,
   MigrationSessionView,
 } from "./contracts";
+import {
+  accountsClasses,
+  accountsReason,
+  hostedMigrationLabels,
+  type AccountsHeadingLevel,
+  type HostedMigrationLabels,
+} from "./accounts-labels";
 export interface HostedMigrationApi {
   sessions(): Promise<{ sessions: MigrationSessionView[] }>;
   create(request: {
@@ -39,13 +47,36 @@ export function HostedMigration({
   origin,
   authorize,
   heading = true,
-}: {
+  labels,
+  locale,
+  headingLevel = 1,
+  now: fixedNow,
+  className,
+  ...props
+}: React.ComponentProps<"div"> & {
   api: HostedMigrationApi;
   origin: string;
   authorize: (request: MigrationAuthorization) => React.ReactNode;
   /** The host already shows the page title. */
   heading?: boolean;
+  labels?: Partial<HostedMigrationLabels>;
+  locale?: Intl.LocalesArgument;
+  /** The page title. The sections inside it follow; every level looks the same. */
+  headingLevel?: AccountsHeadingLevel;
+  /** The moment invitations and sessions are compared to. By default the wall clock, one second at a time. */
+  now?: number;
 }) {
+  const text: HostedMigrationLabels = {
+    ...hostedMigrationLabels,
+    ...labels,
+    directions: { ...hostedMigrationLabels.directions, ...labels?.directions },
+    sessionDirections: {
+      ...hostedMigrationLabels.sessionDirections,
+      ...labels?.sessionDirections,
+    },
+    phases: { ...hostedMigrationLabels.phases, ...labels?.phases },
+    reviewLabels: { ...hostedMigrationLabels.reviewLabels, ...labels?.reviewLabels },
+  };
   const [authorized, setAuthorized] = React.useState<string[]>([]);
   const [direction, setDirection] =
     React.useState<MigrationDirection>("hostedToLocal");
@@ -63,7 +94,9 @@ export function HostedMigration({
   React.useEffect(() => {
     if (error) errorRef.current?.focus();
   }, [error]);
-  const [now, setNow] = React.useState(() => Date.now());
+  const [ticking, setTicking] = React.useState(() => Date.now());
+  const now = fixedNow ?? ticking;
+  const Section = `h${Math.min(6, headingLevel + 1)}` as "h2";
   async function refresh() {
     const data = await migrationApi.sessions();
     setSessions(data.sessions);
@@ -74,9 +107,9 @@ export function HostedMigration({
       .sessions()
       .then((data) => setSessions(data.sessions))
       .catch((error) => {
-        if (!controller.signal.aborted) setError(String(error));
+        if (!controller.signal.aborted) setError(accountsReason(error));
       });
-    const timer = setInterval(() => setNow(Date.now()), 1000);
+    const timer = setInterval(() => setTicking(Date.now()), 1000);
     return () => {
       controller.abort();
       clearInterval(timer);
@@ -89,7 +122,7 @@ export function HostedMigration({
     try {
       await action();
     } catch (error) {
-      setError(String(error));
+      setError(accountsReason(error));
     } finally {
       setBusy(false);
     }
@@ -108,16 +141,17 @@ export function HostedMigration({
     if (view.phase !== "pairing") setInvitation(null);
   }
   return (
-    <div className="fb-form">
+    <div {...props} className={accountsClasses("fb-form", className)}>
       {heading ? (
         <PageHeader
-          title="Account migration"
-          description="Pair Spanreed with this relay. Review the destination and the selected accounts before you approve a transfer."
+          title={text.title}
+          description={text.description}
+          headingLevel={headingLevel as HeadingLevel}
         />
       ) : null}
-      <section className="fb-form" aria-label="Create migration invitation">
+      <section className="fb-form" aria-label={text.createRegion}>
         <Label>
-          Direction
+          {text.direction}
           <NativeSelect
             value={direction}
             disabled={busy}
@@ -125,8 +159,8 @@ export function HostedMigration({
               setDirection(event.target.value as MigrationDirection)
             }
           >
-            <option value="hostedToLocal">ai-relay → Spanreed</option>
-            <option value="localToHosted">Spanreed → ai-relay</option>
+            <option value="hostedToLocal">{text.directions.hostedToLocal}</option>
+            <option value="localToHosted">{text.directions.localToHosted}</option>
           </NativeSelect>
         </Label>
         <Button
@@ -143,25 +177,24 @@ export function HostedMigration({
             })
           }
         >
-          Create invitation
+          {text.create}
         </Button>
         {invitation && (
           <div className="fb-form">
             <p className="fb-muted">
-              Enter these details in Spanreed, on Account migration. The invitation
-              expires {formatWhen(invitation.expiresAtMs)}. The secret stays on this page until you leave it.
+              {text.instructions(formatWhen(invitation.expiresAtMs, locale))}
             </p>
             <Label>
-              Hosted origin
+              {text.hostedOrigin}
               <Input readOnly value={origin} />
             </Label>
             <Label>
-              Session ID
+              {text.sessionId}
               <Input readOnly value={invitation.id} />
             </Label>
             {now < invitation.expiresAtMs ? (
               <Label>
-                Invitation secret
+                {text.invitationSecret}
                 <Input
                   readOnly
                   type="password"
@@ -171,7 +204,7 @@ export function HostedMigration({
                 />
               </Label>
             ) : (
-              <p role="alert">Invitation expired. Create another invitation.</p>
+              <p role="alert">{text.invitationExpired}</p>
             )}
             {now < invitation.expiresAtMs && (
               <Button
@@ -184,40 +217,37 @@ export function HostedMigration({
                   })
                 }
               >
-                Copy invitation secret
+                {text.copySecret}
               </Button>
             )}
-            <p className="fb-muted">
-              The secret is shown only in this page session. Copy it into
-              Spanreed before closing this page.
-            </p>
+            <p className="fb-muted">{text.secretNote}</p>
             <Button
               variant="outline"
               className=""
               disabled={busy}
               onClick={() => void run(async () => open(invitation.id))}
             >
-              Check pairing
+              {text.checkPairing}
             </Button>
             <Button
               variant="outline"
               className=""
               onClick={() => setInvitation(null)}
             >
-              Hide invitation
+              {text.hideInvitation}
             </Button>
           </div>
         )}
       </section>
-      <section className="fb-form" aria-label="Migration sessions">
+      <section className="fb-form" aria-label={text.sessionsRegion}>
         <div className="fb-row">
-          <h2>Sessions</h2>
+          <Section>{text.sessions}</Section>
           <Button variant="outline" disabled={busy} onClick={() => void run(refresh)}>
-            Refresh sessions
+            {text.refresh}
           </Button>
         </div>
-        <p className="fb-muted">Completed receipts stay available for 30 days after the transfer window closes.</p>
-        {!sessions.length ? <p className="fb-muted">No migration sessions yet. Create an invitation to start one.</p> : null}
+        <p className="fb-muted">{text.receiptsNote}</p>
+        {!sessions.length ? <p className="fb-muted">{text.noSessions}</p> : null}
         {sessions.length ? (
           <div className="fb-log">
             {sessions.map((session) => (
@@ -228,8 +258,10 @@ export function HostedMigration({
                 onClick={() => void run(async () => open(session.id))}
                 type="button"
               >
-                <strong>{directionLabel(session.direction)}</strong>
-                <span className="fb-muted">{phaseLabel(session.phase)}</span>
+                <strong>{text.sessionDirections[session.direction]}</strong>
+                <span className="fb-muted">
+                  {text.phases[session.phase] ?? session.phase}
+                </span>
                 <code className="fb-mono" style={{ overflowWrap: "anywhere" }}>{session.id}</code>
               </button>
             ))}
@@ -237,25 +269,23 @@ export function HostedMigration({
         ) : null}
       </section>
       {selected && (
-        <section className="fb-form" aria-label="Selected migration">
-          <h2>Review transfer</h2>
+        <section className="fb-form" aria-label={text.selectedRegion}>
+          <Section>{text.review}</Section>
           <p style={{ overflowWrap: "anywhere" }}>
-            Session: <code>{selected.id}</code>
+            {text.sessionLabel} <code>{selected.id}</code>
             <br />
-            Local installation:{" "}
-            <code>{selected.localEnvironment || "Waiting for pairing"}</code>
+            {text.localInstallation}{" "}
+            <code>{selected.localEnvironment || text.waitingForPairing}</code>
             <br />
-            Status: {selected.phase}
+            {text.statusLabel} {selected.phase}
           </p>
           {selected.review && (
-            <MigrationReviewDetails review={selected.review} />
+            <MigrationReviewDetails
+              labels={text.reviewLabels}
+              review={selected.review}
+            />
           )}
-          {selected.phase === "paired" && (
-            <p>
-              Select accounts and create a review in Spanreed, then refresh this
-              session.
-            </p>
-          )}
+          {selected.phase === "paired" && <p>{text.pairedNote}</p>}
           {selected.phase === "reviewing" && (
             <>
               <Label>
@@ -265,8 +295,7 @@ export function HostedMigration({
                   disabled={busy || now >= selected.expiresAtMs}
                   onChange={(event) => setConfirmed(event.target.checked)}
                 />{" "}
-                I recognize this installation and approve the exact accounts and
-                destination above.
+                {text.confirm}
               </Label>
               <Button
                 className=" "
@@ -279,9 +308,7 @@ export function HostedMigration({
                 onClick={() =>
                   void run(async () => {
                     if (!selected.revision)
-                      throw new Error(
-                        "Review unavailable. Refresh this session.",
-                      );
+                      throw new Error(text.reviewUnavailable);
                     await migrationApi.approve({
                       id: selected.id,
                       revision: selected.revision,
@@ -291,20 +318,15 @@ export function HostedMigration({
                   })
                 }
               >
-                Approve review
+                {text.approve}
               </Button>
             </>
           )}
           {selected.phase === "approved" && (
-            <p role="status">
-              Approved. Confirm and execute the transfer in Spanreed.
-            </p>
+            <p role="status">{text.approvedNote}</p>
           )}
           {selected.phase === "completed" && (
-            <p role="status">
-              API-key transfer completed. OAuth entries require independent
-              authorization in the destination.
-            </p>
+            <p role="status">{text.completedNote}</p>
           )}
           {selected.phase === "completed" &&
             selected.direction === "localToHosted" &&
@@ -338,11 +360,11 @@ export function HostedMigration({
               )}
           {authorized.map((id) => (
             <p role="status" key={id}>
-              Connected {id} with a new hosted authorization.
+              {text.connected(id)}
             </p>
           ))}
           {now >= selected.expiresAtMs && selected.phase !== "completed" && (
-            <p role="alert">This session expired.</p>
+            <p role="alert">{text.expiredSession}</p>
           )}
           {selected.phase === "completed" && (
             <div className="fb-form">
@@ -353,15 +375,11 @@ export function HostedMigration({
                   disabled={busy}
                   onClick={() => setForgetting(true)}
                 >
-                  Forget receipt
+                  {text.forget}
                 </Button>
               ) : (
                 <>
-                  <p>
-                    Remove this migration receipt from ai-relay? Imported
-                    accounts remain connected. The reviewed aliases will no
-                    longer be available here for pending OAuth logins.
-                  </p>
+                  <p>{text.forgetQuestion}</p>
                   <div className="fb-row">
                     <Button
                       variant="outline"
@@ -376,7 +394,7 @@ export function HostedMigration({
                         })
                       }
                     >
-                      Forget this receipt
+                      {text.forgetYes}
                     </Button>
                     <Button
                       variant="outline"
@@ -384,7 +402,7 @@ export function HostedMigration({
                       disabled={busy}
                       onClick={() => setForgetting(false)}
                     >
-                      Keep receipt
+                      {text.forgetNo}
                     </Button>
                   </div>
                 </>
@@ -398,7 +416,7 @@ export function HostedMigration({
               disabled={busy}
               onClick={() => void run(async () => open(selected.id))}
             >
-              Refresh selected session
+              {text.refreshSelected}
             </Button>
             {selected.phase !== "completed" &&
               selected.phase !== "cancelled" && (
@@ -416,13 +434,13 @@ export function HostedMigration({
                     })
                   }
                 >
-                  Cancel migration
+                  {text.cancel}
                 </Button>
               )}
           </div>
         </section>
       )}
-      {busy && <p role="status">Updating migration…</p>}
+      {busy && <p role="status">{text.updating}</p>}
       {error && (
         <p ref={errorRef} tabIndex={-1} className="fb-error" role="alert">
           {error}
@@ -432,22 +450,6 @@ export function HostedMigration({
   );
 }
 
-function directionLabel(direction: MigrationDirection): string {
-  return direction === "hostedToLocal" ? "ai-relay to Spanreed" : "Spanreed to ai-relay";
-}
-
-function phaseLabel(phase: string): string {
-  const labels: Record<string, string> = {
-    pairing: "Waiting to pair",
-    paired: "Paired",
-    reviewing: "Ready to review",
-    approved: "Approved",
-    completed: "Completed",
-    cancelled: "Cancelled",
-  };
-  return labels[phase] ?? phase;
-}
-
-function formatWhen(ms: number): string {
-  return new Intl.DateTimeFormat("en", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(ms);
+function formatWhen(ms: number, locale?: Intl.LocalesArgument): string {
+  return new Intl.DateTimeFormat(locale ?? "en", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(ms);
 }

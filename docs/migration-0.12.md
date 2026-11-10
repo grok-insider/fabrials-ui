@@ -885,3 +885,50 @@ The rail of the reader's own messages on the end side: one small marker each, th
 - The jump key is a control key (8 px corners), not a circle: the house's radii stop at 16 px and rings are for dots and avatars.
 - The rail has no panel, blur or border: it is the ticks alone, so it never covers the words with a surface.
 - Its markers are 24 px wide on a fine pointer and the rail is not offered on touch, where the list scrolls anyway.
+
+## Accounts and usage
+
+The family of `@fabrials/ai-ui` for accounts, usage, history, API keys and migration — sixteen exports written in September, with no story, no test and no way to translate them. 0.12 adds no piece and changes no default: it makes the sixteen fit a host's outline, language and skin. A product that passes nothing sees the same markup and the same words, byte for byte, which is what `tests/unit/accounts.test.tsx` checks against 28 baseline renders taken from 0.11.
+
+### What each export gained
+
+Every component now takes:
+
+- **`labels`** — one object per component, of English by default, with every visible word, `aria-label`, summary and table header in it. A label that interpolates or counts is a function, so a language can put its parts in its own order; counts choose their form through `Intl.PluralRules` (`plural(count, { one, other }, locale)`). The defaults live together in `accounts-labels.ts` and are exported (`providerCardLabels`, `resetInventoryLabels`, …) so a host can spread one and translate it. Nested pieces take theirs one level down: `SynchronizedAccountsLabels.provider`, `ProviderCardLabels.reset`, `BalanceCardLabels.status`, `ResetInventoryLabels.status` and `.expiry`, `HostedMigrationLabels.reviewLabels`, and the `fieldsLabels` and `accountsLabels` props of `ApiKeyForm` and `LinkedAccountUsage`.
+- **`className`** merged on the root and **`...props`** spread on it, so `id`, `data-*`, `aria-*` and `ref` reach the element.
+- **`headingLevel`** (1–6) where the piece renders a heading, defaulting to what it rendered before (2, and 1 for `HostedMigration` and `SynchronizedConsumption`). Nested headings follow it (`SynchronizedAccounts`'s log, `HostedMigration`'s sections, `PrivateHistoryView`'s empty state). `SynchronizedAccounts` also takes `providerHeadingLevel`, because the provider's name inside an account stayed a level two on purpose: a host that wants it under its own title says so.
+- **`locale`** (`Intl.LocalesArgument`) wherever a number, a date, a duration or a currency is written. When it is given, all of that piece's formatting uses it; when it is not, nothing changes.
+
+Two components render several blocks side by side rather than one element: `ConsumptionView` and `SynchronizedConsumption`. Without a `className` or any other prop they still render those blocks exactly where the host put them (a grid or a stack of the host's own); give them one and the blocks sit inside a single element that carries it.
+
+`ConsumptionView` also takes `viewLabels` from `SynchronizedConsumption`, and its three maps (`groupOptions`, `groupHeadings`, `states`) may be given in part.
+
+### Server and browser can disagree
+
+Some formatting reads the runtime locale — the language of the machine or the browser — and a server and a browser rarely agree on it. Those pieces write a date, a number or a time differently on the server and after hydration:
+
+| Piece | What it writes with the runtime locale today |
+| --- | --- |
+| `SynchronizedAccounts` | the reading's date and time (`toLocaleString`), the token counts, the daily table |
+| `ObservationStatus` | the hour of a reading (`toLocaleTimeString`) |
+| `ResetInventory`, `ProviderCard` | the `title` of a reset date |
+| `ConsumptionView` | every number and every currency amount |
+| `ProviderCard` | the date a quota resets |
+
+Others are fixed to English and do not disagree: `BalanceCard` (US currency, `en-US`), `PrivateHistoryView` and `HostedMigration` (`en`). Passing `locale` makes a piece write in the language the page is in, on both sides, and is what a host with a translated `labels` object wants: `labels` and `locale` go together.
+
+A clock is the other half of the same problem: `useClock` reads `Date.now()`, which a server cannot. `ResetInventory` and `SynchronizedAccounts` now take `now` and `HostedMigration` takes `now` too, so a test, a story or a server-rendered page can fix the moment instead of reading the wall clock.
+
+### Markup changes
+
+The default render is unchanged. Three things a host will see once it uses the new props:
+
+- A level other than the default now styles the same: the account family's rules address any heading (`:is(h1, h2, h3, h4, h5, h6)`) instead of `h1`, `h2` and `h3`, so a level-three title keeps the card's title size.
+- **A failure says its reason, not "Error: " in front of it.** `ApiKeyForm`, `HostedMigration`, `PrivateHistoryView` and `SynchronizedConsumption` showed `String(error)`, which for a thrown `Error` reads "Error: the provider refused the key". They show the error's own message now. Only the failed state moves; nothing else does.
+- Dead rules went (`.fb-empty`, `.fb-table-scroll`, `.fb-source-selection`), the rules of the family use logical properties only, and a `@media (forced-colors: active)` block gives the hovered migration row an outline and the reset warning the system's own ink. `fb-table-layout` is still written by `ConsumptionView` and styled by nobody: it does nothing.
+
+### What a product can delete
+
+A product that translates these screens no longer needs a wrapper component to rename "Quota reading" or to reformat a date: it passes `labels` and `locale`. A product that composes its own provider card from `fb-` classes loses nothing: the classes and their names are as they were.
+
+What stays the product's: the data (`MetricLine.label` is the provider's own word, not the library's), the money's currency (USD here), and which reading is authoritative.

@@ -1,4 +1,6 @@
 import type { Observation, ResetInventory } from "./contracts";
+import type { ResetExpiryLabels } from "./accounts-labels";
+import { resetInventoryLabels } from "./accounts-labels";
 
 const HOUR = 3_600_000;
 const MAX_OBSERVATION_AGE = 15 * 60_000;
@@ -15,11 +17,12 @@ export function validTimestamp(
 export function resetExpiryLabel(
   expiry: number | null | undefined,
   now: number | null,
+  labels: ResetExpiryLabels = resetInventoryLabels.expiry,
 ): string {
-  if (!validTimestamp(expiry)) return "Expiry unavailable";
-  if (!validTimestamp(now)) return "…";
+  if (!validTimestamp(expiry)) return labels.unavailable;
+  if (!validTimestamp(now)) return labels.pending;
   const remaining = expiry - now;
-  if (remaining <= 0) return "Expired · refresh inventory";
+  if (remaining <= 0) return labels.expired;
   const minutes = Math.floor(remaining / 60_000);
   if (minutes === 0) return "<1m";
   if (minutes < 60) return `${minutes}m`;

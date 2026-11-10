@@ -7,12 +7,12 @@
     font-size: var(--fui-text-sm);
   }
   .fb-heading {
-    margin-bottom: var(--fui-space-6);
+    margin-block-end: var(--fui-space-6);
   }
-  .fb-heading h1 {
+  .fb-heading :is(h1, h2, h3, h4, h5, h6) {
     font-size: var(--fui-text-title);
     font-weight: 600;
-    margin: 0 0 var(--fui-space-2);
+    margin-block-end: var(--fui-space-2);
   }
   .fb-heading p {
     color: var(--muted-foreground);
@@ -31,10 +31,10 @@
   summary.fb-content-layout {
     padding: var(--fui-space-4);
     cursor: pointer;
-    min-height: 2.75rem;
+    min-block-size: 2.75rem;
   }
-  .fb-card-layout > header :is(h2, h3) {
-    margin: 0;
+  .fb-card-layout > header :is(h1, h2, h3, h4, h5, h6) {
+    margin-block: 0;
     font-size: var(--fui-text-md);
     font-weight: 600;
   }
@@ -76,30 +76,25 @@
     cursor: pointer;
     color: var(--muted-foreground);
     font-size: var(--fui-text-xs);
-    min-height: 2.75rem;
+    min-block-size: 2.75rem;
     align-content: center;
   }
   .fb-metric progress {
-    margin-top: var(--fui-space-3);
+    margin-block-start: var(--fui-space-3);
   }
   .fb-metric p {
-    margin: var(--fui-space-2) 0 0;
+    margin-block: var(--fui-space-2) 0;
+    margin-inline: 0;
   }
   .fb-error {
     color: var(--fui-danger-ink);
     font-size: var(--fui-text-sm);
     line-height: 1.6;
   }
-  .fb-empty {
-    padding: var(--fui-space-6);
-    border: 1px dashed var(--border);
-    border-radius: var(--fui-radius-lg);
-    text-align: center;
-  }
   .fb-history {
     display: grid;
     gap: var(--fui-space-4);
-    min-width: 0;
+    min-inline-size: 0;
   }
   .fb-log {
     list-style: none;
@@ -113,11 +108,12 @@
   .fb-log-item {
     display: grid;
     gap: var(--fui-space-1);
-    padding: var(--fui-space-3) var(--fui-space-4);
-    border-top: 1px solid var(--border);
+    padding-block: var(--fui-space-3);
+    padding-inline: var(--fui-space-4);
+    border-block-start: 1px solid var(--border);
   }
   .fb-log-item:first-child {
-    border-top: 0;
+    border-block-start: 0;
   }
   .fb-log-item p {
     margin: 0;
@@ -126,11 +122,12 @@
   .fb-log-button {
     display: grid;
     gap: 0.125rem;
-    width: 100%;
-    min-height: 2.75rem;
-    padding: var(--fui-space-3) var(--fui-space-4);
+    inline-size: 100%;
+    min-block-size: 2.75rem;
+    padding-block: var(--fui-space-3);
+    padding-inline: var(--fui-space-4);
     border: 0;
-    border-top: 1px solid var(--border);
+    border-block-start: 1px solid var(--border);
     background: transparent;
     color: inherit;
     font: inherit;
@@ -139,7 +136,7 @@
   }
   .fb-log > .fb-log-button:first-child,
   .fb-log > li:first-child .fb-log-button {
-    border-top: 0;
+    border-block-start: 0;
   }
   .fb-log-button:hover {
     background: var(--accent);
@@ -149,10 +146,10 @@
     font-size: 0.92em;
   }
   .fb-form {
-    max-width: 40rem;
+    max-inline-size: 40rem;
     display: grid;
     gap: var(--fui-space-4);
-    min-width: 0;
+    min-inline-size: 0;
   }
   .fb-form label {
     display: grid;
@@ -161,7 +158,7 @@
   .fb-form label:has(> input[type="checkbox"]) {
     grid-template-columns: 1.25rem minmax(0, 1fr);
     align-items: start;
-    min-height: 2.75rem;
+    min-block-size: 2.75rem;
     padding-block: var(--fui-space-2);
     line-height: 1.5;
     cursor: pointer;
@@ -170,14 +167,14 @@
     cursor: default;
     color: var(--muted-foreground);
   }
-  .fb-table-scroll,
   .fb-table-wrap {
-    max-width: 100%;
-    min-width: 0;
+    max-inline-size: 100%;
+    min-inline-size: 0;
   }
   .fb-reset-warning {
     border-inline-start: 3px solid var(--warning);
-    padding: var(--fui-space-2) var(--fui-space-3);
+    padding-block: var(--fui-space-2);
+    padding-inline: var(--fui-space-3);
     background: var(--muted);
     color: var(--foreground);
     font-size: var(--fui-text-xs);
@@ -187,7 +184,7 @@
     display: flex;
     align-items: center;
     gap: var(--fui-space-2);
-    margin-top: var(--fui-space-2);
+    margin-block-start: var(--fui-space-2);
     color: var(--muted-foreground);
     font-variant-numeric: tabular-nums;
   }
@@ -206,8 +203,8 @@
     white-space: nowrap;
   }
   .fb-provider-icon svg {
-    width: 100%;
-    height: 100%;
+    inline-size: 100%;
+    block-size: 100%;
     fill: currentColor;
   }
   .fb-provider-icon svg[data-icon="fallback"] {
@@ -217,13 +214,13 @@
   .fb-synchronized-accounts {
     display: grid;
     gap: var(--fui-space-4);
-    width: 100%;
+    inline-size: 100%;
     margin-block: var(--fui-space-6);
   }
-  .fb-synchronized-accounts > header h2 {
+  .fb-synchronized-accounts > header :is(h1, h2, h3, h4, h5, h6) {
     font-size: var(--fui-text-md);
     font-weight: 600;
-    margin: 0 0 var(--fui-space-2);
+    margin-block: 0 var(--fui-space-2);
   }
   .fb-synchronized-grid {
     display: grid;
@@ -235,7 +232,7 @@
     display: grid;
     align-content: start;
     gap: var(--fui-space-3);
-    min-width: 0;
+    min-inline-size: 0;
   }
   .fb-synchronized-account > p {
     font-size: var(--fui-text-xs);
@@ -247,16 +244,16 @@
   .fb-synchronized-linked {
     display: grid;
     gap: var(--fui-space-4);
-    min-width: 0;
+    min-inline-size: 0;
   }
   .fb-linked-account-usage {
-    min-width: 0;
+    min-inline-size: 0;
     font-size: var(--fui-text-xs);
   }
   .fb-linked-account-usage > summary {
     cursor: pointer;
     padding-block: var(--fui-space-2);
-    min-height: 2.75rem;
+    min-block-size: 2.75rem;
   }
   .fb-consumption-filters {
     display: flex;
@@ -272,18 +269,8 @@
     color: var(--muted-foreground);
   }
   .fb-consumption-device {
-    max-width: 28rem;
+    max-inline-size: 28rem;
     margin-block: var(--fui-space-4);
-  }
-  .fb-source-selection {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
-    gap: var(--fui-space-2) var(--fui-space-4);
-  }
-  .fb-source-selection label {
-    min-height: 2.75rem;
-    display: flex;
-    align-items: center;
   }
   @media (max-width: 1100px) {
     .fb-synchronized-grid {
@@ -3990,5 +3977,26 @@
   /* A skeleton draws its lines whole. */
   [data-fui-loading] .fui-conversation-content {
     mask-image: none;
+  }
+}
+
+@layer components {
+  /* 0.12: the accounts and usage family in forced colors. A tint carries meaning here in one place, the hover of a row that
+     is a button, and a colour is forced to CanvasText on its own: what a person has to be able to see is said with the system's
+     own ink, and the rest is left to the system. */
+  @media (forced-colors: active) {
+    .fb-log-button:hover,
+    .fb-log-button:focus-visible {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+    .fb-reset-warning {
+      border-inline-start-color: CanvasText;
+      background: Canvas;
+    }
+    .fb-reset-warning,
+    .fb-error {
+      color: CanvasText;
+    }
   }
 }

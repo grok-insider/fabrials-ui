@@ -9,6 +9,14 @@ import {
 } from "./consumption";
 
 import type { LocalUsageSnapshotV2 } from "./contracts";
+import {
+  accountsClasses,
+  accountsReason,
+  synchronizedConsumptionLabels,
+  type AccountsHeadingLevel,
+  type ConsumptionViewLabelOverrides,
+  type SynchronizedConsumptionLabels,
+} from "./accounts-labels";
 export type ConsumptionSnapshot = LocalUsageSnapshotV2;
 const empty = (key: string): ConsumptionTotal => ({
   key,
@@ -91,14 +99,28 @@ function project(snapshots: ConsumptionSnapshot[]): ConsumptionReport {
 }
 export function SynchronizedConsumption({
   load,
-}: {
+  labels,
+  viewLabels,
+  locale,
+  headingLevel = 1,
+  className,
+  ...props
+}: Omit<React.ComponentProps<"div">, "children"> & {
   load: () => Promise<{ snapshots: ConsumptionSnapshot[] }>;
+  labels?: Partial<SynchronizedConsumptionLabels>;
+  /** The words of the breakdown under the device picker. */
+  viewLabels?: ConsumptionViewLabelOverrides;
+  locale?: Intl.LocalesArgument;
+  /** The page title. Two by default, as 0.11 wrote it. */
+  headingLevel?: AccountsHeadingLevel;
 }) {
+  const text = { ...synchronizedConsumptionLabels, ...labels };
   const [snapshots, setSnapshots] = React.useState<ConsumptionSnapshot[]>([]);
   const [device, setDevice] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
   const [busy, setBusy] = React.useState(true);
   const [refreshKey, setRefreshKey] = React.useState(0);
+  const Heading = `h${headingLevel}` as "h1";
   React.useEffect(() => {
     let active = true,
       inFlight = false;
@@ -118,7 +140,7 @@ export function SynchronizedConsumption({
           );
         }
       } catch (error) {
-        if (active) setError(String(error));
+        if (active) setError(accountsReason(error));
       } finally {
         inFlight = false;
         if (active) setBusy(false);
@@ -133,14 +155,11 @@ export function SynchronizedConsumption({
       clearInterval(timer);
     };
   }, [load, refreshKey]);
-  return (
+  const body = (
     <>
       <div className="fb-heading">
-        <h1>Local consumption</h1>
-        <p>
-          Private usage shared by your Spanreed installations. Devices are shown
-          separately to avoid counting copied logs twice.
-        </p>
+        <Heading>{text.title}</Heading>
+        <p>{text.description}</p>
       </div>
       <Button
         variant="outline"
@@ -148,24 +167,19 @@ export function SynchronizedConsumption({
         disabled={busy}
         onClick={() => setRefreshKey((value) => value + 1)}
       >
-        Refresh consumption
+        {text.refresh}
       </Button>
       {error && (
         <p role="alert" className="fb-error">
           {error}
         </p>
       )}
-      {busy && <p role="status">Loading consumption…</p>}
-      {!busy && !error && !snapshots.length && (
-        <p>
-          No consumption synchronized yet. In Spanreed, enable private
-          synchronization and select the clients you want to share.
-        </p>
-      )}
+      {busy && <p role="status">{text.loading}</p>}
+      {!busy && !error && !snapshots.length && <p>{text.empty}</p>}
       {snapshots.length > 0 && (
         <>
           <Label className="fb-consumption-device">
-            Device{" "}
+            {text.device}{" "}
             <NativeSelect
               value={device}
               onChange={(event) => setDevice(event.target.value)}
@@ -177,10 +191,20 @@ export function SynchronizedConsumption({
           </Label>
           <ConsumptionView
             synchronized
+            labels={viewLabels}
+            locale={locale}
             report={project(snapshots.filter((s) => s.device === device))}
           />
         </>
       )}
     </>
+  );
+  // As in ConsumptionView: untouched by default, wrapped only for a host that passes something to carry.
+  const carries = className !== undefined || Object.keys(props).length > 0;
+  if (!carries) return body;
+  return (
+    <div {...props} className={accountsClasses("fb-consumption", className)}>
+      {body}
+    </div>
   );
 }
