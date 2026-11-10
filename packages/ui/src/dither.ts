@@ -41,8 +41,9 @@ export function mixHex(a: string, b: string, t: number): string {
   return rgbToHex(x.map((v, i) => v + (y[i]! - v) * t) as Rgb);
 }
 
-/** Integer brightness 0–255, weighted toward green like the eye. */
-export function luma([r, g, b]: Rgb): number {
+/** Integer brightness 0–255, weighted toward green like the eye. Either a colour or three channels. */
+export function luma(color: Rgb | number, green?: number, blue?: number): number {
+  const [r, g, b] = Array.isArray(color) ? color : [color, green ?? 0, blue ?? 0];
   return (r * 2 + g * 5 + b) >> 3;
 }
 
@@ -57,7 +58,7 @@ export function sortByLuma(colors: Rgb[]): Rgb[] {
  */
 export function ditherToRamp(data: Uint8ClampedArray, width: number, ramp: Rgb[]): void {
   if (ramp.length < 2) throw new Error("ditherToRamp needs at least two colours");
-  const levels = ramp.map(luma);
+  const levels = ramp.map((color) => luma(color));
   const last = ramp.length - 1;
   // Per brightness: the lower ramp step and how far toward the next (0–64),
   // so the hot loop is two table reads and a compare.
@@ -185,3 +186,80 @@ export function paintRampField(data: Uint8ClampedArray, width: number, height: n
 }
 
 export * from "./dither-presets";
+
+/* 0.12: a picture, or a scene the host paints, dithered onto the ramp. */
+
+export type DitherSize = { width: number; height: number };
+
+/**
+ * The brightness a picture is mapped into before it is dithered, so that
+ * text over it keeps its contrast. `min` and `max` are luminances 0–255,
+ * `contrast` stretches (above 1) or flattens (below 1) around the middle
+ * first, and `desaturate` (0–1) is how far every pixel is pulled toward its
+ * own grey, used by the colour mode.
+ */
+export type DitherTone = {
+  min?: number;
+  max?: number;
+  contrast?: number;
+  desaturate?: number;
+};
+
+const unit = (value: number, fallback: number) => (Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : fallback);
+
+/** One luminance through a `DitherTone`. With no tone it is the value itself. */
+export function toneLuma(value: number, tone: DitherTone = {}): number {
+  const min = tone.min ?? 0;
+  const max = tone.max ?? 255;
+  const contrast = Number.isFinite(tone.contrast) ? (tone.contrast as number) : 1;
+  const t = unit(value / 255, 0);
+  return Math.round(min + (max - min) * unit(0.5 + (t - 0.5) * contrast, 0));
+}
+
+/** A colour pulled `amount` (0–1) of the way toward its own grey: a vivid photo would fight the text on top. */
+export function desaturate([r, g, b]: Rgb, amount: number): Rgb {
+  const gray = luma([r, g, b]);
+  const t = unit(amount, 0);
+  return [r + (gray - r) * t, g + (gray - g) * t, b + (gray - b) * t];
+}
+
+/** The part of a picture to draw so it covers a box, cropping the overflow evenly (CSS `object-fit: cover`). */
+export function coverFit(source: DitherSize, target: DitherSize): { sx: number; sy: number; sw: number; sh: number } {
+  if (!(source.width > 0 && source.height > 0 && target.width > 0 && target.height > 0)) return { sx: 0, sy: 0, sw: 0, sh: 0 };
+  const scale = Math.max(target.width / source.width, target.height / source.height);
+  const sw = target.width / scale;
+  const sh = target.height / scale;
+  return { sx: (source.width - sw) / 2, sy: (source.height - sh) / 2, sw, sh };
+}
+
+/** Where a whole picture sits inside a box, letterboxed (CSS `object-fit: contain`). */
+export function containFit(source: DitherSize, target: DitherSize): { dx: number; dy: number; dw: number; dh: number } {
+  if (!(source.width > 0 && source.height > 0 && target.width > 0 && target.height > 0)) return { dx: 0, dy: 0, dw: 0, dh: 0 };
+  const scale = Math.min(target.width / source.width, target.height / source.height);
+  const dw = source.width * scale;
+  const dh = source.height * scale;
+  return { dx: (target.width - dw) / 2, dy: (target.height - dh) / 2, dw, dh };
+}
+
+/**
+ * Like `ditherToRamp`, for a ramp whose order is the picture's brightness
+ * itself: 0 is `ramp[0]` (the surface behind the canvas) and 255 the last
+ * colour. The pixels arrive as grey; they leave as ramp colours only.
+ */
+export function ditherLumaToRamp(data: Uint8ClampedArray, width: number, ramp: Rgb[]): void {
+  if (ramp.length < 2) throw new Error("ditherLumaToRamp needs at least two colours");
+  const last = ramp.length - 1;
+  const height = data.length / 4 / width;
+  for (let y = 0, i = 0; y < height; y++) {
+    const row = (y & 7) << 3;
+    for (let x = 0; x < width; x++, i += 4) {
+      const t = (data[i]! / 255) * last;
+      const lo = Math.min(last - 1, Math.floor(t));
+      const [r, g, b] = ramp[t - lo > BAYER_8[row | (x & 7)]! ? lo + 1 : lo]!;
+      data[i] = r;
+      data[i + 1] = g;
+      data[i + 2] = b;
+      data[i + 3] = 255;
+    }
+  }
+}

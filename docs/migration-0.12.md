@@ -1030,3 +1030,95 @@ A message action, the same look as copy, that reads an answer aloud: `text` (mar
 It is `aria-pressed` while it reads, shows a spinner while the first piece loads, and the same key stops it. One reader sounds at a time on the page and it stops when it leaves the screen, because that is `useSpeech`'s job. In a browser that cannot speak and with no loader it draws nothing — there is never a key that does nothing.
 
 A product can delete its own read-aloud action (Radiant: `features/core/read-aloud.tsx`); the loader's route stays the product's.
+
+## The shell: pictures in the dither, the account row and the bar of a sidebar app, a title renamed in place, and a keyboard
+
+Five additions for an app shell, all `@fabrials/ui` and all optional. Nothing that exists changes behaviour: every existing dither reference stays pixel-identical, and `Sidebar` gained two parts and one prop.
+
+### `DitherCanvas`: a scene the host paints, or a picture
+
+The canvas took a per-pixel brightness `field`. It now also takes a scene drawn with Canvas 2D, or a picture. Both are read back and dithered onto the same ramp, with the same 8×8 Bayer order and the same `order`, so a scene sits on the brand material as the storm does.
+
+| Prop | What it does |
+| --- | --- |
+| `paint` | `(context, size, theme) => void`: gradients and shapes at the canvas's working resolution (one pixel per dot). The canvas starts filled with the surface behind it, so anything left unpainted is the background. Keep the function stable (memoise it, or use `paintKey`) or every render repaints |
+| `source` | A picture, or its address. A string is loaded with `crossOrigin="anonymous"`; an `<img>` still loading is waited for; a `CanvasImageSource` already decoded is drawn at once |
+| `fit` | `cover` (default) or `contain` |
+| `tone` | `{ min, max, contrast, desaturate }`: the luminance range the picture is mapped into, so the text over it keeps its contrast. `min`/`max` are luminances 0–255 (the picture's own range by default), `contrast` stretches around the middle (1 by default) |
+| `mode` | `ramp` (default): the picture in mono through the ramp. `channels`: each colour channel dithered to `levels` steps, kept in a range a background can be read on — `tone.min`/`max` are that range, `6…80` in the dark theme and `182…250` in the light one unless given |
+| `levels` | Steps per channel in `channels` mode (5 by default) |
+| `after` | `(context, size, theme) => void`, drawn after the dithering: crisp single-pixel details a dot would swallow (stars) |
+| `onError` | `(reason: "load" \| "tainted") => void`, once per picture. A picture that fails to load, or comes from another origin without CORS, leaves the plain surface and never throws |
+
+`field` is still the first way in and is unchanged; `paint` is used when there is no `source`, and `source` wins when both are given. `reveal` still animates a field (not a scene or a picture). A canvas with a `source` stays invisible until the picture has arrived, so no half-painted box is ever shown.
+
+The pure half is in `@fabrials/ui/dither` (no directive, as `luma` and `ditherToRamp` already were): `toneLuma(value, tone)`, `desaturate(rgb, amount)`, `coverFit(source, target)`, `containFit(source, target)`, `ditherLumaToRamp(data, width, ramp)`, and `luma` takes three channels as well as a colour.
+
+Radiant can delete `components/app/dither-backdrop.tsx`, `lib/backdrop.ts` (the palettes stay Radiant's: pass them as `paint` and `ramp`) and the image half of `lib/chat-background.ts`; its night sky becomes a `paint` function. Two differences from its version: the surface behind the canvas is `--fui-dither-bg`, not a palette argument, and a picture in `channels` mode is squeezed into the theme's range by default (pass `tone={{ min: 0, max: 255 }}` for the whole one).
+
+### `SidebarAccount`
+
+The row at the foot of a sidebar: the picture (or its initials), the name and a second line, and a menu above it.
+
+| Prop | What it does |
+| --- | --- |
+| `name`, `email`, `image` | Who it is. The initials of the name, or of the email when there is no name, stand in for the picture |
+| `active` | The row is the page the person is on: the plate of a current navigation row |
+| `theme`, `onThemeChange` | Given, the menu ends with a labelled group of three: System, Light, Dark (`ThemePreference`, ready for a `ThemeProvider`: `theme={theme} onThemeChange={setTheme}`) |
+| `children` | The menu's items: your links, your "Sign out" as `DropdownMenuItem`s |
+| `labels` | `trigger(name)` ("Account menu for Ada"), `account` ("Account"), `theme`, `system`, `light`, `dark` |
+| `menuSide`, `menuAlign`, `className`, `menuClassName` | Above the row and aligned to its start by default |
+
+The row is 44 px, 48 px on a phone, and its name keeps its own direction (`dir="auto"`). Folded to icons, only the picture shows and a tooltip says whose it is. It needs a `SidebarProvider` above it (it reads the sidebar's state for the tooltip). `useSidebarSide()` gives the edge the sidebar is on, for a part of your own that opens away from it.
+
+### `SidebarInsetHeader`, `SidebarInsetHeaderActions`, `SidebarInsetContent`, and `SidebarInset frame`
+
+- `SidebarInsetHeader` is the 56 px bar at the top of the inset: a 44 px `SidebarTrigger`, a `title` that truncates (an `h1`–`h4` only when `headingLevel` says so, a plain element otherwise), the actions slot, and `end` for one primary action. A hairline and the surface: no blur, and the notch's inset at the top. `visibility` is `"mobile"` by default, so the bar is drawn only where the sidebar is the phone sheet; `"always"` draws a section title with actions of its own at every width.
+- `SidebarInsetHeaderActions` puts its children in that slot from anywhere inside the inset (a page deep in the app adds its key to the phone's bar without knowing where the bar is).
+- `SidebarInset frame` makes the inset a column of the window's height (`100dvh`) whose `SidebarInsetContent` scrolls, so a header stays while the page moves and a composer or an `ActionBar` can dock at the foot. `skipLabel` (and `contentId`, default `main-content`) adds the skip link `WorkspaceShell` has, first in the inset; the content part takes the id and is focusable for it.
+- `SidebarInsetContent` is a tab stop only while it has more than it shows (as `ScrollArea` is), so the keys can scroll it and Tab does not stop on a box that fits.
+
+Radiant can delete `components/app/mobile-header.tsx` (its `MobileHeaderTitle` becomes `title`, its button an `end`), the `data-slot="mobile-header-actions"` element and the hand-written portal, and the `flex h-svh min-h-0 flex-col overflow-hidden` + `overflow-y-auto` pair of `app/(app)/layout.tsx`. Its title is derived from the route in the product, which stays the product's.
+
+### `EditableText`
+
+A title renamed where it is read.
+
+| Prop | What it does |
+| --- | --- |
+| `value`, `onCommit(next)` | The text, and what to do with the trimmed replacement. A promise keeps it pending until it settles; a rejection puts the old text back |
+| `onError(error)` | What a refused commit says |
+| `pending` | For a host that owns the request: its commit has not settled |
+| `editing`, `defaultEditing`, `onEditingChange` | Controlled or not |
+| `startOn` | `"none"` (a trigger or the host's menu item only, the default), `"doubleClick"` or `"click"` on the text itself; a focused text also opens with Enter or F2 |
+| `showTrigger`, `triggerLabel` | A pencil beside the text ("Rename") |
+| `label`, `placeholder`, `maxLength`, `selectOnEdit`, `dir` | The field. `dir` is `auto`, so a title in any script reads the right way round, and the text is selected as the field takes focus |
+| `pendingLabel`, `truncate`, `className`, `fieldClassName`, `style` | "Saving"; the tooltip on a text that is cut short |
+
+Enter commits, Escape cancels (and stops there, so a sheet around it stays open), leaving the field commits, and a text that came out empty or unchanged calls nobody. The blur those first two cause does not commit a second time, and an Enter in an IME composition is the IME's. When editing ends, the focus goes back to what started it — the pencil, or the text itself, made focusable for that moment. In a row that is a link, the field's clicks and keys stay the field's: the row does not navigate while it is being renamed.
+
+Radiant can delete the rename half of `components/app/app-sidebar.tsx` (its draft, `ignoreNextBlur`, the two effects, the `Input`, the "Rename" item handler) and the `TruncatedText` wrapper around a chat title.
+
+One difference from Radiant's version: it replaced the whole row with a field; here the field sits inside the row, so the row's own size and icon stay put.
+
+### `OnScreenKeyboard`, `useOnScreenKeyboard`, `insertAtCaret`, `backspaceAtCaret`, `neighbourKey`
+
+A keyboard for a script the device's own keyboard lacks. The layout is the host's data: the package ships no language.
+
+- `rows` is an array of rows of keys: `{ value, label?, name?, width?, kind?, lang?, id? }`, where `kind` is `char` (default), `space`, `enter` (both of which write their text), or `backspace` (a whole cluster, repeated while held), or `shift`/`custom` (the host's own: they call `onKey` and write nothing).
+- `target` is a ref to the field the keys type into; `onKey(key, { row, column })` hears every press first. With a target, a key writes at the caret, replaces the selection and dispatches a real `input` event, so a React-controlled field updates; with no target the host does it all in `onKey`.
+- It is one toolbar with one tab stop: the arrows move by where the keys are on screen (`neighbourKey`), Home and End stay in the row, and Enter or Space types the key in focus. A press with a finger or the pointer never takes the focus from the field, so the caret stays where the person left it.
+- Keys are at least 44 px under a finger and never smaller than 32 px; the gaps give way first on a narrow keyboard.
+- `useOnScreenKeyboard({ storageKey, defaultOpen })` returns `{ open, setOpen, toggle, inputProps }`: open by itself where the pointer is a finger, held open or shut by the person from then on, remembered in `localStorage` (read outside render, with an in-memory fallback). `inputProps` goes on the field and hides the device's own keyboard while this one is up.
+
+The pure half: `caret.ts` (`insertAtCaret`, `backspaceAtCaret`, and `backspaceAtCaretWithoutSegmenter` for a runtime without `Intl.Segmenter`) and `key-nav.ts` (`neighbourKey`, with `KeyBox`).
+
+Radiant can delete `components/lang/keyboard/arabic-keyboard.tsx`, `keyboard/caret.ts` and the dock half of `exercise/text-field.tsx` (`useArabicDock`, the remembered key, `inputMode="none"`, the toggle); its layout data (`keyboard/layout.ts`, `keys.ts`) becomes the rows it passes, and its Arabic messages become `name`s.
+
+Differences from Radiant's copy: the keyboard no longer assumes Arabic or right to left (`dir` and `label` are props), the layers and the vowel-mark row are the host's data rather than the component's state, and `insertAtCaret`/`backspaceAtCaret` are unchanged in behaviour but take `(value, selectionStart, selectionEnd, text)` as plain values.
+
+### Looks or behaves differently
+
+- Nothing, for a page that uses none of this. The styles are one new block at the end of `styles.css`.
+- `DitherCanvas` now paints a plain surface when it has no `field`, no `paint` and no `source` (before, an empty canvas). With a `source`, the canvas stays at 0 opacity until the picture arrives.
+- `SidebarInset` renders a context provider around its children (no extra element), and `SidebarInsetContent` is a new part: neither changes the markup of a sidebar that does not use them.

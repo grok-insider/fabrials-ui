@@ -21,6 +21,7 @@ import { IconButton, type IconButtonProps } from "./icon-button";
 import { SearchInput, type SearchInputProps } from "./inputs";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./menu";
 import { sidebarTooltipSide, type SidebarSide } from "./sidebar-side";
+import { SidebarInsetContext } from "./sidebar-inset-context";
 import { useIsMobile } from "./use-media-query";
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
@@ -54,6 +55,12 @@ function useSidebar() {
 }
 
 const standalone: Pick<SidebarContextProps, "state" | "isMobile"> = { state: "expanded", isMobile: false };
+
+/** The edge the sidebar is on, for a part drawn by the host that opens away from it (the account row's tooltip). */
+function useSidebarSide(): SidebarSide {
+  const place = React.useContext(SidebarPlaceContext);
+  return place?.side ?? "left";
+}
 
 /** The menu parts read only the state, so a list of navigation rows renders without a provider: expanded, not mobile. */
 function useSidebarState() {
@@ -346,13 +353,41 @@ function SidebarRail({
   );
 }
 
-function SidebarInset({ className, ...props }: React.ComponentProps<"main">) {
+function SidebarInset({
+  frame = false,
+  skipLabel,
+  contentId = "main-content",
+  className,
+  children,
+  ...props
+}: React.ComponentProps<"main"> & {
+  /**
+   * A column of the window's height whose content scrolls inside, so a header stays and a composer or an `ActionBar` can
+   * dock at the foot. Fills the inner area with `SidebarInsetContent`.
+   */
+  frame?: boolean;
+  /** Words for a link to the content, first in the inset (`"Skip to content"`). Off unless given. */
+  skipLabel?: string;
+  /** The element the skip link goes to: the id `SidebarInsetContent` takes. */
+  contentId?: string;
+}) {
+  const [actions, setActions] = React.useState<HTMLElement | null>(null);
   return (
-    <main
-      data-slot="sidebar-inset"
-      className={cn("fui-sidebar-inset", className)}
-      {...props}
-    />
+    <SidebarInsetContext.Provider value={{ contentId, actions, setActions }}>
+      <main
+        data-slot="sidebar-inset"
+        data-frame={frame || undefined}
+        className={cn("fui-sidebar-inset", (frame || skipLabel) && "fui-sidebar-inset-framed", className)}
+        {...props}
+      >
+        {skipLabel ? (
+          <a className="fui-skip-link" href={`#${contentId}`}>
+            {skipLabel}
+          </a>
+        ) : null}
+        {children}
+      </main>
+    </SidebarInsetContext.Provider>
   );
 }
 
@@ -724,4 +759,5 @@ export {
   SidebarSeparator,
   SidebarTrigger,
   useSidebar,
+  useSidebarSide,
 };
