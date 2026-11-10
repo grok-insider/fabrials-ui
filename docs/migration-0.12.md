@@ -1449,3 +1449,66 @@ The keyboard and screen-reader suite of this release (`tests/visual/behaviour-01
 - **Pass `items` to `Select`.** `SelectValue` shows the raw value unless the root is given `items` (`<Select items={{ northwind: "Northwind" }}>`), which lets it print the label of the chosen row. It is Base UI's API; shadcn's examples pass `items` too.
 - **`AlertDialogAction` does not close the dialog.** It is a plain `Button`, as it is in shadcn's Base UI alert dialog, because Base UI has no action part: a host that waits for an async delete closes the dialog itself when the answer arrives. `ConfirmDialog` and `useConfirm` do exactly that for the common case, and `AlertDialogCancel` is the part that closes by itself.
 - A tooltip that repeats the control's name is silent to a screen reader (see above); one that adds to it describes the control.
+
+## Inside: fewer copies of the same thing
+
+Nothing here changes how a piece looks. Two packages that had grown the same small helpers twice now share one of each, and the one behaviour that was wrong is fixed. Everything is additive: no export is removed, no name changes, no default changes.
+
+### One way to copy: `useCopy` and `CopyStatus`
+
+`CopyButton`, the copy key of `CodePanel`/`CodeTabs`, `useCopyToClipboard` in `@fabrials/ai-ui`, `CopyMessageAction` and the spreadsheet's Ctrl+C all keep their own small machine through one hook.
+
+```tsx
+const { status, copy } = useCopy({ resetAfter: 1600, onCopied: (text) => toast(`Copied ${text.length} characters`) });
+<CopyButton onClick={() => void copy(value)} … />
+<CopyStatus labels={{ copied: "Copied to clipboard" }} status={status} />
+```
+
+| Export | What it does |
+| --- | --- |
+| `useCopy({ resetAfter, onCopied, onError })` | `{ status, copy(source, write?), report(result), reset }`. `status` is `"idle"`, `"copied"` (for `resetAfter` ms, 1600 by default) or `"failed"` (until the next copy). `copy` takes text or a function that makes it, writes with `navigator.clipboard.writeText`, never rejects and answers whether it worked. `write` replaces the clipboard write entirely. `report` moves the state without copying, for a key that copies elsewhere. |
+| `CopyStatus` | The live region a copy speaks through: always mounted, empty until something happens. `role="status"` by default; `live="polite"` is the plain `aria-live` span a key inside a button carries, so a panel keeps the one named region it has always had. `failedClassName` shows a failure instead of hiding it. |
+| `copyState(state, event)` | The machine as a plain function, for a host that keeps the state itself. |
+| `copyText` (unchanged) | The subpath helper (`@fabrials/ui/export`) that also falls back to a hidden field; the migration panel's copy uses it, because it keeps no copy state and its error line shows the reason. `CopyButton` and the hook do not fall back: a clipboard that refuses stays a reported failure. |
+
+- Timings, words, classes and props' meanings are what they were: `CopyButton` 1600 ms and `useCopyToClipboard`/`CopyMessageAction` 2000 ms; `CopyButton.onCopy` and `useCopy.onCopied` are **notifications**, while `useCopyToClipboard`'s second argument to `copy` and `CopyMessageAction.onCopy` still **replace** the write (their JSDoc says so).
+- **One behaviour changes, and only for a screen reader.** `CopyMessageAction` used to rename the focused key from "Copy" to "Copied" for two seconds, which assistive technology does not reliably announce. The key now keeps its name, its icon still swaps to the tick, its tooltip still says "Copied", and the words go to a `CopyStatus` beside it. `CopyButton` and the code pieces still rename themselves, as they always have, and still carry a polite region.
+
+### One reading of the motion preference: `prefersReducedMotion`, `useReducedMotion`
+
+`prefersReducedMotion()` is a one-off read and `false` where there is no `matchMedia`; `useReducedMotion()` is the same answer kept up to date (`useSyncExternalStore`, `false` on the server), and `REDUCED_MOTION_QUERY` is the query for the rare caller that watches it itself. The hand-written checks in `DitherCanvas`, `MoonPhase`, the media player, `Readout`, `ScrambleText`, `NumberTicker`, `Carousel`, `Alert`, `useRevealSelectedTab`, and in `@fabrials/ai-ui`'s `AgentThinking` and the conversation all go through them now.
+
+### One clock: `subscribeTick`
+
+`subscribeTick(intervalMs, listener)` calls the listener every `intervalMs` (50 ms at the least) through one interval shared by everyone who asked for that period. The timers stop while the page is hidden and the listener runs once as it shows again; a window taking focus and a page restored from the back-forward cache wake everyone too. It returns the unsubscribe, and the last one out takes the interval and the listeners with it. `useCountdown` was its first user; `useWorkTime` read a timer of its own and now reads this one.
+
+### A vocabulary to grow into: `canonicalSize`
+
+`md` and `default` name the same middle size. One helper, `canonicalSize(size, canonical)`, gives back the word a component draws with, so a product that settled on `md` can pass it anywhere and get the same pixels, the same class and the same `data-*` value. Nothing is deprecated.
+
+| Component | Middle size written | Now accepts |
+| --- | --- | --- |
+| `Badge`, `Progress`, `Toggle`, `ToggleGroup`, `ThemeSwitcher` | `default` | `md` |
+| `Item`, the field size of `SearchInput`, `PasswordInput`, `NumberField` | `default` | `md` |
+| `DisclosureSummary`, `ActivityStrip`, `ProductLockup`, `StatePanel`, `SidebarMenuSubButton`, `Attachments` (ai-ui) | `md` | `default` |
+
+`Button` (`icon-*`, `touch`), the pixel-number sizes (`size={40}`), `Avatar`, `ClipPlayer` and `SelectTrigger` are left as they are.
+
+### Sides
+
+`TruncatedText` and `StatusPopover` narrowed `side` to the four physical edges; they now pass `inline-start` and `inline-end` through to Base UI like `Dialog placement`, `Sheet`, `SidePanel`, `Sidebar`, `Popover` and the tooltip already did. No default moves.
+
+### What Radiant and other products can delete
+
+- Their own copy hook and its per-key "Copied" state (`useCopyToClipboard` and the like): `useCopy` plus one `CopyStatus` per piece.
+- Their reduced-motion helpers (`useReducedMotion` and the local `prefersReducedMotion` functions): import the two from `@fabrials/ui`.
+- Their own interval for a work timer or a countdown: `subscribeTick`.
+
+### What was deliberately left
+
+- **The icons of `@fabrials/ai-ui` stay copied.** `chat-icons.tsx` draws Lucide's paths because ai-ui declares no icon dependency of its own (its peers are `@fabrials/ui` and React, and a package must not reach into a dependency of a dependency), and because lucide-react's markup (a 24 px box, its own classes) would change every icon in the chat. The comment at the top of the file now says that.
+- **`Attachments` keeps its own ring and file preview.** The upload ring is a rounded square that hugs the tile (`rx=9`, `pathLength=100`) and the preview is a category glyph or a still; `Progress variant="ring"` is a 16/24/48 px circle and `FileThumb` a 40 px tile with an extension label. Swapping either changes pixels: see `tests/visual/composer-012.spec.ts-snapshots/composer-012-light-1440-linux.png` (the 36 % tile). `typeLabel` also differs from `fileTypeLabel` on purpose (MIME subtype, any length, against extension first, four letters at most), so `attachmentDetail` keeps its own.
+- **`RelativeTime` keeps its adaptive timer** (5 s, 30 s or 5 min depending on the age it prints) rather than the shared fixed period; `hosted-migration`, `synchronized-consumption`, `providers`, `voice-input` and `recorder` keep their own timers (an upload's cadence, a poll, a recording clock).
+- **`MoonPhase` and the media player keep their own `change` listeners** (they redraw imperatively in an effect); they only share `REDUCED_MOTION_QUERY` now.
+- **`tone` beside a status `variant`**: `Alert` already has both, and no other non-button piece names a status through `variant` or `intent` (`ConfirmDialog` and `useConfirm` keep `destructive`, a boolean, which is not a status name). Nothing to change.
+- **`formatBytes`** in `@fabrials/ai-ui` was already the deprecated wrapper over the generic one.
