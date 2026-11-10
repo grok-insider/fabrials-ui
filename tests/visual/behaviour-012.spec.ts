@@ -50,7 +50,7 @@ test.describe("HoverCard", () => {
     await expect(trigger).toBeFocused();
     // Escape is not a trap: the next Tab leaves the trigger, and a fresh focus opens the preview again.
     await page.keyboard.press("Tab");
-    expect(await focused(page)).toBe("Next control");
+    await expect.poll(() => focused(page)).toBe("Next control");
     await expect(card).toBeHidden();
     await page.keyboard.press("Shift+Tab");
     await expect(trigger).toBeFocused();
@@ -131,19 +131,19 @@ test.describe("NavigationMenu", () => {
     await page.keyboard.press("Enter");
     await expect(first).toHaveAttribute("aria-expanded", "true");
     await page.keyboard.press("Tab");
-    expect(await focused(page)).toBe("Overview");
+    await expect.poll(() => focused(page)).toBe("Overview");
     await page.keyboard.press("ArrowDown");
-    expect(await focused(page)).toBe("Changelog");
+    await expect.poll(() => focused(page)).toBe("Changelog");
     await page.keyboard.press("Escape");
     await expect(first).toBeFocused();
     await expect(first).toHaveAttribute("aria-expanded", "false");
     // Between the triggers, and the plain link is part of the row.
     await page.keyboard.press("ArrowRight");
-    expect(await focused(page)).toBe("Resources");
+    await expect.poll(() => focused(page)).toBe("Resources");
     await page.keyboard.press("ArrowRight");
-    expect(await focused(page)).toBe("Docs");
+    await expect.poll(() => focused(page)).toBe("Docs");
     await page.keyboard.press("ArrowLeft");
-    expect(await focused(page)).toBe("Resources");
+    await expect.poll(() => focused(page)).toBe("Resources");
   });
 
   test("the current page is marked and the panel sits under its trigger", async ({ page }) => {
@@ -426,7 +426,7 @@ test.describe("DropdownMenu and ContextMenu", () => {
     await share.focus();
     await page.keyboard.press("ArrowRight");
     await expect(page.getByRole("menu", { name: "Share" })).toBeVisible();
-    expect(await focused(page)).toBe("Copy link⌘C");
+    await expect.poll(() => focused(page)).toBe("Copy link⌘C");
     await page.keyboard.press("ArrowLeft");
     await expect(page.getByRole("menu", { name: "Share" })).toBeHidden();
     await expect(share).toBeFocused();
