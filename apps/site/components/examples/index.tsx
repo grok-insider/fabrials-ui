@@ -83,6 +83,15 @@ import {
   zoomPanExamples,
 } from "./data-012";
 import { sidebarAccountExamples, sidebarExamples } from "./shell-012";
+import {
+  artifactFrameExamples,
+  composerSelectExamples,
+  conversationExamples,
+  editableMessageExamples,
+  markdownCalloutExamples,
+  useAttachmentsExamples,
+} from "./chat-012";
+import { consumptionViewExamples, providerCardExamples } from "./accounts-012";
 
 /** Examples by catalogue slug. `lib/example-slugs.ts` lists the same keys for the server; a test keeps them equal. */
 export const exampleSets: Record<string, ExampleSet> = {
@@ -156,6 +165,14 @@ export const exampleSets: Record<string, ExampleSet> = {
   "drop-overlay": dropOverlayExamples,
   sidebar: sidebarExamples,
   "sidebar-account": sidebarAccountExamples,
+  conversation: conversationExamples,
+  "artifact-frame": artifactFrameExamples,
+  "use-attachments": useAttachmentsExamples,
+  "markdown-callout": markdownCalloutExamples,
+  "composer-select": composerSelectExamples,
+  "editable-message": editableMessageExamples,
+  "provider-card": providerCardExamples,
+  "consumption-view": consumptionViewExamples,
 };
 
 export type { Example, ExampleSet } from "./types";

@@ -5,6 +5,7 @@ import { moreDemos } from "@/components/ui-demos-more";
 import { instrumentDemos } from "@/components/ui-demos-instrument";
 import { demos012 } from "@/components/ui-demos-012";
 import { demos012b } from "@/components/ui-demos-012b";
+import { demos012c } from "@/components/ui-demos-012c";
 import { exampleSets } from "@/components/examples";
 import { Frame, type FrameWidth } from "@/components/demo-frame";
 import {
@@ -1240,7 +1241,7 @@ export function UiDemo({ slug }: { slug: string }) {
         <Preview />
       </Frame>
     );
-  const Demo = demos[slug] ?? moreDemos[slug] ?? instrumentDemos[slug] ?? demos012[slug] ?? demos012b[slug];
+  const Demo = demos[slug] ?? moreDemos[slug] ?? instrumentDemos[slug] ?? demos012[slug] ?? demos012b[slug] ?? demos012c[slug];
   if (!Demo) return <p className="text-sm">This preview is not available.</p>;
   return <Demo />;
 }

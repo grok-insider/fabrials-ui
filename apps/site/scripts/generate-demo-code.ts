@@ -22,6 +22,7 @@ const SOURCES = [
   ["components/ui-demos-instrument.tsx", "instrumentDemos"],
   ["components/ui-demos-012.tsx", "demos012"],
   ["components/ui-demos-012b.tsx", "demos012b"],
+  ["components/ui-demos-012c.tsx", "demos012c"],
 ] as const;
 const FRAME = "Frame";
 const MODULE_ORDER = ["react", "lucide-react", "@fabrials/ui", "@fabrials/ui/dither", "@fabrials/ai-ui"];

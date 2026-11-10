@@ -71,6 +71,14 @@ export const exampleSlugs = [
   "drop-overlay",
   "sidebar",
   "sidebar-account",
+  "conversation",
+  "artifact-frame",
+  "use-attachments",
+  "markdown-callout",
+  "composer-select",
+  "editable-message",
+  "provider-card",
+  "consumption-view",
 ] as const;
 
 export function hasExamples(slug: string) {
