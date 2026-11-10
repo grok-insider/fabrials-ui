@@ -59,7 +59,14 @@ export type InputProps = ComponentProps<"input"> & {
   count?: CountProps;
 };
 
-export function Input({ className, count, id, value, defaultValue, onChange, "aria-describedby": describedBy, maxLength, ...props }: InputProps) {
+/** Without `count` this is the plain field it has always been: the same element, attributes in the caller's order, no state. */
+export function Input({ count, ...props }: InputProps) {
+  if (count) return <CountedInput count={count} {...props} />;
+  const { className, ...rest } = props;
+  return <input className={classes("fui-input", className)} {...rest} />;
+}
+
+function CountedInput({ className, count, id, value, defaultValue, onChange, "aria-describedby": describedBy, maxLength, ...props }: InputProps & { count: CountProps }) {
   const counted = useCountedValue(value, defaultValue);
   const generated = useId();
   const { maxLength: hardMax } = countLimit(count);
@@ -78,7 +85,6 @@ export function Input({ className, count, id, value, defaultValue, onChange, "ar
       {...props}
     />
   );
-  if (!count) return input;
   return (
     <div className="fui-count-field">
       {input}
@@ -110,7 +116,44 @@ function useCountedValue(value: string | number | readonly string[] | undefined,
   return { shown, track: (next: string) => setTyped(next) };
 }
 
-export function Textarea({
+/** Without `count` this is the textarea of 0.11, unchanged; with it, the same field over its counter. */
+export function Textarea({ count, ...props }: TextareaProps) {
+  return count ? <CountedTextarea count={count} {...props} /> : <PlainTextarea {...props} />;
+}
+
+function PlainTextarea({ className, autoResize = false, minRows, maxRows, style, ref, onInput, ...props }: Omit<TextareaProps, "count">) {
+  const own = useRef<HTMLTextAreaElement | null>(null);
+  const measure = () => {
+    const node = own.current;
+    if (!autoResize || fieldSizing || !node) return;
+    node.style.height = "auto";
+    node.style.height = `${node.scrollHeight + node.offsetHeight - node.clientHeight}px`;
+  };
+  useEffect(measure);
+  return (
+    <textarea
+      className={classes("fui-input", "fui-textarea", className)}
+      data-autoresize={autoResize ? "" : undefined}
+      style={
+        autoResize
+          ? ({ ...style, "--fui-textarea-min-rows": minRows ?? 2, "--fui-textarea-max-rows": maxRows ?? 12 } as CSSProperties)
+          : style
+      }
+      ref={(node) => {
+        own.current = node;
+        if (typeof ref === "function") return ref(node);
+        if (ref) ref.current = node;
+      }}
+      onInput={(event) => {
+        measure();
+        onInput?.(event);
+      }}
+      {...props}
+    />
+  );
+}
+
+function CountedTextarea({
   className,
   autoResize = false,
   minRows,
@@ -125,7 +168,7 @@ export function Textarea({
   "aria-describedby": describedBy,
   maxLength,
   ...props
-}: TextareaProps) {
+}: TextareaProps & { count: CountProps }) {
   const own = useRef<HTMLTextAreaElement | null>(null);
   const counted = useCountedValue(value, defaultValue);
   const generated = useId();
@@ -164,7 +207,6 @@ export function Textarea({
       {...props}
     />
   );
-  if (!count) return area;
   return (
     <div className="fui-count-field">
       {area}
