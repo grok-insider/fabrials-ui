@@ -1237,13 +1237,14 @@
     gap: var(--fui-space-1-5);
     width: 100%;
     min-height: 1.875rem;
-    padding: 0.125rem var(--fui-space-2) 0.125rem calc(var(--fui-space-2) + var(--fui-files-depth, 0) * 1.125rem);
+    padding: 0.125rem var(--fui-space-2);
+    padding-inline-start: calc(var(--fui-space-2) + var(--fui-files-depth, 0) * 1.125rem);
     border: 0;
     border-radius: var(--fui-radius-sm);
     background: none;
     color: var(--foreground);
     font: inherit;
-    text-align: left;
+    text-align: start;
   }
   button.fui-files-row {
     cursor: pointer;
@@ -1273,7 +1274,7 @@
     font-size: 0.8125rem;
   }
   .fui-files-note {
-    margin-left: auto;
+    margin-inline-start: auto;
     color: var(--muted-foreground);
     font-size: var(--fui-text-xs);
   }
@@ -4038,7 +4039,8 @@
     justify-content: space-between;
     gap: var(--fui-space-3);
     margin-bottom: var(--fui-space-4);
-    padding: var(--fui-space-2) var(--fui-space-2) var(--fui-space-2) var(--fui-space-4);
+    padding: var(--fui-space-2);
+    padding-inline-start: var(--fui-space-4);
     border: 1px solid color-mix(in oklab, var(--brand-ink) 28%, var(--border));
     border-radius: var(--fui-radius-md);
     background: color-mix(in oklab, var(--brand) 7%, var(--card));
@@ -4185,7 +4187,7 @@
   .fui-skip-link {
     position: fixed;
     top: var(--fui-space-2);
-    left: var(--fui-space-2);
+    inset-inline-start: var(--fui-space-2);
     z-index: 100;
     padding: var(--fui-space-2) var(--fui-space-3);
     border-radius: var(--fui-radius-md);
@@ -4642,16 +4644,30 @@
       right var(--fui-duration-slow) var(--fui-ease),
       width var(--fui-duration-slow) var(--fui-ease);
   }
+  /* "left" and "right" are physical sides: the same edge, with its border on the inner side, in every writing direction.
+     "start" and "end" (0.12) are the logical ones. */
   .fui-sidebar-container[data-side="left"] {
     left: 0;
   }
   .fui-sidebar-container[data-side="right"] {
     right: 0;
   }
+  .fui-sidebar-container[data-side="start"] {
+    inset-inline-start: 0;
+  }
+  .fui-sidebar-container[data-side="end"] {
+    inset-inline-end: 0;
+  }
   .fui-sidebar[data-variant="sidebar"] .fui-sidebar-container[data-side="left"] {
-    border-inline-end: 1px solid var(--sidebar-border);
+    border-right: 1px solid var(--sidebar-border);
   }
   .fui-sidebar[data-variant="sidebar"] .fui-sidebar-container[data-side="right"] {
+    border-left: 1px solid var(--sidebar-border);
+  }
+  .fui-sidebar[data-variant="sidebar"] .fui-sidebar-container[data-side="start"] {
+    border-inline-end: 1px solid var(--sidebar-border);
+  }
+  .fui-sidebar[data-variant="sidebar"] .fui-sidebar-container[data-side="end"] {
     border-inline-start: 1px solid var(--sidebar-border);
   }
   .fui-sidebar[data-collapsible="offcanvas"] .fui-sidebar-container[data-side="left"] {
@@ -4659,6 +4675,12 @@
   }
   .fui-sidebar[data-collapsible="offcanvas"] .fui-sidebar-container[data-side="right"] {
     right: calc(var(--sidebar-width) * -1);
+  }
+  .fui-sidebar[data-collapsible="offcanvas"] .fui-sidebar-container[data-side="start"] {
+    inset-inline-start: calc(var(--sidebar-width) * -1);
+  }
+  .fui-sidebar[data-collapsible="offcanvas"] .fui-sidebar-container[data-side="end"] {
+    inset-inline-end: calc(var(--sidebar-width) * -1);
   }
   .fui-sidebar[data-collapsible="icon"] .fui-sidebar-container {
     width: var(--sidebar-width-icon);
@@ -4764,7 +4786,7 @@
   .fui-sidebar-group-action {
     position: absolute;
     top: 0.875rem;
-    right: var(--fui-space-4);
+    inset-inline-end: var(--fui-space-4);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -4802,8 +4824,14 @@
   .fui-sidebar-menu:has(> .fui-sidebar-menu-item > .fui-sidebar-menu-button[data-size="touch"]) {
     gap: 0;
   }
+  /* One column whose first row is the menu button: the action and the floating count are placed against that row (an
+     absolutely positioned grid child takes its grid area as its containing block; all four lines are named, because an
+     "auto" line there is the container's edge), so they stay centred on it when the row grows (44 px on a phone, a name
+     that wraps) and when a sub menu follows it. */
   .fui-sidebar-menu-item {
     position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
   }
   .fui-sidebar-menu-button {
     position: relative;
@@ -4870,12 +4898,12 @@
      Stormlight bar on its start edge. */
   .fui-sidebar-menu-button[data-active] {
     background: var(--fui-sidebar-active);
-    box-shadow: var(--fui-shadow-xs), var(--fui-highlight);
-    color: var(--sidebar-accent-foreground);
+    box-shadow: var(--fui-sidebar-active-shadow, var(--fui-shadow-xs), var(--fui-highlight));
+    color: var(--fui-sidebar-active-ink, var(--sidebar-accent-foreground));
     font-weight: var(--fui-weight-medium);
   }
   .fui-sidebar-menu-button[data-active] svg {
-    color: var(--sidebar-accent-foreground);
+    color: var(--fui-sidebar-active-icon, var(--fui-sidebar-active-ink, var(--sidebar-accent-foreground)));
   }
   .fui-sidebar-menu-button[data-active]::before {
     content: "";
@@ -4884,7 +4912,7 @@
     inset-inline-start: 0;
     width: var(--fui-bar);
     border-radius: var(--fui-radius-full);
-    background: var(--brand-ink);
+    background: var(--fui-sidebar-active-bar, var(--brand-ink));
   }
   /* touch: a navigation row. The border box is the 44 px target, the padding box the 40 px band (the transparent block
      borders are the 2 px above and below), so the focus ring is drawn on the element and hugs the band. */
@@ -4913,9 +4941,11 @@
   /* A touch row's transparent block borders are its target, so a shadow outside them would float 2 px off the band; the band
      draws its edge inside instead. */
   .fui-sidebar-menu-button[data-size="touch"][data-active] {
-    box-shadow:
+    box-shadow: var(
+      --fui-sidebar-active-shadow,
       inset 0 0 0 1px color-mix(in oklab, var(--foreground) 7%, transparent),
-      var(--fui-highlight);
+      var(--fui-highlight)
+    );
   }
   /* The icon column stays quiet: a row's state is its fill and bar, not a darker glyph. */
   .fui-sidebar-menu-button[data-size="touch"] svg,
@@ -4960,8 +4990,9 @@
   }
   .fui-sidebar-menu-action {
     position: absolute;
-    top: 0.4375rem;
-    right: var(--fui-space-1);
+    grid-area: 1 / 1 / 2 / 2;
+    top: calc(50% - 0.625rem);
+    inset-inline-end: var(--fui-space-1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -4978,12 +5009,6 @@
     width: 1rem;
     height: 1rem;
   }
-  .fui-sidebar-menu-button[data-size="sm"] ~ .fui-sidebar-menu-action {
-    top: 0.25rem;
-  }
-  .fui-sidebar-menu-button[data-size="lg"] ~ .fui-sidebar-menu-action {
-    top: 0.875rem;
-  }
   .fui-sidebar[data-collapsible="icon"] :is(.fui-sidebar-menu-action, .fui-sidebar-menu-badge, .fui-sidebar-menu-sub) {
     display: none;
   }
@@ -4998,8 +5023,9 @@
   }
   .fui-sidebar-menu-badge {
     position: absolute;
-    top: 0.4375rem;
-    right: var(--fui-space-1);
+    grid-area: 1 / 1 / 2 / 2;
+    top: calc(50% - 0.625rem);
+    inset-inline-end: var(--fui-space-1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -5036,8 +5062,10 @@
     flex-direction: column;
     gap: 2px;
     min-width: 0;
-    margin: 0 0 0 1.125rem;
-    padding: 2px 0 2px 0.625rem;
+    margin: 0;
+    margin-inline-start: 1.125rem;
+    padding: 2px 0;
+    padding-inline-start: 0.625rem;
     border-inline-start: 1px solid var(--sidebar-border);
     list-style: none;
   }
@@ -5071,10 +5099,11 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+  /* The rail straddles the sidebar's inner edge: the inline end of a start sidebar, which is where today's left one has it. */
   .fui-sidebar-rail {
     position: absolute;
     inset-block: 0;
-    right: -0.5rem;
+    inset-inline-end: -0.5rem;
     z-index: 20;
     display: none;
     width: 1rem;
@@ -5082,6 +5111,17 @@
     border: 0;
     background: transparent;
     cursor: w-resize;
+  }
+  .fui-sidebar[data-side="end"] .fui-sidebar-rail {
+    inset-inline: -0.5rem auto;
+  }
+  .fui-sidebar[data-side="left"] .fui-sidebar-rail {
+    inset-inline: auto;
+    right: -0.5rem;
+  }
+  .fui-sidebar[data-side="right"] .fui-sidebar-rail {
+    inset-inline: auto;
+    left: -0.5rem;
   }
   .fui-sidebar-rail::after {
     content: "";
@@ -5093,6 +5133,14 @@
   }
   .fui-sidebar[data-state="collapsed"] .fui-sidebar-rail {
     cursor: e-resize;
+  }
+  /* A sidebar on the right edge (by its side or by the direction) closes towards the east. */
+  .fui-sidebar:is([data-side="right"], [data-side="end"]:dir(ltr), [data-side="start"]:dir(rtl)) .fui-sidebar-rail {
+    cursor: e-resize;
+  }
+  .fui-sidebar:is([data-side="right"], [data-side="end"]:dir(ltr), [data-side="start"]:dir(rtl))[data-state="collapsed"]
+    .fui-sidebar-rail {
+    cursor: w-resize;
   }
   .fui-sidebar-input.fui-input {
     min-height: 2rem;
@@ -5736,12 +5784,12 @@
   }
   .fui-carousel-previous[data-orientation="horizontal"] {
     top: 50%;
-    left: -3rem;
+    inset-inline-start: -3rem;
     translate: 0 -50%;
   }
   .fui-carousel-next[data-orientation="horizontal"] {
     top: 50%;
-    right: -3rem;
+    inset-inline-end: -3rem;
     translate: 0 -50%;
   }
   .fui-carousel-previous[data-orientation="vertical"] {
@@ -6896,7 +6944,7 @@
     color: var(--foreground);
     font: inherit;
     font-family: var(--fui-font-sans);
-    text-align: left;
+    text-align: start;
     cursor: pointer;
     transition:
       background-color var(--fui-duration) var(--fui-ease),
@@ -7168,7 +7216,7 @@
     position: absolute;
     top: calc(var(--fui-space-2-5) + 1.75rem + 2px);
     bottom: calc(-1 * var(--fui-space-2-5) + 2px);
-    left: calc(var(--fui-space-2) + 0.875rem - 0.5px);
+    inset-inline-start: calc(var(--fui-space-2) + 0.875rem - 0.5px);
     width: 1px;
     background: var(--border);
   }
@@ -7224,7 +7272,7 @@
   .fui-timeline-actions {
     display: inline-flex;
     gap: var(--fui-space-1);
-    margin-left: auto;
+    margin-inline-start: auto;
   }
   .fui-timeline-content {
     min-width: 0;
@@ -8799,7 +8847,8 @@
     align-items: center;
     gap: var(--fui-space-2);
     min-height: var(--fui-header-height, 3.5rem);
-    padding: var(--fui-space-2) var(--fui-space-2) var(--fui-space-2) var(--fui-space-4);
+    padding: var(--fui-space-2);
+    padding-inline-start: var(--fui-space-4);
     border-block-end: 1px solid var(--border);
   }
   .fui-side-panel-title {
@@ -9187,7 +9236,8 @@
     justify-content: space-between;
     gap: var(--fui-space-3);
     min-height: var(--fui-header-height);
-    padding: var(--fui-space-1) var(--fui-space-2) var(--fui-space-1) var(--fui-space-4);
+    padding: var(--fui-space-1) var(--fui-space-2);
+    padding-inline-start: var(--fui-space-4);
   }
   .fui-viewer-count,
   .fui-viewer-zoom {
@@ -10189,5 +10239,102 @@
     .fui-progress-scan > span::after {
       background: Highlight;
     }
+  }
+}
+
+/* 0.12: the sidebar's ring, targets and sheet key; right to left for the pieces that were physical; the carousel's region. */
+@layer components {
+  /* A row sits against the edge of a scroll area, which clips a ring drawn outside it: every row size, the sub rows and the
+     two action keys draw theirs inside (touch rows already did, hugging their band). */
+  .fui-sidebar-menu-button:focus-visible,
+  .fui-sidebar-menu-sub-button:focus-visible,
+  .fui-sidebar-menu-action:focus-visible,
+  .fui-sidebar-group-action:focus-visible,
+  .fui-sidebar-group-label:focus-visible {
+    outline-offset: -2px;
+  }
+  /* The icon of the active row follows the row's ink unless it is given its own; in a touch row it stays quiet unless given one. */
+  .fui-sidebar-menu-button[data-size="touch"][data-active] svg {
+    color: var(--fui-sidebar-active-icon, var(--muted-foreground));
+  }
+  /* The two action keys paint 20 px; under a finger their target is 44 px, centred on them. A group label that has a key
+     beside it grows to that height, so the key's target does not reach into the first row. */
+  @media (pointer: coarse) {
+    .fui-sidebar-menu-action::after,
+    .fui-sidebar-group-action::after {
+      content: "";
+      position: absolute;
+      inset: calc((100% - var(--fui-control-height-lg)) / 2);
+    }
+    .fui-sidebar-group:has(> .fui-sidebar-group-action) > .fui-sidebar-group-label {
+      height: var(--fui-control-height-lg);
+    }
+    .fui-sidebar-group-action {
+      top: calc(var(--fui-space-2) + (var(--fui-control-height-lg) - 1.25rem) / 2);
+    }
+    .fui-sidebar[data-collapsible="icon"] .fui-sidebar-group:has(> .fui-sidebar-group-action) > .fui-sidebar-group-label {
+      margin-top: calc(-1 * var(--fui-control-height-lg));
+    }
+  }
+  .fui-sidebar-sheet-bar {
+    display: flex;
+    flex: none;
+    justify-content: flex-end;
+    padding: var(--fui-space-1) var(--fui-space-1) 0;
+  }
+  .fui-sidebar-close.fui-button {
+    flex: none;
+    color: var(--muted-foreground);
+  }
+  .fui-sidebar-search .fui-input {
+    background: var(--background);
+    box-shadow: none;
+  }
+  .fui-sidebar[data-collapsible="icon"] .fui-sidebar-search {
+    display: none;
+  }
+  .fui-sidebar-trigger-icon:dir(rtl) {
+    transform: scaleX(-1);
+  }
+
+  /* Glyphs that point along the line turn with it. */
+  .fui-pagination-step svg:dir(rtl),
+  .fui-files-row:not([aria-expanded="true"]) .fui-files-chevron:dir(rtl),
+  .fui-carousel-control[data-orientation="horizontal"] svg:dir(rtl) {
+    transform: scaleX(-1);
+  }
+  /* The thumb rests at the inline start, so it travels the other way. */
+  .fui-switch[data-checked] .fui-switch-thumb:dir(rtl) {
+    transform: translateX(-1rem);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .fui-switch[data-checked]:active:not([data-disabled]) .fui-switch-thumb:dir(rtl) {
+      transform: translateX(-0.75rem);
+    }
+  }
+  /* The bar a loading field shows where its value would be starts at the inline start (background-position has no logical keyword). */
+  [data-fui-loading]
+    > .fui-loading-content
+    :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="hidden"]), textarea, select):not(
+      :where([data-skeleton="keep"], [data-skeleton="keep"] *)
+    ):dir(rtl) {
+    background-position: right 0.75rem center !important;
+  }
+  [data-fui-loading] > .fui-loading-content textarea:not(:where([data-skeleton="keep"], [data-skeleton="keep"] *)):dir(rtl) {
+    background-position: right 0.75rem top 0.7rem !important;
+  }
+
+  /* A command reads left to right in any page, as code does; its copy key stays at the right, where its lines end. */
+  .fui-snippet-code {
+    direction: ltr;
+  }
+
+  /* The carousel region takes focus for its arrow keys; its ring is drawn inside the viewport, where no frame clips it. */
+  .fui-carousel:focus-visible {
+    outline: none;
+  }
+  .fui-carousel:focus-visible > .fui-carousel-viewport {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: -2px;
   }
 }

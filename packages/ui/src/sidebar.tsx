@@ -4,35 +4,34 @@
 import * as React from "react";
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
-import { PanelLeftIcon } from "lucide-react";
+import { PanelLeftIcon, XIcon } from "lucide-react";
 import { classes as cn } from "./shared";
 import { Button, Input } from "./controls";
 import { Separator, Skeleton } from "./display";
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
 } from "./dialog";
+import { useDirection } from "./direction";
+import { IconButton, type IconButtonProps } from "./icon-button";
+import { SearchInput, type SearchInputProps } from "./inputs";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./menu";
-
-function useIsMobile() {
-  const [isMobile, setIsMobile] = React.useState(false);
-  React.useEffect(() => {
-    const query = window.matchMedia("(max-width: 767px)");
-    const update = () => setIsMobile(query.matches);
-    update();
-    query.addEventListener("change", update);
-    return () => query.removeEventListener("change", update);
-  }, []);
-  return isMobile;
-}
+import { sidebarTooltipSide, type SidebarSide } from "./sidebar-side";
+import { useIsMobile } from "./use-media-query";
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
 const defaultSidebarLabels = { title: "Navigation", description: "Primary navigation for this workspace." };
+const defaultCloseLabel = "Close navigation";
+
+/** What a `Sidebar` tells its parts: the edge it is on, and whether it is the phone sheet (where `SidebarClose` draws). */
+type SidebarPlace = { side: SidebarSide; sheet: boolean; closeLabel: string };
+const SidebarPlaceContext = React.createContext<SidebarPlace | null>(null);
 
 type SidebarContextProps = {
   state: "expanded" | "collapsed";
@@ -73,6 +72,7 @@ function SidebarProvider({
   onOpenChange: setOpenProp,
   keyboardShortcut = SIDEBAR_KEYBOARD_SHORTCUT,
   persist = true,
+  navigationKey,
   className,
   style,
   children,
@@ -85,9 +85,19 @@ function SidebarProvider({
   keyboardShortcut?: string | false;
   /** Remember the state in the `sidebar_state` cookie (default). `false` writes nothing: use it when the host keeps the state. */
   persist?: boolean;
+  /**
+   * Any value that changes when the person navigates (the host's pathname): the phone sheet closes when it does, so a
+   * row that is a link needs no handler of its own. The library imports no router; the first value closes nothing.
+   */
+  navigationKey?: unknown;
 }) {
   const isMobile = useIsMobile();
   const [openMobile, setOpenMobile] = React.useState(false);
+  const [seenNavigationKey, setSeenNavigationKey] = React.useState(navigationKey);
+  if (!Object.is(seenNavigationKey, navigationKey)) {
+    setSeenNavigationKey(navigationKey);
+    setOpenMobile(false);
+  }
   const [_open, _setOpen] = React.useState(defaultOpen);
   const open = openProp ?? _open;
   const setOpen = React.useCallback(
@@ -142,7 +152,7 @@ function SidebarProvider({
         data-slot="sidebar-wrapper"
         data-state={state}
         style={style}
-        className={cn("fui-sidebar-wrapper", "group/sidebar-wrapper", className)}
+        className={cn("fui-sidebar-wrapper", className)}
         {...props}
       >
         {children}
@@ -156,18 +166,26 @@ function Sidebar({
   variant = "sidebar",
   collapsible = "offcanvas",
   labels = defaultSidebarLabels,
+  sheetCloseButton = false,
   className,
   children,
   dir,
   ...props
 }: React.ComponentProps<"div"> & {
-  side?: "left" | "right";
+  /**
+   * The edge it is on. `"left"` and `"right"` are physical: the same edge in every writing direction. `"start"` and `"end"`
+   * follow the direction: the other edge in a right-to-left page.
+   */
+  side?: SidebarSide;
   variant?: "sidebar" | "floating" | "inset";
   collapsible?: "offcanvas" | "icon" | "none";
-  /** The name and description the phone sheet announces (screen-reader text, English by default). */
-  labels?: { title: string; description: string };
+  /** The name and description the phone sheet announces, and the name of its close key (English by default). */
+  labels?: { title: string; description: string; close?: string };
+  /** Put a close key in a row of its own at the top of the phone sheet. Off by default: place a `SidebarClose` in your header instead when it has room for one. */
+  sheetCloseButton?: boolean;
 }) {
   const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
+  const closeLabel = labels.close ?? defaultCloseLabel;
 
   if (collapsible === "none") {
     return (
@@ -198,7 +216,16 @@ function Sidebar({
             <SheetTitle>{labels.title}</SheetTitle>
             <SheetDescription>{labels.description}</SheetDescription>
           </SheetHeader>
-          <div className="fui-sidebar-inner">{children}</div>
+          <SidebarPlaceContext.Provider value={{ side, sheet: true, closeLabel }}>
+            <div className="fui-sidebar-inner">
+              {sheetCloseButton ? (
+                <div className="fui-sidebar-sheet-bar">
+                  <SidebarClose />
+                </div>
+              ) : null}
+              {children}
+            </div>
+          </SidebarPlaceContext.Provider>
         </SheetContent>
       </Sheet>
     );
@@ -225,7 +252,7 @@ function Sidebar({
           data-slot="sidebar-inner"
           className="fui-sidebar-inner"
         >
-          {children}
+          <SidebarPlaceContext.Provider value={{ side, sheet: false, closeLabel }}>{children}</SidebarPlaceContext.Provider>
         </div>
       </div>
     </div>
@@ -257,9 +284,42 @@ function SidebarTrigger({
       }}
       {...props}
     >
-      {children ?? <PanelLeftIcon aria-hidden />}
+      {children ?? <PanelLeftIcon aria-hidden className="fui-sidebar-trigger-icon" />}
       <span className="fui-sr-only">{label}</span>
     </Button>
+  );
+}
+
+/**
+ * The close key of the phone sheet: 44 px, named by the sidebar's `labels.close` (or its own `label`). Put it in the
+ * `SidebarHeader`, beside the brand. It draws nothing while the sidebar is not a sheet, so the same header serves the desktop.
+ */
+function SidebarClose({
+  label,
+  className,
+  children,
+  ...props
+}: Omit<IconButtonProps, "label"> & {
+  /** The key's name. The sidebar's `labels.close` when not given. */
+  label?: string;
+}) {
+  const place = React.useContext(SidebarPlaceContext);
+  if (!place?.sheet) return null;
+  return (
+    <SheetClose
+      render={
+        <IconButton
+          data-slot="sidebar-close"
+          data-sidebar="close"
+          label={label ?? place.closeLabel}
+          tooltip={false}
+          className={cn("fui-sidebar-close", className)}
+          {...props}
+        />
+      }
+    >
+      {children ?? <XIcon aria-hidden />}
+    </SheetClose>
   );
 }
 
@@ -305,6 +365,20 @@ function SidebarInput({
       data-slot="sidebar-input"
       data-sidebar="input"
       className={cn("fui-sidebar-input", className)}
+      {...props}
+    />
+  );
+}
+
+/** The sidebar's search: a `SearchInput` at the sidebar's size (magnifier, clear key, Escape). The text takes its own direction (`dir="auto"`), so a query in another script reads right. */
+function SidebarSearch({ className, size = "sm", dir = "auto", ...props }: SearchInputProps) {
+  return (
+    <SearchInput
+      data-slot="sidebar-search"
+      data-sidebar="search"
+      size={size}
+      dir={dir}
+      className={cn("fui-sidebar-search", className)}
       {...props}
     />
   );
@@ -430,7 +504,7 @@ function SidebarMenuItem({ className, ...props }: React.ComponentProps<"li">) {
     <li
       data-slot="sidebar-menu-item"
       data-sidebar="menu-item"
-      className={cn("fui-sidebar-menu-item", "group/menu-item", className)}
+      className={cn("fui-sidebar-menu-item", className)}
       {...props}
     />
   );
@@ -457,15 +531,13 @@ function SidebarMenuButton({
     tooltip?: string | React.ComponentProps<typeof TooltipContent>;
   }) {
   const { isMobile, state } = useSidebarState();
+  const place = React.useContext(SidebarPlaceContext);
+  const direction = useDirection();
   const comp = useRender({
     defaultTagName: "button",
     props: mergeProps<"button">(
       {
-        className: cn(
-          "fui-sidebar-menu-button",
-          "peer/menu-button group/menu-button",
-          className,
-        ),
+        className: cn("fui-sidebar-menu-button", className),
         "aria-current": isActive ? "page" : undefined,
         style: depth > 0 ? ({ ...style, "--fui-sidebar-depth": Math.min(depth, 4) } as React.CSSProperties) : style,
       },
@@ -487,7 +559,7 @@ function SidebarMenuButton({
     <Tooltip>
       {comp}
       <TooltipContent
-        side="right"
+        side={sidebarTooltipSide(place?.side ?? "left", direction)}
         align="center"
         hidden={state !== "collapsed" || isMobile}
         {...content}
@@ -627,6 +699,7 @@ function SidebarMenuSubButton({
 
 export {
   Sidebar,
+  SidebarClose,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
@@ -647,6 +720,7 @@ export {
   SidebarMenuSubItem,
   SidebarProvider,
   SidebarRail,
+  SidebarSearch,
   SidebarSeparator,
   SidebarTrigger,
   useSidebar,

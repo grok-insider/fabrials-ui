@@ -216,7 +216,7 @@ test("sidebar menu: rows render without a provider (expanded), the count is a sp
       </SidebarMenuItem>
     </SidebarMenu>,
   );
-  assert.match(html, /<a href="\/inbox"[^>]* class="fui-sidebar-menu-button peer\/menu-button group\/menu-button"/);
+  assert.match(html, /<a href="\/inbox"[^>]* class="fui-sidebar-menu-button"/);
   assert.match(html, /aria-current="page"/);
   assert.match(html, /--fui-sidebar-depth:2/);
   assert.match(html, /<span[^>]*data-slot="sidebar-menu-badge"[^>]*>12<\/span>/);

@@ -87,3 +87,4 @@ export * from "./item";
 export * from "./app-header";
 export * from "./resizable";
 export * from "./nav-switcher";
+export * from "./use-media-query";
