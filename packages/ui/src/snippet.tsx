@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState, type ComponentProps } from "react";
+import { useRef, type ComponentProps } from "react";
 import { Check, Copy } from "lucide-react";
 import { Button } from "./controls";
+import { CopyStatus } from "./copy-status";
 import { useLabels } from "./labels";
 import { classes } from "./shared";
+import { useCopy } from "./use-copy";
 import { useOverflowTabStop } from "./use-overflow";
 
 export type CopyButtonProps = Omit<
@@ -15,7 +17,9 @@ export type CopyButtonProps = Omit<
   /** "Copy" by default; a `LabelsProvider` sets it and `copiedLabel` for every copy button (scope `copyButton`). */
   label?: string;
   copiedLabel?: string;
+  /** Told after the text is on the clipboard. It does not replace the copy (`useCopyToClipboard`'s `onCopy` does). */
   onCopy?: (value: string) => void;
+  /** Told what the clipboard threw; the key then shows nothing copied. */
   onCopyError?: (error: unknown) => void;
 };
 
@@ -39,20 +43,8 @@ export function CopyButton({
   ...props
 }: CopyButtonProps) {
   const { copy: label, copied: copiedLabel } = useLabels("copyButton", COPY_LABELS, { copy: ownLabel, copied: ownCopiedLabel });
-  const [copied, setCopied] = useState(false);
-  const timer = useRef<number | undefined>(undefined);
-  useEffect(() => () => window.clearTimeout(timer.current), []);
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(value);
-      setCopied(true);
-      onCopy?.(value);
-      window.clearTimeout(timer.current);
-      timer.current = window.setTimeout(() => setCopied(false), 1600);
-    } catch (error) {
-      onCopyError?.(error);
-    }
-  }
+  const { status, copy } = useCopy({ onCopied: onCopy, onError: onCopyError });
+  const copied = status === "copied";
   return (
     <Button
       type="button"
@@ -62,13 +54,11 @@ export function CopyButton({
       title={copied ? copiedLabel : label}
       data-copied={copied || undefined}
       className={classes("fui-copy-button", className)}
-      onClick={() => void copy()}
+      onClick={() => void copy(value)}
       {...props}
     >
       {copied ? <Check aria-hidden /> : <Copy aria-hidden />}
-      <span className="fui-sr-only" aria-live="polite">
-        {copied ? copiedLabel : ""}
-      </span>
+      <CopyStatus labels={{ copied: copiedLabel }} status={status} />
     </Button>
   );
 }

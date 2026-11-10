@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type HTMLAttributes, type ReactNode } from "react";
-import { CodeLines, LanguageIcon, useOverflowTabStop } from "@fabrials/ui";
+import { useRef, type HTMLAttributes, type ReactNode } from "react";
+import { CodeLines, LanguageIcon, useCopy, useOverflowTabStop } from "@fabrials/ui";
 import { CheckIcon, CopyIcon, DownloadIcon } from "./chat-icons";
 import { codeFilename } from "./format";
 import { useLabels } from "@fabrials/ui";
@@ -23,24 +23,13 @@ const CODE_BLOCK_LABELS: CodeBlockLabels = {
   region: (name) => `${name} code`,
 };
 
+/**
+ * "Copied" for a key of your own, for `resetMs` (2000 by default). Its `copy(text, write)` takes a `write` that REPLACES the
+ * clipboard write; that is the one thing that differs from `useCopy` in `@fabrials/ui`, whose `onCopy` is a notification.
+ */
 export function useCopyToClipboard(resetMs = 2000) {
-  const [copied, setCopied] = useState(false);
-  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  useEffect(() => () => clearTimeout(timer.current), []);
-  const copy = useCallback(
-    async (text: string, write?: (text: string) => void | Promise<void>) => {
-      if (write) await write(text);
-      else if (typeof navigator !== "undefined" && navigator.clipboard) {
-        await navigator.clipboard.writeText(text);
-      } else return false;
-      setCopied(true);
-      clearTimeout(timer.current);
-      timer.current = setTimeout(() => setCopied(false), resetMs);
-      return true;
-    },
-    [resetMs],
-  );
-  return { copied, copy };
+  const { status, copy } = useCopy({ resetAfter: resetMs });
+  return { copied: status === "copied", copy };
 }
 
 function downloadText(text: string, filename: string, mediaType = "text/plain") {
@@ -167,7 +156,7 @@ export function CodeBlock({
               aria-label={copied ? copiedLabel : copyLabel}
               className="fui-code-block-action"
               data-copied={copied || undefined}
-              onClick={() => void copy(text, onCopy).catch(() => undefined)}
+              onClick={() => void copy(text, onCopy)}
               title={copied ? copiedLabel : copyLabel}
               type="button"
             >

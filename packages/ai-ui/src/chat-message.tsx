@@ -1,8 +1,7 @@
 "use client";
 
 import { useLayoutEffect, useRef, type ComponentProps, type HTMLAttributes, type ReactNode } from "react";
-import { Button, LocalTime, Tooltip, TooltipContent, TooltipTrigger } from "@fabrials/ui";
-import { useCopyToClipboard } from "./code-block";
+import { Button, CopyStatus, LocalTime, Tooltip, TooltipContent, TooltipTrigger, useCopy } from "@fabrials/ui";
 import { CheckIcon, CopyIcon } from "./chat-icons";
 
 export type ChatRole = "user" | "assistant" | "system";
@@ -155,28 +154,39 @@ export function MessageAction({ label, tooltip, children, className, ...props }:
   );
 }
 
+/**
+ * Copies the message. The key keeps its name ("Copy") while its icon shows the copy that just happened, and the words in
+ * `copiedLabel` are announced in a live region beside it: a key that renames itself is not read out by every screen reader.
+ */
 export function CopyMessageAction({
   text,
   onCopy,
   label = "Copy",
   copiedLabel = "Copied",
+  tooltip,
   ...props
 }: Omit<MessageActionProps, "label" | "children" | "onClick" | "onCopy"> & {
   text: string | (() => string);
+  /** Puts the text somewhere instead of the clipboard; the copy is then not done at all. */
   onCopy?: (text: string) => void | Promise<void>;
   label?: string;
   copiedLabel?: string;
 }) {
-  const { copied, copy } = useCopyToClipboard();
+  const { status, copy } = useCopy({ resetAfter: 2000 });
+  const copied = status === "copied";
   return (
-    <MessageAction
-      {...props}
-      data-copied={copied || undefined}
-      label={copied ? copiedLabel : label}
-      onClick={() => void copy(typeof text === "function" ? text() : text, onCopy).catch(() => undefined)}
-    >
-      {copied ? <CheckIcon /> : <CopyIcon />}
-    </MessageAction>
+    <>
+      <MessageAction
+        {...props}
+        data-copied={copied || undefined}
+        label={label}
+        tooltip={tooltip ?? (copied ? copiedLabel : label)}
+        onClick={() => void copy(typeof text === "function" ? text() : text, onCopy)}
+      >
+        {copied ? <CheckIcon /> : <CopyIcon />}
+      </MessageAction>
+      <CopyStatus labels={{ copied: copiedLabel }} status={status} />
+    </>
   );
 }
 

@@ -5,6 +5,7 @@
 
 import { useEffect, useId, useMemo, useRef, useState, type ComponentProps, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
 import { asCell, cellAddress, cellKind, cellText, columnName, type Worksheet, type SheetCell, type SheetMerge, type Workbook } from "./spreadsheet-data";
+import { copyText } from "./export";
 import { useLabels, useLocale } from "./labels";
 import { classes } from "./shared";
 
@@ -197,7 +198,7 @@ export function Spreadsheet({
     }
     if (command && event.key.toLowerCase() === "c") {
       event.preventDefault();
-      void navigator.clipboard?.writeText(activeCell?.formula !== undefined && activeCell.value === null ? `=${activeCell.formula}` : cellText(activeCell, locale)).then(
+      void copyText(activeCell?.formula !== undefined && activeCell.value === null ? `=${activeCell.formula}` : cellText(activeCell, locale)).then(
         () => setAnnounce(text.copied(cellAddress(shown.row, shown.column))),
         () => {},
       );

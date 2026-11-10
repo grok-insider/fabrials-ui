@@ -708,31 +708,36 @@ test.describe("Chat pieces", () => {
     await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
     await open(page, "tests-ai-chat--messages");
     const actions = page.locator(".fui-message-actions").first();
-    // By position: the copy action renames itself after copying, so a name-based locator would move to the next message.
+    // By position: the copy action is the first of the row.
     const copy = actions.locator("button").first();
     await expect(copy).toHaveAccessibleName("Copy");
     await tabUntil(page, copy);
     await expect(copy).toBeFocused();
     await page.keyboard.press("Enter");
-    // Read as one state: the copied flag lives for two seconds only.
+    // Read as one state: the copied flag lives for two seconds only, and the key keeps its name (a rename is not read out).
     await expect
       .poll(async () => ({ copied: await copy.getAttribute("data-copied"), name: await copy.getAttribute("aria-label") }))
-      .toEqual({ copied: "true", name: "Copied" });
+      .toEqual({ copied: "true", name: "Copy" });
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe("How should hosts import the shared styles?");
     await expect(actions.getByRole("button", { name: "Edit" })).toBeVisible();
   });
 
-  test.fixme("copying is announced, not only renamed: a live region says so", async ({ page }) => {
-    // Today CopyMessageAction only renames the focused button ("Copy" becomes "Copied"), which a screen reader does not
-    // reliably announce; CopyButton in @fabrials/ui has an aria-live span for exactly this. Expected: a polite live
-    // region that says "Copied" while the button keeps its name.
+  test("copying is announced, not only shown: a live region says so and the key keeps its name", async ({ page }) => {
     await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
     await open(page, "tests-ai-chat--messages");
     const actions = page.locator(".fui-message-actions").first();
-    await actions.locator("button").first().focus();
-    await page.keyboard.press("Enter");
-    const announcement = page.locator("[aria-live=polite]").filter({ hasText: "Copied" });
+    const copy = actions.locator("button").first();
+    const announcement = actions.locator('[role="status"]');
     await expect(announcement).toHaveCount(1);
+    await expect(announcement).toHaveText("");
+    await copy.focus();
+    await page.keyboard.press("Enter");
+    await expect(announcement).toHaveText("Copied");
+    await expect(copy).toHaveAccessibleName("Copy");
+    // The region is for a screen reader only: it takes no room in the row of actions.
+    const box = await announcement.boundingBox();
+    expect(box?.width ?? 0).toBeLessThanOrEqual(1);
+    await expect.poll(async () => announcement.textContent(), { timeout: 4000 }).toBe("");
   });
 
   test("the voice key says what it does in each state and marks the recording one", async ({ page }) => {

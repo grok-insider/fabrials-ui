@@ -1,5 +1,6 @@
 "use client";
 import { PageHeader } from "@fabrials/ui";
+import { copyText } from "@fabrials/ui/export";
 import {
   Button,
   Input,
@@ -213,7 +214,7 @@ export function HostedMigration({
                 disabled={busy}
                 onClick={() =>
                   void run(async () => {
-                    await navigator.clipboard.writeText(invitation.secret);
+                    await copyText(invitation.secret);
                   })
                 }
               >
