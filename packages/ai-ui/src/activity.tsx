@@ -109,7 +109,7 @@ export function ActivityDisclosure({
       >
         <ActivityIcon icon={icon} live={live} />
         {text}
-        <ChevronDownIcon className="fui-disclosure-chevron" />
+        <ChevronDownIcon className="fui-activity-chevron" />
       </CollapsibleTrigger>
       <CollapsibleContent className="fui-activity-body">{children}</CollapsibleContent>
     </Collapsible>

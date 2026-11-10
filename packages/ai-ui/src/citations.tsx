@@ -491,7 +491,7 @@ export function Sources({
           </span>
         ) : null}
         <span>{label(sources.length)}</span>
-        <ChevronDownIcon className="fui-disclosure-chevron" />
+        <ChevronDownIcon className="fui-activity-chevron" />
       </CollapsibleTrigger>
       <CollapsibleContent className="fui-sources-grid" render={<ol />}>
         {sources.map((source, index) => (
