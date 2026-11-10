@@ -79,7 +79,7 @@ Scale tokens: `--fui-text-label` 11, `xs` 12, `sm` 14, `md` 16, `lg` 18, `xl` 20
 ## Space and density
 
 - 4 px grid: `--fui-space-0-5` (2 px) to `--fui-space-24` (96 px). Tailwind's default spacing scale is also 4 px based; stay on it.
-- Controls: 40 px (`--fui-control-height`), `sm` 32, `xs` 28, `lg` 44. Below 768 px or with a coarse pointer every control is 44 px, including segmented toggles and tabs, which keep their painted size and get a 44 px hit area there (an invisible pseudo-element: their group and a header holding a theme switcher do not grow; `size="lg"` paints the whole 44 px). A `Toolbar` pins its 44 px targets in px so 200 % text does not wrap it. Anything else that paints smaller than 44 px (an inline control in a dense line) takes `data-hit="44"` (`"y"` block-wise only, for a control between two fields; `"end"` block-wise and past the end edge only, for an icon button at the end of a group): an invisible pseudo-element grows the target, never the layout (no `overflow`, clip or contain on the same element).
+- Controls: 40 px (`--fui-control-height`), `sm` 32, `xs` 28, `lg` 44. Below 768 px or with a coarse pointer every control is 44 px, including segmented toggles and tabs, which keep their painted size and get a 44 px hit area there (an invisible pseudo-element: their group and a header holding a theme switcher do not grow; `size="lg"` paints the whole 44 px). A `Toolbar` pins its 44 px targets in px so 200 % text does not wrap it. Anything else that paints smaller than 44 px (an inline control in a dense line) takes `data-hit="44"` (`"y"` block-wise only, for a control between two fields; `"end"` block-wise and past the end edge only, for an icon button at the end of a group): an invisible pseudo-element grows the target, never the layout (no `overflow`, clip or contain on the same element). A screen whose every action is a learner's or a phone's takes `Button size="touch"` or `IconButton size="touch"` (44 px on every pointer and in every density) instead of a class of the product's own.
 - `data-density="compact"` on a container: controls 32 px, row padding 8 px. A composition choice for dense tables, not a stored preference.
 - Header 56 px (`--fui-header-height`), sidebar 16rem (icon rail 3.5rem), page gutter 24 px (16 px below 768 px).
 - Working sizes: body 14 px in apps; an operational page shows its data above the fold at 1440 x 900. Loose padding (48 px inside a panel, 24 px gaps between every control) is a defect.
@@ -104,6 +104,7 @@ Scale tokens: `--fui-text-label` 11, `xs` 12, `sm` 14, `md` 16, `lg` 18, `xl` 20
 - A state is a tint of its tone mixed into the card (`--fui-tint-strength`, tags `--fui-tint-strong`, edges `--fui-tint-edge`), with the tone's ink for its text and icon. No coloured side bars.
 - A band inside a plate (a table head, a toolbar well) is `--fui-surface-inset`; a hover fill is `--fui-surface-hover`.
 - Depth comes from the material tokens only (`DESIGN.md` › Material): elevation `--fui-shadow-xs/sm/md/lg`, keys `--fui-bevel` + `--fui-sheen`, raised parts `--fui-highlight` + `--fui-sheen-soft`, wells `--fui-shadow-well`, `--fui-pressed`, `--fui-focus-halo`. Plates rest on `--fui-shadow-xs` and the highlight; overlays on `-md` and `-lg`. Check: no hand-made `box-shadow` or gradient in product code.
+- A floating surface is restyled through the overlay tokens (`--fui-overlay-surface`, `-border`, `-shadow`, `-filter`; `--fui-dialog-*` and `--fui-toast-*` fall back to them), never by overriding `.fui-menu`, `.fui-popover`, `.fui-dialog` or `.fui-command`. A product that frosts its menus sets them once per theme, where it sets its colours, and records it in its own `DESIGN.md`.
 - Do not box every label and control. A form is fields on a surface, not a card per field.
 
 ## Motion
@@ -135,6 +136,19 @@ Scale tokens: `--fui-text-label` 11, `xs` 12, `sm` 14, `md` 16, `lg` 18, `xl` 20
 - Plain verbs in sentence case, from the user's side. An action keeps its name through the flow ("Revoke key", then "Key revoked").
 - Errors: what happened and how to fix it, no apology. Empty states: what to do next. Stale data says it is stale; a configured connection is not called reachable.
 - No marketing filler in product screens; one line of description under a title is enough.
+
+## Words, language and time
+
+- Every visible or spoken word of a shared component comes from its own prop or from `LabelsProvider`; a product that is not in English sets the provider once instead of retyping sentences. Check: no interpolated English in product code where a `labels` key exists.
+- A right-to-left product sets both `dir="rtl"` on the root and `DirectionProvider direction="rtl"`, and `@fabrials/ai-ui` mirrors with them. Check: no `[dir="rtl"] .fui-…` overrides of your own; a fragment in another language is `ForeignText` (a `<bdi lang dir>`), never loose in a sentence.
+- A time that a server also renders is `LocalTime` (or `MessageTimestamp date`), not `toLocaleTimeString()` while rendering and not the server's own clock. Check: no `Intl.DateTimeFormat` in product render code; `timeZone` where a screenshot, a transcript or an export must be fixed.
+- Nothing reads the clock, `localStorage`, `matchMedia`, the viewport or the browser's locale while rendering. Check: `useSyncExternalStore` or an effect, `useHydrated` for what only the device knows, `now` props for a story or a test.
+
+## Confirmations
+
+- A question inside a flow ("End the session early?", "Skip this step?") is `InlineConfirm`: not modal, the safe answer takes focus, Escape is the safe answer, focus returns to the control that asked.
+- A destructive action that leaves the screen is `ConfirmDialog` (or `AlertDialog`), and its confirm names the consequence. `window.confirm` only for a guard that must answer synchronously (back, forward, unload).
+- A required tick ("I understand this deletes the history") is `InlineConfirm` `acknowledgement`: the answer stays pressable and says what is missing instead of going grey.
 
 ## Anti-slop rules
 

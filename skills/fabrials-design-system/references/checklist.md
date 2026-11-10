@@ -11,6 +11,13 @@ Run this before saying UI work is done. Report each item as checked, not applica
 - [ ] Instrument details (0.11): figures end in a `CardCaption` with a real reading; shares and levels have a named ruler; labels and readings use the label voice; charts are dithered unless a colour means something; plates have 12 px corners and the resting shadow, and what belongs together shares one plate with soft dividers; states are tints with the tone's ink, never side bars; `CornerMarks` only in a brand moment.
 - [ ] Life: what arrives after first paint rises (`.fui-rise`, staggered); nothing animates on the first paint of a screen people revisit; the working light (`WorkingLight`, `ShimmerText tone="light"`, agent indicators) shows only while something works and the state is also said in words; reduced motion stops all of it.
 - [ ] Copy is sentence case, names destinations, and errors say what happened and what to do.
+- [ ] Words are props (0.12): every string a shared component says comes from its `labels` prop or from `LabelsProvider`, and a product that is not in English sets the provider once. Check: no English sentence of the product's where a key exists, and no count glued together by hand (`plural`).
+- [ ] A right-to-left product sets `dir="rtl"` and `DirectionProvider direction="rtl"` (the chat pieces mirror with them), and a fragment in another language is `ForeignText` rather than loose text in a sentence.
+- [ ] A time that the server also renders is `LocalTime` (or `MessageTimestamp date`), with `timeZone` where a screenshot or an export must be fixed.
+- [ ] Nothing reads the clock, `localStorage`, `matchMedia` or the browser's locale during render; a story, a test or a server page fixes the moment with `now`.
+- [ ] A question inside a flow is `InlineConfirm`, and a destructive action that leaves the screen is `ConfirmDialog` or `AlertDialog`; a required tick says what is missing instead of disabling its answer.
+- [ ] A learner-facing or phone-first screen uses `Button size="touch"` or `IconButton size="touch"` instead of a class of its own.
+- [ ] Floating surfaces are restyled through `--fui-overlay-*` (and `--fui-dialog-*`, `--fui-toast-*`), never by overriding `.fui-menu`, `.fui-popover`, `.fui-dialog` or `.fui-command`.
 - [ ] Loading, empty, error, stale or offline, and long-content cases exist for every collection and panel you touched.
 - [ ] Data in stories, previews, screenshots and tests is synthetic.
 
@@ -68,6 +75,7 @@ Check each changed screen:
 - [ ] Focus is visible (2 px Stormlight outline with offset) on every interactive element, including custom ones.
 - [ ] Overlays trap focus, close on Escape and return focus to the trigger.
 - [ ] Every control has an accessible name; icon buttons have `aria-label`; colour never carries meaning alone.
+- [ ] What a screen says without moving focus goes through one `Announcer` above it (`useAnnounce`), not a new live region per piece; a streamed answer is announced when it is finished, not token by token.
 - [ ] axe (WCAG 2 A/AA, 2.1 AA) reports no violations in either theme. The visual suite runs it; for other pages use `@axe-core/playwright` in the same container.
 - [ ] `prefers-reduced-motion: reduce`: reveals are skipped, loops stop, durations are 0, state changes still show.
 - [ ] Buttons with async work show `loading` and cannot be pressed twice; failures stay visible where they happened.

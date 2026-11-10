@@ -20,10 +20,11 @@ Resolve this skill directory's real path (`readlink -f`, it is usually a symlink
 | Reference layouts | `stories/instrument.stories.tsx` + `instrument.css` (landing, product overview, pieces), `stories/highstorm.stories.tsx` + `highstorm.css` (sign-in), `apps/site/app/page.tsx`, `apps/site/components/docs/` |
 | Component usage in context | Storybook (`bun run storybook`, port 6041), `apps/site/components/ui-demos*.tsx` |
 | Upgrading or adopting a version | `docs/migration-<version>.md`, one per version from 0.7 to 0.12 (why 0.10 looks as it does: `docs/identity-proposals.md`) |
+| What the release in progress adds, and the rules it is built under | `docs/plan-0.12.md`; the status table at its end says what has landed |
 | What products have asked for, and what a product can delete after upgrading | `docs/requests.md` |
 | Registry, shims, adopting a component from another library | `docs/registry.md` |
 
-The Patterns stories (`stories/patterns.stories.tsx`: PublicSite, Settings, Console, SignIn) are safe references for page composition: the layout rules have not changed since 0.7, and they render in the current look.
+The Patterns stories (`stories/patterns.stories.tsx`: PublicSite, Settings, Console, SignIn) are safe references for page composition: the layout rules have not changed since 0.7, and they render in the current look. 0.12 adds one documented exception — a chat column may be centred by its host (`ConversationContent align="center"`) — and nothing else about page columns.
 
 Precedence: the user's explicit instruction, then the product's own `AGENTS.md` and `DESIGN.md`, then the design-system `DESIGN.md`, then this skill. When this skill and `DESIGN.md` disagree, `DESIGN.md` wins; say so in your report. Code wins over prose for values: read the token or the component instead of guessing.
 
@@ -44,6 +45,8 @@ Without a local checkout (an outside app), the repository is public at https://g
 11. **Accessible by default.** Every control has a name, a visible 2 px Stormlight focus and a keyboard path; colour always travels with a word or symbol; AA contrast in both themes.
 12. **Both themes are designed.** Light (`#f6f7f8` page, white plates) and dark (Deep Stormwall `#08090b`, plates `#0e1014`) are each checked; no literal colours, only tokens.
 13. **Built like an instrument, alive like one.** Figures end in a `CardCaption`; a share or level gets a ruler (`Stat meter`, `Meter variant="ruler"`); a landing hero draws its grid (`GridGuides`) and its figure carries `CornerMarks` (brand moments only, never product screens). What arrives after first paint rises (`.fui-rise`); what works carries light. Labels and readings speak in the label voice (Plex Mono 11 px, muted); a value and its label never share a face. Charts are dithered.
+14. **Words and time belong to the host (0.12).** Every word a shared component says is a prop with an English default, and a product that is not in English sets `LabelsProvider` once (`labels`, `locale`) instead of replacing sentences; a component's own `labels` prop still wins. A time the server also renders is `LocalTime`; nothing reads the clock, `localStorage` or the browser's locale while rendering.
+15. **A better piece is a request, not a fork (0.12).** When a product's own component does its job better than ours, write it in `docs/requests.md` and bring the behaviour into the package in the house look; the product deletes its copy with the release. Floating surfaces are restyled through `--fui-overlay-*`, never by overriding `.fui-menu` or `.fui-popover`.
 
 The full list with checks: [references/style-rules.md](references/style-rules.md).
 
@@ -53,7 +56,7 @@ The full list with checks: [references/style-rules.md](references/style-rules.md
 2. **Name the surface.** Landing, product index, docs, app workspace, settings, sign-in, or a state (empty, loading, error). Each has a recipe in [references/layout.md](references/layout.md); start from it instead of a blank page.
 3. **Pick components before writing markup.** Patterns first (`PageHeader`, `SectionHeader`, `CollectionToolbar`, `Table`, `BulkActions`, `StatePanel`, `SettingsSection`), then controls. See [references/components.md](references/components.md). Do not rebuild a control the package has; do not add a universal component with many flags.
 4. **Compose with tokens.** Spacing on the 4 px grid (`--fui-space-*`), radii from `--fui-radius-*`, colours from roles. In Tailwind hosts use the bridge (`bg-card`, `text-muted-foreground`, `text-brand-ink`, `font-display`, `font-label`, `rounded-md`, `rounded-plate`, `px-(--fui-page-padding)`).
-5. **Write the copy.** Sentence case, names people recognise, an action keeps its name through the flow ("Revoke key", then "Key revoked"). English unless the product decides otherwise.
+5. **Write the copy.** Sentence case, names people recognise, an action keeps its name through the flow ("Revoke key", then "Key revoked"). English unless the product decides otherwise; then the product's strings go through `LabelsProvider` and its locale with them, rather than into a copy of every component's sentence.
 6. **Cover the states.** Loading (a first load is the real view inside `<Loading when label>` with placeholder data; a refresh keeps the last value), empty, error, stale, offline, long content, narrow screen.
 7. **Verify** with [references/checklist.md](references/checklist.md). Report what you did not test.
 
@@ -62,6 +65,7 @@ The full list with checks: [references/style-rules.md](references/style-rules.md
 - Generic presentation: `@fabrials/ui`. Provider, quota, migration and chat presentation: `@fabrials/ai-ui`. Network clients, routing, authentication, theme storage, native window chrome and product policy: the host.
 - A Fabrials product consumes a verified copy made by `bun run vendor <product> --write` in the design-system repo. Never edit a `vendor/` copy; change the package, build it, re-vendor.
 - A missing generic piece is added to the package with a story, a keyboard test and a visual reference, using shadcn's part names where shadcn has them. A product-only exception is recorded in that product's `DESIGN.md`.
+- A product's own component that is better than ours is a request, not a fork: write it down in `docs/requests.md`, then bring its behaviour into the package in the house look. The product deletes its copy when it takes the release.
 - Nothing is installed from another component library through the registry. When a product needs a component another library offers, adopt it into the package in the Fabrials style (story, keyboard test, visual reference); adapted code keeps its license notice beside it and in `THIRD_PARTY.md`.
 
 ## Setting an app up
@@ -77,6 +81,7 @@ npx shadcn@latest add @fabrials/button @fabrials/mcp-dashboard  # shims and bloc
 CSS, once, in this order; theme and gem on the root element:
 
 ```css
+@import "@fabrials/ui/layers.css";   /* 0.12: only in a Tailwind 4 host, and FIRST: @layer theme, base, components, utilities */
 @import "@fabrials/ui/tokens.css";
 @import "@fabrials/ui/fonts.css";
 @import "@fabrials/ui/styles.css";
@@ -88,7 +93,9 @@ CSS, once, in this order; theme and gem on the root element:
 <html class="dark" data-gem="ruby">
 ```
 
-Shared components use `fui-` classes in the `components` layer and work without Tailwind. Host overrides come after them and express a documented product requirement, not a restyle. Do not read `localStorage` or browser globals while rendering shared components. New code imports from `@fabrials/ui` directly, even where a shim exists.
+`layers.css` declares the layer order the styles assume, so a bundler that emits the imports in another order cannot put `base` above `components`. `--fui-font-fallback` is the slot inside `--fui-font-sans`, `-display`, `-mono` and `-label` for a script Plex lacks: set it on the root (`:root { --fui-font-fallback: "IBM Plex Sans Arabic"; }`), not per component. Unset, the stacks are the ones of 0.11.
+
+Shared components use `fui-` classes in the `components` layer and work without Tailwind. Host overrides come after them and express a documented product requirement, not a restyle. Do not read `localStorage` or browser globals while rendering shared components; 0.12 marks a module as a client module by its own `"use client"`, so a pure helper or a hook-free component can be called from a Server Component. New code imports from `@fabrials/ui` directly, even where a shim exists.
 
 ## Other design skills
 

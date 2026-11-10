@@ -209,8 +209,53 @@ import { Users } from "lucide-react";
 - **Readings.** Sync state, time zone, units and identifiers are set in the label voice (mono 11 px, muted): "Synced 14:32 UTC", an address under a name, an id in a cell.
 - **Actions on one record.** A `Toolbar variant="bar" sticky` under the title: one tab stop, `ToolbarGroup`s named for what they hold, a `ToolbarSeparator` between them. The primary action is `variant="secondary"` with `reveal="early"` so its label appears once there is room; low-priority actions are `tier="low"` and reappear as items of a `DropdownMenu` whose trigger is a `tier="overflow"` `ToolbarButton`. The toolbar measures its own width, so it works in a 358 px pane and a 62 rem column alike.
 - **Detail.** A record opens on its own URL with `NavTabs` for its sections, or in a `Sheet` (`side="right"`) for a quick look. Properties use `DescriptionList`; history uses `Timeline`.
+- **On a phone.** `SidebarInset frame` makes the inset a column of the window (`100dvh`) whose `SidebarInsetContent` scrolls, and adds the skip link (`skipLabel`, `contentId`). `SidebarInsetHeader` is the 56 px bar at its top — a 44 px `SidebarTrigger`, a `title` that truncates, the actions slot and `end` for one primary action — and `visibility="mobile"` (the default) draws it only where the sidebar is the sheet; `SidebarInsetHeaderActions` puts a page's key there from anywhere inside the inset. Give `SidebarProvider` `navigationKey={pathname}` so the sheet closes when the person navigates, put `SidebarClose` in the sheet's header, and `SidebarAccount` at the foot of the sidebar for the account and its menu (`theme` and `onThemeChange` add System, Light and Dark). Restyle the current row with the `--fui-sidebar-active-*` tokens, not with rules of your own.
 - **Density.** `data-density="compact"` on a container tightens its controls to 32 px and its rows; it is a composition choice for dense tables, not a user preference.
 - References: `stories/instrument.stories.tsx` › Workspace (the 0.10 product overview), `stories/patterns.stories.tsx` › Console (sidebar shell), `stories/foundation.stories.tsx` › Accounts (`WorkspaceShell`), `stories/monitoring.stories.tsx`.
+
+## Chat screen
+
+A chat is one column that fills its height: the log scrolls, the composer stays.
+
+```tsx
+import { ChatComposer, ChatMessage, Conversation, ConversationContent, ConversationFooter, ConversationScrollButton } from "@fabrials/ai-ui";
+
+<div className="flex h-dvh flex-col">
+  <Conversation stickKey={messages.length}>
+    <ConversationContent measure>
+      {messages.map((m) => <ChatMessage key={m.id} from={m.role}>…</ChatMessage>)}
+    </ConversationContent>
+    <ConversationScrollButton />
+    <ConversationFooter><ChatComposer onSubmit={send} /></ConversationFooter>
+  </Conversation>
+</div>
+```
+
+- The parent needs a height: the conversation fills it (`h-dvh` on a page of its own, or `SidebarInset frame` inside an app).
+- The column anchors to the start with the page gutter, and `measure` gives an answer the width of its text up to 52rem and the whole column for a table, a code block or a figure. `align="center"` is the host's opt-in and the one recognised exception to the house rule about centred columns (`DESIGN.md` › Layout and composition).
+- `stickKey` is what brings the log back when the reader sends: the message count, applied before the next paint, so their own message never flies past. Growth is followed by an observer, never animated, and a reader who scrolls or selects is let go at once.
+- Nothing is announced by default (`aria-live` is off on the log): a streaming answer read token by token is noise. Say the finished answer through `useAnnounce`, or let `ChatMessage streaming` speak for itself.
+- The rail of the reader's own messages is `ConversationCheckpoints`; it hides below a 40rem container and on coarse pointers. The jump key names what arrived ("Jump to latest, 3 new messages") and a press never takes focus from the composer.
+- Files dropped anywhere on the page are `DropOverlay` with `scope="page"`, or `useAttachments({ pageDrop: true })` — one of the two, never both.
+
+## Step or exam screen
+
+One thing asked at a time: the count and the clock above, the step, and a bar that stays at the foot.
+
+```tsx
+import { ActionBar, Button, Countdown, InlineConfirm, Progress } from "@fabrials/ui";
+
+<div className="flex min-h-0 flex-col">
+  <Progress segments={steps} label="Session" />
+  <Countdown deadline={closesAt} offset={offset} onDone={close} />
+  <div className="min-h-0 flex-1 overflow-y-auto px-(--fui-page-padding)">{step}</div>
+  <ActionBar end={<Button onClick={check}>Check</Button>} />
+</div>
+```
+
+- "End early?" is an `InlineConfirm` in the flow, above the bar: the question is not modal, the step stays readable behind it, Escape is the safe answer and focus goes back to the control that asked. `ActionBar` publishes `--fui-action-bar-size`, which the confirm scrolls clear of; a card around the bar clips with `overflow: clip`.
+- The `Countdown` takes the deadline and this device's offset from the server's clock (`clockOffset(serverNow, Date.now())`), never a number it counts down. It speaks at the marks only.
+- `Progress segments` names each step and says which one is current; its value is the number of settled parts. `onSegmentSelect` makes the parts buttons for a strip a person can go back through.
 
 ## Settings
 
@@ -295,15 +340,17 @@ Every collection and panel has these states. Put them where the content would be
 | State | Use | Notes |
 | --- | --- | --- |
 | First load | The real components with placeholder data inside `<Loading when label>` (0.7): it paints them as their own skeleton with no layout shift. Older versions: `Skeleton` blocks; `SidebarMenuSkeleton` in a sidebar | Not a centred spinner on an empty page, not hand-drawn grey boxes |
-| Refresh | Keep the last value and show when it was read (`RelativeTime`) | A stale value says so: `StatePanel state="stale"` or a hint |
+| Refresh | Keep the last value and show when it was read (`RelativeTime`, `LocalTime`) | A stale value says so: `StatePanel state="stale"` or a hint |
 | Long wait with unknown duration | `Spinner` or `Button loading` with text that says what is happening | `Progress` only when the fraction is real; without a value only while a total is on its way (the bar then fills in place) |
 | Empty | `StatePanel state="empty"` with the next action | Title says what is missing, description what to do |
 | No results | `StatePanel state="empty"` with "Clear filters" | Keep the toolbar visible |
 | Error | `StatePanel state="error"` (role alert) or an inline `Alert variant="destructive"` | What happened, what is unchanged, how to retry; no apology |
+| Error that can be tried again | `Alert onRetry` (a promise keeps it busy and keeps focus on the key), `ErrorState onRetry` for a route | Not `onRetry` when asking again cannot help: say what still works and when it returns |
+| A part that breaks | `ErrorBoundary` (`resetKey`, `fallback`, `onError`) | The page stays; the default fallback is a `StatePanel state="error"` with "Try again" |
 | Offline | `StatePanel state="offline"` | Show the last snapshot |
 | Completed action | `toast` from a mounted `Toaster` | Errors that need a decision stay on the page |
 
-`StatePanel` aligns to the start by default; `align="center"` only inside a bounded empty region (an empty table body, a blank chat). A 404 page is left-anchored like any page: display title, one sentence, a list of links (`apps/site/app/not-found.tsx`).
+`StatePanel` aligns to the start by default; `align="center"` only inside a bounded empty region (an empty table body, a blank chat). A whole page that is only a state — not found, gone, a root error — is not a `StatePanel` stretched over the page: it is `StatePage` (brand, `code`, `title`, `description`, `actions`) outside the shell, a `<main>` clear of the safe areas and anchored to the gutter, with `ErrorState` for a route that failed and `BackButton` for a page opened in a new tab. A 404 in the site itself stays a left-anchored page like any other (`apps/site/app/not-found.tsx`).
 
 ## Responsive checks
 
