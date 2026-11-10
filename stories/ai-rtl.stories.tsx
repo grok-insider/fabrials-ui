@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { LabelsProvider, type FabrialsLabels } from "@fabrials/ui";
 import {
   ActivityDisclosure,
   AgentThinking,
@@ -70,14 +71,58 @@ const files: AttachmentItem[] = [
 ];
 
 const removeLabel = (item: AttachmentItem) => `إزالة ${item.name}`;
+
+// The words the chat pieces say on their own, in Arabic: one provider for the whole page.
+const CHAT: FabrialsLabels = {
+  agent: { thinking: "يفكّر", searching: "يبحث", reading: "يقرأ", writing: "يكتب", running: "ينفّذ", rendering: "يولّد", uploading: "يرفع" },
+  attachments: {
+    label: "المرفقات",
+    uploading: "جارٍ الرفع…",
+    uploadingName: (name) => `جارٍ رفع ${name}`,
+    uploadingPercent: (percent) => `جارٍ الرفع، ${percent}`,
+    failed: "فشل الرفع",
+    remove: (name) => removeLabel({ id: "", name, mediaType: "" }),
+  },
+  codeBlock: { copy: "نسخ الشيفرة", copied: "تم النسخ", download: "تنزيل الملف", region: (name) => `شيفرة ${name}` },
+  generation: {
+    queued: "بانتظار البدء",
+    image: "ينشئ الصورة",
+    document: "يكتب المستند",
+    imageFailed: "تعذّر إنشاء الصورة",
+    documentFailed: "تعذّر كتابة المستند",
+    imageReady: "الصورة جاهزة",
+    documentReady: "المستند جاهز",
+  },
+  search: {
+    searching: "يبحث في الويب…",
+    reading: "يقرأ النتائج…",
+    searched: "بحث في الويب",
+    searches: (count) => (count === 1 ? "بحث واحد" : count === 2 ? "بحثان" : `${count} بحوث`),
+    sources: (count) => (count === 1 ? "مصدر واحد" : count === 2 ? "مصدران" : `${count} مصادر`),
+    searchedWeb: "بحث في الويب",
+    readPage: "قرأ الصفحة",
+    opened: (host) => `فتح ${host}`,
+    showQueries: "إظهار الاستعلامات",
+    hideQueries: "إخفاء الاستعلامات",
+    reviewing: "يراجع المصادر",
+  },
+  sources: {
+    source: (number) => `المصدر ${number}`,
+    citation: (number, title) => `المصدر ${number}: ${title}`,
+    count: (count) => (count === 1 ? "مصدر واحد" : count === 2 ? "مصدران" : `${count} مصادر`),
+  },
+  taskList: { pending: "بالانتظار", running: "قيد التنفيذ", done: "تم", failed: "فشل", skipped: "تم التخطي", progress: (done, total) => `${done} من ${total}`, complete: (total) => `انتهت ${total} مهام` },
+};
 const sourcesLabel = (count: number) => `${count} مصادر`;
 
 function Arabic({ width, children }: { width?: number; children: ReactNode }) {
   return (
     <Frame dir="rtl" width={width}>
-      <div lang="ar" style={{ display: "grid", gap: "var(--fui-space-4)", gridTemplateColumns: "minmax(0, 1fr)" }}>
-        {children}
-      </div>
+      <LabelsProvider labels={CHAT} locale="ar-u-nu-latn">
+        <div lang="ar" style={{ display: "grid", gap: "var(--fui-space-4)", gridTemplateColumns: "minmax(0, 1fr)" }}>
+          {children}
+        </div>
+      </LabelsProvider>
     </Frame>
   );
 }
