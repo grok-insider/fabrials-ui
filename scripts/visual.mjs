@@ -23,7 +23,7 @@ const ready = () =>
 let server;
 try {
   if (!(await ready())) {
-    server = spawn("bun", ["run", "storybook", "--ci"], {
+    server = spawn("bun", ["x", "storybook", "dev", "--host", "127.0.0.1", "-p", storybookPort, "--no-open", "--disable-telemetry", "--ci"], {
       cwd: root,
       stdio: "ignore",
       detached: true,
