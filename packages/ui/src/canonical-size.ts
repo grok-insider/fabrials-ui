@@ -15,4 +15,3 @@ export function canonicalSize(size: SizeWord | undefined, canonical: "default" |
   if (size === undefined) return undefined;
   return size === "default" || size === "md" ? canonical : size;
 }
-
