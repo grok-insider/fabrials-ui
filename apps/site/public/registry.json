@@ -916,6 +916,31 @@
       ]
     },
     {
+      "name": "badge",
+      "type": "registry:ui",
+      "title": "Badge",
+      "description": "shadcn's badge, backed by @fabrials/ui. A short status or fact with a text label: a soft tag tinted by its tone, with a dot, an icon or a count.",
+      "author": "Fabrials <admin@grokinsider.net>",
+      "dependencies": [
+        "@fabrials/ui@^0.11.0"
+      ],
+      "registryDependencies": [
+        "https://ui.fabrials.com/r/styles.json"
+      ],
+      "meta": {
+        "source": "shim",
+        "license": "MIT",
+        "category": "Shims",
+        "shadcn": "badge"
+      },
+      "files": [
+        {
+          "path": "registry/shims/badge.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "breadcrumb",
       "type": "registry:ui",
       "title": "Breadcrumb",
@@ -1261,6 +1286,31 @@
       "files": [
         {
           "path": "registry/shims/dropdown-menu.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "field",
+      "type": "registry:ui",
+      "title": "Field",
+      "description": "shadcn's field, backed by @fabrials/ui. Connects a label, hint and error to one control.",
+      "author": "Fabrials <admin@grokinsider.net>",
+      "dependencies": [
+        "@fabrials/ui@^0.11.0"
+      ],
+      "registryDependencies": [
+        "https://ui.fabrials.com/r/styles.json"
+      ],
+      "meta": {
+        "source": "shim",
+        "license": "MIT",
+        "category": "Shims",
+        "shadcn": "field"
+      },
+      "files": [
+        {
+          "path": "registry/shims/field.tsx",
           "type": "registry:ui"
         }
       ]
@@ -1891,6 +1941,31 @@
       ]
     },
     {
+      "name": "tabs",
+      "type": "registry:ui",
+      "title": "Tabs",
+      "description": "shadcn's tabs, backed by @fabrials/ui. Switch between peer views of the same subject.",
+      "author": "Fabrials <admin@grokinsider.net>",
+      "dependencies": [
+        "@fabrials/ui@^0.11.0"
+      ],
+      "registryDependencies": [
+        "https://ui.fabrials.com/r/styles.json"
+      ],
+      "meta": {
+        "source": "shim",
+        "license": "MIT",
+        "category": "Shims",
+        "shadcn": "tabs"
+      },
+      "files": [
+        {
+          "path": "registry/shims/tabs.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "textarea",
       "type": "registry:ui",
       "title": "Textarea",
@@ -1911,6 +1986,31 @@
       "files": [
         {
           "path": "registry/shims/textarea.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "toggle",
+      "type": "registry:ui",
+      "title": "Toggle",
+      "description": "shadcn's toggle, backed by @fabrials/ui.",
+      "author": "Fabrials <admin@grokinsider.net>",
+      "dependencies": [
+        "@fabrials/ui@^0.11.0"
+      ],
+      "registryDependencies": [
+        "https://ui.fabrials.com/r/styles.json"
+      ],
+      "meta": {
+        "source": "shim",
+        "license": "MIT",
+        "category": "Shims",
+        "shadcn": "toggle"
+      },
+      "files": [
+        {
+          "path": "registry/shims/toggle.tsx",
           "type": "registry:ui"
         }
       ]

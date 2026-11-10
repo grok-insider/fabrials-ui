@@ -1122,3 +1122,136 @@ Differences from Radiant's copy: the keyboard no longer assumes Arabic or right 
 - Nothing, for a page that uses none of this. The styles are one new block at the end of `styles.css`.
 - `DitherCanvas` now paints a plain surface when it has no `field`, no `paint` and no `source` (before, an empty canvas). With a `source`, the canvas stays at 0 opacity until the picture arrives.
 - `SidebarInset` renders a context provider around its children (no extra element), and `SidebarInsetContent` is a new part: neither changes the markup of a sidebar that does not use them.
+
+## Controls: a notice that asks again, a count, a field, a slider and a legend
+
+Everything here is additive: a component that is given none of the new props renders exactly the markup and the pixels it
+rendered at 0.11. Two exceptions are named at the end.
+
+### `Alert` (`@fabrials/ui`)
+
+| Prop | What it does |
+| --- | --- |
+| `onRetry` | `() => void \| Promise<void>`. Draws "Try again" in the alert's action place. A promise keeps the action busy until it settles, and shows it by itself. |
+| `retrying` | The busy state, when the host owns it. |
+| `revealOnMount` | The alert appeared after the first paint (an answer came back, a step failed): it scrolls itself into view, keeping clear of a sticky header above it and of an `ActionBar` below. |
+| `tone` | `neutral`, `info`, `success`, `warning`, `danger`: the same five looks as `variant`, under the name the rest of 0.12 uses for a status. **`tone` wins when both are given**; nothing is deprecated. |
+| `labels` | `{ retry, retrying }`, English defaults; a `LabelsProvider` sets them for every alert (scope `alert`). |
+
+- While it retries, the action is `aria-disabled` and keeps its focus: the keyboard stays where the person left it, the same
+  action is not run twice, and the alert's own live region reads the new words when they arrive. `Alert` stays renderable
+  from a Server Component; with `onRetry` it comes from a client module, as any handler does.
+- **Do not pass `onRetry` when asking again cannot help** (a daily allowance already spent). Say what still works and what
+  returns when, and leave the action out.
+
+Radiant can replace the ten hand-made banners that carry a retry (`lang/session/notices.tsx`, `lang/exam/exam-problem.tsx`,
+`lang/perception/problem-note.tsx`, `lang/write/correction-view.tsx`).
+
+### `Input`, `Textarea`: `count`
+
+```tsx
+<Textarea count={{ max: 280 }} />                       {/* characters, soft */}
+<Input count={{ max: 12, soft: false }} />              {/* stops at 12 */}
+<Textarea count={{ max: 20, unit: "words" }} />
+<Textarea count={{ unit: "graphemes" }} />
+<Textarea count={true} />                               {/* a bare counter */}
+```
+
+- The counter sits under the field in the label voice, with the reader's digits, and the field names it with
+  `aria-describedby` (merged with any description it already had).
+- **A soft limit never truncates.** Past it the counter turns to the danger ink and says how far ("12 over"), and a polite
+  region that is always in the page reads the crossing once — nine tenths, the last one, past it — and once again when the
+  text comes back under it. Not on every keystroke.
+- `soft: false` sets `maxlength`, which stops characters. Words and graphemes cannot be stopped by an input: the counter
+  counts them and says so, and the limit is the host's to enforce.
+- `characters` is UTF-16 units, like `maxlength` and like a text engine's own limit. `words` and `graphemes` go through
+  `Intl.Segmenter` (a Chinese sentence is many words, an emoji joined of four code points is one grapheme), with a plain
+  whitespace count where the browser has no segmenter.
+- `countText(value, unit, locale)`, `countLevel`, `countMilestone`, `countLimit` and `CountLabels` are exported, so a host
+  can count the same way in its own box or check the limit before sending.
+
+Radiant can delete `lib/lang/write/limits.ts` and the counter block of `write/text-editor.tsx`.
+
+### `Field`, and the field parts
+
+- `Field` (the render prop) gains `required` (an asterisk, plus the word "required" for a screen reader), `optional` (the
+  word "optional" in muted ink), `className` on its root and `labels` (scope `field`). `required` wins when both are given.
+- `FieldContent`, `FieldLabel`, `FieldDescription`, `FieldError`, `FieldTitle` and `FieldSeparator` (a new module,
+  `field-parts.tsx`) draw the same plate, label, description and error one piece at a time, for a field laid out around
+  other things. `Field` accepts them instead of a function child; `useField()` gives `{ id, descriptionId, errorId,
+  describedBy, invalid }`, so the control is described by what is really there and marked invalid when an error is.
+- `FieldTitle` is a name that is not a form label; `FieldSeparator` is a rule that can hold a word.
+- The `field` shim of shadcn now generates, with all ten of its names.
+
+### `Slider`, `SliderGroup`
+
+| Prop | What it does |
+| --- | --- |
+| `label` | The name in front of the track. With it the slider is a row of label · track · value, and the name is the thumb's. |
+| `unit` | Said and written after the value ("40 rows"), including in `aria-valuetext`. |
+| `format` | `(value) => string`, or `Intl.NumberFormat` options (which `format` also took before this release). |
+| `onValueCommitted` | Base UI's: once when a drag ends or a key is released, not once per pixel. |
+| `locale` | The digits of the value and of the reading. |
+
+- Without `format`, the value is written with the decimals its `step` needs (0.25 → two), and the drawn value is
+  `aria-hidden` because the thumb already speaks it.
+- `SliderGroup` puts several sliders on one grid: names and values line up column by column (a subgrid row each, with each
+  row's own grid where subgrid is missing). Under 28rem of the group's own width each name goes above its track;
+  `columns="auto"` fills the room in columns of at least 14rem.
+
+Radiant can replace the hand-made `input[type=range]` rows of `features/plot/view.tsx` and
+`features/simulation/view.tsx`.
+
+### `ChartLegend`, `LegendItem`, `Swatch`, `ColorRamp`
+
+- `ChartLegend` is the row under a chart; `LegendItem` is one key: `label`, `color`, `pattern` (`solid`, `dashed`,
+  `dither`), `hidden`, and — when the host wants it — `onToggle` (a button with `aria-pressed`, as the chart's own legend
+  is) and `onOnly`. A host can draw the same legend beside its own visual, static or working.
+- `Swatch` paints a key: a solid square, a dashed rule, or the house's 2 px ordered dither in SVG cells (a paint the chart
+  defines, `url(#…)`, is drawn as it is, so a legend beside a chart matches its series exactly).
+- `ColorRamp` is a continuous legend: `min`, `max`, `stops` (token colours), `steps` (8 to 12 cells, 10 by default), `marks`
+  (ticks with a label), `label`, `format` and `labels`. **The bar is painted in cells, sampled across the stops, never as a
+  smooth gradient:** a ramp that encodes a value is data, and the house paints data in steps. A screen reader hears "from 0
+  to 100" instead of the bar.
+- `SeriesChart` itself draws exactly what it drew at 0.11; its legend is now those parts.
+
+Radiant can replace the legends of `features/plot/view.tsx`, `features/map/view.tsx` and
+`features/periodic-table/view.tsx`, whose `.map-legend-bar` is a CSS gradient.
+
+### `Toggle`, and the class-name helpers
+
+- `Toggle` is one key that stays on, on its own: `pressed`/`defaultPressed`/`onPressedChange`, `size` (`sm` 26 px,
+  `default` 34 px, `lg` 44 px on every pointer), `variant` (`default`, `outline`, or `plain` for a key whose look is the
+  host's `className`). It is the same Base UI toggle a `ToggleGroupItem` is.
+- `toggleVariants`, `badgeVariants` and `tabsListVariants` (`variants.ts`, no directive, so a Server Component can call them)
+  return the classes of a `Toggle`, a `Badge` and a `TabsList` for the props given, for a link, a cell or a tab a host draws
+  itself. A `Badge` keeps its own single class and its `data-` attributes, which stay the source of its look; the class hooks
+  are guarded so they never reach it.
+- `badge`, `tabs`, `toggle` and `field` now generate as shadcn shims (`apps/site/components/ui/`).
+
+`ComposerToggle` is built on `Toggle` with `variant="plain"`, so there is one implementation of a pressed key. Its classes
+(`fui-composer-pill`), `aria-pressed` and `data-state` are what they were; Base UI's own `data-pressed` is now on it too, for
+anyone styling by state.
+
+### `GenerationFrame` (`@fabrials/ai-ui`)
+
+| Prop | What it does |
+| --- | --- |
+| `actions` | `["download", "copy"]` for the built-in keys, or any node. Shown over the finished picture when the pointer is on it or the keyboard is in it, and always where there is no hover. |
+| `downloadName` | The name the built-in download saves under (`<a download>`). |
+| `kind="video"` | A `<video controls playsInline>` with `src` and `poster`, in the same queued, generating and failed states; the words say "Making the video" and "Video ready". |
+| `onOpen` | Makes the finished picture a button named "Open", to open it in a viewer. |
+| `prompt`, `showPrompt` | What was asked for, shown under the working field while it is made, cut to two lines and in its own direction (`dir="auto"`). |
+
+- The copy key appears only where the browser has an image clipboard, and the result is announced; the keys are 44 px on a
+  coarse pointer and kept out of a print.
+
+Radiant can replace `components/chat/generated-media.tsx`.
+
+### Two changes that are visible
+
+- **A disabled slider** no longer fades its name and its value to 50 %: the track is dimmed and the words stay in the muted
+  ink. Half of the muted ink over a card is under the contrast a value has to keep, and a value that is off is still read.
+  Only disabled sliders are affected.
+- **A `TabsList`** now carries `fui-tabs-list-segmented` beside `data-variant="segmented"`. The attributes still select the
+  look; a host rule that keys on the class alone now matches.

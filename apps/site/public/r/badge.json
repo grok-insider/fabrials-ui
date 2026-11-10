@@ -1,0 +1,27 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "badge",
+  "type": "registry:ui",
+  "title": "Badge",
+  "description": "shadcn's badge, backed by @fabrials/ui. A short status or fact with a text label: a soft tag tinted by its tone, with a dot, an icon or a count.",
+  "author": "Fabrials <admin@grokinsider.net>",
+  "dependencies": [
+    "@fabrials/ui@^0.11.0"
+  ],
+  "registryDependencies": [
+    "https://ui.fabrials.com/r/styles.json"
+  ],
+  "files": [
+    {
+      "path": "registry/shims/badge.tsx",
+      "type": "registry:ui",
+      "content": "export { Badge, badgeVariants } from \"@fabrials/ui\";\n\n// Fabrials UI shim for shadcn's badge: https://ui.fabrials.com/docs/shims\n// The names match shadcn; the control is @fabrials/ui's. Import from\n// \"@fabrials/ui\" directly in new code.\n"
+    }
+  ],
+  "meta": {
+    "source": "shim",
+    "license": "MIT",
+    "category": "Shims",
+    "shadcn": "badge"
+  }
+}

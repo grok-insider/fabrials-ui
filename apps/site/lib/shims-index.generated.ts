@@ -53,6 +53,13 @@ export const shimIndex: { name: string; exports: string[] }[] = [
     ]
   },
   {
+    "name": "badge",
+    "exports": [
+      "Badge",
+      "badgeVariants"
+    ]
+  },
+  {
     "name": "breadcrumb",
     "exports": [
       "Breadcrumb",
@@ -219,6 +226,21 @@ export const shimIndex: { name: string; exports: string[] }[] = [
       "DropdownMenuSubContent",
       "DropdownMenuSubTrigger",
       "DropdownMenuTrigger"
+    ]
+  },
+  {
+    "name": "field",
+    "exports": [
+      "Field",
+      "FieldContent",
+      "FieldDescription",
+      "FieldError",
+      "FieldGroup",
+      "FieldLabel",
+      "FieldLegend",
+      "FieldSeparator",
+      "FieldSet",
+      "FieldTitle"
     ]
   },
   {
@@ -467,9 +489,26 @@ export const shimIndex: { name: string; exports: string[] }[] = [
     ]
   },
   {
+    "name": "tabs",
+    "exports": [
+      "Tabs",
+      "TabsContent",
+      "TabsList",
+      "TabsTrigger",
+      "tabsListVariants"
+    ]
+  },
+  {
     "name": "textarea",
     "exports": [
       "Textarea"
+    ]
+  },
+  {
+    "name": "toggle",
+    "exports": [
+      "Toggle",
+      "toggleVariants"
     ]
   },
   {

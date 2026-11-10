@@ -57,6 +57,7 @@ Namespace: add "registries": { "@fabrials": "https://ui.fabrials.com/r/{name}.js
 - alert-dialog: npx shadcn@latest add https://ui.fabrials.com/r/alert-dialog.json
 - aspect-ratio: npx shadcn@latest add https://ui.fabrials.com/r/aspect-ratio.json
 - avatar: npx shadcn@latest add https://ui.fabrials.com/r/avatar.json
+- badge: npx shadcn@latest add https://ui.fabrials.com/r/badge.json
 - breadcrumb: npx shadcn@latest add https://ui.fabrials.com/r/breadcrumb.json
 - button: npx shadcn@latest add https://ui.fabrials.com/r/button.json
 - button-group: npx shadcn@latest add https://ui.fabrials.com/r/button-group.json
@@ -71,6 +72,7 @@ Namespace: add "registries": { "@fabrials": "https://ui.fabrials.com/r/{name}.js
 - dialog: npx shadcn@latest add https://ui.fabrials.com/r/dialog.json
 - direction: npx shadcn@latest add https://ui.fabrials.com/r/direction.json
 - dropdown-menu: npx shadcn@latest add https://ui.fabrials.com/r/dropdown-menu.json
+- field: npx shadcn@latest add https://ui.fabrials.com/r/field.json
 - hover-card: npx shadcn@latest add https://ui.fabrials.com/r/hover-card.json
 - input: npx shadcn@latest add https://ui.fabrials.com/r/input.json
 - input-group: npx shadcn@latest add https://ui.fabrials.com/r/input-group.json
@@ -96,7 +98,9 @@ Namespace: add "registries": { "@fabrials": "https://ui.fabrials.com/r/{name}.js
 - spinner: npx shadcn@latest add https://ui.fabrials.com/r/spinner.json
 - switch: npx shadcn@latest add https://ui.fabrials.com/r/switch.json
 - table: npx shadcn@latest add https://ui.fabrials.com/r/table.json
+- tabs: npx shadcn@latest add https://ui.fabrials.com/r/tabs.json
 - textarea: npx shadcn@latest add https://ui.fabrials.com/r/textarea.json
+- toggle: npx shadcn@latest add https://ui.fabrials.com/r/toggle.json
 - toggle-group: npx shadcn@latest add https://ui.fabrials.com/r/toggle-group.json
 - tooltip: npx shadcn@latest add https://ui.fabrials.com/r/tooltip.json
 
