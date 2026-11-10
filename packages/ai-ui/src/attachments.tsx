@@ -1,7 +1,7 @@
 "use client";
 
 import type { CSSProperties, ReactNode } from "react";
-import { Spinner, localeTag, useLabels, useLocale, useProvidedLocale } from "@fabrials/ui";
+import { Spinner, canonicalSize, localeTag, useLabels, useLocale, useProvidedLocale } from "@fabrials/ui";
 import { useArrivals } from "./agent";
 import { attachmentCategory, formatBytes, formatPercent, type AttachmentCategory } from "./format";
 import {
@@ -207,8 +207,8 @@ export function AttachmentChip({
 export type AttachmentsProps = {
   items: readonly AttachmentItem[];
   variant?: AttachmentVariant;
-  /** The size of `grid` tiles: `md` (96 px, the default) or `sm` (56 px, for a composer). */
-  size?: "sm" | "md";
+  /** The size of `grid` tiles: `md` (96 px, the default, named `default` too) or `sm` (56 px, for a composer). */
+  size?: "sm" | "md" | "default";
   onRemove?: (id: string) => void;
   removeLabel?: (item: AttachmentItem) => string;
   empty?: ReactNode;
@@ -242,7 +242,7 @@ export function Attachments({
     <ul
       aria-label={label ?? labels.label}
       className={["fui-attachments", className].filter(Boolean).join(" ")}
-      data-size={variant === "grid" && size === "sm" ? "sm" : undefined}
+      data-size={variant === "grid" && (canonicalSize(size, "md") ?? "md") === "sm" ? "sm" : undefined}
       data-variant={variant}
     >
       {items.map((item) => (

@@ -160,3 +160,5 @@ export {
   type FieldLabels,
 } from "./field-parts";
 export * from "./reduced-motion";
+export * from "./ticker";
+export * from "./canonical-size";

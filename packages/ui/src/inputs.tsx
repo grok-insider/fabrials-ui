@@ -6,9 +6,10 @@ import { NumberField as BaseNumberField } from "@base-ui/react/number-field";
 import { Eye, EyeOff, Minus, Plus, Search, TriangleAlert, X } from "lucide-react";
 import { IconButton } from "./icon-button";
 import { PixelSpinner } from "./pixel-spinner";
+import { canonicalSize } from "./canonical-size";
 import { classes, type StyledProps } from "./shared";
 
-type FieldSize = "sm" | "default";
+type FieldSize = "sm" | "default" | "md";
 
 function assignRef<T>(ref: Ref<T> | undefined, node: T | null) {
   if (typeof ref === "function") ref(node);
@@ -62,6 +63,7 @@ export function SearchInput({
   ...props
 }: SearchInputProps) {
   const own = useRef<HTMLInputElement | null>(null);
+  const scale = canonicalSize(size, "default") ?? "default";
   const [typed, setTyped] = useState(String(defaultValue ?? ""));
   const text = value !== undefined ? String(value ?? "") : typed;
   const clearable = text.length > 0 && !disabled && !readOnly;
@@ -75,7 +77,7 @@ export function SearchInput({
   return (
     <div
       className={classes("fui-search-input", className)}
-      data-size={size}
+      data-size={scale}
       data-loading={loading ? "" : undefined}
       data-disabled={disabled ? "" : undefined}
     >
@@ -170,7 +172,7 @@ export function PasswordInput({
     if (typeof event.getModifierState === "function") setCapsLock(event.getModifierState("CapsLock"));
   };
   return (
-    <div className={classes("fui-password-input", className)} data-size={size} data-disabled={disabled ? "" : undefined}>
+    <div className={classes("fui-password-input", className)} data-size={canonicalSize(size, "default") ?? "default"} data-disabled={disabled ? "" : undefined}>
       <div className="fui-password-input-row">
         <input
           {...props}
@@ -263,7 +265,7 @@ export function NumberField({
   const base = id ?? generated;
   const ids = [describedBy, unit ? `${base}-unit` : undefined].filter(Boolean).join(" ");
   return (
-    <BaseNumberField.Root {...props} id={base} className={classes("fui-number-field", className)} data-size={size}>
+    <BaseNumberField.Root {...props} id={base} className={classes("fui-number-field", className)} data-size={canonicalSize(size, "default") ?? "default"}>
       <BaseNumberField.Group className="fui-number-field-group" data-invalid={invalid === true || invalid === "true" ? "" : undefined}>
         <BaseNumberField.Input
           className={classes("fui-number-field-input", inputClassName)}

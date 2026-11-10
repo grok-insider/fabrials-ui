@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useId, useRef, useState, type ComponentProps, type CSSProperties, type ReactNode } from "react";
-import { ShimmerText, WorkingLight, copyImage, formatCount, plural, prefersReducedMotion, useAnnounce, useLabels, useLocale, useScramble } from "@fabrials/ui";
+import { ShimmerText, WorkingLight, copyImage, formatCount, plural, prefersReducedMotion, subscribeTick, useAnnounce, useLabels, useLocale, useScramble } from "@fabrials/ui";
 import { CopyIcon, DownloadIcon } from "./chat-icons";
 import { formatPercent, formatTokens } from "./format";
 
@@ -38,8 +38,7 @@ export function useWorkTime(startedAt?: number | Date, running = true): number |
     else if (origin.current === null) origin.current = Date.now();
     setNow(Date.now());
     if (!running) return;
-    const timer = window.setInterval(() => setNow(Date.now()), prefersReducedMotion() ? 1000 : 100);
-    return () => window.clearInterval(timer);
+    return subscribeTick(prefersReducedMotion() ? 1000 : 100, () => setNow(Date.now()));
   }, [start, running]);
   if (now === null || origin.current === null) return null;
   return Math.max(0, now - origin.current);

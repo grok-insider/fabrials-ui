@@ -8,6 +8,7 @@ import {
   Inbox,
   WifiOff,
 } from "lucide-react";
+import { canonicalSize } from "./canonical-size";
 import { PixelSpinner } from "./pixel-spinner";
 import { FieldDescription, FieldError, FieldLabel, FieldOptionalMark, FieldRequiredMark, FieldRoot, type FieldLabels } from "./field-parts";
 import { classes } from "./shared";
@@ -245,8 +246,8 @@ export type StatePanelProps = Omit<ComponentProps<"div">, "title"> & {
   headingLevel?: 2 | 3 | 4;
   icon?: ReactNode;
   align?: "start" | "center";
-  /** `sm` is 16 px of padding, for a drawer, a popover, a sidebar or a list slot; the icon and text stay the same. */
-  size?: "md" | "sm";
+  /** `sm` is 16 px of padding, for a drawer, a popover, a sidebar or a list slot; the icon and text stay the same. `default` names `md`. */
+  size?: "md" | "default" | "sm";
   /** `inline` has no border and no tint (an overlay, a palette, a region that already sits in a panel); the icon still carries the state. */
   variant?: "panel" | "inline";
   /** Fill the height of the region and centre the content in it (an empty reader pane). */
@@ -278,7 +279,7 @@ export function StatePanel({
       className={classes("fui-state-panel", className)}
       data-state={state}
       data-align={align}
-      data-size={size === "sm" ? "sm" : undefined}
+      data-size={canonicalSize(size, "md") === "sm" ? "sm" : undefined}
       data-variant={variant === "inline" ? "inline" : undefined}
       data-fill={fill || undefined}
     >

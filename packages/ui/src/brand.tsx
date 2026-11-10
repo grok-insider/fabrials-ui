@@ -1,4 +1,5 @@
 import type { ComponentProps, ReactNode } from "react";
+import { canonicalSize } from "./canonical-size";
 import { classes } from "./shared";
 
 export type GemName =
@@ -58,7 +59,8 @@ export type ProductLockupProps = Omit<ComponentProps<"span">, "children"> & {
   gem?: GemName;
   /** Replaces the gem, for example with a product illustration in marketing. */
   mark?: ReactNode;
-  size?: "sm" | "md" | "lg";
+  /** `md` is the middle size; `default` names it too. */
+  size?: "sm" | "md" | "default" | "lg";
 };
 
 export function ProductLockup({
@@ -70,11 +72,12 @@ export function ProductLockup({
   className,
   ...props
 }: ProductLockupProps) {
-  const gemSize = size === "lg" ? 28 : size === "sm" ? 18 : 22;
+  const scale = canonicalSize(size, "md") ?? "md";
+  const gemSize = scale === "lg" ? 28 : scale === "sm" ? 18 : 22;
   return (
     <span
       data-slot="product-lockup"
-      data-size={size}
+      data-size={scale}
       data-gem={gem}
       className={classes("fui-lockup", className)}
       {...props}

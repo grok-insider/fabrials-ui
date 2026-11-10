@@ -17,47 +17,7 @@ import {
   type CountdownTone,
 } from "./countdown-logic";
 import { classes } from "./shared";
-
-// One ticker for every countdown on the page. Timers sleep in a hidden tab; the reading does not, because it is computed
-// from the time: the page showing again, the window taking focus and a page restored from the back-forward cache all ask again.
-const MIN_TICK = 50;
-const listeners = new Map<() => void, number>();
-let timer: ReturnType<typeof setInterval> | undefined;
-let beat = 0;
-
-function wakeAll() {
-  for (const listener of [...listeners.keys()]) listener();
-}
-
-function wakeWhenVisible() {
-  if (document.visibilityState === "visible") wakeAll();
-}
-
-function retime() {
-  const next = listeners.size ? Math.max(MIN_TICK, Math.min(...listeners.values())) : 0;
-  if (next === beat) return;
-  if (timer !== undefined) clearInterval(timer);
-  beat = next;
-  timer = next ? setInterval(wakeAll, next) : undefined;
-}
-
-function subscribeToClock(listener: () => void, tick: number) {
-  if (listeners.size === 0) {
-    document.addEventListener("visibilitychange", wakeWhenVisible);
-    window.addEventListener("focus", wakeAll);
-    window.addEventListener("pageshow", wakeAll);
-  }
-  listeners.set(listener, tick);
-  retime();
-  return () => {
-    listeners.delete(listener);
-    retime();
-    if (listeners.size > 0) return;
-    document.removeEventListener("visibilitychange", wakeWhenVisible);
-    window.removeEventListener("focus", wakeAll);
-    window.removeEventListener("pageshow", wakeAll);
-  };
-}
+import { subscribeTick } from "./ticker";
 
 const subscribeToNothing = () => () => {};
 
@@ -66,7 +26,7 @@ export type UseCountdownOptions = {
   offset?: number;
   /** Seconds left at which `crossed` changes, for one announcement each. The end (0) is always a mark. */
   marks?: readonly number[];
-  /** How often the clock is read, in ms. All countdowns share one timer, at the smallest tick asked for. */
+  /** How often the clock is read, in ms. Every countdown that asks for the same tick shares one timer. */
   tick?: number;
   /** `remainingMs` is rounded up to this many ms, and the hook renders when that changes: once a second by default. */
   precision?: number;
@@ -102,7 +62,7 @@ export function useCountdown(
   };
   const frozen = now !== undefined;
   const subscribe = useCallback(
-    (onChange: () => void) => (frozen ? subscribeToNothing() : subscribeToClock(onChange, tick)),
+    (onChange: () => void) => (frozen ? subscribeToNothing() : subscribeTick(tick, onChange)),
     [frozen, tick],
   );
   const left = useSyncExternalStore(

@@ -3,6 +3,7 @@
 import { useId, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
 import { Progress as BaseProgress } from "@base-ui/react/progress";
 import { Toolbar as BaseToolbar } from "@base-ui/react/toolbar";
+import { canonicalSize } from "./canonical-size";
 import type { Tone } from "./display";
 import { classes, type StyledProps } from "./shared";
 
@@ -70,8 +71,8 @@ export type ProgressProps = Omit<BaseProgress.Root.Props, "className" | "childre
   /** The value (a percentage, or what `format` makes of it) at the end of the label row. Default: shown with a `label`, and inside a large ring. */
   showValue?: boolean;
   tone?: Tone;
-  /** `sm` 4 px for a row, `default` 6 px, `lg` 8 px for a page's task; a ring of 16, 24 or 48 px. */
-  size?: "sm" | "default" | "lg";
+  /** `sm` 4 px for a row, `default` 6 px, `lg` 8 px for a page's task; a ring of 16, 24 or 48 px. `md` is `default`. */
+  size?: "sm" | "default" | "md" | "lg";
   /**
    * `bar` (default); `ring`: a circle that closes clockwise, with the label and hint beside it; `scan`: while the total is
    * not known (a search), a strip of square cells where a head of the working light hops across with a trail. With a value,
@@ -125,6 +126,7 @@ export function Progress({
   ...props
 }: ProgressProps) {
   const hintId = useId();
+  const scale = canonicalSize(size, "default") ?? "default";
   if (parts != null && variant !== "ring") {
     return (
       <SegmentedProgress
@@ -138,7 +140,7 @@ export function Progress({
         onSegmentSelect={onSegmentSelect}
         segments={parts}
         showValue={showValue}
-        size={size}
+        size={scale}
         tone={tone}
         value={value}
         {...props}
@@ -152,7 +154,7 @@ export function Progress({
   const ring = variant === "ring";
   const scan = variant === "scan" && percent == null;
   const segments = !ring && percent != null && steps != null && steps >= 2 ? Math.min(48, Math.round(steps)) : undefined;
-  const valueShown = showValue ?? (label != null || (ring && size === "lg"));
+  const valueShown = showValue ?? (label != null || (ring && scale === "lg"));
   const ticks = !ring && marks != null && marks.length > 0 ? marks : undefined;
   const marksId = `${hintId}-marks`;
   const track = scan ? (
@@ -172,7 +174,7 @@ export function Progress({
       locale={locale}
       data-slot="progress"
       data-tone={tone}
-      data-size={size === "default" ? undefined : size}
+      data-size={scale === "default" ? undefined : scale}
       data-variant={ring ? "ring" : scan ? "scan" : undefined}
       aria-describedby={[describedBy, hint != null ? hintId : undefined, ticks ? marksId : undefined].filter(Boolean).join(" ") || undefined}
       className={classes("fui-progress", className)}
@@ -182,7 +184,7 @@ export function Progress({
       {valueShown ? <ProgressValue /> : null}
       {children}
       {ring ? (
-        <ProgressRing percent={percent} size={size} />
+        <ProgressRing percent={percent} size={scale} />
       ) : ticks ? (
         <div className="fui-progress-rail" data-captions={ticks.some((mark) => mark.caption) ? "" : undefined}>
           {track}

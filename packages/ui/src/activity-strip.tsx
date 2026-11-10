@@ -1,4 +1,5 @@
 import type { ComponentProps, ReactNode } from "react";
+import { canonicalSize } from "./canonical-size";
 import type { Tone } from "./display";
 import { classes } from "./shared";
 
@@ -16,7 +17,8 @@ export type ActivityStripProps = Omit<ComponentProps<"figure">, "children"> & {
   caption: string;
   /** Value of the fullest cell. Defaults to the largest value. */
   max?: number;
-  size?: "sm" | "md" | "lg";
+  /** `sm`, `md` (the middle size, named `default` too) or `lg`. */
+  size?: "sm" | "md" | "default" | "lg";
   /** Text under the first and last cell, e.g. "hace 90 días" / "hoy". */
   startLabel?: ReactNode;
   endLabel?: ReactNode;
@@ -47,7 +49,7 @@ export function ActivityStrip({
 }: ActivityStripProps) {
   const top = max ?? Math.max(0, ...cells.map((cell) => cell.value));
   return (
-    <figure data-slot="activity-strip" data-size={size} className={classes("fui-activity-strip", className)} {...props}>
+    <figure data-slot="activity-strip" data-size={canonicalSize(size, "md") ?? "md"} className={classes("fui-activity-strip", className)} {...props}>
       <div className="fui-activity-cells" aria-hidden>
         {cells.map((cell, index) => (
           <span

@@ -2,6 +2,7 @@
 // Origin: Fabrials, 0.8. A styled native disclosure: no JavaScript, the panel is always in the DOM.
 import type { ComponentProps, ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
+import { canonicalSize } from "./canonical-size";
 import { classes } from "./shared";
 
 /**
@@ -47,13 +48,14 @@ export function DisclosureSummary({
 }: ComponentProps<"summary"> & {
   count?: ReactNode;
   chevron?: "end" | "start" | "none";
-  size?: "sm" | "md" | "lg";
+  /** `md` is the middle size; `default` names it too. */
+  size?: "sm" | "md" | "default" | "lg";
 }) {
   const icon = <ChevronDown aria-hidden className="fui-disclosure-chevron" />;
   return (
     <summary
       data-slot="disclosure-summary"
-      data-size={size}
+      data-size={canonicalSize(size, "md")}
       data-chevron={chevron}
       className={classes("fui-disclosure-summary", className)}
       {...props}

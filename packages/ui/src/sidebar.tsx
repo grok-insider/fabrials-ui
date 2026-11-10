@@ -5,6 +5,7 @@ import * as React from "react";
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
 import { PanelLeftIcon, XIcon } from "lucide-react";
+import { canonicalSize } from "./canonical-size";
 import { classes as cn } from "./shared";
 import { Button, Input } from "./controls";
 import { Separator, Skeleton } from "./display";
@@ -710,7 +711,8 @@ function SidebarMenuSubButton({
   ...props
 }: useRender.ComponentProps<"a"> &
   React.ComponentProps<"a"> & {
-    size?: "sm" | "md";
+    /** `md` is the middle size; `default` names it too. */
+    size?: "sm" | "md" | "default";
     isActive?: boolean;
   }) {
   return useRender({
@@ -726,7 +728,7 @@ function SidebarMenuSubButton({
     state: {
       slot: "sidebar-menu-sub-button",
       sidebar: "menu-sub-button",
-      size,
+      size: canonicalSize(size, "md"),
       active: isActive,
     },
   });

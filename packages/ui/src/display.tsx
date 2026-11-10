@@ -3,6 +3,7 @@
 import { useEffect, useRef, type ComponentProps, type CSSProperties, type RefObject } from "react";
 import { useRender } from "@base-ui/react/use-render";
 import { Tabs as BaseTabs } from "@base-ui/react/tabs";
+import { canonicalSize } from "./canonical-size";
 import { useLabels } from "./labels";
 import { classes, type StyledProps } from "./shared";
 import { prefersReducedMotion } from "./reduced-motion";
@@ -64,12 +65,13 @@ function badgeParts({
   ...props
 }: Omit<BadgeProps, "render">) {
   const count = typeof children === "number" || (typeof children === "string" && COUNT.test(children.trim()));
+  const scale = canonicalSize(size, "default");
   const attributes = {
     "data-slot": "badge",
     className: classes("fui-badge", className),
     "data-tone": tone === "accent" ? "info" : tone,
     "data-variant": variant,
-    "data-size": size === "default" ? undefined : size,
+    "data-size": scale === "default" ? undefined : scale,
     "data-count": count || undefined,
     "data-truncate": truncate || undefined,
     title: title ?? (truncate && typeof children === "string" ? children : undefined),

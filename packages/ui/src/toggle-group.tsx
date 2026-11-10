@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, type ReactNode, type Ref } from "react"
 import { Toggle as BaseToggle } from "@base-ui/react/toggle";
 import { ToggleGroup as BaseToggleGroup } from "@base-ui/react/toggle-group";
 import { Monitor, Moon, Sun } from "lucide-react";
+import { canonicalSize } from "./canonical-size";
 import { useLabels } from "./labels";
 import { classes, type StyledProps } from "./shared";
 import { toggleVariants, type ToggleSize, type ToggleVariant } from "./variants";
@@ -83,15 +84,15 @@ export function ToggleGroup({
   ref,
   ...props
 }: StyledProps<BaseToggleGroup.Props> & {
-  /** `sm` 26 px, `default` 34 px, `lg` 44 px painted on every pointer (the large control height); `sm` and `default` are 44 px on touch and narrow screens. */
-  size?: "default" | "sm" | "lg";
+  /** `sm` 26 px, `default` 34 px, `lg` 44 px painted on every pointer (the large control height); `sm` and `default` are 44 px on touch and narrow screens. `md` is `default`. */
+  size?: "default" | "md" | "sm" | "lg";
   ref?: Ref<HTMLDivElement>;
 }) {
   const setNode = useSlidingIndicator(ref);
   return (
     <BaseToggleGroup
       data-slot="toggle-group"
-      data-size={size}
+      data-size={canonicalSize(size, "default")}
       className={classes("fui-toggle-group", className)}
       ref={setNode}
       {...props}
@@ -156,8 +157,8 @@ export function ThemeSwitcher({
   labels?: Record<ThemePreference, ReactNode>;
   showLabels?: boolean;
   label?: string;
-  /** As `ToggleGroup`; `lg` paints 44 px on every pointer, for a row of primary 44 px targets. */
-  size?: "default" | "sm" | "lg";
+  /** As `ToggleGroup`; `lg` paints 44 px on every pointer, for a row of primary 44 px targets. `md` is `default`. */
+  size?: "default" | "md" | "sm" | "lg";
   className?: string;
 }) {
   const labels = useLabels("themeSwitcher", THEME_LABELS, ownLabels);

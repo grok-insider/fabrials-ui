@@ -4,6 +4,7 @@
 import { createContext, useContext, type ComponentProps } from "react";
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
+import { canonicalSize } from "./canonical-size";
 import { classes } from "./shared";
 
 /** Data attributes and class as one loosely typed bag: Base UI's prop types do not list `data-*`. */
@@ -28,7 +29,8 @@ export function ItemGroup({ className, bordered = false, ...props }: ComponentPr
 export type ItemProps = useRender.ComponentProps<"li"> & {
   /** `default` is a row of a list. `outline` and `muted` are standalone items (a boxed row, a quiet well). */
   variant?: "default" | "outline" | "muted";
-  size?: "default" | "sm";
+  /** `default` is the middle size; `md` names it too. */
+  size?: "default" | "md" | "sm";
   /** The record that is open in the detail pane: a soft Stormlight fill and a 2 px bar on the inline-start edge. The link inside says the same with `aria-current`. */
   current?: boolean;
   /** Picked for a bulk action: the same fill, no bar. A checked native checkbox inside an `ItemCheck` does it without this prop. */
@@ -46,6 +48,7 @@ export type ItemProps = useRender.ComponentProps<"li"> & {
  */
 export function Item({ className, variant = "default", size = "default", current, selected, unread, stretch, render, ...props }: ItemProps) {
   const inGroup = useContext(InsideGroup);
+  const scale = canonicalSize(size, "default") ?? "default";
   return useRender({
     defaultTagName: inGroup ? "li" : "div",
     render,
@@ -54,7 +57,7 @@ export function Item({ className, variant = "default", size = "default", current
         className: classes("fui-item", className),
         "data-slot": "item",
         "data-variant": variant,
-        "data-size": size === "default" ? undefined : size,
+        "data-size": scale === "default" ? undefined : scale,
         "data-current": current ? "" : undefined,
         "data-selected": selected ? "" : undefined,
         "data-unread": unread ? "" : undefined,
