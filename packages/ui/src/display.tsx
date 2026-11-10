@@ -6,6 +6,9 @@ import { Tabs as BaseTabs } from "@base-ui/react/tabs";
 import { useLabels } from "./labels";
 import { classes, type StyledProps } from "./shared";
 import { useOverflowTabStop } from "./use-overflow";
+import { tabsListVariants, type BadgeSize, type BadgeTone, type BadgeVariant } from "./variants";
+
+export { badgeVariants, tabsListVariants, type BadgeSize, type BadgeTone, type BadgeVariant } from "./variants";
 
 export { Alert, AlertAction, AlertDescription, AlertTitle } from "./alert";
 export { Card, CardAction, CardCaption, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./card";
@@ -15,10 +18,10 @@ export { Skeleton } from "./skeleton";
 export type Tone = "neutral" | "info" | "success" | "warning" | "danger";
 
 export type BadgeProps = ComponentProps<"span"> & {
-  tone?: Tone | "accent";
-  variant?: "soft" | "outline" | "solid";
+  tone?: BadgeTone;
+  variant?: BadgeVariant;
   /** `sm` 18 px for a dense row, `default` 20 px, `lg` 24 px beside a heading or in a card's header (0.11). */
-  size?: "sm" | "default" | "lg";
+  size?: BadgeSize;
   /** Adds a leading status dot; the text remains the accessible meaning. `"hollow"` is an outline dot (an archived or inactive item). */
   dot?: boolean | "hollow";
   /** The dot ripples while the state is live (syncing, recording), and stops when it is not (0.11). Still under reduced motion. */
@@ -226,7 +229,7 @@ export function TabsList({
     <BaseTabs.List
       data-variant={variant}
       data-scrollable={scrollable === false ? undefined : scrollable === true ? "always" : scrollable}
-      className={classes("fui-tabs-list", className)}
+      className={tabsListVariants({ variant, className })}
       ref={setRef}
       {...props}
     >

@@ -13,7 +13,7 @@ import {
   type Ref,
   type TextareaHTMLAttributes,
 } from "react";
-import { Button, Spinner, Tooltip, TooltipContent, TooltipTrigger, WorkingLight } from "@fabrials/ui";
+import { Button, Spinner, Toggle, Tooltip, TooltipContent, TooltipTrigger, WorkingLight } from "@fabrials/ui";
 import { ArrowUpIcon, SquareIcon } from "./chat-icons";
 
 const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
@@ -235,20 +235,23 @@ export function ComposerToggle({
   tooltip?: ReactNode;
   disabled?: boolean;
 }) {
+  // A single key that stays on, in the composer's own pill look: `plain` keeps only the classes below, as the hand-made
+  // button it replaces had, and `data-state` stays for the hosts that style the pill by it (0.12).
   const button = (
-    <button
+    <Toggle
       aria-label={label}
-      aria-pressed={pressed}
       className="fui-composer-pill"
       data-icon-only={children ? undefined : true}
       data-state={pressed ? "on" : "off"}
       disabled={disabled}
-      onClick={() => onPressedChange(!pressed)}
+      onPressedChange={onPressedChange}
+      pressed={pressed}
       type="button"
+      variant="plain"
     >
       {icon}
       {children ? <span>{children}</span> : null}
-    </button>
+    </Toggle>
   );
   if (!tooltip) return button;
   return (

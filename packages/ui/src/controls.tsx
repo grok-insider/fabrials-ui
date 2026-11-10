@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef, type ComponentProps, type CSSProperties, type ReactNode, type Ref } from "react";
+import { useDeferredValue, useEffect, useId, useRef, useState, type ComponentProps, type CSSProperties, type ReactNode, type Ref } from "react";
 import { Button as BaseButton } from "@base-ui/react/button";
 import { Checkbox as BaseCheckbox } from "@base-ui/react/checkbox";
 import { Switch as BaseSwitch } from "@base-ui/react/switch";
 import { Check, Minus } from "lucide-react";
+import { FieldCount, countId, countLimit, mergeDescribedBy, type CountProps } from "./field-count";
 import { PixelSpinner } from "./pixel-spinner";
 import { classes, type StyledProps } from "./shared";
 
@@ -50,8 +51,40 @@ export function Button({
   );
 }
 
-export function Input({ className, ...props }: ComponentProps<"input">) {
-  return <input className={classes("fui-input", className)} {...props} />;
+export type InputProps = ComponentProps<"input"> & {
+  /**
+   * The counter under the field: `count={true}` shows how much it holds, `{ max, unit, soft }` adds the limit. A soft limit
+   * (the default) never truncates and says when the text is past it.
+   */
+  count?: CountProps;
+};
+
+export function Input({ className, count, id, value, defaultValue, onChange, "aria-describedby": describedBy, maxLength, ...props }: InputProps) {
+  const counted = useCountedValue(value, defaultValue);
+  const generated = useId();
+  const { maxLength: hardMax } = countLimit(count);
+  const input = (
+    <input
+      className={classes("fui-input", className)}
+      id={id}
+      value={value}
+      defaultValue={defaultValue}
+      maxLength={hardMax ?? maxLength}
+      aria-describedby={count ? mergeDescribedBy(describedBy, countId(id, generated)) : describedBy}
+      onChange={(event) => {
+        counted.track(event.currentTarget.value);
+        onChange?.(event);
+      }}
+      {...props}
+    />
+  );
+  if (!count) return input;
+  return (
+    <div className="fui-count-field">
+      {input}
+      <FieldCount count={count} id={countId(id, generated)} value={counted.shown} />
+    </div>
+  );
 }
 
 export type TextareaProps = ComponentProps<"textarea"> & {
@@ -60,12 +93,43 @@ export type TextareaProps = ComponentProps<"textarea"> & {
   autoResize?: boolean;
   minRows?: number;
   maxRows?: number;
+  /**
+   * The counter under the field: `count={true}` shows how much it holds, `{ max, unit, soft }` adds the limit. A soft limit
+   * (the default) never truncates and says when the text is past it.
+   */
+  count?: CountProps;
 };
 
 const fieldSizing = typeof CSS !== "undefined" && typeof CSS.supports === "function" && CSS.supports("field-sizing", "content");
 
-export function Textarea({ className, autoResize = false, minRows, maxRows, style, ref, onInput, ...props }: TextareaProps) {
+/** What a field holds, whether the host holds it or the field does, and the value the counter reads a frame later. */
+function useCountedValue(value: string | number | readonly string[] | undefined, defaultValue: string | number | readonly string[] | undefined) {
+  const [typed, setTyped] = useState(() => (defaultValue == null ? "" : String(defaultValue)));
+  const text = value === undefined ? typed : String(value ?? "");
+  const shown = useDeferredValue(text);
+  return { shown, track: (next: string) => setTyped(next) };
+}
+
+export function Textarea({
+  className,
+  autoResize = false,
+  minRows,
+  maxRows,
+  style,
+  ref,
+  onInput,
+  count,
+  id,
+  value,
+  defaultValue,
+  "aria-describedby": describedBy,
+  maxLength,
+  ...props
+}: TextareaProps) {
   const own = useRef<HTMLTextAreaElement | null>(null);
+  const counted = useCountedValue(value, defaultValue);
+  const generated = useId();
+  const { maxLength: hardMax } = countLimit(count);
   const measure = () => {
     const node = own.current;
     if (!autoResize || fieldSizing || !node) return;
@@ -73,7 +137,7 @@ export function Textarea({ className, autoResize = false, minRows, maxRows, styl
     node.style.height = `${node.scrollHeight + node.offsetHeight - node.clientHeight}px`;
   };
   useEffect(measure);
-  return (
+  const area = (
     <textarea
       className={classes("fui-input", "fui-textarea", className)}
       data-autoresize={autoResize ? "" : undefined}
@@ -82,17 +146,30 @@ export function Textarea({ className, autoResize = false, minRows, maxRows, styl
           ? ({ ...style, "--fui-textarea-min-rows": minRows ?? 2, "--fui-textarea-max-rows": maxRows ?? 12 } as CSSProperties)
           : style
       }
+      id={id}
+      value={value}
+      defaultValue={defaultValue}
+      maxLength={hardMax ?? maxLength}
+      aria-describedby={count ? mergeDescribedBy(describedBy, countId(id, generated)) : describedBy}
       ref={(node) => {
         own.current = node;
         if (typeof ref === "function") return ref(node);
         if (ref) ref.current = node;
       }}
       onInput={(event) => {
+        counted.track(event.currentTarget.value);
         measure();
         onInput?.(event);
       }}
       {...props}
     />
+  );
+  if (!count) return area;
+  return (
+    <div className="fui-count-field">
+      {area}
+      <FieldCount count={count} id={countId(id, generated)} value={counted.shown} />
+    </div>
   );
 }
 

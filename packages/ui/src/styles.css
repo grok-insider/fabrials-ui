@@ -8368,8 +8368,13 @@
     outline: 2px solid var(--fui-focus);
     outline-offset: 2px;
   }
-  .fui-slider[data-disabled] {
+  /* A disabled slider dims its track, not its words: the value of a control that is off is still read, and 50 % of the muted
+     ink over a card is under the contrast a value has to keep (0.12). */
+  .fui-slider[data-disabled] .fui-slider-control {
     opacity: 0.5;
+  }
+  .fui-slider[data-disabled] :is(.fui-slider-label, .fui-slider-value) {
+    color: var(--muted-foreground);
   }
   .fui-slider[data-disabled] .fui-slider-control {
     cursor: not-allowed;
@@ -12654,6 +12659,437 @@
     .fui-keyboard-key:active:not(:disabled) {
       background: Highlight;
       color: HighlightText;
+    }
+  }
+}
+
+@layer components {
+  /* 0.12: what a notice, a count, a field, a slider, a legend and a single key gained (Alert retry and reveal, the count
+     under a field, the parts of a Field, a Slider's label and group, ChartLegend/LegendItem/Swatch/ColorRamp, Toggle, and the
+     class hooks badgeVariants, tabsListVariants and toggleVariants return). A piece that already drew itself keeps its rules:
+     the class hooks are guarded with `:not([data-…])` so they never reach a component that carries the attribute. */
+
+  /* --------------------------------------------------------------- alert */
+  /* An alert that arrived after the first paint scrolls itself into view, keeping clear of a sticky header above it and of
+     an ActionBar below. */
+  .fui-alert[data-reveal] {
+    scroll-margin-block-start: calc(var(--fui-header-height, 0px) + var(--fui-space-3));
+    scroll-margin-block-end: calc(var(--fui-action-bar-size, 0px) + var(--fui-keyboard-inset, 0px) + var(--fui-space-3));
+  }
+
+  /* --------------------------------------------------------------- count */
+  .fui-count-field {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--fui-space-1-5);
+    min-inline-size: 0;
+  }
+  .fui-count {
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: var(--fui-space-2);
+    min-inline-size: 0;
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: var(--fui-tracking-label);
+    line-height: var(--fui-leading-sm);
+  }
+  .fui-count-value {
+    white-space: nowrap;
+  }
+  .fui-count-over {
+    color: var(--fui-danger-ink);
+    font-weight: var(--fui-weight-medium);
+    white-space: nowrap;
+  }
+  .fui-count[data-level="over"] .fui-count-value {
+    color: var(--fui-danger-ink);
+  }
+  .fui-count-field:has(.fui-count[data-level="over"]) .fui-input {
+    border-color: color-mix(in oklab, var(--destructive) 55%, var(--fui-control-border));
+  }
+
+  /* ---------------------------------------------------------- field parts */
+  .fui-field-content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--fui-space-1-5);
+    min-inline-size: 0;
+  }
+  .fui-field-title {
+    font-weight: var(--fui-weight-semibold);
+  }
+  /* The mark of a required field, and the word after an optional one: neither is colour alone (the asterisk has the word for
+     a screen reader, and "optional" is a word). */
+  .fui-field-required {
+    margin-inline-start: 0.125rem;
+    color: var(--fui-danger-ink);
+  }
+  .fui-field-optional {
+    margin-inline-start: var(--fui-space-1-5);
+    color: var(--muted-foreground);
+    font-weight: var(--fui-weight-regular);
+  }
+  .fui-field-separator {
+    display: flex;
+    align-items: center;
+    gap: var(--fui-space-3);
+    min-inline-size: 0;
+  }
+  .fui-field-separator:not(:has(.fui-field-separator-word)) {
+    gap: 0;
+  }
+  .fui-field-separator::before,
+  .fui-field-separator::after {
+    content: "";
+    flex: 1 1 0;
+    block-size: 1px;
+    background: var(--border);
+  }
+  .fui-field-separator-word {
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    letter-spacing: var(--fui-tracking-label);
+    white-space: nowrap;
+  }
+
+  /* -------------------------------------------------------------- slider */
+  .fui-slider[data-label] {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+  .fui-slider-label {
+    min-inline-size: 0;
+    color: var(--foreground);
+    font-size: var(--fui-text-sm);
+    font-weight: var(--fui-weight-medium);
+    overflow-wrap: anywhere;
+  }
+  /* A panel of sliders whose names and values line up: one grid, each slider a subgrid row. The wrapper is the container the
+     narrow form answers to, so it is the group's own width that decides, not the window's. */
+  .fui-slider-group-wrap {
+    container: fui-slider-group / inline-size;
+    min-inline-size: 0;
+  }
+  .fui-slider-group {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: var(--fui-space-3);
+    row-gap: var(--fui-space-3);
+    min-inline-size: 0;
+  }
+  .fui-slider-group > .fui-slider {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+  }
+  @supports (grid-template-columns: subgrid) {
+    .fui-slider-group > .fui-slider {
+      grid-template-columns: subgrid;
+    }
+  }
+  .fui-slider-group > .fui-slider > .fui-slider-label {
+    grid-column: 1;
+  }
+  .fui-slider-group > .fui-slider > .fui-slider-control {
+    grid-column: 2;
+  }
+  .fui-slider-group > .fui-slider > .fui-slider-value {
+    grid-column: 3;
+  }
+  .fui-slider-group[data-columns="auto"] {
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  }
+  .fui-slider-group[data-columns="auto"] > .fui-slider {
+    grid-column: auto;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .fui-slider-group[data-columns="auto"] > .fui-slider > .fui-slider-label {
+    grid-column: 1 / -1;
+  }
+  .fui-slider-group[data-columns="auto"] > .fui-slider > .fui-slider-control {
+    grid-column: 1;
+  }
+  .fui-slider-group[data-columns="auto"] > .fui-slider > .fui-slider-value {
+    grid-column: 2;
+  }
+  @container fui-slider-group (max-width: 28rem) {
+    .fui-slider-group {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .fui-slider-group > .fui-slider,
+    .fui-slider-group[data-columns="auto"] > .fui-slider {
+      grid-column: auto;
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+    .fui-slider-group > .fui-slider > .fui-slider-label,
+    .fui-slider-group[data-columns="auto"] > .fui-slider > .fui-slider-label {
+      grid-column: 1 / -1;
+    }
+    .fui-slider-group > .fui-slider > .fui-slider-control,
+    .fui-slider-group[data-columns="auto"] > .fui-slider > .fui-slider-control {
+      grid-column: 1;
+    }
+    .fui-slider-group > .fui-slider > .fui-slider-value,
+    .fui-slider-group[data-columns="auto"] > .fui-slider > .fui-slider-value {
+      grid-column: 2;
+    }
+  }
+
+  /* --------------------------------------------------------------- chart */
+  /* A legend a host draws beside its own visual: the same row as the chart's, without the toggle. */
+  .fui-chart-legend-static {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--fui-space-2);
+    min-block-size: 2rem;
+    padding: 0 var(--fui-space-1-5);
+    color: var(--foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    letter-spacing: var(--fui-tracking-label);
+  }
+  /* A dashed series is a dashed rule, not a square: the colour is the one the host gave. */
+  .fui-chart-swatch[data-pattern="dashed"] {
+    align-self: center;
+    block-size: 0;
+    border-block-start: 2px dashed currentColor;
+    background: none;
+  }
+  /* A continuous legend, painted in cells: a ramp that encodes a value is data, so it is stepped, not a gradient. */
+  .fui-color-ramp {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--fui-space-1);
+    min-inline-size: 0;
+  }
+  .fui-color-ramp-label {
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    letter-spacing: var(--fui-tracking-label);
+  }
+  .fui-color-ramp-scale {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: var(--fui-space-2);
+    min-inline-size: 0;
+  }
+  .fui-color-ramp-end {
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: var(--fui-tracking-label);
+    white-space: nowrap;
+  }
+  .fui-color-ramp-bar {
+    grid-column: 2;
+    display: flex;
+    min-inline-size: 4rem;
+    block-size: 0.5rem;
+    overflow: hidden;
+    border-radius: var(--fui-radius-xs);
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--fui-control-border) 45%, transparent);
+  }
+  .fui-color-ramp-bar > span {
+    flex: 1 1 0;
+    min-inline-size: 0;
+  }
+  .fui-color-ramp-marks {
+    position: relative;
+    grid-column: 2;
+    display: block;
+    block-size: 1.375rem;
+  }
+  .fui-color-ramp-mark {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: var(--fui-ramp-mark);
+    inline-size: 1px;
+    block-size: 0.25rem;
+    background: color-mix(in oklab, var(--muted-foreground) 70%, transparent);
+  }
+  .fui-color-ramp-mark-label {
+    position: absolute;
+    inset-block-start: 0.375rem;
+    inset-inline-start: 0;
+    translate: -50% 0;
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    letter-spacing: var(--fui-tracking-label);
+    white-space: nowrap;
+  }
+  .fui-color-ramp-mark-label:dir(rtl) {
+    translate: 50% 0;
+  }
+  /* As on a slider's ruler: a label at either end of the bar turns inward, so it never leaves the ramp. */
+  .fui-color-ramp-mark[data-edge="start"] .fui-color-ramp-mark-label {
+    translate: 0 0;
+  }
+  .fui-color-ramp-mark[data-edge="end"] .fui-color-ramp-mark-label {
+    translate: -100% 0;
+  }
+  .fui-color-ramp-mark[data-edge="end"] .fui-color-ramp-mark-label:dir(rtl) {
+    translate: 100% 0;
+  }
+
+  /* -------------------------------------------------------------- toggle */
+  /* The look of a key on its own: `default` sits on the page as a control, `outline` draws only its hairline. Pressed is the
+     same raised segment the key has inside a group (its own rule comes earlier, so it is said again here). */
+  .fui-toggle-default {
+    background: var(--muted);
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--foreground) 5%, transparent);
+  }
+  .fui-toggle-outline {
+    background: transparent;
+    box-shadow: inset 0 0 0 1px var(--border);
+  }
+  .fui-toggle-default[data-pressed],
+  .fui-toggle-outline[data-pressed] {
+    background: var(--fui-segment);
+    color: var(--foreground);
+    box-shadow:
+      var(--fui-shadow-xs),
+      0 0 0 1px color-mix(in oklab, var(--foreground) 8%, transparent);
+  }
+  .fui-toggle-size-sm {
+    min-block-size: calc(var(--fui-control-height-sm) - 6px);
+    padding-inline: var(--fui-space-2);
+    font-size: 0.8125rem;
+  }
+  .fui-toggle-size-lg {
+    min-block-size: var(--fui-control-height-lg);
+  }
+  @media (pointer: coarse) {
+    .fui-toggle-default,
+    .fui-toggle-outline,
+    .fui-toggle-size-sm,
+    .fui-toggle-size-lg {
+      min-block-size: 2.75rem;
+      min-inline-size: 2.75rem;
+    }
+  }
+
+  /* ------------------------------------------- badge and tabs, as classes */
+  /* What `badgeVariants` and `tabsListVariants` return, for a tag or a strip of tabs a host draws itself (a link, a cell, a
+     router's own tab). A Badge and a TabsList carry the attributes, so these never reach them. */
+  .fui-badge-tone-info:not([data-tone]) {
+    --fui-badge-ink: var(--brand-ink);
+    --fui-badge-solid: var(--brand);
+  }
+  .fui-badge-tone-success:not([data-tone]) {
+    --fui-badge-ink: var(--fui-success-ink);
+    --fui-badge-solid: var(--success);
+  }
+  .fui-badge-tone-warning:not([data-tone]) {
+    --fui-badge-ink: var(--fui-warning-ink);
+    --fui-badge-solid: var(--warning);
+  }
+  .fui-badge-tone-danger:not([data-tone]) {
+    --fui-badge-ink: var(--fui-danger-ink);
+    --fui-badge-solid: var(--destructive);
+  }
+  :is(
+    .fui-badge-tone-info:not([data-tone]),
+    .fui-badge-tone-success:not([data-tone]),
+    .fui-badge-tone-warning:not([data-tone]),
+    .fui-badge-tone-danger:not([data-tone])
+  ):not(.fui-badge-solid):not(.fui-badge-outline) {
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--fui-badge-solid) 14%, transparent);
+  }
+  .fui-badge-outline:not([data-variant]) {
+    background: transparent;
+    box-shadow: inset 0 0 0 1px var(--border);
+  }
+  .fui-badge-solid:not([data-variant]) {
+    background: var(--fui-badge-ink);
+    box-shadow: none;
+    color: var(--card);
+  }
+  .fui-badge-size-sm:not([data-size]) {
+    --fui-badge-text: 0.6875rem;
+    gap: 0.25rem;
+    min-height: 1.125rem;
+    padding-inline: 0.375rem;
+  }
+  .fui-badge-size-sm:not([data-size]) > svg {
+    width: 0.6875rem;
+    height: 0.6875rem;
+  }
+  .fui-badge-size-lg:not([data-size]) {
+    --fui-badge-text: 0.8125rem;
+    gap: 0.375rem;
+    min-height: 1.5rem;
+    padding-inline: 0.5625rem;
+  }
+  .fui-badge-size-lg:not([data-size]) > svg {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+  .fui-tabs-list-segmented:not([data-variant]) {
+    inline-size: fit-content;
+    max-inline-size: 100%;
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px;
+    padding: 3px;
+    border: 0;
+    border-radius: var(--fui-radius-md);
+    background: var(--muted);
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--foreground) 5%, transparent);
+  }
+  .fui-tabs-list-segmented:not([data-variant]) :is(.fui-tab, [role="tab"])[data-active] {
+    background: var(--fui-segment);
+    color: var(--foreground);
+    box-shadow:
+      var(--fui-shadow-xs),
+      0 0 0 1px color-mix(in oklab, var(--foreground) 8%, transparent);
+  }
+
+  /* ------------------------------------------------------- forced colours */
+  @media (forced-colors: active) {
+    /* The ramp's cells are the data, so they keep their colour and the bar takes a CanvasText edge. */
+    .fui-color-ramp-bar {
+      box-shadow: none;
+      outline: 1px solid CanvasText;
+      outline-offset: -1px;
+    }
+    .fui-color-ramp-bar > span,
+    .fui-color-ramp-mark {
+      forced-color-adjust: none;
+    }
+    .fui-color-ramp-label,
+    .fui-color-ramp-end,
+    .fui-color-ramp-mark-label {
+      color: CanvasText;
+    }
+    /* A key of its own is a plate, which a forced palette would flatten: it gets its hairline back. */
+    .fui-toggle-default,
+    .fui-toggle-outline,
+    .fui-tabs-list-segmented:not([data-variant]) {
+      outline: 1px solid CanvasText;
+      outline-offset: -1px;
+      box-shadow: none;
+      forced-color-adjust: none;
+    }
+    .fui-count-over,
+    .fui-count[data-level="over"] .fui-count-value,
+    .fui-field-required {
+      color: CanvasText;
+      font-weight: var(--fui-weight-semibold);
+    }
+    .fui-field-separator::before,
+    .fui-field-separator::after {
+      background: CanvasText;
     }
   }
 }

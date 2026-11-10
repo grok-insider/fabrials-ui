@@ -6,6 +6,9 @@ import { ToggleGroup as BaseToggleGroup } from "@base-ui/react/toggle-group";
 import { Monitor, Moon, Sun } from "lucide-react";
 import { useLabels } from "./labels";
 import { classes, type StyledProps } from "./shared";
+import { toggleVariants, type ToggleSize, type ToggleVariant } from "./variants";
+
+export { toggleVariants, type ToggleSize, type ToggleVariant } from "./variants";
 
 /**
  * Keeps one indicator under the pressed item of a single-choice group and lets it slide when the choice changes (0.10). It
@@ -107,6 +110,23 @@ export function ToggleGroupItem({
       {...props}
     />
   );
+}
+
+export type ToggleProps = StyledProps<BaseToggle.Props> & {
+  /** `default` sits on the page as a control; `outline` draws only its hairline; `plain` has no look of its own. */
+  variant?: ToggleVariant;
+  /** `sm` 26 px, `default` 34 px, `lg` 44 px on every pointer. */
+  size?: ToggleSize;
+};
+
+/**
+ * One key that stays on, on its own: the look of a `ToggleGroupItem` for a screen that has only one mode to switch. Its
+ * state is `pressed` (or `defaultPressed` when the host does not hold it) and a screen reader hears "pressed"; inside a
+ * `ToggleGroup` use `ToggleGroupItem`, which takes its value from the group. `variant="plain"` keeps none of the look, for
+ * a key that is a mode inside something else (the composer's pills are one).
+ */
+export function Toggle({ className, variant = "default", size = "default", ...props }: ToggleProps) {
+  return <BaseToggle data-slot="toggle" className={toggleVariants({ variant, size, className })} {...props} />;
 }
 
 export type ThemePreference = "system" | "light" | "dark";

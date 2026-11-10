@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useId, useRef, useState, type ComponentProps, type CSSProperties, type ReactNode } from "react";
-import { ShimmerText, WorkingLight, formatCount, plural, useLabels, useLocale, useScramble } from "@fabrials/ui";
+import { ShimmerText, WorkingLight, copyImage, formatCount, plural, useAnnounce, useLabels, useLocale, useScramble } from "@fabrials/ui";
+import { CopyIcon, DownloadIcon } from "./chat-icons";
 import { formatPercent, formatTokens } from "./format";
 
 function join(...values: Array<string | false | null | undefined>) {
@@ -616,11 +617,17 @@ export type GenerationStatus = "queued" | "generating" | "done" | "failed";
 /** The rows of a page being written: how far across each one reaches; 0 is the gap between paragraphs. */
 const PAGE_ROWS = [0.46, 0, 0.94, 0.9, 0.97, 0.58, 0, 0.92, 0.88, 0.95, 0.9, 0.36, 0, 0.6, 0.93, 0.86, 0.71];
 
+/** What a finished picture can do on its own: saved under a name, or copied to the clipboard. */
+export type GenerationAction = "download" | "copy";
+
 export type GenerationFrameProps = Omit<ComponentProps<"figure">, "children"> & {
   /** `queued` and `generating` show the field and the working light, `done` the image, `failed` the error. */
   status: GenerationStatus;
-  /** `image` (default), or `document`: a page whose rows are written from the top, the row being written in the light. */
-  kind?: "image" | "document";
+  /**
+   * `image` (default), `document`: a page whose rows are written from the top, the row being written in the light; or
+   * `video`: a moving picture, played in a `<video>` once it is done.
+   */
+  kind?: "image" | "document" | "video";
   /**
    * How a picture being made looks: `ripple` (default), light rippling through a field of square dots; `refine`, square
    * cells that grow finer, pass after pass, behind a band moving down; `scan`, a band of light sweeping down the field.
@@ -630,8 +637,10 @@ export type GenerationFrameProps = Omit<ComponentProps<"figure">, "children"> & 
   children?: ReactNode;
   /** Known progress, 0 to 1. Without it the frame says how long it has been working instead. */
   progress?: number;
-  /** The finished image. */
+  /** The finished image, or the video's own source. */
   src?: string;
+  /** A frame of the video, shown before it plays and while it is being made. */
+  poster?: string;
   /** The image's text alternative: what it shows, usually the prompt in plain words. */
   alt: string;
   /** Width over height (a number) or a CSS ratio ("4 / 3"). Default 1. */
@@ -646,6 +655,19 @@ export type GenerationFrameProps = Omit<ComponentProps<"figure">, "children"> & 
   doneLabel?: string;
   /** When the work began, for the time shown without a known progress. */
   startedAt?: number | Date;
+  /**
+   * What the finished picture offers over it, shown when the pointer is on it or the keyboard is in it (and always on a
+   * screen without a pointer): `["download", "copy"]` for the built-in keys, or any node of the host's own.
+   */
+  actions?: ReactNode | GenerationAction[];
+  /** The name the built-in download saves under. */
+  downloadName?: string;
+  /** Makes the finished picture a button: to open it full size, in a viewer, in a new tab. */
+  onOpen?: () => void;
+  /** What was asked for, shown under the working light while it is made when `showPrompt` is set. */
+  prompt?: string;
+  /** Shows `prompt` while the frame is working. */
+  showPrompt?: boolean;
   /** The status sentences; `label` and `doneLabel` win over them. A `LabelsProvider` sets them (scope `generation`). */
   labels?: Partial<GenerationLabels>;
   /** The locale of the percentage; "en" unless a `LabelsProvider` says otherwise. */
@@ -657,28 +679,48 @@ export type GenerationLabels = {
   /** While it works, for an image and for a document. */
   image: string;
   document: string;
+  video: string;
   imageFailed: string;
   documentFailed: string;
+  videoFailed: string;
   /** Read out when the result is ready. */
   imageReady: string;
   documentReady: string;
+  videoReady: string;
+  /** The name of the key that opens the finished picture (when the frame has `onOpen`). */
+  open: string;
+  /** The name of the built-in download and copy keys. */
+  download: string;
+  copy: string;
+  /** Said when the picture reached the clipboard, and when the browser refused. */
+  copied: string;
+  copyFailed: string;
 };
 
 const GENERATION_LABELS: GenerationLabels = {
   queued: "Waiting to start",
   image: "Making the image",
   document: "Writing the document",
+  video: "Making the video",
   imageFailed: "The image could not be made",
   documentFailed: "The document could not be written",
+  videoFailed: "The video could not be made",
   imageReady: "Image ready",
   documentReady: "Document ready",
+  videoReady: "Video ready",
+  open: "Open",
+  download: "Download",
+  copy: "Copy the picture",
+  copied: "Copied to the clipboard",
+  copyFailed: "The browser did not allow the copy",
 };
 
 /**
- * A picture (or a document) being made. While it works, the field inside the frame moves (`effect`: light ripples through
- * square dots, cells grow finer behind a band, or a band sweeps down; a document's rows are written from the top) and the
- * working light turns along its edge; a polite status says what it is doing and how far it got. The finished image arrives
- * through the dither. Under reduced motion the field and the edge hold still and the image appears at once.
+ * A picture (or a document, or a video) being made. While it works, the field inside the frame moves (`effect`: light
+ * ripples through square dots, cells grow finer behind a band, or a band sweeps down; a document's rows are written from
+ * the top) and the working light turns along its edge; a polite status says what it is doing and how far it got. The
+ * finished image arrives through the dither. Under reduced motion the field and the edge hold still and the image appears
+ * at once. A finished picture can offer actions over it, open as a button, and a video plays in place with its controls.
  */
 export function GenerationFrame({
   status,
@@ -687,6 +729,7 @@ export function GenerationFrame({
   children,
   progress,
   src,
+  poster,
   alt,
   aspectRatio = 1,
   label,
@@ -694,6 +737,11 @@ export function GenerationFrame({
   error,
   doneLabel,
   startedAt,
+  actions,
+  downloadName,
+  onOpen,
+  prompt,
+  showPrompt = false,
   labels: ownLabels,
   locale: ownLocale,
   className,
@@ -702,8 +750,14 @@ export function GenerationFrame({
 }: GenerationFrameProps) {
   const labels = useLabels("generation", GENERATION_LABELS, ownLabels);
   const locale = useLocale(ownLocale);
+  const announce = useAnnounce();
+  const [canCopy, setCanCopy] = useState(false);
+  useEffect(() => {
+    setCanCopy(typeof ClipboardItem !== "undefined");
+  }, []);
   const working = status === "queued" || status === "generating";
   const page = kind === "document";
+  const motion = kind === "video";
   const elapsed = useWorkTime(startedAt, working);
   // An image still on its way when it mounts waits hidden and arrives through the dither; one that is already there (cached,
   // or loaded before hydration) just shows. Set on the element, not rendered, so the server's markup never hides it.
@@ -719,10 +773,14 @@ export function GenerationFrame({
       : status === "failed"
         ? page
           ? labels.documentFailed
-          : labels.imageFailed
+          : motion
+            ? labels.videoFailed
+            : labels.imageFailed
         : page
           ? labels.document
-          : labels.image);
+          : motion
+            ? labels.video
+            : labels.image);
   // A known progress places the field instead of the clock: how far down the page, or which pass and how far down it.
   const pass = share === undefined ? undefined : Math.min(2, Math.floor(share * 3));
   const field: CSSProperties | undefined =
@@ -732,33 +790,78 @@ export function GenerationFrame({
         ? ({ "--fui-page-t": share * PAGE_ROWS.length } as CSSProperties)
         : ({ "--fui-refine-pass": pass, "--fui-refine-band": `${(share * 3 - pass!) * 100}%`, "--fui-scan-band": `${share * 100}%` } as CSSProperties);
   const reading = working ? (percent !== undefined ? formatPercent(percent, locale) : elapsed === null ? "" : formatWorkTime(elapsed)) : "";
+  const done = status === "done" && (src !== undefined || children != null);
+  const builtIn = Array.isArray(actions) ? actions : undefined;
+  const copyPicture = async () => {
+    if (!src) return;
+    try {
+      await copyImage(src);
+      announce(labels.copied);
+    } catch {
+      announce(labels.copyFailed);
+    }
+  };
+  const picture =
+    status === "done" && motion && src ? (
+      <video aria-label={alt} className="fui-generation-video" controls playsInline poster={poster} preload="metadata" src={src} />
+    ) : status === "done" && src ? (
+      <img
+        alt={alt}
+        className="fui-generation-image"
+        decoding="async"
+        key={src}
+        onError={(event) => {
+          delete event.currentTarget.dataset.fuiReveal;
+        }}
+        onLoad={(event) => {
+          if (event.currentTarget.dataset.fuiReveal === "pending") event.currentTarget.dataset.fuiReveal = "in";
+        }}
+        ref={watchImage}
+        src={src}
+      />
+    ) : null;
   return (
     <figure
       className={join("fui-generation", className)}
       data-effect={page || effect === "ripple" ? undefined : effect}
-      data-kind={page ? "document" : undefined}
+      data-kind={page ? "document" : motion ? "video" : undefined}
       data-status={status}
       style={{ "--fui-generation-ratio": String(aspectRatio), ...style } as CSSProperties}
       {...props}
     >
       <div className="fui-generation-frame">
-        {status === "done" && src ? (
-          <img
-            alt={alt}
-            className="fui-generation-image"
-            decoding="async"
-            key={src}
-            onError={(event) => {
-              delete event.currentTarget.dataset.fuiReveal;
-            }}
-            onLoad={(event) => {
-              if (event.currentTarget.dataset.fuiReveal === "pending") event.currentTarget.dataset.fuiReveal = "in";
-            }}
-            ref={watchImage}
-            src={src}
-          />
-        ) : null}
+        {picture && onOpen ? (
+          <button aria-label={labels.open} className="fui-generation-open" onClick={onOpen} type="button">
+            {picture}
+          </button>
+        ) : (
+          picture
+        )}
         {status === "done" && !src && children ? <div className="fui-generation-content">{children}</div> : null}
+        {done && actions ? (
+          <div className="fui-generation-actions" data-static={builtIn ? undefined : ""}>
+            {builtIn
+              ? builtIn.map((action) =>
+                  action === "download" ? (
+                    <a
+                      aria-label={labels.download}
+                      className="fui-generation-action"
+                      download={downloadName ?? ""}
+                      href={src}
+                      key="download"
+                      rel="noopener"
+                    >
+                      <DownloadIcon />
+                    </a>
+                  ) : canCopy && src ? (
+                    <button aria-label={labels.copy} className="fui-generation-action" key="copy" onClick={copyPicture} type="button">
+                      <CopyIcon />
+                    </button>
+                  ) : null,
+                )
+              : actions}
+          </div>
+        ) : null}
         {working ? (
           <>
             {page ? (
@@ -805,9 +908,14 @@ export function GenerationFrame({
               ) : null}
             </>
           ) : status === "done" ? (
-            (doneLabel ?? (page ? labels.documentReady : labels.imageReady))
+            (doneLabel ?? (page ? labels.documentReady : motion ? labels.videoReady : labels.imageReady))
           ) : null}
         </span>
+        {working && showPrompt && prompt ? (
+          <p className="fui-generation-prompt" dir="auto">
+            {prompt}
+          </p>
+        ) : null}
         {status === "failed" ? (
           <div className="fui-generation-failed" role="alert">
             <span className="fui-generation-words">{words}</span>

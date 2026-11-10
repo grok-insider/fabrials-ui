@@ -19,6 +19,8 @@ const PLAIN_BY_DESIGN: Record<string, string> = {
     "reads a colour through a canvas when one exists and returns the value untouched when none does; `DitherCanvas` and `useResolvedTokens`, both client modules, are its callers",
   "ui/export.ts":
     "downloads, serialises and copies in the browser, and every function says so when called without a DOM; the module itself must import on the server, where a Server Component reads `fileStem`",
+  "ui/alert.tsx":
+    "hands `onRetry` to `AlertRetry`, a client module that waits on the promise; the alert itself draws nothing in the browser and stays renderable from a Server Component without it",
 };
 
 // Client on purpose although the scan finds no hook, handler or browser API.

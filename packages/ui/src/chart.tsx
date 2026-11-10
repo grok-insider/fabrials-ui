@@ -1,7 +1,7 @@
 "use client";
 // Origin: shadcn/ui chart (Recharts), adapted 2026-09-22 for Fabrials metric series. Restyled with fui- classes in 0.4.
 
-import { useId, useMemo, useState } from "react";
+import { useId, useMemo, useState, type ComponentProps, type CSSProperties, type ReactNode } from "react";
 import {
   Bar,
   BarChart,
@@ -13,7 +13,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { useLabels, useProvidedLocale } from "./labels";
+import { useLabels, useLocale, useProvidedLocale } from "./labels";
 import { formatCount } from "./plural";
 import { classes } from "./shared";
 import { useElementSize } from "./use-element-size";
@@ -253,30 +253,20 @@ export function SeriesChart({
         </tbody>
       </table>
       {painted.length > 1 ? (
-        <div className="fui-chart-legend">
+        <ChartLegend>
           {painted.map((item) => {
             const shown = !hidden.has(item.key);
+            const paint = kind === "bar" ? item.fill : item.color;
             return (
-              <span key={item.key} className="fui-chart-legend-item">
-                <button
-                  type="button"
-                  aria-pressed={shown}
-                  aria-label={shown ? labels.hide(item.label) : labels.show(item.label)}
-                  className="fui-chart-legend-toggle"
-                  onClick={() => toggle(item.key)}
-                >
-                  <Swatch paint={kind === "bar" ? item.fill : item.color} />
-                  <span data-hidden={shown ? undefined : ""}>{item.label}</span>
-                </button>
-                <button
-                  type="button"
-                  aria-label={labels.showOnly(item.label)}
-                  className="fui-chart-legend-only"
-                  onClick={() => setHidden(new Set(painted.filter((entry) => entry.key !== item.key).map((entry) => entry.key)))}
-                >
-                  {labels.only}
-                </button>
-              </span>
+              <LegendItem
+                key={item.key}
+                color={paint}
+                hidden={!shown}
+                label={item.label}
+                labels={labels}
+                onOnly={() => setHidden(new Set(painted.filter((entry) => entry.key !== item.key).map((entry) => entry.key)))}
+                onToggle={() => toggle(item.key)}
+              />
             );
           })}
           {visible.length !== painted.length ? (
@@ -288,7 +278,7 @@ export function SeriesChart({
               {labels.showAll}
             </button>
           ) : null}
-        </div>
+        </ChartLegend>
       ) : null}
     </div>
   );
@@ -308,17 +298,196 @@ function DitherPatterns({ uid }: { uid: string }) {
   );
 }
 
-/** A legend or tooltip key: a solid square, or a square of the series' dither when its paint is a pattern. */
-function Swatch({ paint }: { paint?: string }) {
-  if (paint?.startsWith("url(")) {
+/** How a key is painted: a solid square, a dashed rule (a dashed line), or the house's 2 px ordered dither. */
+export type SwatchPattern = "solid" | "dashed" | "dither";
+
+export type SwatchProps = {
+  /** The colour of the key: a token (`var(--chart-1)`), a hue, or a paint a chart defines (`url(#fui-dither-…)`). */
+  color?: string;
+  /** `solid` (default), `dashed`, or `dither`: the same square of 2 px cells the chart's series are drawn in. */
+  pattern?: SwatchPattern;
+  className?: string;
+};
+
+/** A legend's key: a small square (or dashed rule) in a series' colour, or in the dither that series is painted with. */
+export function Swatch({ color, pattern = "solid", className }: SwatchProps) {
+  const uid = useId().replace(/[^a-zA-Z0-9_-]/g, "");
+  if (color?.startsWith("url(")) {
     return (
-      <svg aria-hidden focusable="false" className="fui-chart-swatch" viewBox="0 0 10 10" shapeRendering="crispEdges">
-        <rect width={10} height={10} fill={paint} />
+      <svg aria-hidden focusable="false" className={classes("fui-chart-swatch", className)} viewBox="0 0 10 10" shapeRendering="crispEdges">
+        <rect width={10} height={10} fill={color} />
       </svg>
     );
   }
-  return <span aria-hidden className="fui-chart-swatch" style={{ background: paint }} />;
+  if (pattern === "dither") {
+    return (
+      <svg aria-hidden focusable="false" className={classes("fui-chart-swatch", className)} viewBox="0 0 10 10" shapeRendering="crispEdges">
+        <defs>
+          <pattern id={`fui-swatch-${uid}`} width={4} height={4} patternUnits="userSpaceOnUse">
+            <rect width={2} height={2} fill={color} />
+            <rect x={2} y={2} width={2} height={2} fill={color} />
+          </pattern>
+        </defs>
+        <rect width={10} height={10} fill={`url(#fui-swatch-${uid})`} />
+      </svg>
+    );
+  }
+  return (
+    <span
+      aria-hidden
+      className={classes("fui-chart-swatch", className)}
+      data-pattern={pattern === "dashed" ? "dashed" : undefined}
+      style={pattern === "dashed" ? { borderColor: color } : { background: color }}
+    />
+  );
 }
+
+export type LegendItemProps = {
+  /** The series' name. A screen reader hears it in the toggle's own name ("Hide requests"). */
+  label: ReactNode;
+  color?: string;
+  pattern?: SwatchPattern;
+  /** Shown in the legend but off the chart: struck through, its key dimmed. */
+  hidden?: boolean;
+  /** Given, the item toggles its series: a button with `aria-pressed`, as the chart's own legend has. */
+  onToggle?: (shown: boolean) => void;
+  /** Given, an "Only" key beside the toggle, which leaves this series alone on the chart. */
+  onOnly?: () => void;
+  /** The words of the toggle and of "Only". A `LabelsProvider` sets them (scope `chart`). */
+  labels?: Partial<SeriesChartLabels>;
+  className?: string;
+};
+
+/** One row of a legend: a key and a name, static or a toggle (and an "Only" beside it) as a chart's own legend is. */
+export function LegendItem({ label, color, pattern = "solid", hidden = false, onToggle, onOnly, labels: ownLabels, className }: LegendItemProps) {
+  const labels = useLabels("chart", CHART_LABELS, ownLabels);
+  const name = typeof label === "string" ? label : undefined;
+  const words = <span data-hidden={hidden ? "" : undefined}>{label}</span>;
+  if (!onToggle) {
+    return (
+      <span className={classes("fui-chart-legend-item", className)}>
+        <span className="fui-chart-legend-static">
+          <Swatch color={color} pattern={pattern} />
+          {words}
+        </span>
+      </span>
+    );
+  }
+  return (
+    <span className={classes("fui-chart-legend-item", className)}>
+      <button
+        type="button"
+        aria-pressed={!hidden}
+        aria-label={name ? (hidden ? labels.show(name) : labels.hide(name)) : undefined}
+        className="fui-chart-legend-toggle"
+        onClick={() => onToggle(hidden)}
+      >
+        <Swatch color={color} pattern={pattern} />
+        {words}
+      </button>
+      {onOnly ? (
+        <button type="button" aria-label={name ? labels.showOnly(name) : undefined} className="fui-chart-legend-only" onClick={onOnly}>
+          {labels.only}
+        </button>
+      ) : null}
+    </span>
+  );
+}
+
+export type ChartLegendProps = ComponentProps<"div">;
+
+/** The legend under a chart, or beside a visual of the host's own: `LegendItem` goes inside, `Swatch` paints its key. */
+export function ChartLegend({ className, ...props }: ChartLegendProps) {
+  return <div className={classes("fui-chart-legend", className)} {...props} />;
+}
+
+export type ColorRampLabels = {
+  /** The bar's text alternative: "from 0 to 100". */
+  range: (min: string, max: string) => string;
+};
+
+export const COLOR_RAMP_LABELS: ColorRampLabels = {
+  range: (min, max) => `from ${min} to ${max}`,
+};
+
+export type ColorRampMark = { value: number; label?: ReactNode };
+
+export type ColorRampProps = Omit<ComponentProps<"div">, "children"> & {
+  /** The lowest value the left end of the ramp stands for. */
+  min: number;
+  /** The highest, at the right end. */
+  max: number;
+  /** The colours across the ramp, in order: token colours (`var(--brand)`, `var(--chart-1)`) or any CSS colour. */
+  stops: string[];
+  /** How many cells the bar is painted with, 8 to 12 (10 unless given): a stepped ramp, which is data, not a gradient. */
+  steps?: number;
+  /** Ticks under the bar: a value between `min` and `max`, and the word under it. */
+  marks?: ColorRampMark[];
+  /** What the colour means ("Requests per minute"). */
+  label?: ReactNode;
+  /** How the ends and the ticks are written; the reader's digits unless given. */
+  format?: (value: number) => string;
+  /** The bar's text alternative. A `LabelsProvider` sets it (scope `colorRamp`). */
+  labels?: Partial<ColorRampLabels>;
+  locale?: Intl.LocalesArgument;
+};
+
+/**
+ * The colours of a map or a heat map, read from one end to the other: the lowest value, a bar painted in steps sampled from
+ * `stops`, the highest, and any ticks between. The bar itself is decoration to a screen reader, which hears "from 0 to 100".
+ */
+export function ColorRamp({ min, max, stops, steps = 10, marks, label, format, labels: ownLabels, locale: ownLocale, className, ...props }: ColorRampProps) {
+  const labels = useLabels("colorRamp", COLOR_RAMP_LABELS, ownLabels);
+  const locale = useLocale(ownLocale);
+  const write = format ?? ((value: number) => formatCount(value, locale));
+  const cells = rampColors(stops, steps);
+  const span = max - min || 1;
+  return (
+    <div className={classes("fui-color-ramp", className)} data-slot="color-ramp" {...props}>
+      {label ? <span className="fui-color-ramp-label">{label}</span> : null}
+      <div className="fui-color-ramp-scale">
+        <span className="fui-color-ramp-end">{write(min)}</span>
+        <span aria-hidden="true" className="fui-color-ramp-bar" data-cells={cells.length}>
+          {cells.map((paint, index) => (
+            <span key={index} style={{ background: paint }} />
+          ))}
+        </span>
+        <span className="fui-color-ramp-end">{write(max)}</span>
+        {marks?.length ? (
+          <span aria-hidden="true" className="fui-color-ramp-marks">
+            {marks.map((mark) => (
+              <span
+                className="fui-color-ramp-mark"
+                data-edge={mark.value <= min ? "start" : mark.value >= max ? "end" : undefined}
+                key={mark.value}
+                style={{ "--fui-ramp-mark": `${((Math.min(max, Math.max(min, mark.value)) - min) / span) * 100}%` } as CSSProperties}
+              >
+                {mark.label !== undefined ? <span className="fui-color-ramp-mark-label">{mark.label}</span> : null}
+              </span>
+            ))}
+          </span>
+        ) : null}
+      </div>
+      <span className="fui-sr-only">{labels.range(write(min), write(max))}</span>
+    </div>
+  );
+}
+
+/** The cells of a stepped ramp: `steps` colours sampled across `stops`, beside each other with no gradient between them. */
+export function rampColors(stops: string[], steps = 10): string[] {
+  if (!stops.length) return [];
+  const count = Math.max(2, Math.min(12, Math.round(steps)));
+  if (stops.length === 1) return Array.from({ length: count }, () => stops[0]!);
+  return Array.from({ length: count }, (_, index) => {
+    const at = (index / (count - 1)) * (stops.length - 1);
+    const low = Math.floor(at);
+    const high = Math.min(stops.length - 1, low + 1);
+    const mix = at - low;
+    if (mix === 0) return stops[low]!;
+    return `color-mix(in oklab, ${stops[low]} ${Math.round((1 - mix) * 100)}%, ${stops[high]})`;
+  });
+}
+
 
 function SeriesTooltip({
   active,
@@ -356,7 +525,7 @@ function SeriesTooltip({
             // By position: two series may carry the same label.
             <li className="fui-chart-tip-row" key={index}>
               <span className="fui-chart-tip-name">
-                <Swatch paint={paints.get(String(item.name ?? "")) ?? item.color} />
+                <Swatch color={paints.get(String(item.name ?? "")) ?? item.color} />
                 <span>{String(item.name ?? "")}</span>
               </span>
               <span className="fui-chart-tip-value">{yFormat(numeric(item.value))}</span>

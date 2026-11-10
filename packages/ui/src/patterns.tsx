@@ -9,6 +9,7 @@ import {
   WifiOff,
 } from "lucide-react";
 import { PixelSpinner } from "./pixel-spinner";
+import { FieldDescription, FieldError, FieldLabel, FieldOptionalMark, FieldRequiredMark, FieldRoot, type FieldLabels } from "./field-parts";
 import { classes } from "./shared";
 
 export type HeadingLevel = 1 | 2 | 3 | 4;
@@ -302,31 +303,63 @@ export function StatePanel({
   );
 }
 
+export type FieldRenderProps = {
+  id: string;
+  "aria-describedby"?: string;
+  "aria-invalid"?: true;
+};
+
+export type FieldProps = {
+  /** The name of the field. In the composable form, `FieldLabel` carries it instead. */
+  label?: ReactNode;
+  description?: ReactNode;
+  error?: ReactNode;
+  id?: string;
+  /** An asterisk after the label, and the word itself for a screen reader. */
+  required?: boolean;
+  /** The word "optional" after the label, in muted ink. `required` wins when both are given. */
+  optional?: boolean;
+  /** The words of those two marks. A `LabelsProvider` sets them (scope `field`). */
+  labels?: Partial<FieldLabels>;
+  /** A function receives the ids to put on the control; a node composes `FieldLabel`, `FieldError` and the rest itself. */
+  children?: ((props: FieldRenderProps) => ReactNode) | ReactNode;
+};
+
+/**
+ * One field: its name, the control, a description under it and what went wrong. A function child receives the `id` and the
+ * `aria-describedby` the control needs; rendered parts (`FieldLabel`, `FieldDescription`, `FieldError`, `FieldContent`,
+ * `FieldTitle`, `FieldSeparator`) make the same field with `useField()` for the same ids.
+ */
 export function Field({
   label,
   description,
   error,
   children,
   id: providedId,
-}: {
-  label: ReactNode;
-  description?: ReactNode;
-  error?: ReactNode;
-  id?: string;
-  children: (props: {
-    id: string;
-    "aria-describedby"?: string;
-    "aria-invalid"?: true;
-  }) => ReactNode;
-}) {
+  required,
+  optional,
+  labels,
+  className,
+}: FieldProps & { className?: string }) {
   const generatedId = useId();
+  if (typeof children !== "function") {
+    return (
+      <FieldRoot className={className} id={providedId} labels={labels}>
+        {label ? <FieldLabel optional={optional} required={required}>{label}</FieldLabel> : null}
+        {children}
+        {description ? <FieldDescription>{description}</FieldDescription> : null}
+        {error ? <FieldError>{error}</FieldError> : null}
+      </FieldRoot>
+    );
+  }
   const id = providedId ?? generatedId;
   const descriptionId = `${id}-description`;
   const errorId = `${id}-error`;
   return (
-    <div className="fui-field">
+    <div className={classes("fui-field", className)}>
       <label className="fui-label" htmlFor={id}>
         {label}
+        {required ? <FieldRequiredMark label={labels?.required} /> : optional ? <FieldOptionalMark label={labels?.optional} /> : null}
       </label>
       {children({
         id,

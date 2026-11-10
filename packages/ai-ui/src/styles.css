@@ -4152,3 +4152,109 @@
     }
   }
 }
+
+@layer components {
+  /* 0.12: what a finished picture offers over it, a video in the frame, and the prompt while it is made. A picture that is
+     also a button keeps the frame's size, and the keys over it show when the pointer is on it or the keyboard is in it. */
+  .fui-generation-open {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    padding: 0;
+    border: 0;
+    border-radius: inherit;
+    background: none;
+    color: inherit;
+    cursor: zoom-in;
+  }
+  .fui-generation-open:focus-visible {
+    outline-offset: -2px;
+  }
+  .fui-generation-video {
+    position: absolute;
+    inset: 0;
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    border-radius: inherit;
+    background: var(--fui-surface-inset);
+    object-fit: cover;
+  }
+  .fui-generation-actions {
+    position: absolute;
+    z-index: 3;
+    inset-block-start: var(--fui-space-2);
+    inset-inline-end: var(--fui-space-2);
+    display: flex;
+    gap: var(--fui-space-1);
+    opacity: 0;
+    transition: opacity var(--fui-duration) var(--fui-ease);
+  }
+  .fui-generation-frame:focus-within .fui-generation-actions {
+    opacity: 1;
+  }
+  .fui-generation-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 2rem;
+    block-size: 2rem;
+    padding: 0;
+    border: 1px solid var(--fui-overlay-border);
+    border-radius: var(--fui-radius-sm);
+    background: var(--fui-overlay-surface);
+    box-shadow: var(--fui-shadow-xs);
+    color: var(--foreground);
+    cursor: pointer;
+  }
+  .fui-generation-prompt {
+    position: absolute;
+    z-index: 2;
+    inset-block-start: var(--fui-space-3);
+    inset-inline: var(--fui-space-3);
+    display: -webkit-box;
+    margin: 0;
+    overflow: hidden;
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+    line-height: var(--fui-leading-sm);
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    text-align: start;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .fui-generation-frame:hover .fui-generation-actions {
+      opacity: 1;
+    }
+  }
+  /* No pointer to hover with: the keys are simply there. */
+  @media (hover: none) {
+    .fui-generation-actions {
+      opacity: 1;
+    }
+  }
+  @media (pointer: coarse) {
+    .fui-generation-action {
+      inline-size: 2.75rem;
+      block-size: 2.75rem;
+    }
+  }
+  @media (forced-colors: active) {
+    .fui-generation-action {
+      border-color: CanvasText;
+      background: Canvas;
+      color: CanvasText;
+      forced-color-adjust: none;
+    }
+    .fui-generation-actions {
+      opacity: 1;
+    }
+  }
+  @media print {
+    .fui-generation-actions,
+    .fui-generation-prompt {
+      display: none;
+    }
+  }
+}
