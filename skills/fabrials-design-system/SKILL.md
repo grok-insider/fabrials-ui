@@ -1,11 +1,11 @@
 ---
 name: fabrials-design-system
-description: Build, restyle or review React interfaces in the Fabrials house style (Fabrials UI 0.11 "Instrument with life", the successor of 0.10 "Instrument" and 0.7 "Highstorm"), in Fabrials products that use @fabrials/ui or @fabrials/ai-ui and in apps that install from the ui.fabrials.com shadcn registry. Use for page layout, components, tokens, theming, on-screen copy and UI QA. Not for backend-only work, and not for a product whose own DESIGN.md or owner has chosen a different look.
+description: Build, restyle or review React interfaces in the Fabrials house style (Fabrials UI 0.12 "Instrument with life", the look that began with 0.11, successor of 0.10 "Instrument" and 0.7 "Highstorm"), in Fabrials products that use @fabrials/ui or @fabrials/ai-ui and in apps that install from the ui.fabrials.com shadcn registry. Use for page layout, components, tokens, theming, on-screen copy and UI QA. Not for backend-only work, and not for a product whose own DESIGN.md or owner has chosen a different look.
 ---
 
 # Fabrials design system
 
-Fabrials UI 0.11 "Instrument with life" (Highstorm's rules with a voice: deep Stormwall neutrals, soft 12 px plates grouped by space, states as tints, a mono label voice, dithered data, motion that answers, and a working light for agents) is one house style for every Fabrials product and for apps that install from ui.fabrials.com. Reproduce it; do not invent a style per screen. This file is the operating guide; the detail lives in `references/`.
+Fabrials UI 0.12 "Instrument with life" (the look of 0.11, with the pieces 0.12 adds for chat, learning screens and phones; Highstorm's rules with a voice: deep Stormwall neutrals, soft 12 px plates grouped by space, states as tints, a mono label voice, dithered data, motion that answers, and a working light for agents) is one house style for every Fabrials product and for apps that install from ui.fabrials.com. Reproduce it; do not invent a style per screen. This file is the operating guide; the detail lives in `references/`.
 
 ## Sources of truth
 

@@ -6,7 +6,7 @@
   "description": "shadcn's avatar, backed by @fabrials/ui. A person or account, with initials when there is no image.",
   "author": "Fabrials <admin@grokinsider.net>",
   "dependencies": [
-    "@fabrials/ui@^0.11.0"
+    "@fabrials/ui@^0.12.0"
   ],
   "registryDependencies": [
     "https://ui.fabrials.com/r/styles.json"

@@ -6,7 +6,7 @@
   "description": "shadcn's badge, backed by @fabrials/ui. A short status or fact with a text label: a soft tag tinted by its tone, with a dot, an icon or a count.",
   "author": "Fabrials <admin@grokinsider.net>",
   "dependencies": [
-    "@fabrials/ui@^0.11.0"
+    "@fabrials/ui@^0.12.0"
   ],
   "registryDependencies": [
     "https://ui.fabrials.com/r/styles.json"

@@ -9,7 +9,7 @@
       "title": "Fabrials styles",
       "description": "Installs @fabrials/ui and imports its tokens, IBM Plex and component styles. Every Fabrials block and shim depends on it.",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [],
       "meta": {
@@ -25,7 +25,7 @@
       "title": "Fabrials UI",
       "description": "Sets a shadcn app up for Fabrials UI: Base UI primitives, the @fabrials registry, the styles, IBM Plex and the Highstorm palette in light and dark.",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json",
@@ -138,7 +138,7 @@
       "description": "Show native support, legacy compatibility or manual mode.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -168,7 +168,7 @@
       "description": "A single action with pending, error and duplicate-click handling.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0",
+        "@fabrials/ui@^0.12.0",
         "lucide-react@^1.68.0"
       ],
       "registryDependencies": [
@@ -199,7 +199,7 @@
       "description": "Turn a tool schema into a usable form, with a JSON escape hatch.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0",
+        "@fabrials/ui@^0.12.0",
         "ajv-formats@^3.0.1",
         "ajv@^8.20.0"
       ],
@@ -236,7 +236,7 @@
       "description": "Search, filter, sort and select records with one shared state.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0",
+        "@fabrials/ui@^0.12.0",
         "lucide-react@^1.68.0"
       ],
       "registryDependencies": [
@@ -262,7 +262,7 @@
       "description": "Native date fields and an accessible calendar, working in tandem.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0",
+        "@fabrials/ui@^0.12.0",
         "lucide-react@^1.68.0"
       ],
       "registryDependencies": [
@@ -289,7 +289,7 @@
       "description": "Guide a shared human-agent workflow through review and completion.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -319,7 +319,7 @@
       "description": "Give an action a clear review point before it runs.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -387,7 +387,7 @@
       "description": "An endpoint, an auth method, and a clear connection state.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0",
+        "@fabrials/ui@^0.12.0",
         "@modelcontextprotocol/client@2.4.0",
         "lucide-react@^1.68.0"
       ],
@@ -424,7 +424,7 @@
       "description": "Make tool discovery readable, searchable and keyboard accessible.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0",
+        "@fabrials/ui@^0.12.0",
         "ajv-formats@^3.0.1",
         "ajv@^8.20.0",
         "lucide-react@^1.68.0"
@@ -468,7 +468,7 @@
       "description": "A tool description, its arguments, and the action in one place.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0",
+        "@fabrials/ui@^0.12.0",
         "ajv-formats@^3.0.1",
         "ajv@^8.20.0",
         "lucide-react@^1.68.0"
@@ -512,7 +512,7 @@
       "description": "Readable text, structured content and media, with raw data one click away.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json",
@@ -538,7 +538,7 @@
       "description": "Follow progress, inspect results, and cancel outstanding requests.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0",
+        "@fabrials/ui@^0.12.0",
         "lucide-react@^1.68.0"
       ],
       "registryDependencies": [
@@ -575,7 +575,7 @@
       "description": "Answer the server when a tool needs another piece of information.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0",
+        "@fabrials/ui@^0.12.0",
         "@modelcontextprotocol/client@2.4.0",
         "ajv-formats@^3.0.1",
         "ajv@^8.20.0"
@@ -634,7 +634,7 @@
       "description": "Read resources, resolve templates, and fill reusable prompts.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0",
+        "@fabrials/ui@^0.12.0",
         "@modelcontextprotocol/client@2.4.0",
         "ajv-formats@^3.0.1",
         "ajv@^8.20.0"
@@ -683,7 +683,7 @@
       "description": "A complete working console, composed from the registry.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0",
+        "@fabrials/ui@^0.12.0",
         "@modelcontextprotocol/client@2.4.0",
         "ajv-formats@^3.0.1",
         "ajv@^8.20.0",
@@ -797,7 +797,7 @@
       "description": "shadcn's accordion, backed by @fabrials/ui. Questions and details that open in place.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -822,7 +822,7 @@
       "description": "shadcn's alert, backed by @fabrials/ui. A status that stays on the page.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -847,7 +847,7 @@
       "description": "shadcn's alert-dialog, backed by @fabrials/ui. A confirmation for a destructive or hard-to-undo action.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -872,7 +872,7 @@
       "description": "shadcn's aspect-ratio, backed by @fabrials/ui.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -897,7 +897,7 @@
       "description": "shadcn's avatar, backed by @fabrials/ui. A person or account, with initials when there is no image.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -922,7 +922,7 @@
       "description": "shadcn's badge, backed by @fabrials/ui. A short status or fact with a text label: a soft tag tinted by its tone, with a dot, an icon or a count.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -947,7 +947,7 @@
       "description": "shadcn's breadcrumb, backed by @fabrials/ui. Where the page sits, with a way back up.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -972,7 +972,7 @@
       "description": "shadcn's button, backed by @fabrials/ui. The action control. One primary action per task, with quiet alternatives.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -997,7 +997,7 @@
       "description": "shadcn's button-group, backed by @fabrials/ui. Related actions that belong to one choice.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1022,7 +1022,7 @@
       "description": "shadcn's calendar, backed by @fabrials/ui. A month grid for a date or a range.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1047,7 +1047,7 @@
       "description": "shadcn's card, backed by @fabrials/ui. A bounded summary of one subject.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1072,7 +1072,7 @@
       "description": "shadcn's carousel, backed by @fabrials/ui. A sideways list of peer items, such as citations.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1097,7 +1097,7 @@
       "description": "shadcn's checkbox, backed by @fabrials/ui. A binary choice that can sit in a form or a selection list.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1122,7 +1122,7 @@
       "description": "shadcn's collapsible, backed by @fabrials/ui. A disclosure for reasoning, sources or a long detail.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1147,7 +1147,7 @@
       "description": "shadcn's combobox, backed by @fabrials/ui. A text field that filters a list of known values.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1172,7 +1172,7 @@
       "description": "shadcn's command, backed by @fabrials/ui. The command palette. Search a short list of real destinations.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1197,7 +1197,7 @@
       "description": "shadcn's context-menu, backed by @fabrials/ui. The actions of a row or an object, at the pointer.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1222,7 +1222,7 @@
       "description": "shadcn's dialog, backed by @fabrials/ui. A modal task with a title, an explanation and explicit actions.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1247,7 +1247,7 @@
       "description": "shadcn's direction, backed by @fabrials/ui. Tells Base UI the reading direction, for right-to-left interfaces.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1272,7 +1272,7 @@
       "description": "shadcn's dropdown-menu, backed by @fabrials/ui. A small list of actions for one record.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1297,7 +1297,7 @@
       "description": "shadcn's field, backed by @fabrials/ui. Connects a label, hint and error to one control.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1322,7 +1322,7 @@
       "description": "shadcn's hover-card, backed by @fabrials/ui. A preview of a person, file or citation.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1347,7 +1347,7 @@
       "description": "shadcn's input, backed by @fabrials/ui. A single-line text field for names, identifiers and short values.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1372,7 +1372,7 @@
       "description": "shadcn's input-group, backed by @fabrials/ui. A field with an addon or an action attached to it.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1397,7 +1397,7 @@
       "description": "shadcn's input-otp, backed by @fabrials/ui. A verification code in separate slots.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1422,7 +1422,7 @@
       "description": "shadcn's item, backed by @fabrials/ui. A record row for master-detail panes: one stretched target, controls above it, current and selected fills, unread weight.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1447,7 +1447,7 @@
       "description": "shadcn's kbd, backed by @fabrials/ui. A flat hint for a keyboard shortcut.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1472,7 +1472,7 @@
       "description": "shadcn's label, backed by @fabrials/ui. The visible name of a control.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1497,7 +1497,7 @@
       "description": "shadcn's native-select, backed by @fabrials/ui. The browser's own select, styled, for long lists and forms that must work without JavaScript.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1522,7 +1522,7 @@
       "description": "shadcn's navigation-menu, backed by @fabrials/ui. The top-level links of a site, with one panel of related links.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1547,7 +1547,7 @@
       "description": "shadcn's pagination, backed by @fabrials/ui. Pages of a long collection.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1572,7 +1572,7 @@
       "description": "shadcn's popover, backed by @fabrials/ui. A small anchored panel for one extra choice.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1597,7 +1597,7 @@
       "description": "shadcn's progress, backed by @fabrials/ui. How far a task has gone: a bar or a ring, with its label, value and hint; steps; and the working light while the total is not known yet.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1622,7 +1622,7 @@
       "description": "shadcn's radio-group, backed by @fabrials/ui. One choice from a short list that stays visible.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1647,7 +1647,7 @@
       "description": "shadcn's resizable, backed by @fabrials/ui. Panes with draggable, keyboard-operable handles: navigation, list and reader.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1672,7 +1672,7 @@
       "description": "shadcn's scroll-area, backed by @fabrials/ui. A region that scrolls without moving the page: a slim round thumb, its own focus ring, and edges that fade where there is more.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1697,7 +1697,7 @@
       "description": "shadcn's select, backed by @fabrials/ui. A closed list of options.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1722,7 +1722,7 @@
       "description": "shadcn's separator, backed by @fabrials/ui. A visual break between groups.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1747,7 +1747,7 @@
       "description": "shadcn's sheet, backed by @fabrials/ui. A side panel for filters and secondary tasks.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1772,7 +1772,7 @@
       "description": "shadcn's sidebar, backed by @fabrials/ui. The persistent navigation of an operational app.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1797,7 +1797,7 @@
       "description": "shadcn's skeleton, backed by @fabrials/ui. A placeholder while the first response is still loading.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1822,7 +1822,7 @@
       "description": "shadcn's slider, backed by @fabrials/ui. A value or a range on a track, with ruler marks.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1847,7 +1847,7 @@
       "description": "shadcn's sonner, backed by @fabrials/ui.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1872,7 +1872,7 @@
       "description": "shadcn's spinner, backed by @fabrials/ui. An indeterminate wait, in square cells: a ring, dots, bars, a grid or a line.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1897,7 +1897,7 @@
       "description": "shadcn's switch, backed by @fabrials/ui. An immediate on or off setting.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1922,7 +1922,7 @@
       "description": "shadcn's table, backed by @fabrials/ui. A data table with a caption and column headers.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1947,7 +1947,7 @@
       "description": "shadcn's tabs, backed by @fabrials/ui. Switch between peer views of the same subject.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1972,7 +1972,7 @@
       "description": "shadcn's textarea, backed by @fabrials/ui. A multi-line field for notes, prompts and messages.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -1997,7 +1997,7 @@
       "description": "shadcn's toggle, backed by @fabrials/ui. One key that stays on, on its own.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -2022,7 +2022,7 @@
       "description": "shadcn's toggle-group, backed by @fabrials/ui. A segmented choice for ranges and views.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"
@@ -2047,7 +2047,7 @@
       "description": "shadcn's tooltip, backed by @fabrials/ui. A short name for an icon button.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
-        "@fabrials/ui@^0.11.0"
+        "@fabrials/ui@^0.12.0"
       ],
       "registryDependencies": [
         "https://ui.fabrials.com/r/styles.json"

@@ -87,6 +87,11 @@ Seen by the packages of 0.12 and left alone, because the fix changes what a prod
 | The first part of the `@fabrials/ui` stylesheet is one `@layer components` block of 6,500 lines; cutting it per component changes the bytes of the sheet | `packages/ui/src/styles/000-base-and-components.css` | open: with the visual suite per component |
 | `references/components.md` of the skill is one table of 74 KB | `skills/fabrials-design-system/references/components.md` | open: split by area or generate it from the catalogue |
 | `Calendar`, `DatePicker`, `DateRangePicker` and `Spreadsheet` write in English unless a `locale` or a `LabelsProvider` says otherwise (0.11 used the runtime's locale, which made server and browser disagree) | `docs/migration-0.12.md` › Words and locale | owner: confirm or revert before the release |
+| The accounts family writes dates in the runtime's zone and has no `timeZone` prop (`ObservationStatus`, `ProviderCard`, `ResetInventory`, `SynchronizedAccounts`, `PrivateHistoryView`, `HostedMigration`): a server in UTC and a reader elsewhere fail hydration, so the docs draw three previews after hydration | `packages/ai-ui/src/providers.tsx`, `synchronized-accounts.tsx`, `private-history.tsx`, `hosted-migration.tsx` | open: `timeZone` beside `locale` |
+| `ApiKeyFields` with a `secret` and no `onSecretChange` renders a controlled input with no handler (React warns); it should be read-only | `packages/ai-ui/src/api-key-form.tsx` | open |
+| `HostedMigration` keeps its one-second interval when `now` is given | `packages/ai-ui/src/hosted-migration.tsx` | open |
+| `ConsumptionView`: three summary cards leave an empty cell at about 670 px, and the "Group by" label and the breakdown heading wrap into a tall empty band | `.fb-grid`, `.fb-consumption-filters` in `packages/ai-ui/src/styles/000-observation.css` | open: with the restyle of the family |
+| `MigrationReviewDetails` prints a literal arrow between source and target, which keeps its direction in a right-to-left page | `packages/ai-ui/src/migration-review.tsx` | open |
 | The loading stand-in of `ImageViewer` carries a 6 px blur, the one blur outside a reveal | `packages/ui/src/styles/240-0.12-viewer-and-gallery.css` (`.fui-viewer-under`) | owner |
 
 ## What Radiant can adopt today

@@ -6,7 +6,7 @@
   "description": "shadcn's spinner, backed by @fabrials/ui. An indeterminate wait, in square cells: a ring, dots, bars, a grid or a line.",
   "author": "Fabrials <admin@grokinsider.net>",
   "dependencies": [
-    "@fabrials/ui@^0.11.0"
+    "@fabrials/ui@^0.12.0"
   ],
   "registryDependencies": [
     "https://ui.fabrials.com/r/styles.json"

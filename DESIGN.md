@@ -1,6 +1,6 @@
 # Fabrials design system
 
-Fabrials UI 0.11 "Instrument with life" is the shared interface of the Fabrials products and the registry at ui.fabrials.com. This document is the brief: what the system looks like, why, and the rules a screen follows. Code is the source of truth for values (`packages/ui/src/tokens.css`); this file explains them. Explicit product decisions, recorded in that product's own `DESIGN.md`, win over it.
+Fabrials UI 0.12 "Instrument with life" (the look that began with 0.11) is the shared interface of the Fabrials products and the registry at ui.fabrials.com. This document is the brief: what the system looks like, why, and the rules a screen follows. Code is the source of truth for values (`packages/ui/src/tokens.css`); this file explains them. Explicit product decisions, recorded in that product's own `DESIGN.md`, win over it.
 
 ## Principles
 
@@ -136,7 +136,7 @@ Three pieces use it, and every product uses them in these places:
 
 Motion answers what a person did, what the data did or what an agent is doing, like an instrument responding to its controls: opening, expanding, choosing, confirming, a value arriving, work in progress. Durations are 100, 150 and 240 ms (`--fui-duration-fast`, `--fui-duration`, `--fui-duration-slow`) on a quick-out ease (`--fui-ease-out`); things a hand moves (a thumb, a tile landing) may overshoot a little on `--fui-ease-spring`. All of it drops to 0 under reduced motion, where every state still shows at once.
 
-The vocabulary (0.11, "instrument with life"), each tied to one cause:
+The vocabulary ("instrument with life", since 0.11; the rows 0.12 adds are at the end), each tied to one cause:
 
 | Cause | Motion | Where |
 | --- | --- | --- |

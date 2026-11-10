@@ -6,7 +6,7 @@
   "description": "shadcn's progress, backed by @fabrials/ui. How far a task has gone: a bar or a ring, with its label, value and hint; steps; and the working light while the total is not known yet.",
   "author": "Fabrials <admin@grokinsider.net>",
   "dependencies": [
-    "@fabrials/ui@^0.11.0"
+    "@fabrials/ui@^0.12.0"
   ],
   "registryDependencies": [
     "https://ui.fabrials.com/r/styles.json"

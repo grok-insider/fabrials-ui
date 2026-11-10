@@ -6,7 +6,7 @@
   "description": "shadcn's slider, backed by @fabrials/ui. A value or a range on a track, with ruler marks.",
   "author": "Fabrials <admin@grokinsider.net>",
   "dependencies": [
-    "@fabrials/ui@^0.11.0"
+    "@fabrials/ui@^0.12.0"
   ],
   "registryDependencies": [
     "https://ui.fabrials.com/r/styles.json"
