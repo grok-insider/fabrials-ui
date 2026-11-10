@@ -256,3 +256,112 @@ export function playbackProblem(
   if (code === 4) return words.source;
   return words.other;
 }
+
+/** A touch must travel this far before the viewer decides whether it goes down (to close) or sideways (to a neighbour). */
+export const AXIS_SLOP = 10;
+/** A fitted picture dragged down this far closes the viewer when it is let go. */
+export const CLOSE_DISTANCE = 96;
+/** A flick down this fast (pixels per millisecond) closes it from a shorter drag, of at least `FLICK_DISTANCE`. */
+export const FLICK_SPEED = 0.6;
+export const FLICK_DISTANCE = 24;
+/** Two taps this close in time (milliseconds) and place (pixels) are a double tap. */
+export const DOUBLE_TAP_TIME = 300;
+export const DOUBLE_TAP_DISTANCE = 24;
+
+/**
+ * Which way a touch on a fitted picture is going, decided once from its first `AXIS_SLOP` pixels: "y" is a drag down to
+ * close (or up, which does nothing), "x" a swipe to a neighbour. Null while it has not travelled far enough to say.
+ */
+export function dragAxis(from: { x: number; y: number }, to: { x: number; y: number }): "x" | "y" | null {
+  const dx = Math.abs(to.x - from.x);
+  const dy = Math.abs(to.y - from.y);
+  if (Math.hypot(dx, dy) < AXIS_SLOP) return null;
+  // A diagonal counts as vertical: closing can be undone, a swipe cannot.
+  return dy >= dx ? "y" : "x";
+}
+
+/**
+ * A picture being dragged down by `dy` pixels in a stage `height` tall: how far it has moved (never up), how much of the
+ * backdrop is left (1 at rest, 0.4 at the most) and how much the picture has shrunk (1 at rest, 0.88 at the most).
+ */
+export function dragDown(dy: number, height: number): { offset: number; fade: number; scale: number } {
+  const offset = Number.isFinite(dy) ? Math.max(0, dy) : 0;
+  const progress = clamp(offset / Math.max(CLOSE_DISTANCE * 2.5, height > 0 ? height / 2 : 0), 0, 1);
+  return { offset, fade: 1 - progress * 0.6, scale: 1 - progress * 0.12 };
+}
+
+/** Whether letting go closes the viewer: dragged down past `CLOSE_DISTANCE`, or flicked down fast from a shorter drag. */
+export function closesOnRelease(dy: number, speed = 0): boolean {
+  if (!Number.isFinite(dy)) return false;
+  return dy >= CLOSE_DISTANCE || (dy >= FLICK_DISTANCE && speed >= FLICK_SPEED);
+}
+
+/** Whether a tap follows `previous` closely enough, in time and in place, to be the second half of a double tap. */
+export function isDoubleTap(previous: { x: number; y: number; time: number } | null | undefined, tap: { x: number; y: number; time: number }): boolean {
+  if (!previous) return false;
+  const elapsed = tap.time - previous.time;
+  return elapsed >= 0 && elapsed <= DOUBLE_TAP_TIME && Math.hypot(tap.x - previous.x, tap.y - previous.y) <= DOUBLE_TAP_DISTANCE;
+}
+
+/**
+ * The pictures to ask for ahead of time when `index` is on show: the next and the previous one (the next first), skipping
+ * videos and GIFs, anything already asked for (`done`) and everything on a connection that saves data.
+ */
+export function preloadTargets(
+  items: readonly { src: string; kind?: "image" | "video" | "gif" }[],
+  index: number | null,
+  done: { has: (src: string) => boolean },
+  saveData = false,
+): string[] {
+  if (saveData || index === null || index < 0 || index >= items.length) return [];
+  const targets: string[] = [];
+  for (const neighbour of [items[index + 1], items[index - 1]]) {
+    if (!neighbour || (neighbour.kind && neighbour.kind !== "image") || !neighbour.src) continue;
+    if (neighbour.src === items[index]!.src || done.has(neighbour.src) || targets.includes(neighbour.src)) continue;
+    targets.push(neighbour.src);
+  }
+  return targets;
+}
+
+export type GalleryLayout = {
+  /** How many tiles are drawn. */
+  shown: number;
+  /** How many items are behind the "+N" of the last tile. */
+  hidden: number;
+  /** Columns in a wide container. */
+  columns: 1 | 2 | 3 | 4;
+  /** Columns in a narrow container. */
+  narrowColumns: 1 | 2;
+  /** Five tiles: the first one is large (two columns, two rows) beside a square of four. */
+  lead: boolean;
+  /** An odd count in a narrow container: the first tile spans both columns, so no cell is left empty. */
+  spanFirst: boolean;
+};
+
+/**
+ * The shape of a gallery of `count` pictures, of which at most `max` are drawn: one, two or three in a row; four as two
+ * by two; five as a large lead tile and four; six as three by two; seven and eight in four columns. A narrow container
+ * has two columns, and an odd count lets the first tile span both.
+ */
+export function galleryLayout(count: number, max = 8): GalleryLayout {
+  const limit = Number.isFinite(max) ? clamp(Math.floor(max), 1, 8) : 8;
+  const total = Number.isFinite(count) ? Math.max(0, Math.floor(count)) : 0;
+  const shown = Math.min(total, limit);
+  const columns = shown <= 1 ? 1 : shown === 2 || shown === 4 ? 2 : shown === 3 || shown === 6 ? 3 : 4;
+  return { shown, hidden: total - shown, columns, narrowColumns: shown <= 1 ? 1 : 2, lead: shown === 5, spanFirst: shown > 1 && shown % 2 === 1 };
+}
+
+/**
+ * The items whose picture has not failed, each with its place in the full list: the set a grid draws and hands to the
+ * viewer once its dead tiles are dropped. `broken` holds the `src` of every picture that failed.
+ */
+export function unbrokenSet<T extends { src: string }>(items: readonly T[], broken: { has: (src: string) => boolean }): { items: T[]; indexes: number[] } {
+  const kept: T[] = [];
+  const indexes: number[] = [];
+  items.forEach((item, index) => {
+    if (broken.has(item.src)) return;
+    kept.push(item);
+    indexes.push(index);
+  });
+  return { items: kept, indexes };
+}

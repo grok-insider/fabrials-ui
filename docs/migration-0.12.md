@@ -592,3 +592,60 @@ States read apart without colour: done is the fill, to do the empty track, curre
 - Nothing in a product changes until it adopts a piece. The styles are one new block at the end of `styles.css`.
 - One bar answers to the digit keys at a time: two `RatingBar`s with `shortcuts` on the same screen each prevent the other's default, so the first in the document takes the key. Leave the keys off the bar that is not on screen.
 - `useHotkeys` (B1) will replace the private helper these pieces use for the same guards (modifiers, IME, key repeat, typing targets, `data-hotkeys="off"`); until then a key that acts from anywhere ignores fields, editable text and the roles that take text, and islands that opted out.
+
+## ImageViewer and MediaGrid
+
+The viewer is the same component it was; what is new is the wiring a page with many pictures would otherwise write, and a few things a phone gallery does that it did not. Nothing changes unless you ask for it: no existing prop, label or reference changed.
+
+```tsx
+<ImageViewerProvider label="Photos">
+  <ImageViewerGroup name="message-1">
+    {photos.map((photo) => (
+      <ZoomableImage key={photo.src} src={photo.thumb} full={photo.src} alt={photo.alt} ratio="4 / 3" />
+    ))}
+  </ImageViewerGroup>
+</ImageViewerProvider>
+```
+
+- **`ImageViewerProvider`** renders one viewer for everything below it. It takes the viewer's own props (`label`, `labels`, `thumbnails`, `renderMedia`, `actions`, `zoomOn`, `compact`, `dragToClose`, `onNearEnd`).
+- **`useImageViewer()`** gives `{ open(items, index = 0, { returnFocus }), close(), isOpen }`; it is `null` outside a provider, so a piece can fall back instead of drawing a control that does nothing.
+- **`ZoomableImage`** is an `Image` (same frame, ratio, dither reveal and error plate) that opens the provider's viewer when pressed. Inside a provider it is a real button named "Open {alt}" (`labels.open(alt)`).
+- **`ImageViewerGroup name="…"`**: every `ZoomableImage` in the same group opens the viewer at its own place, with the pictures of the group beside it. Use one per message or per result set. Without a group, a picture opens alone.
+- **Outside a provider `ZoomableImage` is a plain image**, not a disabled control.
+
+| `ImageViewer` prop | What it does |
+| --- | --- |
+| `dragToClose` (default `true`) | A finger or a pen on a fitted picture drags it down; past 96 px, or on a quick flick, letting go closes the viewer; under that it springs back. A sideways drag still moves to the neighbour, a mouse drag does not close. The stage takes the touch while the picture is fitted (`touch-action: none`). |
+| `zoomOn` (`"click"` by default, `"double"`) | With `"double"`, two taps or two clicks zoom around the point pressed and one click does nothing; a single tap of a finger shows and hides the bars. |
+| `actions` (`["download"]` by default) | Keys of the bar that act on the picture, in order. `"copy"` puts the picture on the clipboard (`copyImage` from `@fabrials/ui/export`) and says so in a polite region; it is drawn only where the browser can copy a picture. |
+| `compact` (default `false`) | Under 48rem the zoom level leaves the bar, and with eight items or fewer dots stand for the strip. Previous and Next stay for assistive technology. |
+| `returnFocus` | A ref to the element focus goes back to on close; what was focused on open is the default. |
+
+- **`ViewerItem`** gains `downloadName` (the name the download saves), `credit` (a node), `sourceUrl` and `sourceLabel`: the credit is a line in the label voice under the caption, with the source as a link ("Photo: Ada Rivera · unsplash.com"), `dir="auto"` and `rel="noreferrer noopener"`.
+- **`thumb`** now also stands under the picture while the full one loads, at the place and size the picture will take (from `width` and `height`, or as large as the stage allows), blurred by 6 px and at 60 % — the dither reveal of `Image` is for a picture arriving into a frame, not for one already framed. It is replaced without a jump. The spinner stays for an item with no thumbnail.
+- **The next and previous pictures are asked for once each** when an item is shown, and never on a connection that saves data.
+- **Safe areas**: the viewer pads by `env(safe-area-inset-*)` through `max()`, so nothing moves where the inset is 0.
+- The zoom, the swipe and the close gesture now decide their axis from the first 10 px (`dragAxis`): a drag that is more vertical is a drag down, otherwise a swipe.
+
+New pure helpers in `media-logic`: `dragAxis`, `dragDown`, `closesOnRelease`, `isDoubleTap`, `preloadTargets`, `galleryLayout`, `unbrokenSet`, with `AXIS_SLOP`, `CLOSE_DISTANCE`, `FLICK_SPEED`, `FLICK_DISTANCE`, `DOUBLE_TAP_TIME` and `DOUBLE_TAP_DISTANCE`.
+
+### `MediaGrid`
+
+The mosaic of four is unchanged. `layout="gallery"` draws up to eight tiles: one, two or three in a row; four as two by two; five around a large lead tile; six as three by two; seven and eight in four columns. In a container narrower than 30rem there are two columns, and an odd count lets the first tile span both.
+
+| `MediaGrid` prop | What it does |
+| --- | --- |
+| `layout` (`"grid"` by default, `"gallery"`) | The mosaic of four, or the gallery of up to eight. |
+| `max` | How many tiles are drawn: four in a grid, eight in a gallery. Past that the last tile says "+N". |
+| `caption` | The grid's name, for a screen reader; the grid becomes a `figure role="group"`. |
+| `footer` | A `figcaption` under the tiles: where they come from. |
+| `empty` | What to draw when every tile failed and `hideBroken` took them all. |
+| `hideBroken` (default `false`) | A tile whose picture fails leaves the grid, the "+N" count and the viewer's set. |
+| `onItemError(item, index)` | Called for each picture that fails. |
+| `referrerPolicy` | Passed to every picture. |
+| `openWith="viewer"` | Pressing a tile opens the nearest `ImageViewerProvider` on the unbroken set at that place. `onOpen` still wins when both are given. |
+
+- **`MediaGridItem`** gains `caption` (a line over the foot of the tile, in the label voice on a scrim, on hover and on keyboard focus, always on a touch screen), `credit`, `sourceUrl`, `sourceLabel`, `downloadName`, `download`, `width` and `height` — the whole item is what the viewer receives, so a gallery and its viewer say the same thing.
+- A tile that is a button describes itself with its caption (`aria-describedby`), and the caption is not part of its accessible name.
+
+Radiant can delete `components/chat/image-lightbox.tsx` and `components/chat/image-results.tsx` once it migrates (the gallery it built is `layout="gallery"` with `hideBroken`, its lightbox is the provider, and `messageGallery` in `chat-transcript.tsx` is the group), and every hand-rolled `MAX_SCALE`/`CLOSE_DRAG_PX`/`SWIPE_PX` in them. Its look stays its own.
