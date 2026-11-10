@@ -506,3 +506,89 @@ Changed:
 A product can delete: its own audio-note components, its silence helper (Radiant's `components/lang/exercise/silence.ts`), its clip cache and turn counter, its recorder state machine, its slow-work timer, and its speech chunker. What stays the product's: the loader functions (its own routes), what it does with a recording, and its strings.
 
 Nothing looks different on a page that uses none of this. A page that uses a player now also goes quiet when a clip starts, which is the same rule it already followed with another player.
+
+## Answers and steps
+
+Five new pieces for a screen that asks something and shows something in steps, and two new ways to draw `Progress`. All in `@fabrials/ui`; nothing that existed changed behaviour.
+
+### `ChoiceGroup`, `ChoiceOption`
+
+The answers to a question as tiles. One answer is a Base UI radio group (the arrow keys move the pick, Tab enters at it, the form gets the value); `multiple` makes it a group of checkboxes (each its own tab stop, Space ticks it, one value each under `name`).
+
+| Prop | What it does |
+| --- | --- |
+| `markers` | `letters` (A, B, C; default), `numbers` (1, 2, 3, in `locale`'s digits) or `none`, in a small keycap, which is `aria-hidden` |
+| `shortcuts` | Off by default. The marker's key picks its option from anywhere on the page that is not a text field: digit 1 to 9, or A to Z beside letters. It selects, or toggles in a `multiple` group, and moves focus to the option. Announced through `aria-keyshortcuts` |
+| `orientation`, `columns`, `size` | A stack (default), a row that wraps, at most `columns` columns as many as fit (an option is never narrower than 12rem), and `sm`, `default` or `lg` |
+| `result` | `correct` or `incorrect` on the group: it becomes read-only and the picked option is marked. Per option: `correct`, `incorrect` or `missed` |
+| `readOnly` | Focusable and readable, not changeable. On by itself once the group or one of its options has a `result` |
+| `labels` | The words spoken after a marked option's name: `correct` ("Correct"), `incorrect` ("Your answer, incorrect"), `missed` ("Correct answer"), `ruledOut` ("Ruled out") |
+
+`ChoiceOption` takes `value` (required), `description` (a second line that describes the option and stays out of its name), `ruledOut` (stays where it was, struck through, `aria-disabled`, passed over by the arrows and without its key) and `result`.
+
+- An option's name is its own content: an answer in another language keeps its `lang`, and there is no `aria-label` over the text.
+- A marked option shows an icon **and** a word to a screen reader; the tints come from the success and danger tones, and in forced colors the edge says it: a `Highlight` edge and keycap when a pick, a solid, a double and a dashed `CanvasText` edge for right, wrong and missed.
+- Give the group a name with `aria-labelledby` (the question) or `aria-label`.
+
+### `ChoiceFeedback`
+
+What became of an answer, under its group: an `Alert` in the tone of the verdict (`correct`, `incorrect`, `partial`, `neutral`) with the tone's icon and its word ("Correct", "Not quite", "Partly right"; `title` replaces it, `null` leaves it out). Always `role="status"`, never an alert: a wrong answer is not an emergency. If `Alert` is all you need, use `Alert` with `variant="success"` or `"destructive"` and mount it when the answer is checked.
+
+### `RevealCard`, `RatingBar`
+
+| Prop | What it does |
+| --- | --- |
+| `front`, `back` | The question, always shown; the answer, shown once revealed |
+| `revealed`, `defaultRevealed`, `onRevealedChange` | Controlled or not |
+| `label` | Names the card for a screen reader ("Card 3 of 20"); the card is a focus target (`tabIndex={-1}`) and its ref exposes `focus()`, so a session brings focus back to it |
+| `revealLabel`, `revealKeyLabel` | The button's words and the key printed beside them (hidden where nothing hovers) |
+| `shortcuts` | On by default: Space reveals from the card, from its button or from the page itself, never from a field or another control, and once per press (holding the key does not toggle it, and its repeats do not scroll the page). Off where several cards share a screen |
+| `children` | What follows the answer once it shows: a `RatingBar`, a Next button |
+
+The answer sits in a container with `aria-live="polite"` that exists, empty, before the reveal, so the answer is announced; it rises in (`.fui-rise`) and nothing moves under reduced motion. There is no flip: both sides stay in the layout.
+
+`RatingBar` takes `options: { value, label, hint?, tone?, shortcut? }[]`, `onRate(value)`, `label` (which names the group), `disabled`, `pending`, `shortcuts` (digit keys, from anywhere but a field, default on), `once` (default on: one rating until the bar is mounted again or `resetKey` changes; `false` for a rating a person may change) and `resetKey`. Each rating is a button with its key, its word and what it means; the meaning goes under a narrow container (22rem) and the keys where nothing hovers; 44 px on coarse pointers.
+
+### `StepControls`, `useStepPlayer`
+
+`useStepPlayer({ count, index?, defaultIndex, onIndexChange, playing?, defaultPlaying, onPlayingChange, speed?, defaultSpeed = 1, onSpeedChange, interval = 1200, loop })` returns `{ index, playing, speed, atStart, atEnd, next, previous, goTo, play, pause, toggle, restart, setSpeed }`, plus `count`. It advances on a timer (the interval divided by the speed), stops at the end (or goes round with `loop`), waits while the page is hidden, and a step taken by hand pauses it. `stepPlayerReducer` is the pure state machine behind it.
+
+`StepControls` is a `Toolbar` (one tab stop, the arrow keys and Home and End between the keys): previous, play or pause (Replay at the end), next, an optional reset, "Step 3 of 12" in the label voice in the reader's digits, an optional set of speeds, and `children` for one more key. Spread `<StepControls {...player} />` or pass plain props; the play key shows when `toggle` (or `play` and `pause`) is given, so previous and next alone make a pager. The counter is not a live region: the step is announced when a key changes it, and when playing pauses or ends — never on every tick. Chevrons are mirrored in a right-to-left page.
+
+### `Progress` `segments` and `marks`
+
+Two props on `Progress`; without them it is exactly as it was.
+
+| Prop | What it does |
+| --- | --- |
+| `segments` | A track of named parts, each as wide as its `weight` (default 1) in its own state: `done`, `current`, `todo`, `correct`, `incorrect`, `skipped`. The whole is still a `progressbar`; its value is the number of settled parts and its value text names the current one ("Step 3 of 8, Listening", `labels.step`, `labels.settled`), unless `value` or `getAriaValueText` say otherwise. Each part has `aria-current="step"` when current and a spoken "Listening, current" |
+| `onSegmentSelect` | Makes each part a button that calls back with its place. Then the parts are a toolbar (one tab stop, the arrows and Home and End, named by `label` or `aria-label`) and no longer a progressbar |
+| `marks` | Ticks across the track of an ordinary bar at their `value`, measured from the start of the track (so a right-to-left page mirrors them), each with a `label` that is spoken as part of the bar's description and, with `caption`, shown under the bar at the tick |
+| `labels` | `step`, `settled`, `segment` and `segments` |
+
+States read apart without colour: done is the fill, to do the empty track, current stands taller with an edge, correct is the success fill, incorrect is dashed and skipped dotted. In forced colors each is a `Highlight` fill, a pattern or an edge. One bar uses one ladder: `done`/`current`/`todo` for the parts of a plan, or `correct`/`incorrect`/`skipped` for the questions of a quiz (there, a done part and a right one would both be a solid fill, since they never share a bar).
+
+### `MarkedText`, `AnnotationList`, `TextDiff`
+
+| Prop | What it does |
+| --- | --- |
+| `MarkedText` `text`, `ranges` | `ranges` are `{ start, end, id?, severity?, label? }` in UTF-16 code units. Out-of-range ranges are clamped, a range is widened to whole characters (never cutting an emoji, a joined emoji or a letter from its accent), and where two overlap the later keeps what is left; a range with nothing left draws no mark and the others keep their numbers. `severity` is `error` (solid line), `warning` (dashed) or `note` (dotted) |
+| | Each mark has a spoken prefix ("Mistake 1: "), an `aria-hidden` number that matches its note, and is described by the element of its range's `id`. `lang`, `dir`, `labelLang`, `labelDir` and `locale` are props |
+| `AnnotationList` `items` | The notes under the text: `{ id?, number?, severity?, title?, before?, after?, children? }`. `before` and `after` are quoted in the marked text's `lang`/`dir` as "old, an arrow, new" |
+| `TextDiff` `before`, `after` or `parts`, `legend` | A word diff (`Intl.Segmenter`, LCS) into `<del>` and `<ins>` with spoken "Removed" and "Added", or parts computed elsewhere (a letter-level diff). A removal is struck through and an addition underlined, so it reads without colour |
+
+`segmentText`, `placeRanges`, `diffWords`, `wordTokens` and `graphemeBoundaries` are exported from `@fabrials/ui` for a host that wants to place or compare text itself.
+
+### What a product can delete
+
+- Radiant's `components/lang/exercise/choice.tsx` and the option list of `features/quiz/view.tsx` (the radios there have no arrow keys; these do), its `placement/yesno.tsx` (two `ChoiceOption`s in a `ChoiceGroup` named `numbers`).
+- `components/lang/review/review-card.tsx` as the card's shell and the key handling of `review/review-session.tsx` (Space, the rating digits, the double-rate guard, focus back to the card): `RevealCard` + `RatingBar` + `useStepPlayer` keep the behaviour and the guards. The weaker `learn/review-session.tsx` has an `aria-label` over the whole card that hides its text from a screen reader; do not copy that.
+- The players of `features/algorithm/view.tsx` and `features/simulation/view.tsx`: `useStepPlayer` + `StepControls`.
+- `components/lang/session/progress.tsx`, `placement/progress.tsx` and the strip of `features/quiz/view.tsx`: `Progress` with `segments` (and `onSegmentSelect` for the strip).
+- `components/lang/write/marked-text.tsx`, the list of `correction-view.tsx`, and `Diff`/`Marked` in `exercise/feedback.tsx`.
+
+### Looks or behaves differently
+
+- Nothing in a product changes until it adopts a piece. The styles are one new block at the end of `styles.css`.
+- One bar answers to the digit keys at a time: two `RatingBar`s with `shortcuts` on the same screen each prevent the other's default, so the first in the document takes the key. Leave the keys off the bar that is not on screen.
+- `useHotkeys` (B1) will replace the private helper these pieces use for the same guards (modifiers, IME, key repeat, typing targets, `data-hotkeys="off"`); until then a key that acts from anywhere ignores fields, editable text and the roles that take text, and islands that opted out.

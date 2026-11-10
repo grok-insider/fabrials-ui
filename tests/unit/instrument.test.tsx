@@ -132,12 +132,19 @@ test("material: gradients exist only as the sheen tokens, and every theme define
 test("the working light is the only light: painted from the three light tokens, in its own rules, still under reduced motion", () => {
   const life = styles.slice(styles.indexOf('/* 0.11 "Instrument with life"'));
   // Every gradient of the block is either a mask (an opaque fill whose colour does not matter) or lives in a light rule: the
-  // working light, light in words, and the light Progress carries while its total is not known.
+  // working light, light in words, and the light Progress carries while its total is not known. One repeating pattern is not a
+  // gradient of light at all: the dashes of a quiz segment that was answered wrong or skipped (0.12), one solid ink with gaps,
+  // so a wrong answer reads without colour.
+  const dash = /^\.fui-progress-part\[data-state="(incorrect|skipped)"\]::before$/;
   const css = life.replace(/\/\*[\s\S]*?\*\//g, "");
   for (const match of css.matchAll(/([^{}]+)\{([^{}]*gradient\([^{}]*)\}/g)) {
     const selector = match[1]!.trim();
     const body = match[2]!.replace(/linear-gradient\(var\(--foreground\) 0 0\)/g, "").replace(/\bmask:[^;]*;/g, "");
     if (!/gradient\(/.test(body)) continue;
+    if (dash.test(selector)) {
+      for (const colour of body.match(/var\(--[a-z0-9-]+\)/g) ?? []) assert.match(colour, /--destructive|--muted-foreground/, `${selector}: ${colour}`);
+      continue;
+    }
     assert.match(
       selector,
       /\.fui-working-light(-bloom)?::before|\.fui-shimmer-text\[data-tone="light"\]|^\.fui-progress-indicator\[data-indeterminate\](:dir\(rtl\))?$|^\.fui-progress-ring-light$/,

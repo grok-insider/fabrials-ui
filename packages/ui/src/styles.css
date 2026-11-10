@@ -11115,3 +11115,785 @@
     }
   }
 }
+@layer components {
+  /* 0.12: answers and steps */
+
+  /* ChoiceGroup: the answers to a question as tiles. A tile is a raised plate like an outline button; picked, it takes a
+     Stormlight tint and edge, its keycap fills and a tick shows at its end, so the pick reads without colour. */
+  .fui-choice-group {
+    --fui-choice-min: 12rem;
+    --fui-choice-gap: var(--fui-space-2);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--fui-choice-gap);
+    min-inline-size: 0;
+  }
+  .fui-choice-group[data-orientation="horizontal"] {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .fui-choice-group[data-orientation="horizontal"] > .fui-choice-option {
+    flex: 1 1 8rem;
+  }
+  /* At most --fui-choice-columns columns, fewer where an option would be narrower than --fui-choice-min. */
+  .fui-choice-group[data-columns] {
+    display: grid;
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(
+        max(
+          min(var(--fui-choice-min), 100%),
+          calc((100% - (var(--fui-choice-columns) - 1) * var(--fui-choice-gap)) / var(--fui-choice-columns))
+        ),
+        1fr
+      )
+    );
+  }
+  .fui-choice-option {
+    --fui-choice-surface: var(--card);
+    --fui-choice-edge: color-mix(in oklab, var(--foreground) 16%, transparent);
+    --fui-choice-ink: var(--brand-ink);
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--fui-space-3);
+    min-inline-size: 0;
+    min-block-size: 2.75rem;
+    padding: calc(var(--fui-space-2-5) - 1px) var(--fui-space-3);
+    border: 1px solid var(--fui-choice-edge);
+    border-radius: var(--fui-radius-md);
+    background: var(--fui-choice-surface);
+    background-image: var(--fui-sheen-soft);
+    box-shadow: var(--fui-shadow-xs), var(--fui-highlight);
+    color: var(--foreground);
+    font-size: var(--fui-text-sm);
+    line-height: 1.5rem;
+    text-align: start;
+    cursor: pointer;
+    user-select: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .fui-choice-group[data-size="sm"] .fui-choice-option {
+    gap: var(--fui-space-2);
+    min-block-size: 2.25rem;
+    padding: calc(var(--fui-space-1-5) - 1px) var(--fui-space-2-5);
+    font-size: 0.8125rem;
+  }
+  .fui-choice-group[data-size="lg"] .fui-choice-option {
+    min-block-size: 3.5rem;
+    padding: calc(var(--fui-space-4) - 1px) var(--fui-space-4);
+    font-size: var(--fui-text-md);
+  }
+  .fui-choice-marker {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: 1.5rem;
+    block-size: 1.5rem;
+    padding-inline: 0.25rem;
+    border: 1px solid var(--border);
+    border-block-end-width: 2px;
+    border-radius: var(--fui-radius-xs);
+    background: var(--card);
+    background-image: var(--fui-sheen-soft);
+    box-shadow: var(--fui-highlight);
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    font-weight: var(--fui-weight-medium);
+    line-height: 1;
+  }
+  .fui-choice-body {
+    display: grid;
+    flex: 1 1 0;
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+  }
+  .fui-choice-description {
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+    line-height: var(--fui-leading-xs);
+  }
+  /* The end of a tile holds the tick of a pick or the icon of a verdict; its width is kept, so nothing moves when one shows. */
+  .fui-choice-state {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: 1.125rem;
+    block-size: 1.5rem;
+    color: var(--fui-choice-ink);
+  }
+  .fui-choice-state svg {
+    inline-size: 1.125rem;
+    block-size: 1.125rem;
+  }
+  .fui-choice-option[data-checked] {
+    --fui-choice-surface: color-mix(in oklab, var(--brand) var(--fui-tint-strength), var(--card));
+    --fui-choice-edge: var(--brand-ink);
+    background-image: none;
+  }
+  .fui-choice-option[data-checked] .fui-choice-marker {
+    border-color: var(--brand);
+    background: var(--brand);
+    background-image: var(--fui-sheen);
+    box-shadow: var(--fui-bevel);
+    color: var(--brand-foreground);
+  }
+  /* A verdict is a tint of its tone with the tone's ink on the edge and the icon. A right answer that was not picked has a
+     dashed edge and no tint: it was not the reader's. */
+  .fui-choice-option[data-result="correct"] {
+    --fui-choice-surface: color-mix(in oklab, var(--success) var(--fui-tint-strength), var(--card));
+    --fui-choice-edge: var(--fui-success-ink);
+    --fui-choice-ink: var(--fui-success-ink);
+    background-image: none;
+  }
+  .fui-choice-option[data-result="incorrect"] {
+    --fui-choice-surface: color-mix(in oklab, var(--destructive) var(--fui-tint-strength), var(--card));
+    --fui-choice-edge: var(--fui-danger-ink);
+    --fui-choice-ink: var(--fui-danger-ink);
+    background-image: none;
+  }
+  .fui-choice-option[data-result="missed"] {
+    --fui-choice-surface: var(--card);
+    --fui-choice-edge: var(--fui-success-ink);
+    --fui-choice-ink: var(--fui-success-ink);
+    border-style: dashed;
+    box-shadow: none;
+  }
+  .fui-choice-option[data-result] .fui-choice-marker {
+    border-color: color-mix(in oklab, var(--fui-choice-ink) 45%, transparent);
+    background: color-mix(in oklab, var(--fui-choice-ink) var(--fui-tint-strong), var(--card));
+    background-image: none;
+    box-shadow: none;
+    color: var(--fui-choice-ink);
+  }
+  /* Ruled out: still readable where it was, struck through and flat. */
+  .fui-choice-option[data-ruled-out] {
+    --fui-choice-surface: var(--fui-surface-inset);
+    --fui-choice-edge: var(--border);
+    background-image: none;
+    box-shadow: none;
+    color: var(--muted-foreground);
+    cursor: not-allowed;
+  }
+  .fui-choice-option[data-ruled-out] .fui-choice-label {
+    text-decoration: line-through;
+  }
+  .fui-choice-option[data-ruled-out] .fui-choice-marker {
+    border-block-end-width: 1px;
+    background: transparent;
+    background-image: none;
+    box-shadow: none;
+  }
+  .fui-choice-option[data-disabled]:not([data-ruled-out]) {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .fui-choice-group[data-readonly] .fui-choice-option {
+    cursor: default;
+  }
+  .fui-choice-group:not([data-readonly]) .fui-choice-option:not([data-disabled]):active {
+    box-shadow: var(--fui-pressed);
+    translate: 0 1px;
+  }
+  @media (hover: hover) {
+    .fui-choice-group:not([data-readonly]) .fui-choice-option:not([data-disabled], [data-checked]):hover {
+      --fui-choice-surface: var(--fui-surface-hover);
+      background-image: none;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .fui-choice-option {
+      transition:
+        background-color var(--fui-duration-fast) var(--fui-ease),
+        border-color var(--fui-duration-fast) var(--fui-ease),
+        translate var(--fui-duration-fast) var(--fui-ease);
+    }
+  }
+  @media (pointer: coarse) {
+    .fui-choice-group[data-size="sm"] .fui-choice-option {
+      min-block-size: 2.75rem;
+      padding-block: calc(var(--fui-space-2-5) - 1px);
+    }
+  }
+  .fui-choice-feedback-body {
+    min-inline-size: 0;
+    font-size: var(--fui-text-sm);
+    line-height: var(--fui-leading-sm);
+  }
+
+  /* RevealCard: a plate with the question, then the answer under a soft line once it is asked for. The answer's region is
+     there from the start (it is the live region), so it must not take a gap while it is empty. */
+  .fui-reveal-card {
+    --fui-reveal-gap: var(--fui-space-4);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--fui-reveal-gap);
+    min-inline-size: 0;
+    padding: var(--fui-space-5);
+    border: 1px solid var(--border);
+    border-radius: var(--fui-radius-plate);
+    background: var(--card);
+    box-shadow: var(--fui-shadow-xs), var(--fui-highlight);
+    color: var(--card-foreground);
+  }
+  .fui-reveal-card-front,
+  .fui-reveal-card-back,
+  .fui-reveal-card-after {
+    min-inline-size: 0;
+  }
+  .fui-reveal-card-back:empty {
+    margin-block-end: calc(-1 * var(--fui-reveal-gap));
+  }
+  .fui-reveal-card-answer {
+    padding-block-start: var(--fui-reveal-gap);
+    border-block-start: 1px solid var(--fui-separator);
+  }
+  .fui-reveal-card-show {
+    inline-size: 100%;
+    min-block-size: var(--fui-control-height-lg);
+  }
+  .fui-reveal-card-key {
+    flex: none;
+  }
+
+  /* RatingBar: one key per rating, in a row of equal columns: its number, its word and, where there is room, what it means. */
+  .fui-rating-bar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--fui-space-2);
+    min-inline-size: 0;
+    container: fui-rating-bar / inline-size;
+  }
+  .fui-rating-bar-label {
+    margin: 0;
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    line-height: var(--fui-leading-label);
+  }
+  .fui-rating-bar-options {
+    display: grid;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+    gap: var(--fui-space-2);
+  }
+  .fui-rating {
+    --fui-rating-ink: var(--foreground);
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "key label"
+      "key hint";
+    align-content: center;
+    align-items: center;
+    column-gap: var(--fui-space-2);
+    min-inline-size: 0;
+    min-block-size: var(--fui-control-height-lg);
+    margin: 0;
+    padding: var(--fui-space-1-5) var(--fui-space-3);
+    border: 1px solid color-mix(in oklab, var(--foreground) 16%, transparent);
+    border-radius: var(--fui-radius-md);
+    background: var(--card);
+    background-image: var(--fui-sheen-soft);
+    box-shadow: var(--fui-shadow-xs), var(--fui-highlight);
+    color: var(--foreground);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .fui-rating[data-tone="success"] {
+    --fui-rating-ink: var(--fui-success-ink);
+  }
+  .fui-rating[data-tone="warning"] {
+    --fui-rating-ink: var(--fui-warning-ink);
+  }
+  .fui-rating[data-tone="danger"] {
+    --fui-rating-ink: var(--fui-danger-ink);
+  }
+  .fui-rating-key {
+    grid-area: key;
+  }
+  .fui-rating-label {
+    grid-area: label;
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+    color: var(--fui-rating-ink);
+    font-size: var(--fui-text-sm);
+    font-weight: var(--fui-weight-medium);
+    line-height: var(--fui-leading-sm);
+  }
+  .fui-rating-hint {
+    grid-area: hint;
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+    line-height: var(--fui-leading-xs);
+  }
+  .fui-rating[aria-disabled="true"] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .fui-rating:not([aria-disabled="true"]):active {
+    background-image: none;
+    box-shadow: var(--fui-pressed);
+    translate: 0 1px;
+  }
+  @media (hover: hover) {
+    .fui-rating:not([aria-disabled="true"]):hover {
+      background-color: var(--accent);
+    }
+  }
+  /* A narrow bar keeps the words of the ratings and drops what they mean; the word sits in the middle of its key. */
+  @container fui-rating-bar (max-width: 22rem) {
+    .fui-rating {
+      padding-inline: var(--fui-space-2);
+    }
+    .fui-rating-hint {
+      display: none;
+    }
+  }
+  /* Where nothing hovers there is no keyboard to speak of: the key hints go. */
+  @media (hover: none) {
+    .fui-rating-key,
+    .fui-reveal-card-key {
+      display: none;
+    }
+    .fui-rating {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        "label"
+        "hint";
+      text-align: center;
+    }
+  }
+  @media (pointer: coarse) {
+    .fui-rating {
+      min-block-size: 2.75rem;
+    }
+  }
+
+  /* StepControls: a toolbar whose play key shows its word, a counter in the label voice, and chevrons that follow the page. */
+  .fui-step-controls {
+    gap: var(--fui-space-1);
+  }
+  .fui-step-controls .fui-button.fui-step-controls-play {
+    aspect-ratio: auto;
+    min-inline-size: 5.75rem;
+    padding-inline: var(--fui-space-3);
+  }
+  .fui-step-controls-play .fui-toolbar-label {
+    position: static;
+    inline-size: auto;
+    block-size: auto;
+    margin: 0;
+    overflow: visible;
+    clip-path: none;
+  }
+  .fui-step-controls-chevron:dir(rtl) {
+    transform: scaleX(-1);
+  }
+  .fui-step-controls-count {
+    margin-inline: var(--fui-space-2);
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .fui-step-controls-speeds {
+    margin-inline-start: auto;
+  }
+  .fui-step-controls-speed-label {
+    margin-inline-end: var(--fui-space-1);
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+  }
+  .fui-step-controls-speed {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Progress, segments: a track of named parts, each as wide as its weight. A part is drawn by its ::before, so a part that
+     is a button can be taller than the line it shows. Done is the fill; to do is the empty track; current stands taller with
+     an edge; correct is the success fill; incorrect is dashed and skipped dotted, so the three read apart without colour. */
+  .fui-progress-parts {
+    display: flex;
+    flex: 0 0 100%;
+    align-items: center;
+    gap: var(--fui-progress-gap);
+    min-inline-size: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .fui-progress-part {
+    --fui-progress-part-rise: 0px;
+    position: relative;
+    flex: 1 1 0;
+    min-inline-size: 0;
+    block-size: var(--fui-progress-thickness);
+  }
+  .fui-progress-part::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    inset-block: calc(50% - var(--fui-progress-thickness) / 2 - var(--fui-progress-part-rise));
+    border-radius: var(--fui-radius-full);
+    background: var(--border);
+  }
+  .fui-progress-part[data-state="done"]::before {
+    background: var(--fui-progress-fill);
+  }
+  .fui-progress-part[data-state="correct"]::before {
+    background: var(--success);
+  }
+  .fui-progress-part[data-state="incorrect"]::before {
+    border-radius: 1px;
+    background: repeating-linear-gradient(90deg, var(--destructive) 0 0.375rem, transparent 0.375rem 0.5625rem);
+  }
+  .fui-progress-part[data-state="skipped"]::before {
+    border-radius: 1px;
+    background: repeating-linear-gradient(90deg, var(--muted-foreground) 0 0.125rem, transparent 0.125rem 0.375rem);
+  }
+  .fui-progress-part[data-state="current"] {
+    --fui-progress-part-rise: 2px;
+  }
+  .fui-progress-part[data-state="current"]::before {
+    border: 1.5px solid var(--foreground);
+    background: color-mix(in oklab, var(--fui-progress-fill) 45%, var(--card));
+  }
+  /* Segments that are buttons: the button is the target, the line stays as thin as the bar. */
+  button.fui-progress-part {
+    block-size: 1.5rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: var(--fui-radius-xs);
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  @media (hover: hover) {
+    button.fui-progress-part:hover {
+      --fui-progress-part-rise: 1px;
+    }
+    button.fui-progress-part[data-state="current"]:hover {
+      --fui-progress-part-rise: 3px;
+    }
+  }
+  @media (pointer: coarse) {
+    button.fui-progress-part {
+      block-size: 2.75rem;
+    }
+  }
+
+  /* Progress, marks: ticks across the track at their value, measured from the start so a right-to-left page mirrors them.
+     The rail holds the track and the marks, since the track clips what it holds. */
+  .fui-progress-rail {
+    position: relative;
+    flex: 0 0 100%;
+    min-inline-size: 0;
+  }
+  .fui-progress-rail[data-captions] {
+    padding-block-end: calc(var(--fui-space-1) + 0.1875rem + 1rem);
+  }
+  .fui-progress-marks {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: 0;
+    block-size: var(--fui-progress-thickness);
+    pointer-events: none;
+  }
+  .fui-progress-mark {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: var(--fui-progress-mark-at);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    inline-size: 0;
+  }
+  .fui-progress-mark-tick {
+    flex: none;
+    inline-size: 2px;
+    block-size: calc(var(--fui-progress-thickness) + 0.375rem);
+    margin-block-start: -0.1875rem;
+    border-radius: 1px;
+    background: var(--foreground);
+  }
+  .fui-progress-mark-caption {
+    flex: none;
+    margin-block-start: var(--fui-space-1);
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    line-height: 1rem;
+    white-space: nowrap;
+  }
+  .fui-progress-mark[data-align="start"] .fui-progress-mark-caption {
+    align-self: flex-start;
+  }
+  .fui-progress-mark[data-align="end"] .fui-progress-mark-caption {
+    align-self: flex-end;
+  }
+
+  /* MarkedText: a tint and a line under each marked passage, and its number. The line's style is the severity: solid for a
+     mistake, dashed for a warning, dotted for a note. */
+  .fui-marked-text {
+    margin: 0;
+    line-height: 1.9;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+  }
+  .fui-mark {
+    --fui-marked-tone: var(--destructive);
+    --fui-marked-ink: var(--fui-danger-ink);
+    padding-inline: 1px;
+    border-radius: var(--fui-radius-xs);
+    background: color-mix(in oklab, var(--fui-marked-tone) var(--fui-tint-strong), transparent);
+    color: inherit;
+    text-decoration: underline solid var(--fui-marked-ink) 2px;
+    text-underline-offset: 0.25em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+  .fui-mark[data-severity="warning"] {
+    --fui-marked-tone: var(--warning);
+    --fui-marked-ink: var(--fui-warning-ink);
+    text-decoration-style: dashed;
+  }
+  .fui-mark[data-severity="note"] {
+    --fui-marked-tone: var(--brand);
+    --fui-marked-ink: var(--brand-ink);
+    text-decoration-style: dotted;
+  }
+  /* The number stays inline, so it never wraps away from the last word of its passage. */
+  .fui-mark-number {
+    margin-inline-start: 1px;
+    color: var(--fui-marked-ink);
+    font-family: var(--fui-font-label);
+    font-size: 0.625rem;
+    font-weight: var(--fui-weight-medium);
+    line-height: 1;
+    vertical-align: super;
+    user-select: none;
+  }
+
+  /* AnnotationList: the notes under the text, each with its mark's number in a tag edged like the mark's line. */
+  .fui-annotation-list {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--fui-space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .fui-annotation {
+    --fui-marked-tone: var(--destructive);
+    --fui-marked-ink: var(--fui-danger-ink);
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: var(--fui-space-3);
+    scroll-margin-block: var(--fui-space-4);
+    font-size: var(--fui-text-sm);
+    line-height: var(--fui-leading-sm);
+  }
+  .fui-annotation[data-severity="warning"] {
+    --fui-marked-tone: var(--warning);
+    --fui-marked-ink: var(--fui-warning-ink);
+  }
+  .fui-annotation[data-severity="note"] {
+    --fui-marked-tone: var(--brand);
+    --fui-marked-ink: var(--brand-ink);
+  }
+  .fui-annotation-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: 1.25rem;
+    block-size: 1.25rem;
+    padding-inline: 0.25rem;
+    border: 1px solid color-mix(in oklab, var(--fui-marked-ink) 55%, transparent);
+    border-radius: var(--fui-radius-xs);
+    background: color-mix(in oklab, var(--fui-marked-tone) var(--fui-tint-strong), var(--card));
+    color: var(--fui-marked-ink);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    font-weight: var(--fui-weight-medium);
+    line-height: 1;
+  }
+  .fui-annotation[data-severity="warning"] .fui-annotation-number {
+    border-style: dashed;
+  }
+  .fui-annotation[data-severity="note"] .fui-annotation-number {
+    border-style: dotted;
+  }
+  .fui-annotation-body {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--fui-space-1);
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+  }
+  .fui-annotation-title {
+    margin: 0;
+    font-weight: var(--fui-weight-semibold);
+  }
+  .fui-annotation-change {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--fui-space-1) var(--fui-space-2);
+    margin: 0;
+  }
+  /* What was written is struck through, what is suggested is underlined: the pair reads without colour. */
+  .fui-annotation-fragment {
+    font-weight: var(--fui-weight-medium);
+  }
+  .fui-annotation-fragment[data-kind="before"] {
+    color: var(--muted-foreground);
+    text-decoration: line-through;
+  }
+  .fui-annotation-fragment[data-kind="after"] {
+    color: var(--fui-success-ink);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .fui-annotation-arrow {
+    flex: none;
+    align-self: center;
+    inline-size: 0.875rem;
+    block-size: 0.875rem;
+    color: var(--muted-foreground);
+  }
+  .fui-annotation-arrow:dir(rtl) {
+    transform: scaleX(-1);
+  }
+  .fui-annotation-note {
+    color: var(--muted-foreground);
+  }
+
+  /* TextDiff: a removal struck through on a garnet tint, an addition underlined on a verdigris one. */
+  .fui-text-diff {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--fui-space-2);
+    min-inline-size: 0;
+  }
+  .fui-text-diff-text {
+    margin: 0;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+  }
+  .fui-text-diff :is(del, ins) {
+    padding-inline: 1px;
+    border-radius: var(--fui-radius-xs);
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+  /* A word and its replacement touch in the source: a hair of space keeps the two lines apart. */
+  .fui-text-diff del + ins {
+    margin-inline-start: 2px;
+  }
+  .fui-text-diff del {
+    background: color-mix(in oklab, var(--destructive) var(--fui-tint-strong), transparent);
+    color: var(--fui-danger-ink);
+    text-decoration: line-through;
+  }
+  .fui-text-diff ins {
+    background: color-mix(in oklab, var(--success) var(--fui-tint-strong), transparent);
+    color: var(--fui-success-ink);
+    text-decoration: underline 2px;
+    text-underline-offset: 0.2em;
+  }
+  .fui-text-diff-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--fui-space-1) var(--fui-space-3);
+    margin: 0;
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    line-height: 1.6;
+  }
+
+  /* Forced colors: a tint and a fill are gone, so each state is an edge, a line or a pattern in a system colour. A pick is a
+     Highlight edge and a Highlight keycap; a verdict is its icon and the style of its edge (solid, double, dashed). */
+  @media (forced-colors: active) {
+    .fui-choice-option[data-checked] {
+      border: 2px solid Highlight;
+    }
+    .fui-choice-option[data-checked] .fui-choice-marker {
+      forced-color-adjust: none;
+      border-color: Highlight;
+      background: Highlight;
+      color: HighlightText;
+    }
+    .fui-choice-option[data-result="correct"] {
+      border: 2px solid CanvasText;
+    }
+    .fui-choice-option[data-result="incorrect"] {
+      border: 3px double CanvasText;
+    }
+    .fui-choice-option[data-result="missed"] {
+      border: 2px dashed CanvasText;
+    }
+    .fui-choice-option[data-ruled-out] {
+      border-style: dotted;
+      color: GrayText;
+    }
+    .fui-choice-state {
+      color: CanvasText;
+    }
+    .fui-step-controls-speed[aria-pressed="true"]::after {
+      content: "";
+      position: absolute;
+      inset-inline: 25%;
+      inset-block-end: 0.375rem;
+      block-size: 2px;
+      background: Highlight;
+    }
+    .fui-progress-part::before {
+      border: 1px solid CanvasText;
+    }
+    .fui-progress-part:is([data-state="done"], [data-state="correct"])::before {
+      background: Highlight;
+    }
+    .fui-progress-part[data-state="incorrect"]::before {
+      forced-color-adjust: none;
+      border: 0;
+      background: repeating-linear-gradient(90deg, CanvasText 0 0.375rem, transparent 0.375rem 0.5625rem);
+    }
+    .fui-progress-part[data-state="skipped"]::before {
+      forced-color-adjust: none;
+      border: 0;
+      background: repeating-linear-gradient(90deg, GrayText 0 0.125rem, transparent 0.125rem 0.375rem);
+    }
+    .fui-progress-part[data-state="current"]::before {
+      border: 2px solid Highlight;
+    }
+    .fui-progress-mark-tick {
+      background: CanvasText;
+    }
+    .fui-mark {
+      background: Mark;
+      color: MarkText;
+      text-decoration-color: MarkText;
+    }
+    .fui-annotation-number {
+      border-color: CanvasText;
+    }
+  }
+}

@@ -125,3 +125,9 @@ export {
 export * from "./recorder";
 export * from "./speech-text";
 export * from "./speech";
+export * from "./choice-group";
+export * from "./reveal-card";
+export * from "./step-controls";
+export * from "./marked-text";
+export { diffWords, segmentText, type DiffPart, type TextRange, type TextRangeSeverity, type TextSegment } from "./text-ranges";
+export type { StepPlayerState } from "./step-player";
