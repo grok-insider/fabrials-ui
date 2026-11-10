@@ -114,6 +114,7 @@ function createEngine(initial: { anchor: ConversationAnchor; threshold: number }
   let chase: Chase | null = null;
   let touchY: number | null = null;
   let footer: number | null = null;
+  let scrollbar = 0;
   let version = 0;
   const subscribers = new Set<() => void>();
   const watchers = new Set<() => void>();
@@ -257,12 +258,14 @@ function createEngine(initial: { anchor: ConversationAnchor; threshold: number }
       typeof ResizeObserver === "undefined"
         ? null
         : new ResizeObserver((entries) => {
+            applyScrollbar();
             const grew = entries.some((entry) => entry.target === column);
             if (entries.some((entry) => entry.target === scroller)) dispatch({ type: "resize", metrics: read() });
             if (grew && column) dispatch({ type: "grow", metrics: read(), items: column.childElementCount });
           });
     observer?.observe(nextScroller);
     observer?.observe(nextColumn);
+    applyScrollbar();
     const passive = { passive: true } as const;
     nextScroller.addEventListener("scroll", onScroll, passive);
     nextScroller.addEventListener("wheel", onWheel, passive);
@@ -293,6 +296,16 @@ function createEngine(initial: { anchor: ConversationAnchor; threshold: number }
     };
   }
 
+  // What the log's own scrollbar takes of its width (nothing where scrollbars lie over the content): the rail stands clear of it.
+  const applyScrollbar = () => {
+    if (!root) return;
+    const size = scroller ? Math.max(0, scroller.offsetWidth - scroller.clientWidth) : 0;
+    if (size === scrollbar) return;
+    scrollbar = size;
+    if (size === 0) root.style.removeProperty("--fui-conversation-scrollbar");
+    else root.style.setProperty("--fui-conversation-scrollbar", `${size}px`);
+  };
+
   const applyFooter = () => {
     if (!root) return;
     if (footer === null) root.style.removeProperty("--fui-conversation-footer-size");
@@ -310,7 +323,9 @@ function createEngine(initial: { anchor: ConversationAnchor; threshold: number }
     },
     setRoot(node: HTMLElement | null) {
       root = node;
+      scrollbar = 0;
       applyFooter();
+      applyScrollbar();
     },
     setFooter(size: number | null) {
       footer = size;

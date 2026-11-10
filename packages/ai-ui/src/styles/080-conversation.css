@@ -171,11 +171,13 @@
     background: var(--brand-ink);
   }
 
-  /* The rail of the reader's own messages, on the end side, centred on the log and never past 70% of its height. */
+  /* The rail of the reader's own messages, on the end side, centred on the log and never past 70% of its height. It stands
+     clear of the log's scrollbar: where a scrollbar takes room the conversation measures it (`--fui-conversation-scrollbar`),
+     so a marker and its focus ring are never drawn over the thumb. */
   .fui-conversation-rail {
     position: absolute;
     inset-block-start: calc((100% - var(--fui-conversation-footer-size)) / 2);
-    inset-inline-end: var(--fui-space-1);
+    inset-inline-end: calc(var(--fui-conversation-scrollbar, 0px) + var(--fui-space-2));
     z-index: 1;
     display: none;
     flex-direction: column;
@@ -236,7 +238,7 @@
         display: flex;
       }
       .fui-conversation:has(> .fui-conversation-rail) > .fui-conversation-content > .fui-conversation-column {
-        padding-inline-end: calc(var(--fui-conversation-gutter) + var(--fui-space-6));
+        padding-inline-end: calc(var(--fui-conversation-gutter) + var(--fui-space-6) + var(--fui-space-1));
       }
     }
   }

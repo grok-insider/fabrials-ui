@@ -876,6 +876,7 @@ The rail of the reader's own messages on the end side: one small marker each, th
 
 - `ConversationEmpty` is what a thread shows before its first message: a line (`title`, default "No messages yet", a paragraph, not a heading), a `description` and an optional `icon`, centred because it is the only thing in a large box.
 - `ConversationFooter` is the composer's dock at the end of the log, clear of the device's safe area. It publishes its height as `--fui-conversation-footer-size`, which the jump key and the rail stand on, and the last lines of the log fade out above it (the column reserves that band, so no line is ever under the fade). `fade={false}` ends them at a hard edge.
+- The rail stands 8 px clear of the log's scrollbar. Where a scrollbar takes room (a desktop browser on Windows or Linux) the conversation measures it and publishes `--fui-conversation-scrollbar`; where scrollbars lie over the content the property is absent and the rail keeps 8 px from the edge.
 - `useConversation()` gives `{ atEnd, locked, unread, hasNew, scrollToEnd, scrollToMessage }` to anything inside the conversation.
 
 ### What Radiant can delete

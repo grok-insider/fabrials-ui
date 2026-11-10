@@ -484,13 +484,14 @@ test("the way back is hidden until it is needed, and it rises rather than jumps"
 
 test("the rail keeps to the end side, to 70% of the height, and away where it would cover the text", () => {
   const rail = rule(".fui-conversation-rail {");
-  assert.match(rail, /inset-inline-end: var\(--fui-space-1\);/);
+  // Clear of the log's scrollbar, which the conversation measures: 8 px inside it, or inside the edge where scrollbars take no room.
+  assert.match(rail, /inset-inline-end: calc\(var\(--fui-conversation-scrollbar, 0px\) \+ var\(--fui-space-2\)\);/);
   assert.match(rail, /max-block-size: 70%;/);
   assert.match(rail, /display: none;/);
   assert.match(rail, /translate: 0 -50%;/);
   const shows = blockAt("@media (pointer: fine) {\n    @container (min-width: 40rem) {");
   assert.match(shows, /\.fui-conversation-rail \{\s*display: flex;/);
-  assert.match(shows, /padding-inline-end: calc\(var\(--fui-conversation-gutter\) \+ var\(--fui-space-6\)\);/);
+  assert.match(shows, /padding-inline-end: calc\(var\(--fui-conversation-gutter\) \+ var\(--fui-space-6\) \+ var\(--fui-space-1\)\);/);
   assert.match(rule(".fui-conversation-marker {"), /block-size: var\(--fui-conversation-slot, 22px\);/);
   assert.match(rule(".fui-conversation-marker[aria-current=\"true\"] .fui-conversation-marker-tick {"), /background: var\(--fui-focus\);/);
 });
