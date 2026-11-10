@@ -7,7 +7,8 @@ import { classes } from "./shared";
 export type TruncatedTextProps = {
   children: string;
   className?: string;
-  side?: "top" | "right" | "bottom" | "left";
+  /** Where the tooltip opens. `inline-start` and `inline-end` follow the writing direction (`start`, `end` in the house words). */
+  side?: "top" | "right" | "bottom" | "left" | "inline-start" | "inline-end";
   sideOffset?: number;
   align?: "start" | "center" | "end";
 };

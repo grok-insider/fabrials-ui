@@ -1,4 +1,7 @@
-// Origin: Lucide icons (ISC, lucide.dev) path data, copied 2026-09-26 so @fabrials/ai-ui stays free of an icon dependency.
+// Origin: Lucide icons (ISC, lucide.dev) path data, copied 2026-09-26. Not imported from lucide-react because ai-ui declares
+// no icon dependency of its own (its peers are @fabrials/ui and React, and a package must not reach into a dependency of a
+// dependency), and because these draw at 16 px with `aria-hidden` on the root: lucide-react's defaults are a 24 px box with
+// its own class names, so importing it would change every icon in the chat on screen.
 import type { ReactNode, SVGProps } from "react";
 
 type IconProps = Omit<SVGProps<SVGSVGElement>, "children">;

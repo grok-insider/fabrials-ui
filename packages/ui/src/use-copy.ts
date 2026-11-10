@@ -3,7 +3,6 @@
 // reports itself the same way everywhere and a product can say what happened once, in one place.
 
 import { useCallback, useEffect, useReducer, useRef } from "react";
-import { copyText } from "./export";
 
 /** What a copy left behind: nothing yet, the text on the clipboard, or a clipboard that refused. */
 export type CopyState = "idle" | "copied" | "failed";
@@ -14,6 +13,12 @@ export type CopyEvent = { type: "reset" } | { type: "settled"; result: Exclude<C
 export function copyState(state: CopyState, event: CopyEvent): CopyState {
   if (event.type === "reset") return "idle";
   return event.result;
+}
+
+/** Puts the text on the clipboard, and fails when the browser has none to give it (a key outside a gesture, a page without permission). */
+async function writeClipboard(text: string) {
+  if (typeof navigator === "undefined" || typeof navigator.clipboard?.writeText !== "function") throw new Error("This browser has no clipboard.");
+  await navigator.clipboard.writeText(text);
 }
 
 /** The text to copy, or a function that makes it (a message built from the page, a selection read on the click). */
@@ -34,8 +39,8 @@ export type UseCopyOptions = {
 export type UseCopyResult = {
   status: CopyState;
   /**
-   * Copies `source` (through `copyText`, which falls back to a hidden field where the clipboard API is missing or refuses)
-   * and answers whether it worked. `write`, when given, replaces the clipboard write entirely.
+   * Copies `source` and answers whether it worked. `write`, when given, replaces the clipboard write entirely; without it
+   * the text goes through `navigator.clipboard.writeText`, and a browser that refuses leaves `status` at "failed".
    */
   copy: (source: CopySource, write?: CopyWriter) => Promise<boolean>;
   /**
@@ -73,7 +78,7 @@ export function useCopy({ resetAfter = 1600, onCopied, onError }: UseCopyOptions
       try {
         const text = typeof source === "function" ? await source() : source;
         if (write) await write(text);
-        else await copyText(text);
+        else await writeClipboard(text);
         report("copied");
         copied.current?.(text);
         return true;

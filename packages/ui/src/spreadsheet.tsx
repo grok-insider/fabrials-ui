@@ -5,7 +5,7 @@
 
 import { useEffect, useId, useMemo, useRef, useState, type ComponentProps, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
 import { asCell, cellAddress, cellKind, cellText, columnName, type Worksheet, type SheetCell, type SheetMerge, type Workbook } from "./spreadsheet-data";
-import { copyText } from "./export";
+import { useCopy } from "./use-copy";
 import { useLabels, useLocale } from "./labels";
 import { classes } from "./shared";
 
@@ -98,6 +98,7 @@ export function Spreadsheet({
   const [view, setView] = useState({ left: 0, top: 0, width: 960, height: 420 });
   const [active, setActive] = useState({ row: 0, column: 0 });
   const [announce, setAnnounce] = useState("");
+  const copyCell = useCopy();
 
   const rowCount = Math.max(sheet?.rows.length ?? 0, 1);
   const columnCount = useMemo(() => Math.max(1, ...(sheet?.rows ?? []).map((row) => row?.length ?? 0), ...(sheet?.merges ?? []).map((merge) => merge.right + 1)), [sheet]);
@@ -198,10 +199,11 @@ export function Spreadsheet({
     }
     if (command && event.key.toLowerCase() === "c") {
       event.preventDefault();
-      void copyText(activeCell?.formula !== undefined && activeCell.value === null ? `=${activeCell.formula}` : cellText(activeCell, locale)).then(
-        () => setAnnounce(text.copied(cellAddress(shown.row, shown.column))),
-        () => {},
-      );
+      void copyCell
+        .copy(activeCell?.formula !== undefined && activeCell.value === null ? `=${activeCell.formula}` : cellText(activeCell, locale))
+        .then((copied) => {
+          if (copied) setAnnounce(text.copied(cellAddress(shown.row, shown.column)));
+        });
     }
   };
 

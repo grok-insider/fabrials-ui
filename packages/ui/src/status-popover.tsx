@@ -44,7 +44,8 @@ export function StatusPopover({
   attention?: boolean | "warning" | "danger";
   /** Icon only, whatever the width; the label stays in the accessible name. */
   compact?: boolean;
-  side?: "top" | "bottom" | "left" | "right";
+  /** Where the popover opens. `inline-start` and `inline-end` follow the writing direction. */
+  side?: "top" | "bottom" | "left" | "right" | "inline-start" | "inline-end";
   align?: "start" | "center" | "end";
   keepMounted?: boolean;
   className?: string;

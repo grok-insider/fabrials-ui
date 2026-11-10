@@ -16,17 +16,23 @@ export type CopyStatusProps = Omit<ComponentProps<"span">, "children"> & {
   status: CopyState;
   labels: CopyStatusLabels;
   /**
+   * `status` names the region (a panel or a page says what happened there); `polite` is the plain `aria-live` span a key
+   * that is itself a button carries, so a panel keeps one named region of its own.
+   */
+  live?: "status" | "polite";
+  /**
    * The class of the region while a failure has to be read as well as heard: the region then shows instead of hiding.
    * Without it the region is only for a screen reader (`.fui-sr-only`).
    */
   failedClassName?: string;
 };
 
-export function CopyStatus({ status, labels, failedClassName, className, ...props }: CopyStatusProps) {
+export function CopyStatus({ status, labels, live = "status", failedClassName, className, ...props }: CopyStatusProps) {
   const shown = status === "failed" && failedClassName;
   return (
     <span
-      role="status"
+      role={live === "status" ? "status" : undefined}
+      aria-live={live === "polite" ? "polite" : undefined}
       data-state={status === "idle" ? undefined : status}
       className={classes(shown ? failedClassName : "fui-sr-only", className)}
       {...props}

@@ -52,6 +52,12 @@ test("CopyStatus is always in the page, hidden, and only says something once a c
   // A caller that gives no words for a failure says nothing, and stays hidden.
   assert.equal(html(<CopyStatus labels={{ copied: "Copied" }} status="failed" />), '<span role="status" data-state="failed" class="fui-sr-only"></span>');
   assert.match(html(<CopyStatus className="beside" labels={labels} status="copied" />), /class="fui-sr-only beside"/);
+  // The form a key inside a button carries: a plain live region, so a panel keeps the one named region it has always had.
+  assert.equal(html(<CopyStatus labels={labels} live="polite" status="idle" />), '<span aria-live="polite" class="fui-sr-only"></span>');
+  assert.equal(
+    html(<CopyStatus labels={labels} live="polite" status="copied" />),
+    '<span aria-live="polite" data-state="copied" class="fui-sr-only">Copied to clipboard</span>',
+  );
 });
 
 /* --------------------------------------------------------------- the clock */

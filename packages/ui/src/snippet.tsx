@@ -58,7 +58,7 @@ export function CopyButton({
       {...props}
     >
       {copied ? <Check aria-hidden /> : <Copy aria-hidden />}
-      <CopyStatus labels={{ copied: copiedLabel }} status={status} />
+      <CopyStatus labels={{ copied: copiedLabel }} live="polite" status={status} />
     </Button>
   );
 }
