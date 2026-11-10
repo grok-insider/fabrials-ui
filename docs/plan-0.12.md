@@ -187,8 +187,9 @@ Merged means: on `feat/0.12`, with `bun run check` green on the merged branch an
 | D1, D2, D3 | merged (`GenerationFrame` went with D2) |
 | E1, E2 | merged |
 | F1 (not in the first plan): the bugs E2's keyboard specs found | merged |
-| E3 | the pages of `@fabrials/ui`, the skill and `DESIGN.md` merged; the pages of `@fabrials/ai-ui` in progress |
+| E3 | merged: 48 new pages and about 60 updated on ui.fabrials.com, the skill and `DESIGN.md`; ten exports have no page, all sub-parts (portals, overlays, contexts) |
 | 7.1, 7.2 | merged: 29 and 13 parts, the sheets ship minified beside a readable copy. The first part of `@fabrials/ui` stays one block of 6,500 lines (`docs/requests.md`) |
 | 7.3, 7.5 | merged, except `Attachments` on the house ring, the icons of `@fabrials/ai-ui` and `RelativeTime` on the shared clock (`docs/requests.md`) |
 | 7.4 | merged |
-| Version 0.12.0 and the final runs | not started |
+| Version 0.12.0 | done on `feat/0.12`; not pushed, not tagged, not published |
+| Final runs (2026-11-10) | `bun run check` 811 and 149 tests; the visual suite 1243 of 1243 against the parts and against the minified sheets; the skeleton suite 2485 passed, 26 skipped on purpose, in three engines; gitleaks clean. Not verified: a screen reader, real Safari and Firefox, a phone, a microphone, any product on 0.12 |
