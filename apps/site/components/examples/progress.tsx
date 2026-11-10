@@ -114,6 +114,63 @@ function SearchDemo() {
 
 const STEPS = ["Account", "Workspace", "Billing", "Invite your team"];
 
+const PARTS = [
+  { label: "Warm-up", state: "done", weight: 1 },
+  { label: "Listening", state: "done", weight: 2 },
+  { label: "Reading", state: "current", weight: 2 },
+  { label: "Writing", state: "todo", weight: 1 },
+  { label: "Speaking", state: "todo", weight: 1 },
+] as const;
+
+const QUIZ = [
+  { label: "Where is the harbour?", state: "correct" },
+  { label: "Who wrote the note?", state: "correct" },
+  { label: "What comes after six?", state: "incorrect" },
+  { label: "How do you greet someone?", state: "skipped" },
+  { label: "What does a ferry carry?", state: "current" },
+] as const;
+
+const QUESTIONS = ["Where is the harbour?", "Who wrote the note?", "What comes after six?", "How do you greet someone?", "What does a ferry carry?"];
+
+function SegmentsDemo() {
+  const [current, setCurrent] = useState(2);
+  return (
+    <div style={stack}>
+      <Progress hint="Reading, from 6:10 to 8:00" label="Thursday's session" segments={PARTS} />
+      <Progress hint="Four questions answered, one missed" label="Quiz" segments={QUIZ} />
+      <Progress
+        hint={QUESTIONS[current]}
+        label="Questions"
+        onSegmentSelect={setCurrent}
+        segments={QUESTIONS.map((label, index) => ({ label, state: index < current ? "done" : index === current ? "current" : "todo" }))}
+      />
+      <p style={{ margin: 0, color: "var(--muted-foreground)", fontSize: "var(--fui-text-sm)" }}>
+        Question {current + 1} of {QUESTIONS.length}: the parts are keys now, one tab stop, the arrow keys between them.
+      </p>
+    </div>
+  );
+}
+
+function MarksDemo() {
+  return (
+    <div style={stack}>
+      <Progress
+        hint="38 of 60 minutes, a trial test"
+        label="Time per test"
+        marks={[
+          { caption: true, label: "A1 ends here", value: 15 },
+          { caption: true, label: "A2", value: 30 },
+          { caption: true, label: "B1", value: 45 },
+        ]}
+        max={60}
+        value={38}
+      />
+      <Progress hint="A mark with no caption is only spoken" label="Reading" marks={[{ label: "The shortest test ends here", value: 26 }]} max={60} value={26} />
+    </div>
+  );
+}
+
+
 function StepsDemo() {
   const [step, setStep] = useState(2);
   return (
@@ -306,6 +363,44 @@ export function Imports({ mailboxes }: { mailboxes: Mailbox[] }) {
           </Progress>
         </div>
       ),
+    },
+    {
+      id: "segments",
+      title: "A track of named parts",
+      description:
+        "`segments` draws a plan as its parts: each is as wide as its `weight` and in its own state, `done`, `current` or `todo`, so the bar says where a session stands. With `onSegmentSelect` every part is a key: the parts become one toolbar, the arrow keys move between them, and a press says which one. A quiz uses the other ladder, `correct`, `incorrect` and `skipped`.",
+      code: `<Progress
+  label="Thursday's session"
+  segments={[
+    { label: "Warm-up", state: "done", weight: 1 },
+    { label: "Listening", state: "done", weight: 2 },
+    { label: "Reading", state: "current", weight: 2 },
+    { label: "Writing", state: "todo", weight: 1 },
+  ]}
+  hint="Reading, from 6:10 to 8:00"
+/>
+<Progress label="Questions" segments={questions} onSegmentSelect={setCurrent} hint={questions[current].label} />`,
+      render: () => <SegmentsDemo />,
+      align: "start",
+    },
+    {
+      id: "marks",
+      title: "Marks on the track",
+      description:
+        "`marks` puts ticks on an ordinary bar at their `value`, each with a `label` that is part of the bar's description and, with `caption`, a line under the tick. A right-to-left page mirrors them.",
+      code: `<Progress
+  label="Time per test"
+  value={38}
+  max={60}
+  hint="38 of 60 minutes, a trial test"
+  marks={[
+    { value: 15, label: "A1 ends here", caption: true },
+    { value: 30, label: "A2", caption: true },
+    { value: 45, label: "B1", caption: true },
+  ]}
+/>`,
+      render: () => <MarksDemo />,
+      align: "start",
     },
   ],
 };

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { moreDemos } from "@/components/ui-demos-more";
 import { instrumentDemos } from "@/components/ui-demos-instrument";
+import { demos012 } from "@/components/ui-demos-012";
 import { exampleSets } from "@/components/examples";
 import { Frame, type FrameWidth } from "@/components/demo-frame";
 import {
@@ -1211,6 +1212,14 @@ const previewWidths: Record<string, FrameWidth> = {
   "code-block": "wide",
   "scramble-text": "field",
   "shimmer-text": "field",
+  "local-time": "form",
+  "inline-confirm": "form",
+  countdown: "form",
+  "choice-group": "form",
+  "reveal-card": "form",
+  "step-controls": "wide",
+  "clip-button": "form",
+  "recorder-panel": "form",
 };
 
 export function UiDemo({ slug }: { slug: string }) {
@@ -1221,7 +1230,7 @@ export function UiDemo({ slug }: { slug: string }) {
         <Preview />
       </Frame>
     );
-  const Demo = demos[slug] ?? moreDemos[slug] ?? instrumentDemos[slug];
+  const Demo = demos[slug] ?? moreDemos[slug] ?? instrumentDemos[slug] ?? demos012[slug];
   if (!Demo) return <p className="text-sm">This preview is not available.</p>;
   return <Demo />;
 }

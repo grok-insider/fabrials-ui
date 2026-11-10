@@ -45,6 +45,14 @@ export const exampleSlugs = [
   "dropdown-menu",
   "tooltip",
   "item",
+  "local-time",
+  "inline-confirm",
+  "countdown",
+  "choice-group",
+  "reveal-card",
+  "step-controls",
+  "clip-button",
+  "recorder-panel",
 ] as const;
 
 export function hasExamples(slug: string) {

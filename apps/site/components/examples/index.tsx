@@ -20,6 +20,10 @@ import { codeBlockExamples } from "./code-block";
 import { scrambleTextExamples, shimmerTextExamples } from "./text";
 import { checkboxExamples, fieldExamples, radioGroupExamples, selectExamples, sliderExamples, switchExamples } from "./forms";
 import { accordionExamples, dialogExamples, dropdownMenuExamples, itemExamples, tabsExamples, tooltipExamples } from "./structure";
+import { localTimeExamples } from "./foundations";
+import { countdownExamples, inlineConfirmExamples } from "./states";
+import { choiceGroupExamples, revealCardExamples, stepControlsExamples } from "./answers";
+import { clipButtonExamples, recorderPanelExamples } from "./sound";
 
 /** Examples by catalogue slug. `lib/example-slugs.ts` lists the same keys for the server; a test keeps them equal. */
 export const exampleSets: Record<string, ExampleSet> = {
@@ -67,6 +71,14 @@ export const exampleSets: Record<string, ExampleSet> = {
   "dropdown-menu": dropdownMenuExamples,
   tooltip: tooltipExamples,
   item: itemExamples,
+  "local-time": localTimeExamples,
+  "inline-confirm": inlineConfirmExamples,
+  countdown: countdownExamples,
+  "choice-group": choiceGroupExamples,
+  "reveal-card": revealCardExamples,
+  "step-controls": stepControlsExamples,
+  "clip-button": clipButtonExamples,
+  "recorder-panel": recorderPanelExamples,
 };
 
 export type { Example, ExampleSet } from "./types";
