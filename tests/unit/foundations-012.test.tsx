@@ -82,6 +82,9 @@ test("a locale changes the words and the order, options pass through and their o
   assert.match(formatLocalTime(sent, "date", { timeZone: "UTC", locale: "ar-EG" }), /٢٠٢٦/);
   assert.equal(formatLocalTime(sent, { weekday: "long", hour: "numeric", hour12: false }, { timeZone: "UTC", locale: "en" }), "Sunday, 07");
   assert.equal(formatLocalTime(sent, { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Tokyo" }, { timeZone: "UTC", locale: "en-GB" }), "16:31");
+  // No locale is English, whatever the runtime's language: the text a server prints is the text the reader gets.
+  assert.equal(formatLocalTime(sent, "date", { timeZone: "UTC" }), "Sep 27, 2026");
+  assert.equal(formatLocalTime(sent, "time", { timeZone: "UTC" }), "7:31 AM");
 });
 
 test("an empty or invalid value is no text and no instant", () => {

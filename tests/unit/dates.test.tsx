@@ -25,9 +25,11 @@ test("matchers: a date, a list, before, after, an interval, weekdays and a test"
   assert.equal(matchesDate(day, undefined), false);
 });
 
-test("the week starts where the locale says, Monday when the runtime cannot tell", () => {
+test("the week starts where the locale says, English's Sunday without one, Monday when Intl has no data", () => {
   assert.equal(firstDayOfWeek("en-GB"), 1);
   assert.equal(firstDayOfWeek("en-US"), 0);
+  // No locale is English's week, whatever the runtime's locale is: a server and a browser draw the same grid.
+  assert.equal(firstDayOfWeek(), 0);
   assert.equal(firstDayOfWeek("xx-not-a-locale"), 1);
 });
 

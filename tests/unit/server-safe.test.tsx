@@ -103,6 +103,8 @@ test("avatarInitials and avatarTint give the same answer on the server and in th
   assert.equal(avatarInitials("ada@example.org"), "A");
   assert.equal(avatarInitials("élodie de la tour"), "ÉT");
   assert.equal(avatarInitials("istanbul", "?", "tr"), "İ");
+  // No locale is English: the same initials on a server and in a browser, whatever the runtime's language.
+  assert.equal(avatarInitials("istanbul"), "I");
   assert.equal(avatarInitials("   "), "?");
   assert.equal(avatarInitials("", "–"), "–");
   assert.equal(avatarTint("AL"), 3);
