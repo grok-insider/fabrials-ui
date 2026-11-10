@@ -932,6 +932,9 @@
     font-size: var(--fui-text-xs);
   }
   .fui-message-actions {
+    /* The containing block of what the row hides for a screen reader (a copy's status): without it that 1 px box is placed
+       against the page, outside any scroller the message is in, and lengthens the page by the scroller's hidden height. */
+    position: relative;
     display: flex;
     min-height: 2rem;
     align-items: center;

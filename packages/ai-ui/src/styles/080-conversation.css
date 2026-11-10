@@ -17,6 +17,9 @@
 
   /* The scroller. Its thin bar is a tint of the ink, deeper under the pointer; it never scrolls the page behind it. */
   .fui-conversation-content {
+    /* The log holds what scrolls in it, including what a piece hides for a screen reader: an absolutely placed box inside
+       a scroller that is not its containing block is laid out against the page and is never clipped. */
+    position: relative;
     min-block-size: 0;
     flex: 1 1 auto;
     overflow-x: hidden;
