@@ -1,5 +1,6 @@
 "use client";
 
+import { Children, isValidElement, type ReactNode } from "react";
 import { Select as BaseSelect } from "@base-ui/react/select";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import { classes, type StyledProps } from "./shared";
@@ -18,7 +19,7 @@ export function SelectSeparator({ className, ...props }: StyledProps<BaseSelect.
 
 export function SelectScrollUpButton({ className, ...props }: StyledProps<BaseSelect.ScrollUpArrow.Props>) {
   return (
-    <BaseSelect.ScrollUpArrow className={classes("fui-menu-scroll-arrow", className)} {...props}>
+    <BaseSelect.ScrollUpArrow data-slot="select-scroll-up" className={classes("fui-menu-scroll-arrow", "fui-menu-scroll-arrow-up", className)} {...props}>
       <ChevronUp aria-hidden size={16} />
     </BaseSelect.ScrollUpArrow>
   );
@@ -26,7 +27,7 @@ export function SelectScrollUpButton({ className, ...props }: StyledProps<BaseSe
 
 export function SelectScrollDownButton({ className, ...props }: StyledProps<BaseSelect.ScrollDownArrow.Props>) {
   return (
-    <BaseSelect.ScrollDownArrow className={classes("fui-menu-scroll-arrow", className)} {...props}>
+    <BaseSelect.ScrollDownArrow data-slot="select-scroll-down" className={classes("fui-menu-scroll-arrow", "fui-menu-scroll-arrow-down", className)} {...props}>
       <ChevronDown aria-hidden size={16} />
     </BaseSelect.ScrollDownArrow>
   );
@@ -60,6 +61,16 @@ export function SelectContent({
 }: StyledProps<BaseSelect.Popup.Props> & {
   align?: "start" | "center" | "end";
 }) {
+  // The scroll keys are siblings of the list, never rows of it: Base UI draws them only while the list has more to scroll
+  // and would read them as options otherwise. They are written among the items, as shadcn's users write them.
+  const rows: ReactNode[] = [];
+  const up: ReactNode[] = [];
+  const down: ReactNode[] = [];
+  Children.forEach(children, (child) => {
+    if (isValidElement(child) && child.type === SelectScrollUpButton) up.push(child);
+    else if (isValidElement(child) && child.type === SelectScrollDownButton) down.push(child);
+    else rows.push(child);
+  });
   return (
     <BaseSelect.Portal>
       <BaseSelect.Positioner
@@ -68,8 +79,10 @@ export function SelectContent({
         align={align}
         alignItemWithTrigger={false}
       >
-        <BaseSelect.Popup className={classes("fui-menu", className)} {...props}>
-          <BaseSelect.List>{children}</BaseSelect.List>
+        <BaseSelect.Popup className={classes("fui-menu", "fui-select-popup", className)} data-slot="select-content" {...props}>
+          {up}
+          <BaseSelect.List className="fui-select-list">{rows}</BaseSelect.List>
+          {down}
         </BaseSelect.Popup>
       </BaseSelect.Positioner>
     </BaseSelect.Portal>

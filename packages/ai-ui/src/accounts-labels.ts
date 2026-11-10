@@ -110,6 +110,8 @@ export type ProviderCardLabels = {
   resets: string;
   /** A percentage, in the reader's digits when the host passed a `locale`. */
   percent: (value: number) => string;
+  /** A count and the unit the provider gives it: "42 requests". Empty unit for a bare number. */
+  count: (value: string, suffix: string) => string;
   reset: Partial<ResetInventoryLabels>;
 };
 export const providerCardLabels: ProviderCardLabels = {
@@ -117,6 +119,7 @@ export const providerCardLabels: ProviderCardLabels = {
   noQuota: "No quota reported by this provider.",
   resets: "Resets",
   percent: (value) => `${Math.round(value)}%`,
+  count: (value, suffix) => (suffix ? `${value} ${suffix}` : value),
   reset: {},
 };
 

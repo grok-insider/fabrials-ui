@@ -130,9 +130,9 @@ export function SynchronizedAccounts({
                     <Table>
                       <thead>
                         <tr>
-                          <th>{text.date}</th>
-                          <th>{text.tokens}</th>
-                          <th>{text.estimatedCost}</th>
+                          <th scope="col">{text.date}</th>
+                          <th scope="col">{text.tokens}</th>
+                          <th scope="col">{text.estimatedCost}</th>
                         </tr>
                       </thead>
                       <tbody>

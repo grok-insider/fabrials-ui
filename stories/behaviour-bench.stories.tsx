@@ -111,8 +111,25 @@ type Story = StoryObj<typeof meta>;
 export const HoverCard: Story = {
   name: "Hover card",
   render: () => (
-    <Page description="A source preview that opens on hover and on focus, with a link inside it." title="Hover card">
-      <Block title="A source" description="Keyboard focus opens it as hover does; Escape or moving on closes it.">
+    <Page description="A source preview that opens on hover and on focus: one of short text, one with a link inside it, and one that says nothing to a screen reader." title="Hover card">
+      <Block title="Short text" description="Keyboard focus opens it as hover does; the trigger is described by the few words of the panel.">
+        <Frame width={420}>
+          <p style={{ margin: 0 }}>
+            The notes for{" "}
+            <HoverCardPart>
+              <HoverCardTrigger delay={0} href="#release">
+                Release notes 2.4
+              </HoverCardTrigger>
+              <HoverCardContent aria-label="Preview of the release note">
+                <strong>Release notes 2.4</strong>
+                <p style={{ margin: "0.25rem 0 0" }}>Nine fixes, one new panel. Thursday.</p>
+              </HoverCardContent>
+            </HoverCardPart>{" "}
+            are short this week.
+          </p>
+        </Frame>
+      </Block>
+      <Block title="With a link inside" description="A preview holding a link is a place of its own: it describes nothing, and the trigger's destination carries it.">
         <Frame width={420}>
           <p style={{ margin: 0 }}>
             Read the note on{" "}
@@ -120,7 +137,7 @@ export const HoverCard: Story = {
               <HoverCardTrigger delay={0} href="#cascade">
                 Cascade layers in practice
               </HoverCardTrigger>
-              <HoverCardContent aria-label="Preview of the source">
+              <HoverCardContent aria-label="Preview of the article">
                 <strong>Cascade layers in practice</strong>
                 <p style={{ margin: "0.25rem 0 0" }}>docs.example.org · 6 min read</p>
                 <a href="#cascade-full">Open the article</a>
@@ -130,6 +147,22 @@ export const HoverCard: Story = {
           </p>
           <p style={{ margin: "0.75rem 0 0" }}>
             <button type="button">Next control</button>
+          </p>
+        </Frame>
+      </Block>
+      <Block title="Silent on purpose" description="A product that says it another way passes describe={false}.">
+        <Frame width={420}>
+          <p style={{ margin: 0 }}>
+            Our{" "}
+            <HoverCardPart describe={false}>
+              <HoverCardTrigger delay={0} href="#guide">
+                Writing guide
+              </HoverCardTrigger>
+              <HoverCardContent aria-label="Preview of the guide">
+                <p style={{ margin: 0 }}>Two pages, no jargon.</p>
+              </HoverCardContent>
+            </HoverCardPart>{" "}
+            fits on one screen.
           </p>
         </Frame>
       </Block>

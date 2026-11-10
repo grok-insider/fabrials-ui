@@ -48,6 +48,7 @@ export const esProvider = {
     noQuota: "Este proveedor no informa de cuota.",
     resets: "Se reinicia",
     percent: (value: number) => `${Math.round(value)} %`,
+    count: (value: string, suffix: string) => (suffix ? `${value} ${suffix}` : value),
     reset: esReset,
   } satisfies typeof providerCardLabels;
 

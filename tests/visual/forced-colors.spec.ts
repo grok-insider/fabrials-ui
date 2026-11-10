@@ -311,6 +311,38 @@ for (const scheme of ["light", "dark"] as const) {
       }
     });
 
+    test("a highlighted row of a menu, a context menu, a select and a command list is an outline in Highlight", async ({ page }) => {
+      // The tint behind a row is gone in high contrast: the row the arrows are on keeps a shape, as a row of the combobox does.
+      await open(page, "tests-behaviour--menus", scheme);
+      const system = await palette(page);
+      const ring = { outlineStyle: "solid", outlineWidth: "2px", outlineColor: system.Highlight, outlineOffset: "-2px" };
+      await page.getByRole("button", { name: "View" }).click();
+      const menu = page.getByRole("menu", { name: "View" });
+      await expect(menu).toBeVisible();
+      await menu.press("ArrowDown");
+      expect(await style(page, ".fui-menu-item[data-highlighted]", ["outlineStyle", "outlineWidth", "outlineColor", "outlineOffset"])).toEqual(ring);
+      await page.keyboard.press("Escape");
+      // The context menu is the same row.
+      const box = (await page.getByText("Invoice 2025-0412").boundingBox())!;
+      await page.mouse.click(box.x + 24, box.y + 12, { button: "right" });
+      await page.keyboard.press("ArrowDown");
+      expect(await style(page, ".fui-menu-item[data-highlighted]", ["outlineColor"])).toEqual({ outlineColor: system.Highlight });
+      await page.keyboard.press("Escape");
+      // A select's rows are the same row too.
+      await open(page, "tests-parts--select-parts", scheme);
+      expect(await style(page, ".fui-select-list .fui-menu-item[data-highlighted]", ["outlineColor", "outlineOffset"])).toEqual({
+        outlineColor: system.Highlight,
+        outlineOffset: "-2px",
+      });
+      // And a command list's own active row.
+      await open(page, "tests-parts--commands", scheme);
+      await page.keyboard.press("ArrowDown");
+      expect(await style(page, ".fui-command-item:is([data-selected='true'], [data-active], [aria-selected='true'])", ["outlineColor", "outlineOffset"])).toEqual({
+        outlineColor: system.Highlight,
+        outlineOffset: "-2px",
+      });
+    });
+
     test("a native select gives way to the browser's own arrow", async ({ page }) => {
       await open(page, "tests-enterprise--preferences", scheme);
       expect(await style(page, "select.fui-native-select", ["appearance", "backgroundImage"])).toEqual({ appearance: "auto", backgroundImage: "none" });

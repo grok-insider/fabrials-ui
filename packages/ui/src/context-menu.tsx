@@ -6,6 +6,7 @@
 import type { ComponentProps } from "react";
 import { ContextMenu as BaseContextMenu } from "@base-ui/react/context-menu";
 import { Check, ChevronRight, Dot } from "lucide-react";
+import { useDirection } from "./direction";
 import { classes, type StyledProps } from "./shared";
 
 /** Opens at the pointer on right-click, a long press, the Menu key or Shift+F10. Offer the same actions somewhere visible too. */
@@ -85,7 +86,7 @@ export function ContextMenuSubTrigger({ className, children, ...props }: StyledP
   return (
     <BaseContextMenu.SubmenuTrigger className={classes("fui-menu-item", className)} {...props}>
       {children}
-      <ChevronRight aria-hidden size={16} className="fui-menu-submenu-icon" />
+      <ChevronRight aria-hidden data-direction={useDirection() === "rtl" ? "rtl" : undefined} size={16} className="fui-menu-submenu-icon" />
     </BaseContextMenu.SubmenuTrigger>
   );
 }
@@ -93,7 +94,7 @@ export function ContextMenuSubTrigger({ className, children, ...props }: StyledP
 export function ContextMenuSubContent({ className, sideOffset = 4, ...props }: StyledProps<BaseContextMenu.Popup.Props> & { sideOffset?: number }) {
   return (
     <BaseContextMenu.Portal>
-      <BaseContextMenu.Positioner className="fui-positioner" side="right" align="start" sideOffset={sideOffset}>
+      <BaseContextMenu.Positioner className="fui-positioner" side="inline-end" align="start" sideOffset={sideOffset}>
         <BaseContextMenu.Popup className={classes("fui-menu", className)} {...props} />
       </BaseContextMenu.Positioner>
     </BaseContextMenu.Portal>

@@ -115,8 +115,11 @@ function CommandSeparator({
   className,
   ...props
 }: React.ComponentProps<typeof CommandPrimitive.Separator>) {
+  // cmdk gives the rule role="separator", which a listbox may not own: the divider says nothing the groups either side of
+  // it do not, so it is hidden from assistive technology and axe no longer reads it as a stray child of the listbox.
   return (
     <CommandPrimitive.Separator
+      aria-hidden
       data-slot="command-separator"
       className={cn("fui-command-separator", className)}
       {...props}

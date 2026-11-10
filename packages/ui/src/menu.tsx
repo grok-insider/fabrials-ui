@@ -1,9 +1,11 @@
 "use client";
 
-import type { ComponentProps } from "react";
+import { Children, createContext, isValidElement, useContext, useId, useState, type ComponentProps, type ReactNode } from "react";
 import { Menu as BaseMenu } from "@base-ui/react/menu";
 import { Tooltip as BaseTooltip } from "@base-ui/react/tooltip";
 import { Check, ChevronRight, Dot } from "lucide-react";
+import { useDirection } from "./direction";
+import { controlName, describesControl, panelOf, type Panel } from "./description";
 import { classes, type StyledProps } from "./shared";
 
 export const DropdownMenu = BaseMenu.Root;
@@ -14,10 +16,12 @@ export const DropdownMenuPortal = BaseMenu.Portal;
 export const DropdownMenuSub = BaseMenu.SubmenuRoot;
 
 export function DropdownMenuSubTrigger({ className, children, ...props }: StyledProps<BaseMenu.SubmenuTrigger.Props>) {
+  // The chevron points at the side the submenu opens on: the inline end, which a right-to-left page mirrors. The menu is
+  // portaled out of the page's `dir`, so the direction is taken from Base UI's provider, not from the DOM.
   return (
     <BaseMenu.SubmenuTrigger className={classes("fui-menu-item", className)} {...props}>
       {children}
-      <ChevronRight aria-hidden size={16} className="fui-menu-submenu-icon" />
+      <ChevronRight aria-hidden data-direction={useDirection() === "rtl" ? "rtl" : undefined} size={16} className="fui-menu-submenu-icon" />
     </BaseMenu.SubmenuTrigger>
   );
 }
@@ -31,7 +35,7 @@ export function DropdownMenuSubContent({
   Pick<BaseMenu.Positioner.Props, "sideOffset"> & { keepMounted?: boolean }) {
   return (
     <BaseMenu.Portal keepMounted={keepMounted}>
-      <BaseMenu.Positioner className="fui-positioner" side="right" align="start" sideOffset={sideOffset}>
+      <BaseMenu.Positioner className="fui-positioner" side="inline-end" align="start" sideOffset={sideOffset}>
         <BaseMenu.Popup className={classes("fui-menu", className)} {...props} />
       </BaseMenu.Positioner>
     </BaseMenu.Portal>
@@ -162,8 +166,69 @@ export function DropdownMenuSeparator({
 }
 
 export const TooltipProvider = BaseTooltip.Provider;
-export const Tooltip = BaseTooltip.Root;
-export const TooltipTrigger = BaseTooltip.Trigger;
+
+type TooltipPair = { id: string; open: boolean; panel: Panel | undefined; describe: boolean | undefined };
+
+const TooltipContext = createContext<TooltipPair | null>(null);
+
+/** The panel of a tooltip, read while it is still closed: the pair is written as a root with a trigger and a content. */
+function panelFromChildren(children: ReactNode): Panel | undefined {
+  let panel: Panel | undefined;
+  Children.forEach(children, (child) => {
+    if (panel === undefined && isValidElement(child) && child.type === TooltipContent) {
+      panel = panelOf((child.props as { children?: ReactNode }).children) ?? { text: "", interactive: false };
+    }
+  });
+  return panel;
+}
+
+function tooltipId(reactId: string) {
+  return `fui-tooltip-${reactId.replace(/[^A-Za-z0-9_-]/g, "")}`;
+}
+
+/**
+ * A hint on hover and on keyboard focus. Its popup is a `role="tooltip"` and the trigger is described by it while it is
+ * open, unless the tooltip only repeats the trigger's name (an icon key named by `aria-label`: it would be read twice) or
+ * its words are built by another component. `describe` decides either way.
+ */
+export function Tooltip({
+  describe,
+  children,
+  open,
+  defaultOpen,
+  onOpenChange,
+  ...props
+}: BaseTooltip.Root.Props & { describe?: boolean }) {
+  const [shown, setShown] = useState(Boolean(defaultOpen));
+  const controlled = open !== undefined;
+  const id = tooltipId(useId());
+  const panel = panelFromChildren(typeof children === "function" ? undefined : children);
+  return (
+    <TooltipContext.Provider value={{ id, open: controlled ? Boolean(open) : shown, panel, describe }}>
+      <BaseTooltip.Root
+        open={open}
+        defaultOpen={defaultOpen}
+        onOpenChange={(next, details) => {
+          if (!controlled) setShown(next);
+          onOpenChange?.(next, details);
+        }}
+        {...props}
+      >
+        {children}
+      </BaseTooltip.Root>
+    </TooltipContext.Provider>
+  );
+}
+
+export function TooltipTrigger({ render, ...props }: BaseTooltip.Trigger.Props) {
+  const pair = useContext(TooltipContext);
+  const rendered = isValidElement(render) ? (render.props as Record<string, unknown>) : undefined;
+  const describedBy =
+    pair?.open && describesControl(controlName(rendered, props as Record<string, unknown>), pair.panel, pair.describe)
+      ? [props["aria-describedby"], pair.id].filter(Boolean).join(" ")
+      : props["aria-describedby"];
+  return <BaseTooltip.Trigger render={render} {...props} aria-describedby={describedBy} />;
+}
 
 export function TooltipContent({
   className,
@@ -173,6 +238,7 @@ export function TooltipContent({
   ...props
 }: StyledProps<BaseTooltip.Popup.Props> &
   Pick<BaseTooltip.Positioner.Props, "sideOffset" | "side" | "align">) {
+  const pair = useContext(TooltipContext);
   return (
     <BaseTooltip.Portal>
       <BaseTooltip.Positioner
@@ -183,6 +249,8 @@ export function TooltipContent({
       >
         <BaseTooltip.Popup
           className={classes("fui-tooltip", className)}
+          id={pair?.id}
+          role="tooltip"
           {...props}
         />
       </BaseTooltip.Positioner>

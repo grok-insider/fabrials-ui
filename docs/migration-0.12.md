@@ -925,6 +925,8 @@ The default render is unchanged. Three things a host will see once it uses the n
 
 - A level other than the default now styles the same: the account family's rules address any heading (`:is(h1, h2, h3, h4, h5, h6)`) instead of `h1`, `h2` and `h3`, so a level-three title keeps the card's title size.
 - **A failure says its reason, not "Error: " in front of it.** `ApiKeyForm`, `HostedMigration`, `PrivateHistoryView` and `SynchronizedConsumption` showed `String(error)`, which for a thrown `Error` reads "Error: the provider refused the key". They show the error's own message now. Only the failed state moves; nothing else does.
+- **A count keeps the unit the provider gave it.** A `progress` line with `format: { kind: "count", suffix: "requests" }` printed `42`; it prints `42 requests` now, through `ProviderCardLabels.count`, so a language can put the number and the word in its own order.
+- The three column headers of `SynchronizedAccounts`' daily table carry `scope="col"`, as `ConsumptionView`'s already did, so a screen reader reads a cell with its column.
 - Dead rules went (`.fb-empty`, `.fb-table-scroll`, `.fb-source-selection`), the rules of the family use logical properties only, and a `@media (forced-colors: active)` block gives the hovered migration row an outline and the reset warning the system's own ink. `fb-table-layout` is still written by `ConsumptionView` and styled by nobody: it does nothing.
 
 ### What a product can delete
@@ -1421,3 +1423,29 @@ The sections above name the pieces. This one names what those pieces are made of
 | `EMPTY_ATTACHMENTS` | The state of a composer with no file, for a test or a first render that must not allocate |
 | `ImageViewerControlContext`, `ImageViewerGroupContext`, `ImageViewerOpenContext` | The provider's three contexts, exported for a wrapper that must sit between a provider and its pictures. A product reaches the viewer through `useImageViewer`, `ZoomableImage` and `ImageViewerGroup`; these are what is under them |
 | `providerCardLabels`, `resetInventoryLabels`, `observationStatusLabels`, `balanceCardLabels`, `routingExplanationLabels`, `routingPolicyFormLabels`, `synchronizedAccountsLabels`, `linkedAccountUsageLabels`, `consumptionViewLabels`, `synchronizedConsumptionLabels`, `privateHistoryLabels`, `apiKeyFormLabels`, `apiKeyFieldsLabels`, `hostedMigrationLabels`, `migrationReviewLabels` | The English words of the accounts and usage pieces, one object per component (an inner piece takes its words one level down), exported so a host spreads one and translates it instead of retyping every sentence |
+
+## Fixes found by the new keyboard specs
+
+The keyboard and screen-reader suite of this release (`tests/visual/behaviour-012.spec.ts`) was written against pieces that only had a picture. It found seven things that were wrong, marked them, and they are fixed here. Each paragraph says what a person using a keyboard or a screen reader gets now.
+
+**A preview card is announced while it is text.** `HoverCard`'s trigger now carries `aria-describedby` naming the open panel, so a screen reader hears the few words of a preview instead of nothing. Only while the panel is short text (200 characters) with nothing to operate in it: a preview holding a link is a place of its own, not a description, and its trigger's own destination has to carry the same information (the link inside the panel is reached with the pointer only). `HoverCard` takes `describe` to force either way; the panel is still not a dialog, focus stays on the trigger and Escape closes it.
+
+**A tooltip describes its trigger.** `TooltipContent` is a `role="tooltip"` with an id, and `TooltipTrigger` is described by it while the popup is open — unless the tooltip only repeats the control's name: an icon key is named by its `aria-label` and its tooltip repeats it (with the shortcut's keys, which `aria-keyshortcuts` already says), and describing it would read the name twice. A tooltip built by another component cannot be read from here and is left out rather than guessed at; `Tooltip` takes `describe` to say it either way.
+
+**A submenu opens at the inline end.** `DropdownMenuSubContent` and `ContextMenuSubContent` asked for the physical right; they ask for `inline-end` now, so in a right-to-left page the submenu opens on the left, over the parent menu's inline end, and its chevron turns with it (`.fui-menu-submenu-icon[data-direction="rtl"]`, from Base UI's direction, because a portaled menu is outside the page's `dir`). In a left-to-right page nothing moves.
+
+**A `Select` list longer than its popup scrolls.** The list is the scroller — bounded by the room the popup was given, `max-block-size: calc(var(--available-height, 60vh) - 2 * var(--fui-space-1))` — and `SelectScrollUpButton`/`SelectScrollDownButton` are its siblings inside the popup, where Base UI draws them while there is more to scroll that way. Writing them among the items, as shadcn's examples do, still works: `SelectContent` lifts them out. The arrow keys keep the highlighted row in view, Home and End go to the ends, and typing jumps. `MultiSelect`'s popup scrolled already and is unchanged.
+
+**A suggestion row that scrolls sideways can be reached.** Below 768 px `SuggestionGrid` scrolls sideways; it is a tab stop with a name ("Suggestions"; `label` or `aria-label` renames it) only while it holds more than it shows, and its ring is drawn inside. When everything fits it is not a stop.
+
+**The rule between two groups of a command list is not part of its listbox.** cmdk gives it `role="separator"`, which a listbox may not own; the house wrapper hides it from assistive technology (it says nothing the groups either side do not). The groups and their headings were already right: cmdk puts the heading inside the group it names.
+
+**A highlighted menu row has a shape in forced colors.** A menu, context menu or select row is marked by a tint, which high contrast repaints away; it gets an outline in `Highlight`, as a row of the combobox and of a command list.
+
+**The accounts table names its columns, and a count keeps its unit** (see *Markup changes* above).
+
+### Things to know when coming from shadcn
+
+- **Pass `items` to `Select`.** `SelectValue` shows the raw value unless the root is given `items` (`<Select items={{ northwind: "Northwind" }}>`), which lets it print the label of the chosen row. It is Base UI's API; shadcn's examples pass `items` too.
+- **`AlertDialogAction` does not close the dialog.** It is a plain `Button`, as it is in shadcn's Base UI alert dialog, because Base UI has no action part: a host that waits for an async delete closes the dialog itself when the answer arrives. `ConfirmDialog` and `useConfirm` do exactly that for the common case, and `AlertDialogCancel` is the part that closes by itself.
+- A tooltip that repeats the control's name is silent to a screen reader (see above); one that adds to it describes the control.

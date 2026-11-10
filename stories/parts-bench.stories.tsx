@@ -313,7 +313,7 @@ export const Commands: Story = {
   ),
 };
 
-const archived = ["Delta Works", "Evergreen", "Globex", "Harbour Freight", "Initech", "Juniper", "Kestrel", "Litware", "Octavo", "Proseware", "Quartz"];
+const archived = ["Delta Works", "Evergreen", "Globex", "Harbour Freight", "Initech", "Juniper", "Kestrel", "Litware", "Octavo", "Proseware", "Quartz", "Redwood", "Saffron", "Tessera", "Umbra", "Vantage", "Wavelength", "Xenon", "Yardley", "Zenith", "Ardent", "Basalt", "Cinder", "Driftwood", "Ember", "Fathom", "Granite", "Hollow", "Ironwood", "Jasper", "Keystone", "Lantern", "Meridian", "Nimbus"];
 
 const billingItems = { northwind: "Northwind", contoso: "Contoso", fabrikam: "Fabrikam", ...Object.fromEntries(archived.map((name) => [name.toLowerCase().replace(/\s+/g, "-"), name])) };
 

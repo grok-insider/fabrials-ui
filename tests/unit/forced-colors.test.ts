@@ -55,6 +55,7 @@ test("the block holds exactly the selectors of the four groups", () => {
     ".fui-checkbox[data-indeterminate]",
     ".fui-meter-indicator",
     ".fui-meter-track",
+    ".fui-menu-item[data-highlighted]",
     ".fui-progress-indicator",
     ".fui-progress-ring-fill",
     ".fui-progress-ring-track",

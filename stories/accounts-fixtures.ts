@@ -45,6 +45,15 @@ export const NOUS_PROVIDER: ProviderOutput = {
   lines: [],
 };
 
+export const PROVIDER_WITH_COUNT: ProviderOutput = {
+  providerId: "cursor",
+  displayName: "Cursor",
+  plan: "Pro",
+  lines: [
+    { type: "progress", kind: "quota", label: "Fast requests", used: 42.4, limit: 500, format: { kind: "count", suffix: "requests" } },
+  ],
+};
+
 export const PROVIDER_WITH_ERROR: ProviderOutput = {
   providerId: "codex",
   displayName: "Codex",

@@ -447,7 +447,10 @@ export function ProviderCard({
                     ? dollars(line.used ?? null)
                     : line.format?.kind === "percent"
                       ? text.percent(line.used ?? 0)
-                      : String(Math.round(line.used ?? 0))}
+                      : text.count(
+                          String(Math.round(line.used ?? 0)),
+                          line.format?.kind === "count" ? line.format.suffix : "",
+                        )}
                 </strong>
               </div>
               <Progress

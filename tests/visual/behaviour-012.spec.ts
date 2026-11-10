@@ -38,8 +38,8 @@ test.describe("HoverCard", () => {
   test("opens on keyboard focus as on hover, Escape closes it, it traps nothing and its link is not a dead stop", async ({ page }) => {
     await open(page, id);
     const trigger = page.getByRole("link", { name: "Cascade layers in practice" });
-    const card = page.locator(".fui-hover-card");
-    await page.keyboard.press("Tab");
+    const card = page.locator(".fui-hover-card").filter({ hasText: "Open the article" });
+    await tabUntil(page, trigger);
     await expect(trigger).toBeFocused();
     await expect(card).toBeVisible();
     // It is a preview, not a dialog: nothing behind it becomes inert and focus stays on the trigger.
@@ -60,24 +60,41 @@ test.describe("HoverCard", () => {
   test("a pointer over the trigger opens it and moving off closes it", async ({ page }) => {
     await open(page, id);
     const trigger = page.getByRole("link", { name: "Cascade layers in practice" });
-    const card = page.locator(".fui-hover-card");
+    const card = page.locator(".fui-hover-card").filter({ hasText: "Open the article" });
     const box = (await trigger.boundingBox())!;
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 4 });
     await expect(card).toBeVisible();
-    await page.mouse.move(5, 700, { steps: 6 });
+    await page.mouse.move(5, 5, { steps: 6 });
     await expect(card).toBeHidden();
   });
 
-  test.fixme("the preview is announced: the trigger is described by the panel while it is open", async ({ page }) => {
-    // Today the trigger carries no aria-describedby and the panel no role: a screen reader is never told a preview exists
-    // (Base UI PreviewCard sets tabindex -1 on the panel and no relationship). Expected: aria-describedby on the trigger
-    // naming the open panel, as Tooltip should do too.
+  test("the preview is announced while it is short text, and one with a link is not described", async ({ page }) => {
+    // A preview card is a sighted convenience: Base UI gives its panel tabindex -1 and no role, and a keyboard user cannot
+    // reach the link inside it, so the trigger's own destination must hold the same information. What a screen reader can
+    // be told is the short text of a panel nothing can be done with: the trigger is described by it while it is open.
     await open(page, id);
-    const trigger = page.getByRole("link", { name: "Cascade layers in practice" });
-    await page.keyboard.press("Tab");
-    const describedBy = await trigger.getAttribute("aria-describedby");
+    const short = page.getByRole("link", { name: "Release notes 2.4" });
+    await short.focus();
+    const describedBy = await short.getAttribute("aria-describedby");
     expect(describedBy).not.toBeNull();
-    await expect(page.locator(`#${describedBy}`)).toContainText("Cascade layers in practice");
+    const preview = page.locator(`#${describedBy}`);
+    await expect(preview).toContainText("Nine fixes, one new panel");
+    // It is still a preview, not a dialog or a tooltip.
+    await expect(preview).not.toHaveAttribute("role", "dialog");
+    await expect(preview).not.toHaveAttribute("role", "tooltip");
+    await expect(short).toBeFocused();
+    // The panel with a link in it describes nothing: announcing it would announce a place focus cannot enter.
+    await page.keyboard.press("Escape");
+    const linked = page.getByRole("link", { name: "Cascade layers in practice" });
+    await linked.focus();
+    await expect(page.locator(".fui-hover-card").filter({ hasText: "Open the article" })).toBeVisible();
+    expect(await linked.getAttribute("aria-describedby")).toBeNull();
+    // And `describe={false}` keeps the short one quiet for a product that says it another way.
+    await page.keyboard.press("Escape");
+    const quiet = page.getByRole("link", { name: "Writing guide" });
+    await quiet.focus();
+    await expect(page.locator(".fui-hover-card").filter({ hasText: "Two pages, no jargon" })).toBeVisible();
+    expect(await quiet.getAttribute("aria-describedby")).toBeNull();
   });
 });
 
@@ -252,17 +269,35 @@ test.describe("Tooltip", () => {
     await expect(trigger).toBeFocused();
   });
 
-  test.fixme("the tooltip is tied to its trigger: role=tooltip and aria-describedby", async ({ page }) => {
-    // Today TooltipContent renders a plain div: no role and no id, and the trigger carries no aria-describedby, so a
-    // screen reader never hears the hint. Base UI leaves this to the host; the component owns it.
+  test("a tooltip that adds to the name describes it: role=tooltip and aria-describedby while open", async ({ page }) => {
+    // Base UI leaves the relationship to the host. A tooltip is a description: the trigger names it while the popup is open,
+    // and the popup is a role=tooltip with an id of its own.
     await open(page, id);
-    const key = page.getByRole("button", { name: "Copy the reference" });
-    await page.keyboard.press("Tab");
-    const describedBy = await key.getAttribute("aria-describedby");
+    const named = page.getByRole("button", { name: "Sync now" });
+    await named.focus();
+    const describedBy = await named.getAttribute("aria-describedby");
     expect(describedBy).not.toBeNull();
     const tooltip = page.locator(`#${describedBy}`);
     await expect(tooltip).toHaveAttribute("role", "tooltip");
-    await expect(tooltip).toHaveText("Copy the reference");
+    await expect(tooltip).toHaveText("Fetch new headers only");
+    // The name is its own: the description is not part of it.
+    await expect(named).toHaveAccessibleName("Sync now");
+    await page.keyboard.press("Escape");
+    await expect(named).not.toHaveAttribute("aria-describedby", /.*/);
+  });
+
+  test("a tooltip that only repeats the control's name does not describe it", async ({ page }) => {
+    // An icon key is named by `aria-label` and its tooltip repeats the name (with the shortcut's keys, which say themselves):
+    // describing it would read the name twice. The popup is still a role=tooltip with an id.
+    await open(page, id);
+    const key = page.getByRole("button", { name: "Copy the reference" });
+    await page.keyboard.press("Tab");
+    await expect(key).toBeFocused();
+    const tooltip = page.locator(".fui-tooltip").filter({ hasText: "Copy the reference" });
+    await expect(tooltip).toBeVisible();
+    expect(await key.getAttribute("aria-describedby")).toBeNull();
+    await expect(tooltip).toHaveAttribute("role", "tooltip");
+    expect(await tooltip.getAttribute("id")).not.toBeNull();
   });
 });
 
@@ -429,9 +464,9 @@ test.describe("DropdownMenu and ContextMenu", () => {
     expect(Math.abs(m.y - point.y)).toBeLessThan(20);
   });
 
-  test.fixme("in a right-to-left page the submenu opens at the inline end, on the left", async ({ page }) => {
-    // The submenu's positioner is pinned to the physical "right" (menu.tsx:34 and context-menu.tsx:96), so in a
-    // right-to-left page it opens over the parent menu instead of at the inline end. Keys are mirrored already.
+  test("in a right-to-left page the submenu opens at the inline end, on the left", async ({ page }) => {
+    // The submenu's positioner asks for the logical inline end (menu.tsx, context-menu.tsx), so in a right-to-left page it
+    // opens on the left, over the parent menu's own inline end, and its chevron points that way too.
     await open(page, "tests-behaviour--menus-rtl");
     await page.getByRole("button", { name: "View" }).click();
     const share = page.getByRole("menuitem", { name: "Share" });
@@ -441,6 +476,9 @@ test.describe("DropdownMenu and ContextMenu", () => {
     await expect(submenu).toBeVisible();
     const [t, s] = [(await share.boundingBox())!, (await submenu.boundingBox())!];
     expect(s.x + s.width).toBeLessThanOrEqual(t.x + 1);
+    // The chevron points at the side the submenu opens on: mirrored, and marked with the direction its provider gave it.
+    await expect(share.locator(".fui-menu-submenu-icon")).toHaveAttribute("data-direction", "rtl");
+    expect(await share.locator(".fui-menu-submenu-icon").evaluate((node) => getComputedStyle(node).transform)).toBe("matrix(-1, 0, 0, 1, 0, 0)");
   });
 });
 
@@ -466,14 +504,18 @@ test.describe("AlertDialog", () => {
     await expect(trigger).toBeFocused();
   });
 
-  test.fixme("the destructive action confirms and closes the alert dialog", async ({ page }) => {
-    // AlertDialogAction is a plain Button (dialog.tsx:425), not a close part as in shadcn: pressing Delete leaves the
-    // dialog open with nothing happening. Expected: it closes the dialog after its onClick, as AlertDialogCancel does.
+  test("the destructive action is a plain button: the host closes the dialog, and only Cancel closes by itself", async ({ page }) => {
+    // `AlertDialogAction` is `Button` on purpose, as it is in shadcn's Base UI alert dialog: Base UI has no action part, and
+    // a host that waits for an async delete closes the dialog itself when the answer arrives. `ConfirmDialog` and `useConfirm`
+    // do exactly that. So pressing it runs its `onClick` and leaves the dialog where it is.
     await open(page, id);
     await page.getByRole("button", { name: "Delete workspace" }).click();
     const dialog = page.getByRole("alertdialog");
     await expect(dialog).toBeVisible();
     await page.getByRole("button", { name: "Delete", exact: true }).click();
+    await expect(dialog).toBeVisible();
+    // Cancel is the close part: it leaves without confirming.
+    await page.getByRole("button", { name: "Keep it" }).click();
     await expect(dialog).toBeHidden();
   });
 });
@@ -556,15 +598,60 @@ test.describe("InputGroup and ButtonGroup", () => {
 });
 
 test.describe("Select parts", () => {
-  test.fixme("a long list scrolls inside its popup, between the two scroll keys", async ({ page }) => {
-    // SelectContent puts its children (including SelectScrollUpButton and SelectScrollDownButton) inside Select.List
-    // (select.tsx:63-73) instead of around it, and nothing bounds the list's height, so a long list is clipped by the
-    // popup and the keys never render: the rows past the popup cannot be reached at all.
+  test("a long list scrolls inside its popup, between the two scroll keys", async ({ page }) => {
+    // The list is the scroller, bounded by the space the popup was given, and the keys are its siblings: Base UI draws a key
+    // only while there is more to scroll that way, and the rows past the popup are reachable with the keyboard and the wheel.
     await open(page, "tests-parts--select-parts");
     const list = page.getByRole("listbox");
     await expect(list).toBeVisible();
     expect(await list.evaluate((node) => node.scrollHeight > node.clientHeight + 1)).toBe(true);
-    await expect(page.locator(".fui-menu [data-slot=select-scroll-up], .fui-menu [data-slot=select-scroll-down]")).toHaveCount(2);
+    const up = page.locator(".fui-select-popup [data-slot=select-scroll-up]");
+    const down = page.locator(".fui-select-popup [data-slot=select-scroll-down]");
+    // At the top there is nothing above it.
+    await expect(down).toBeVisible();
+    await expect(up).toHaveCount(0);
+    // The popup is never taller than the window it is in, and the keys are not rows of the list.
+    const [popup, view] = [
+      await page.locator(".fui-select-popup").evaluate((node) => node.getBoundingClientRect().toJSON()),
+      page.viewportSize()!,
+    ];
+    expect(popup.y + popup.height).toBeLessThanOrEqual(view.height);
+    expect(await list.locator("[data-slot=select-scroll-up], [data-slot=select-scroll-down]").count()).toBe(0);
+
+    // The arrows walk the rows and each one is brought into view; End goes to the last, Home back to the first.
+    const highlighted = async () =>
+      list.evaluate((node) => node.querySelector<HTMLElement>("[data-highlighted]")?.textContent?.trim() ?? "");
+    // The chosen row is where the highlight starts: six steps down is the sixth row after it.
+    for (let step = 0; step < 6; step += 1) await page.keyboard.press("ArrowDown");
+    expect(await highlighted()).toBe("Harbour Freight");
+    const inView = async () =>
+      list.evaluate((node) => {
+        const active = node.querySelector<HTMLElement>("[data-highlighted]")!;
+        const box = active.getBoundingClientRect();
+        const frame = node.getBoundingClientRect();
+        return { inside: box.top >= frame.top - 1 && box.bottom <= frame.bottom + 1, scrolled: node.scrollTop };
+      });
+    expect((await inView()).inside).toBe(true);
+    // Walking on, the list scrolls under the highlight and both keys appear.
+    for (let step = 0; step < 14; step += 1) await page.keyboard.press("ArrowDown");
+    const walked = await inView();
+    expect(walked.inside).toBe(true);
+    expect(walked.scrolled).toBeGreaterThan(0);
+    await expect(up).toBeVisible();
+    await expect(down).toBeVisible();
+    await page.keyboard.press("End");
+    expect(await highlighted()).toBe("Nimbus");
+    expect((await inView()).inside).toBe(true);
+    await expect(up).toBeVisible();
+    await expect(down).toHaveCount(0);
+    await page.keyboard.press("Home");
+    expect(await highlighted()).toBe("Northwind");
+    // The group's label above the first row may stay scrolled off; the row itself is in view.
+    expect((await inView()).inside).toBe(true);
+    // Typing jumps to a row and brings it into view too.
+    await page.keyboard.type("prose");
+    expect(await highlighted()).toBe("Proseware");
+    await expect(page.getByRole("option", { name: "Proseware" })).toBeInViewport();
   });
 });
 

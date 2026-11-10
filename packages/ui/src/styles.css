@@ -958,6 +958,12 @@
     margin-inline-start: auto;
     color: var(--muted-foreground);
   }
+  /* The submenu opens at the inline end, so in a right-to-left page its chevron points the other way. The menu is portaled
+     out of the page's `dir`, so the direction arrives as an attribute from Base UI's provider. */
+  .fui-menu-submenu-icon[data-direction="rtl"],
+  .fui-menu-submenu-icon:dir(rtl) {
+    transform: scaleX(-1);
+  }
   .fui-menu-scroll-arrow {
     display: flex;
     align-items: center;
@@ -965,6 +971,30 @@
     height: 1.5rem;
     color: var(--muted-foreground);
     cursor: default;
+  }
+  /* A select's rows scroll inside its box, between its two keys: the box itself stays put, and the keys are drawn over the
+     ends of the list (Base UI positions them absolutely) on the menu's own surface.
+     0.12: before this the popup scrolled and the keys, written among the rows, never rendered. */
+  .fui-menu.fui-select-popup {
+    position: relative;
+    overflow: hidden;
+  }
+  .fui-select-list {
+    max-block-size: calc(var(--available-height, 60vh) - 2 * var(--fui-space-1));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    outline: none;
+  }
+  .fui-select-popup .fui-menu-scroll-arrow {
+    inset-inline: 0;
+    z-index: 1;
+    background: var(--fui-overlay-surface);
+  }
+  .fui-menu-scroll-arrow-up {
+    top: 0;
+  }
+  .fui-menu-scroll-arrow-down {
+    bottom: 0;
   }
   .fui-alert-dialog-media {
     display: inline-flex;
@@ -5296,6 +5326,7 @@
   @media (forced-colors: active) {
     .fui-command-item:is([data-selected="true"], [data-active], [aria-selected="true"]) {
       outline: 2px solid Highlight;
+      outline-offset: -2px;
     }
   }
   .fui-command-item[data-disabled="true"] {
@@ -6981,6 +7012,12 @@
     min-width: 0;
     scroll-snap-align: start;
   }
+  /* On a phone the row scrolls sideways and takes focus to be scrolled: its ring is drawn inside, where the row's own clip
+     cannot cut it off. It is a tab stop only while it overflows (see `useOverflowTabStop`). */
+  .fui-suggestion-grid:focus-visible {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: -2px;
+  }
   @media (min-width: 768px) {
     .fui-suggestion-grid {
       display: grid;
@@ -7460,6 +7497,12 @@
     }
     .fui-progress-ring-fill {
       stroke: Highlight;
+    }
+    /* A row of a menu, a context menu or a select is marked by a tint that is gone: an outline in Highlight, as a row of the
+       combobox and of a command list. */
+    .fui-menu-item[data-highlighted] {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
     }
     /* The thumb is a fill: CanvasText when off (a dot at the start), HighlightText on a Highlight track when on. */
     .fui-switch-thumb {

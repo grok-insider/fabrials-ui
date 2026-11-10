@@ -20,11 +20,7 @@ const stories: Story[] = [
   { id: "patterns-generic--truncated-rows", slug: "patterns-truncated-rows" },
   { id: "patterns-generic--settings-sections", slug: "patterns-settings-sections" },
   { id: "patterns-generic--filter-chips", slug: "patterns-filter-chips" },
-  {
-    id: "patterns-generic--suggestion-cards",
-    slug: "patterns-suggestion-cards",
-    axeDebt: { reason: "scrollable-region-focusable: the row scrolls sideways below 768 px and is not a tab stop", widths: [390] },
-  },
+  { id: "patterns-generic--suggestion-cards", slug: "patterns-suggestion-cards" },
   { id: "patterns-generic--shimmer", slug: "patterns-shimmer" },
   { id: "patterns-generic--recency-groups", slug: "patterns-recency-groups" },
   { id: "patterns-generic--recency-groups-empty", slug: "patterns-recency-groups-empty" },
@@ -34,11 +30,7 @@ const stories: Story[] = [
   { id: "foundations-motion--vocabulary", slug: "motion-vocabulary" },
   { id: "tests-parts--display", slug: "parts-display" },
   { id: "tests-parts--table-and-item", slug: "parts-table-and-item" },
-  {
-    id: "tests-parts--commands",
-    slug: "parts-commands",
-    axeDebt: { reason: "aria-required-children: the separator and the group headings sit inside cmdk's listbox" },
-  },
+  { id: "tests-parts--commands", slug: "parts-commands" },
   { id: "tests-parts--select-parts", slug: "parts-select", ready: "[role=listbox]" },
   { id: "tests-parts--sidebar-parts", slug: "parts-sidebar" },
   { id: "tests-parts--avatar-and-calendar", slug: "parts-avatar-and-calendar" },
@@ -87,11 +79,9 @@ for (const theme of ["light", "dark"]) {
   }
 }
 
-// Two stories have a rule they cannot pass today. They keep their six pictures (the parts exist and are looked at) and
-// the rule is written down here rather than switched off, so the debt is in the suite and in the report:
-//  - the command list puts a separator and group headings inside cmdk's listbox, which axe reads as a listbox whose
-//    children are neither options nor groups;
-//  - the suggestion row scrolls sideways below 768 px without being a tab stop, so a keyboard user cannot scroll it.
+// A story that cannot pass a rule today keeps its six pictures (the parts exist and are looked at) and the rule is written
+// down here rather than switched off, so the debt stays in the suite and in the report. Nothing is owed now; the loop is
+// kept so the next debt is written down the same way.
 for (const story of stories.filter((entry) => entry.axeDebt)) {
   for (const theme of ["light", "dark"]) {
     for (const width of story.axeDebt!.widths ?? [390, 768, 1440]) {
