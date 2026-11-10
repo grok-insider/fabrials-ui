@@ -1386,7 +1386,7 @@ A sent message edited where it stands, in the bubble it replaces.
 
 | Prop | What it does |
 | --- | --- |
-| `date` | `Date | string | number`. Rendered in the reader's zone and locale; until the page has hydrated, a hidden stand-in of the same shape, so nothing moves and the server's zone is never shown. It wins over `dateTime` and `label`. |
+| `date` | A `Date`, a string or a number of milliseconds. Rendered in the reader's zone and locale; until the page has hydrated, a hidden stand-in of the same shape, so nothing moves and the server's zone is never shown. It wins over `dateTime` and `label`. |
 | `locale`, `timeZone` | The reader's language (the provider's, else the browser's), and a zone the host fixes for a screenshot, a transcript or an export. A fixed zone is rendered at once, hidden by nothing. |
 | `format` | `"message"` (default: "09:31" today, "Sep 26, 09:31" another day), `"time"` or `"dateTime"`. The tooltip is always the whole date and time. |
 
