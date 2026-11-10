@@ -65,6 +65,7 @@ nix run nixpkgs#gitleaks -- git --config .gitleaks.toml .   # before making hist
 Bun 1.4.4 manages dependencies with the frozen `bun.lock`; Node 26 builds and serves Next.js. The site deploys through Coolify from `Dockerfile.site` with the repository root as the build context; secrets live only in Coolify.
 
 - `STORYBOOK_PORT` picks the Storybook the visual suite starts or reuses (default 6041). Two worktrees need two ports; the suite trusts whatever answers on its port.
+- Storybook reads `@fabrials/ui/fonts.css` from `packages/ui/dist`. In a fresh worktree run `bun run build` (or `bun run check`) before the visual suite, or every test fails with "Failed to load the Storybook preview file".
 - The visual suite and the skeleton suite both write `test-results`: never run them at the same time in one checkout.
 - A reference changes only on purpose: regenerate with `--update-snapshots` for the spec you changed, look at the new picture, and say in the commit why it changed.
 - CI type-checks before it builds. A stale `dist` hides a missing path in `tsconfig.json`, so before a release run `bun install --frozen-lockfile && bun run check` in a clean worktree.
