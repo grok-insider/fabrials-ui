@@ -61,7 +61,7 @@ test("plates have 12 px corners and rest on the plate elevation, which only the 
     assert.match(block, /border-radius: var\(--fui-radius-plate\)/, selector);
     assert.doesNotMatch(block, /box-shadow/, selector);
   }
-  const material = styles.slice(styles.indexOf("/* 0.10 material."));
+  const material = styles.slice(styles.indexOf("/*! 0.10 material."));
   assert.match(material, /\.fui-card,\n  \.fui-stat,\n  \.fui-stat-group,\n  \.fui-table-scroll,\n  \.fui-code-panel \{\n    box-shadow: var\(--fui-shadow-xs\), var\(--fui-highlight\);/);
   assert.match(tokens, /--fui-radius-plate: 0\.75rem;/);
   assert.match(tokens, /--fui-font-label: var\(--fui-font-mono\);/);
@@ -122,7 +122,7 @@ test("data-theme=system carries exactly the dark tokens under prefers-color-sche
 });
 
 test("material: gradients exist only as the sheen tokens, and every theme defines the recipes", () => {
-  const material = styles.slice(styles.indexOf("/* 0.10 material."), styles.indexOf('/* 0.11 "Instrument with life"'));
+  const material = styles.slice(styles.indexOf("/*! 0.10 material."), styles.indexOf('/* 0.11 "Instrument with life"'));
   assert.doesNotMatch(material.replace(/var\(--fui-sheen(-soft)?\)/g, ""), /gradient\(/);
   for (const token of ["--fui-shadow-well", "--fui-bevel", "--fui-sheen", "--fui-sheen-soft", "--fui-pressed"]) {
     assert.ok((tokens.match(new RegExp(`${token}:`, "g")) ?? []).length >= 3, token);

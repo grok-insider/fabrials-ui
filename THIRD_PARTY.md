@@ -20,6 +20,6 @@ Fabrials UI is MIT licensed (see `LICENSE`). It includes material from these pro
 | Spectrum UI number ticker | Apache-2.0 | `packages/ui/src/number-ticker.tsx` |
 | Vercel AI Elements (message, prompt input, code block, reasoning, sources, attachments, suggestion, shimmer) | Apache-2.0 | `packages/ai-ui`, `packages/ui` (see `docs/provenance.md`) |
 | Lucide icon paths | ISC | `packages/ai-ui/src/chat-icons.tsx` |
-| Radix Themes depth recipes (shadows, bevel, sheen, wells), Copyright (c) 2023 WorkOS | MIT | `packages/ui/src/tokens.css`, `packages/ui/src/styles.css` (0.10 material) |
+| Radix Themes depth recipes (shadows, bevel, sheen, wells), Copyright (c) 2023 WorkOS | MIT | `packages/ui/src/tokens.css`, `packages/ui/src/styles/070-material.css` (0.10 material) |
 
 The language marks are trademarks of their owners, shown only to say which language a code sample is in. Logos shared only share-alike or non-commercially (Ruby, PHP, Zig, R, Vue, Sass) are not included.

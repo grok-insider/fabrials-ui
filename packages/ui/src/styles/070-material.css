@@ -1,4 +1,4 @@
-/* 0.10 material. The components were flat; depth now comes from a few shared recipes (tokens.css): layered elevation, a bevel
+/*! 0.10 material. The components were flat; depth now comes from a few shared recipes (tokens.css): layered elevation, a bevel
    and a sheen on solid fills, sunken fields and wells, raised thumbs and indicators. Recipes adapted from Radix Themes
    (https://github.com/radix-ui/themes, MIT, Copyright (c) 2023 WorkOS); the enter motion follows Base UI's popup examples
    (MIT). Only these tokens may paint a gradient: a sheen inside a control, never a glow, never decoration. */

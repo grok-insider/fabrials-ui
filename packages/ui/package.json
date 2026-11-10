@@ -41,6 +41,7 @@
     },
     "./tokens.css": "./dist/tokens.css",
     "./styles.css": "./dist/styles.css",
+    "./styles.readable.css": "./dist/styles.readable.css",
     "./fonts.css": "./dist/fonts.css",
     "./tailwind.css": "./dist/tailwind.css",
     "./layers.css": "./dist/layers.css",

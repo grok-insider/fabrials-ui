@@ -1,4 +1,5 @@
 import { build } from "vite";
+import { transform } from "lightningcss";
 import { cp, mkdir, readdir, copyFile, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -28,6 +29,19 @@ export async function stylesheet(directory) {
     order.map((file) => readFile(resolve(parts, file), "utf8")),
   );
   return texts.join("");
+}
+
+/**
+ * The same sheet with the whitespace and the comments gone, ready to ship. No targets
+ * are set, so nothing is lowered or prefixed: oklch, colour-mix, nesting, @layer,
+ * @property and logical properties stay exactly as written, and no rule moves.
+ */
+export function minifyStyles(css, filename) {
+  // The minifier drops every comment, so the notices a licence requires beside adapted
+  // code (written `/*! … *\/` in the parts) are put back at the top of the sheet.
+  const notices = css.match(/\/\*![\s\S]*?\*\//g) ?? [];
+  const body = transform({ filename, code: Buffer.from(css), minify: true }).code.toString();
+  return notices.length ? `${notices.join("")}${body}` : body;
 }
 
 /** Bundles one package's modules into `outDir` (relative to the package), one file per source module. */
@@ -117,9 +131,13 @@ async function distribute(name) {
         resolve(directory, staging, file),
       );
   }
+  // What ships is one sheet, minified; the same bytes unminified sit beside it for
+  // whoever reads a rule in a browser's inspector and wants it readable.
+  const styles = await stylesheet(directory);
+  await writeFile(resolve(directory, staging, "styles.readable.css"), styles);
   await writeFile(
     resolve(directory, staging, "styles.css"),
-    await stylesheet(directory),
+    minifyStyles(styles, `${name}/styles.css`),
   );
   if (name === "ui") {
     await mkdir(resolve(directory, staging, "fonts"), { recursive: true });

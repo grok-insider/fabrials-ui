@@ -24,6 +24,7 @@
       "import": "./dist/markdown.js"
     },
     "./styles.css": "./dist/styles.css",
+    "./styles.readable.css": "./dist/styles.readable.css",
     "./package.json": "./package.json"
   },
   "files": [

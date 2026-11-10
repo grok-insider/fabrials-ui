@@ -14,7 +14,16 @@ const baseUiEntries = Object.keys((JSON.parse(readFileSync(baseUi, "utf8")) as {
   .map((key) => `@base-ui/react/${key.slice(2)}`);
 
 // Stories read the packages' sources, not their builds: a change shows at once, and the props tables and controls are read
-// from the TypeScript types and their comments. The fonts stay on the build, which carries the font files.
+// from the TypeScript types and their comments. The fonts stay on the build, which carries the font files. With
+// FUI_STYLES=dist the two stylesheets come from the build instead, so the visual suite photographs the minified files a
+// product gets; it is also how the parts behind `src/styles.css` (its @imports) are proven to render the same.
+const shipped = process.env.FUI_STYLES === "dist";
+const stylesheets = shipped
+  ? [
+      { find: /^@fabrials\/ui\/styles\.css$/, replacement: resolve(root, "packages/ui/dist/styles.css") },
+      { find: /^@fabrials\/ai-ui\/styles\.css$/, replacement: resolve(root, "packages/ai-ui/dist/styles.css") },
+    ]
+  : [];
 const sources = [
   { find: /^@fabrials\/ui$/, replacement: resolve(root, "packages/ui/src/index.ts") },
   { find: /^@fabrials\/ui\/dither$/, replacement: resolve(root, "packages/ui/src/dither.ts") },
@@ -22,10 +31,11 @@ const sources = [
   { find: /^@fabrials\/ui\/spreadsheet$/, replacement: resolve(root, "packages/ui/src/spreadsheet-read.ts") },
   { find: /^@fabrials\/ui\/export$/, replacement: resolve(root, "packages/ui/src/export.ts") },
   { find: /^@fabrials\/ui\/button-variants$/, replacement: resolve(root, "packages/ui/src/button-variants.ts") },
-  { find: /^@fabrials\/ui\/(tokens|styles|layers)\.css$/, replacement: resolve(root, "packages/ui/src/$1.css") },
+  ...stylesheets,
+  { find: /^@fabrials\/ui\/(tokens|layers)\.css$/, replacement: resolve(root, "packages/ui/src/$1.css") },
   { find: /^@fabrials\/ai-ui$/, replacement: resolve(root, "packages/ai-ui/src/index.tsx") },
   { find: /^@fabrials\/ai-ui\/markdown$/, replacement: resolve(root, "packages/ai-ui/src/markdown.ts") },
-  { find: /^@fabrials\/ai-ui\/styles\.css$/, replacement: resolve(root, "packages/ai-ui/src/styles.css") },
+  ...(shipped ? [] : [{ find: /^@fabrials\/ai-ui\/styles\.css$/, replacement: resolve(root, "packages/ai-ui/src/styles.css") }]),
 ];
 
 const config: StorybookConfig = {

@@ -1517,3 +1517,31 @@ const { status, copy } = useCopy({ resetAfter: 1600, onCopied: (text) => toast(`
 - **`MoonPhase` and the media player keep their own `change` listeners** (they redraw imperatively in an effect); they only share `REDUCED_MOTION_QUERY` now.
 - **`tone` beside a status `variant`**: `Alert` already has both, and no other non-button piece names a status through `variant` or `intent` (`ConfirmDialog` and `useConfirm` keep `destructive`, a boolean, which is not a status name). Nothing to change.
 - **`formatBytes`** in `@fabrials/ai-ui` was already the deprecated wrapper over the generic one.
+
+## The stylesheets: parts at source, minified in the package
+
+Nothing a product imports changes. `@fabrials/ui/styles.css` and `@fabrials/ai-ui/styles.css` hold the same rules, in the same order, in the same layer. They are smaller: the spaces and the comments are gone.
+
+| Sheet | before | after | gzip before | gzip after |
+| --- | --- | --- | --- | --- |
+| `@fabrials/ui/styles.css` | 411,470 B | 279,055 B | 74,199 B | 44,164 B |
+| `@fabrials/ai-ui/styles.css` | 133,179 B | 94,507 B | 22,548 B | 15,187 B |
+
+### In the repository
+
+- Each sheet is a folder of parts and an order: `packages/ui/src/styles/` with `order.json`, `packages/ai-ui/src/styles/` with `order.json`. A part is one top-level statement of the old file (a layer block, an at-rule, a run of unlayered rules) with the comment that introduces it, and it is balanced on its own.
+- New styles go in a new part at the end of the order. Appending to a file nobody else is editing no longer collides with another package's block.
+- `src/styles.css` stays, as the development entry point: it only imports the parts, in order, so Storybook and a dev server serve exactly what ships.
+- The build joins the parts. `dist/styles.css` is that text minified; `dist/styles.readable.css` is the same text as it was written, comments and all.
+
+### What a product can use
+
+- `@fabrials/ui/styles.readable.css` and `@fabrials/ai-ui/styles.readable.css` are new subpaths. A host that read a rule in `dist/styles.css` — a comment naming a section, a `/* 0.12: sound */` marker — reads the readable copy now; the minified sheet carries no comments except the licence notices.
+- A vendored copy ships both files. Nothing else to do.
+
+### What to know
+
+- The minifier is `lightningcss` with no browser targets, as a dev tool of the build (not a dependency of the packages): nothing is lowered or prefixed. `@layer`, `@property`, `oklch()`, `color-mix()`, `:has()`, `:dir()`, logical properties and container queries stay as written, and a rule never moves across another.
+- It does rewrite spellings that mean the same: `0.5rem` → `.5rem`, `transparent` → `#0000`, `oklch(1 0 0 / 12%)` → `oklch(100% 0 0/.12)`, `translateX(1rem)` → `translate(1rem)`, and a width query to range form (`(max-width: 47.99rem)` → `(width<=47.99rem)`, `(min-width: 40rem)` → `(width>=40rem)`). All of it is inside the browser baseline `DESIGN.md` states: Chrome 120, Safari 16.4, Firefox 128.
+- The notices a licence requires beside adapted code are written `/*! … */` in the parts (the Radix Themes recipes, in `070-material.css`) and the build puts them back at the top of the minified sheet.
+- The whole visual suite runs against the minified sheets as well as against the parts (`FUI_STYLES=dist`), with no reference changed: the two render the same.
