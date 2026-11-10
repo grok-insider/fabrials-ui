@@ -19,7 +19,15 @@ import {
 
 const styles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
 // The block this package appends, so a rule of 0.10 with the same selector is not the one read.
-const own = styles.slice(styles.indexOf("/* 0.12: the viewer and the gallery."));
+const ownAt = styles.indexOf("/* 0.12: the viewer and the gallery.");
+const own = styles.slice(ownAt, (() => {
+  let depth = 0;
+  for (let at = styles.indexOf("{", ownAt); at < styles.length; at += 1) {
+    if (styles[at] === "{") depth += 1;
+    if (styles[at] === "}" && --depth === 0) return at + 1;
+  }
+  return styles.length;
+})());
 const rule = (selector: string) => {
   const at = own.indexOf(selector);
   assert.ok(at >= 0, `missing rule ${selector}`);
