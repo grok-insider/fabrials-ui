@@ -14,10 +14,12 @@ export type ButtonSize =
   | "xs"
   | "sm"
   | "lg"
+  | "touch"
   | "icon"
   | "icon-xs"
   | "icon-sm"
-  | "icon-lg";
+  | "icon-lg"
+  | "icon-touch";
 
 export type ButtonStyleProps = {
   variant?: ButtonVariant;

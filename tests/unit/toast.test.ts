@@ -13,7 +13,7 @@ test("shared toast keeps success, error and neutral distinct without gem color",
   assert.match(toastCss, /\[data-type="error"\]/);
   assert.match(toastCss, /--fui-success-ink/);
   assert.match(toastCss, /--fui-danger-ink/);
-  assert.match(toastCss, /--popover/);
+  assert.match(toastCss, /background: var\(--fui-toast-surface, var\(--fui-overlay-surface\)\);/);
   assert.doesNotMatch(toastCss, /var\(--gem\)/);
   assert.match(source, /expand=\{expand \?\? false\}/);
   assert.match(source, /closeButton=\{closeButton \?\? false\}/);

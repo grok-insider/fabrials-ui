@@ -15,6 +15,8 @@ export type ButtonProps = StyledProps<BaseButton.Props> &
   ButtonStyleProps & {
     /** Keeps the label, adds a spinner and blocks repeated activation. */
     loading?: boolean;
+    /** What the button says while `loading` ("Saving"), in place of its children. The width follows the text. */
+    loadingLabel?: ReactNode;
   };
 
 export function Button({
@@ -22,6 +24,7 @@ export function Button({
   variant = "default",
   size = "default",
   loading = false,
+  loadingLabel,
   disabled,
   focusableWhenDisabled,
   children,
@@ -42,7 +45,7 @@ export function Button({
       {loading ? (
         <PixelSpinner aria-hidden className="fui-button-spinner" />
       ) : null}
-      {children}
+      {loading && loadingLabel != null ? loadingLabel : children}
     </BaseButton>
   );
 }

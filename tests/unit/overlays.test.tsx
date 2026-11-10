@@ -182,7 +182,7 @@ test("the command dialog follows DESIGN.md: 6 px, overlay shadow and highlight, 
   assert.match(dialog, /--fui-command-top: min\(14dvh, 9rem\)/);
   assert.match(dialog, /max-height: calc\(100dvh - var\(--fui-command-top\) - 1\.5rem\)/);
   assert.match(dialog, /border-radius: var\(--fui-radius-lg\)/);
-  assert.match(dialog, /box-shadow: var\(--fui-shadow-overlay\), var\(--fui-highlight\)/);
+  assert.match(dialog, /box-shadow: var\(--fui-dialog-shadow, var\(--fui-shadow-overlay\), var\(--fui-highlight\)\);/);
   assert.match(rule('.fui-dialog.fui-command-dialog[data-placement="center"] {'), /top: var\(--fui-command-top\)/);
 });
 

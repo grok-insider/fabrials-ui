@@ -13,7 +13,7 @@ const meta = {
   tags: ["autodocs"],
   parameters: { docs: { description: { component: description } } },
   args: { label: "Search", variant: "ghost", size: "icon-lg", children: <Search aria-hidden /> },
-  argTypes: { variant: { control: "select", options: ["ghost", "outline", "secondary", "default", "destructive"] }, size: { control: "inline-radio", options: ["icon-xs", "icon-sm", "icon", "icon-lg"] }, children: { control: false } },
+  argTypes: { variant: { control: "select", options: ["ghost", "outline", "secondary", "default", "destructive"] }, size: { control: "inline-radio", options: ["icon-xs", "icon-sm", "icon", "icon-lg", "touch"] }, children: { control: false } },
 } satisfies Meta<typeof IconButton>;
 
 export default meta;

@@ -1,0 +1,10 @@
+/*
+ * The order of the cascade layers, for a host that uses Tailwind CSS v4. Import it first, before Tailwind and before the
+ * Fabrials styles, so the first mention of each layer fixes the order whatever the bundler does with the imports:
+ *   @import "@fabrials/ui/layers.css";
+ *   @import "tailwindcss";
+ *   @import "@fabrials/ui/tokens.css";
+ *   @import "@fabrials/ui/styles.css";
+ * styles.css lives in `components`: above Tailwind's preflight (`base`), below its utilities.
+ */
+@layer theme, base, components, utilities;

@@ -234,11 +234,13 @@ const stateIcons = {
   success: CheckCircle2,
 };
 
-export type StatePanelProps = Omit<ComponentProps<"div">, "title" | "children"> & {
+export type StatePanelProps = Omit<ComponentProps<"div">, "title"> & {
   state: keyof typeof stateIcons;
   title: ReactNode;
   description?: ReactNode;
   actions?: ReactNode;
+  /** More under the description and before the actions: suggestions as chips, a short list, a field (0.12). */
+  children?: ReactNode;
   headingLevel?: 2 | 3 | 4;
   icon?: ReactNode;
   align?: "start" | "center";
@@ -262,6 +264,7 @@ export function StatePanel({
   size = "md",
   variant = "panel",
   fill = false,
+  children,
   ...props
 }: StatePanelProps) {
   const Icon = stateIcons[state];
@@ -292,6 +295,7 @@ export function StatePanel({
       <div className="fui-state-text">
         <Heading>{title}</Heading>
         {description && <p className="fui-description">{description}</p>}
+        {children != null && children !== false ? <div className="fui-state-content">{children}</div> : null}
       </div>
       {actions && <div className="fui-actions">{actions}</div>}
     </div>

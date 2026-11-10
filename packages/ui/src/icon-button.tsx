@@ -12,7 +12,7 @@ export type { ControlShortcut } from "./icon-tooltip";
 
 export type IconButtonSize = "icon" | "icon-xs" | "icon-sm" | "icon-lg";
 
-export type IconButtonProps = Omit<ButtonProps, "aria-label" | "title" | "size" | "variant"> & {
+export type IconButtonProps = Omit<ButtonProps, "aria-label" | "title" | "size" | "variant" | "loadingLabel"> & {
   /** The control's name: `aria-label`, or a visually hidden text node with `textName`. Required: an icon is not a name. */
   label: string;
   /** A tooltip repeats the name for sighted people (default), `false` leaves it out, a node replaces its text. */
@@ -22,7 +22,8 @@ export type IconButtonProps = Omit<ButtonProps, "aria-label" | "title" | "size" 
   /** The name is a text node inside the button (for toolbars whose tests, voice control or find-in-page read
    * `textContent`) instead of `aria-label`. It is visually hidden. */
   textName?: boolean;
-  size?: IconButtonSize;
+  /** `touch` is 44 px on every pointer and in every density, whatever the control tokens say. */
+  size?: IconButtonSize | "touch";
   variant?: ButtonProps["variant"];
 };
 
@@ -49,7 +50,7 @@ export function IconButton({
       aria-keyshortcuts={keyShortcutsValue(shortcut)}
       {...props}
       variant={variant}
-      size={size}
+      size={size === "touch" ? "icon-touch" : size}
       loading={loading}
       aria-label={textName ? undefined : label}
     >

@@ -25,7 +25,6 @@ test("generic source only depends on presentation libraries and local modules", 
           "react",
           "react-dom", // a declared peer: DialogActions portals into the dialog footer
           "lucide-react",
-          "class-variance-authority",
           "cmdk",
           "embla-carousel-react",
           "motion/react",

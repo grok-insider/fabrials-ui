@@ -99,7 +99,6 @@
       "version": "0.11.0",
       "dependencies": {
         "@base-ui/react": "1.9.0",
-        "class-variance-authority": "0.7.1",
         "cmdk": "1.1.1",
         "embla-carousel-react": "8.6.0",
         "lucide-react": "1.68.0",

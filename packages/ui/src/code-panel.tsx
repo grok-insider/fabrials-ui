@@ -1,11 +1,22 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore, type ComponentProps, type ReactNode } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type ComponentProps, type ReactNode } from "react";
 import { Tabs as BaseTabs } from "@base-ui/react/tabs";
 import { LanguageIcon } from "./language-icon";
 import { CopyButton } from "./snippet";
 import { classes } from "./shared";
 import { highlightCode, packageCommand, PACKAGE_MANAGERS, type PackageManager } from "./syntax";
+import { useOverflowTabStop } from "./use-overflow";
+
+/** The scrolling body of a code sample: a tab stop only while a line or the sample is longer than the box. */
+function CodeBody({ children }: { children: ReactNode }) {
+  const body = useRef<HTMLPreElement | null>(null);
+  return (
+    <pre ref={body} className="fui-code-panel-body" tabIndex={useOverflowTabStop(body)}>
+      {children}
+    </pre>
+  );
+}
 
 /** Copy with a spoken result: "Copied", or how to copy by hand when the clipboard refuses. */
 function useCopyStatus() {
@@ -148,7 +159,7 @@ export function CodePanel({
           <CopyButton value={copy} label="Copy code" onCopy={copied.onCopy} onCopyError={copied.onCopyError} />
         </figcaption>
       )}
-      <pre className="fui-code-panel-body" tabIndex={0}>
+      <CodeBody>
         {children ?? (
           <CodeLines
             code={code}
@@ -159,7 +170,7 @@ export function CodePanel({
             highlightWords={highlightWords}
           />
         )}
-      </pre>
+      </CodeBody>
       {bare ? (
         <CopyButton value={copy} label="Copy code" className="fui-code-panel-float" onCopy={copied.onCopy} onCopyError={copied.onCopyError} />
       ) : null}
@@ -229,7 +240,7 @@ export function CodeTabs({
       </div>
       {items.map(({ value: tab, label: _label, code, language, lineNumbers, highlightLines, addedLines, removedLines, highlightWords, children }) => (
         <BaseTabs.Panel key={tab} value={tab} className="fui-code-tabs-panel" data-line-numbers={lineNumbers || undefined}>
-          <pre className="fui-code-panel-body" tabIndex={0}>
+          <CodeBody>
             {children ?? (
               <CodeLines
                 code={code}
@@ -240,7 +251,7 @@ export function CodeTabs({
                 highlightWords={highlightWords}
               />
             )}
-          </pre>
+          </CodeBody>
         </BaseTabs.Panel>
       ))}
       <CopyStatus status={copied.status} />

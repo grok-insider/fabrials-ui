@@ -12,7 +12,7 @@ const meta = {
   tags: ["autodocs"],
   parameters: { docs: { description: { component: description } } },
   args: { children: "Save changes", variant: "default", size: "default", loading: false, disabled: false },
-  argTypes: { variant: { control: "select", options: ["default", "accent", "outline", "secondary", "ghost", "destructive", "link"] }, size: { control: "inline-radio", options: ["xs", "sm", "default", "lg"] }, render: { control: false } },
+  argTypes: { variant: { control: "select", options: ["default", "accent", "outline", "secondary", "ghost", "destructive", "link"] }, size: { control: "inline-radio", options: ["xs", "sm", "default", "lg", "touch"] }, render: { control: false } },
 } satisfies Meta<typeof Button>;
 
 export default meta;

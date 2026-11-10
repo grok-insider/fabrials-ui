@@ -874,11 +874,12 @@
     overflow-y: auto;
     overscroll-behavior: contain;
     padding: var(--fui-space-1);
-    border: 1px solid var(--border);
+    border: 1px solid var(--fui-overlay-border);
     border-radius: var(--fui-radius-lg);
-    background: var(--popover);
+    background: var(--fui-overlay-surface);
     color: var(--popover-foreground);
-    box-shadow: var(--fui-shadow-md), var(--fui-highlight);
+    box-shadow: var(--fui-overlay-shadow);
+    backdrop-filter: var(--fui-overlay-filter);
     outline: none;
     transform-origin: var(--transform-origin);
     transition:
@@ -1366,16 +1367,22 @@
     width: 18rem;
     max-width: calc(100vw - 2rem);
     padding: var(--fui-space-3);
-    border: 1px solid var(--border);
+    border: 1px solid var(--fui-overlay-border);
     border-radius: var(--fui-radius-lg);
-    background: var(--popover);
+    background: var(--fui-overlay-surface);
     color: var(--popover-foreground);
-    box-shadow: var(--fui-shadow-md), var(--fui-highlight);
+    box-shadow: var(--fui-overlay-shadow);
+    backdrop-filter: var(--fui-overlay-filter);
     outline: none;
     transform-origin: var(--transform-origin);
     transition:
       opacity var(--fui-duration) var(--fui-ease),
       transform var(--fui-duration) var(--fui-ease);
+    /* 0.12: never taller than the room its positioner measured (Base UI's --available-height); the rest scrolls inside. With
+       no positioner the variable is missing and there is no limit. */
+    max-block-size: var(--available-height);
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
   .fui-hover-card {
     width: 16rem;
@@ -1574,11 +1581,12 @@
     overflow-y: auto;
     overscroll-behavior: contain;
     padding: var(--fui-space-6);
-    border: 1px solid var(--border);
+    border: 1px solid var(--fui-dialog-border, var(--fui-overlay-border));
     border-radius: var(--fui-radius-2xl);
-    background: var(--popover);
+    background: var(--fui-dialog-surface, var(--fui-overlay-surface));
     color: var(--popover-foreground);
-    box-shadow: var(--fui-shadow-lg), var(--fui-highlight);
+    box-shadow: var(--fui-dialog-shadow, var(--fui-shadow-lg), var(--fui-highlight));
+    backdrop-filter: var(--fui-dialog-filter, var(--fui-overlay-filter));
     outline: none;
     transition:
       opacity var(--fui-duration-slow) var(--fui-ease),
@@ -1602,6 +1610,21 @@
     width: min(var(--fui-sheet-width, 26rem), 100vw);
     border-radius: 0;
     border-block: 0;
+    /* 0.12: what the notch and the home indicator take from this sheet, less what its own offsets already leave free. Read
+       them in a sheet that draws its own padding (padding="none"). */
+    --fui-sheet-safe-block-start: max(0px, calc(env(safe-area-inset-top, 0px) - var(--fui-sheet-inset-block-start, 0px)));
+    --fui-sheet-safe-block-end: max(0px, calc(env(safe-area-inset-bottom, 0px) - var(--fui-sheet-inset-block-end, 0px)));
+  }
+  /* A padded sheet keeps its content clear of them, and of the side inset on the edge it is docked to (a phone on its side).
+     :where keeps these at one class: padding="none", a DialogBody layout and a host's class still decide the padding. */
+  .fui-dialog:where([data-placement="start"], [data-placement="end"]) {
+    padding-block: max(var(--fui-space-6), var(--fui-sheet-safe-block-start)) max(var(--fui-space-6), var(--fui-sheet-safe-block-end));
+  }
+  .fui-dialog:where([data-placement="end"]:not([data-side="end"]), [data-side="end"]:dir(ltr), [data-side="start"]:dir(rtl)) {
+    padding-right: max(var(--fui-space-6), env(safe-area-inset-right, 0px));
+  }
+  .fui-dialog:where([data-placement="start"]:not([data-side="start"]), [data-side="start"]:dir(ltr), [data-side="end"]:dir(rtl)) {
+    padding-left: max(var(--fui-space-6), env(safe-area-inset-left, 0px));
   }
   .fui-dialog[data-placement="end"] {
     right: 0;
@@ -1657,6 +1680,9 @@
     top: var(--fui-space-3);
     inset-inline-end: var(--fui-space-3);
     color: var(--muted-foreground);
+  }
+  .fui-dialog:is([data-placement="start"], [data-placement="end"]) > .fui-dialog-close {
+    top: max(var(--fui-space-3), var(--fui-sheet-safe-block-start));
   }
   .fui-dialog-footer {
     display: flex;
@@ -1777,7 +1803,6 @@
     margin: 0;
     padding: var(--fui-space-3) var(--fui-space-5);
     border-block-start: 1px solid var(--border);
-    background: var(--popover);
   }
   .fui-dialog:has(> .fui-dialog-body) > .fui-dialog-footer > .fui-button,
   .fui-dialog:has(> .fui-dialog-body) > .fui-dialog-footer > .fui-dialog-footer-slot > .fui-button {
@@ -1817,7 +1842,9 @@
       position: sticky;
       inset-block-end: 0;
       z-index: 1;
-      padding-block: var(--fui-space-2);
+      padding-block: var(--fui-space-2) max(var(--fui-space-2), calc(env(safe-area-inset-bottom, 0px) - 1rem));
+      background: var(--fui-dialog-surface, var(--fui-overlay-surface));
+      backdrop-filter: var(--fui-dialog-filter, var(--fui-overlay-filter));
     }
   }
   /* A full-screen dialog keeps its bars clear of the notch and the home indicator. */
@@ -3760,10 +3787,6 @@
     overflow: visible;
   }
   /* The area under the line is drawn as horizontal scanlines (1 px every 3), which stay crisp however wide the line is. */
-  .fui-sparkline-area {
-    fill: currentColor;
-    opacity: 0.1;
-  }
   .fui-sparkline-hatched {
     opacity: 0.5;
   }
@@ -4174,6 +4197,7 @@
     gap: var(--fui-space-3);
     min-height: var(--fui-header-height);
     padding: var(--fui-space-2) var(--fui-page-padding);
+    padding-block-start: max(var(--fui-space-2), env(safe-area-inset-top, 0px));
     border-bottom: 1px solid var(--border);
     background: color-mix(in oklab, var(--background) 88%, transparent);
     backdrop-filter: blur(12px);
@@ -4210,6 +4234,7 @@
   .fui-site-header[data-sticky] {
     position: sticky;
     top: 0;
+    padding-block-start: env(safe-area-inset-top, 0px);
   }
   /* 0.7: the header spans the window and anchors left, like the page under it. */
   .fui-site-header-inner {
@@ -4286,6 +4311,7 @@
   .fui-app-header[data-sticky] {
     position: sticky;
     top: 0;
+    padding-block-start: env(safe-area-inset-top, 0px);
   }
   .fui-app-header-inner {
     display: flex;
@@ -5175,8 +5201,12 @@
     width: 100%;
     overflow: hidden;
     border-radius: var(--fui-radius-lg);
-    background: var(--popover);
+    background: var(--fui-overlay-surface);
     color: var(--popover-foreground);
+  }
+  /* Inside a dialog or a popover the surface under it is already the overlay's: a see-through surface is not laid twice. */
+  :is(.fui-dialog, .fui-popover) .fui-command {
+    background: transparent;
   }
   .fui-command-input-wrapper {
     display: flex;
@@ -5311,7 +5341,7 @@
     padding: 0;
     overflow: hidden;
     border-radius: var(--fui-radius-lg);
-    box-shadow: var(--fui-shadow-overlay), var(--fui-highlight);
+    box-shadow: var(--fui-dialog-shadow, var(--fui-shadow-overlay), var(--fui-highlight));
   }
   .fui-dialog.fui-command-dialog[data-placement="center"] {
     top: var(--fui-command-top);
@@ -5577,11 +5607,12 @@
     width: var(--popup-width);
     height: var(--popup-height);
     overflow: hidden;
-    border: 1px solid var(--border);
+    border: 1px solid var(--fui-overlay-border);
     border-radius: var(--fui-radius-lg);
-    background: var(--popover);
+    background: var(--fui-overlay-surface);
     color: var(--popover-foreground);
-    box-shadow: var(--fui-shadow-md), var(--fui-highlight);
+    box-shadow: var(--fui-overlay-shadow);
+    backdrop-filter: var(--fui-overlay-filter);
     transform-origin: var(--transform-origin);
     transition:
       opacity var(--fui-duration) var(--fui-ease),
@@ -5993,11 +6024,12 @@
     gap: var(--fui-space-2);
     min-width: 12rem;
     padding: var(--fui-space-2) var(--fui-space-3);
-    border: 1px solid var(--border);
+    border: 1px solid var(--fui-overlay-border);
     border-radius: var(--fui-radius-md);
-    background: var(--popover);
+    background: var(--fui-overlay-surface);
     color: var(--popover-foreground);
-    box-shadow: var(--fui-shadow-md);
+    box-shadow: var(--fui-chart-tip-shadow, var(--fui-shadow-md));
+    backdrop-filter: var(--fui-overlay-filter);
     font-family: var(--fui-font-sans);
     font-size: var(--fui-text-xs);
     font-variant-numeric: tabular-nums;
@@ -6141,9 +6173,6 @@
     }
   }
   @media (prefers-reduced-motion: no-preference) {
-    .fui-spin {
-      animation: fui-spin 1s linear infinite;
-    }
     .fui-skeleton {
       background: linear-gradient(
           90deg,
@@ -6478,6 +6507,34 @@
   z-index: var(--fui-z-toast);
   max-width: calc(100vw - 2rem);
 }
+/* 0.12: the stack keeps clear of the notch and the home indicator. Sonner places it with these offsets (its own rules, and
+   the narrow ones under 600 px); the larger of the offset and the inset wins, so nothing moves where the inset is 0. */
+.fui-toaster[data-sonner-toaster][data-y-position="top"] {
+  top: max(var(--offset-top), env(safe-area-inset-top, 0px));
+}
+.fui-toaster[data-sonner-toaster][data-y-position="bottom"] {
+  bottom: max(var(--offset-bottom), env(safe-area-inset-bottom, 0px));
+}
+.fui-toaster[data-sonner-toaster][data-x-position="left"] {
+  left: max(var(--offset-left), env(safe-area-inset-left, 0px));
+}
+.fui-toaster[data-sonner-toaster][data-x-position="right"] {
+  right: max(var(--offset-right), env(safe-area-inset-right, 0px));
+}
+@media (max-width: 600px) {
+  .fui-toaster[data-sonner-toaster][data-y-position="top"] {
+    top: max(var(--mobile-offset-top), env(safe-area-inset-top, 0px));
+  }
+  .fui-toaster[data-sonner-toaster][data-y-position="bottom"] {
+    bottom: max(var(--mobile-offset-bottom), env(safe-area-inset-bottom, 0px));
+  }
+  .fui-toaster[data-sonner-toaster][data-x-position="left"] {
+    left: var(--mobile-offset-left);
+  }
+  .fui-toaster[data-sonner-toaster][data-x-position="right"] {
+    right: var(--mobile-offset-right);
+  }
+}
 .fui-toaster[data-sonner-toaster][dir="ltr"],
 .fui-toaster[data-sonner-toaster][dir="rtl"] {
   --toast-icon-margin-start: 0px;
@@ -6509,9 +6566,10 @@
   padding-inline: var(--fui-space-3);
   overflow: visible;
   border-radius: var(--fui-radius-plate);
-  background: var(--popover);
-  border-color: var(--border);
-  box-shadow: var(--fui-shadow-md), var(--fui-highlight);
+  background: var(--fui-toast-surface, var(--fui-overlay-surface));
+  border-color: var(--fui-toast-border, var(--fui-overlay-border));
+  box-shadow: var(--fui-toast-shadow, var(--fui-overlay-shadow));
+  backdrop-filter: var(--fui-toast-filter, var(--fui-overlay-filter));
   color: var(--foreground);
   font-family: var(--fui-font-sans);
   font-size: var(--fui-text-sm);
@@ -6519,22 +6577,22 @@
 }
 .fui-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"][data-type="success"],
 .fui-toaster[data-sonner-toaster] [data-rich-colors="true"][data-sonner-toast][data-type="success"] {
-  background: var(--popover);
+  background: var(--fui-toast-surface, var(--fui-overlay-surface));
   color: var(--foreground);
 }
 .fui-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"][data-type="error"],
 .fui-toaster[data-sonner-toaster] [data-rich-colors="true"][data-sonner-toast][data-type="error"] {
-  background: var(--popover);
+  background: var(--fui-toast-surface, var(--fui-overlay-surface));
   color: var(--foreground);
 }
 .fui-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"][data-type="warning"],
 .fui-toaster[data-sonner-toaster] [data-rich-colors="true"][data-sonner-toast][data-type="warning"] {
-  background: var(--popover);
+  background: var(--fui-toast-surface, var(--fui-overlay-surface));
   color: var(--foreground);
 }
 .fui-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"][data-type="info"],
 .fui-toaster[data-sonner-toaster] [data-rich-colors="true"][data-sonner-toast][data-type="info"] {
-  background: var(--popover);
+  background: var(--fui-toast-surface, var(--fui-overlay-surface));
   color: var(--foreground);
 }
 .fui-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"] [data-icon] {
@@ -8885,6 +8943,7 @@
     display: flex;
     flex-direction: column;
     padding: 0;
+    padding-block: var(--fui-sheet-safe-block-start, 0px) var(--fui-sheet-safe-block-end, 0px);
   }
 
   .fui-dropzone-field {
@@ -10810,5 +10869,77 @@
     .fui-action-bar {
       border-block-start-color: CanvasText;
     }
+  }
+}
+
+@layer components {
+  /* 0.12: surfaces */
+  /* size="touch": 44 px on every pointer and in every density, with the padding and the type of the default size. */
+  :is(.fui-button[data-size="touch"], .fui-button-size-touch),
+  :is(.fui-button[data-size="icon-touch"], .fui-button-size-icon-touch) {
+    min-block-size: 2.75rem;
+  }
+  :is(.fui-button[data-size="icon-touch"], .fui-button-size-icon-touch) {
+    aspect-ratio: 1;
+    min-inline-size: 2.75rem;
+    padding: 0;
+  }
+
+  /* The popover's close key. The popover becomes a column, where a key can stick: it holds the corner while the content
+     scrolls under it, on the popover's own surface. Its margins take it out of the flow (its height and the gap are given
+     back), so the content starts where it would without it; a header leaves it room. A sticky inset is measured from the
+     scroller's content edge, so the one that holds the key 6 px from the popover's edge is negative, like its margin. */
+  .fui-popover:has(> .fui-popover-close) {
+    --fui-popover-close-size: var(--fui-control-height-sm);
+    display: flex;
+    flex-direction: column;
+    scroll-padding-block-start: calc(var(--fui-popover-close-size) + var(--fui-space-2));
+  }
+  .fui-popover > .fui-popover-close {
+    --fui-button-bg: var(--fui-overlay-surface);
+    position: sticky;
+    inset-block-start: calc(-1 * var(--fui-space-1-5));
+    z-index: 1;
+    order: -1;
+    flex: none;
+    align-self: flex-end;
+    block-size: var(--fui-popover-close-size);
+    margin-block: calc(-1 * var(--fui-space-1-5)) calc(-1 * (var(--fui-popover-close-size) - var(--fui-space-1-5) + var(--fui-space-2)));
+    margin-inline-end: calc(-1 * var(--fui-space-1-5));
+    color: var(--muted-foreground);
+  }
+  .fui-popover:has(> .fui-popover-close) > .fui-popover-header {
+    padding-inline-end: calc(var(--fui-popover-close-size) - var(--fui-space-1-5) + var(--fui-space-2));
+  }
+
+  /* What a state panel holds under its description: chips, a short list. */
+  .fui-state-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--fui-space-2);
+    margin-block-start: var(--fui-space-3);
+  }
+  .fui-state-panel[data-align="center"] .fui-state-content {
+    justify-content: center;
+  }
+
+  /* On a phone the search takes the row; filters and actions follow under it. */
+  @media (max-width: 40rem) {
+    .fui-collection-toolbar > .fui-search {
+      flex-basis: 100%;
+      max-inline-size: none;
+    }
+  }
+
+  /* A sheet laid out with a DialogBody has no padding of its own: the safe areas are added around its bars. The docked edge
+     gives up only what the bars' own inset does not already cover. */
+  .fui-dialog:is([data-placement="start"], [data-placement="end"]):has(> .fui-dialog-body) {
+    padding-block: var(--fui-sheet-safe-block-start) var(--fui-sheet-safe-block-end);
+  }
+  .fui-dialog:is([data-placement="end"]:not([data-side="end"]), [data-side="end"]:dir(ltr), [data-side="start"]:dir(rtl)):has(> .fui-dialog-body) {
+    padding-right: max(0px, calc(env(safe-area-inset-right, 0px) - var(--fui-space-5)));
+  }
+  .fui-dialog:is([data-placement="start"]:not([data-side="start"]), [data-side="start"]:dir(ltr), [data-side="end"]:dir(rtl)):has(> .fui-dialog-body) {
+    padding-left: max(0px, calc(env(safe-area-inset-left, 0px) - var(--fui-space-5)));
   }
 }

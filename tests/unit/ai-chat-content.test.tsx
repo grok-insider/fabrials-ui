@@ -29,7 +29,8 @@ test("code block renders language, one line per span and accessible actions", ()
   assert.equal(html.match(/class="fui-code-line"/g)?.length, 2);
   assert.match(html, /aria-label="Copy code"/);
   assert.match(html, /aria-label="Download file"/);
-  assert.match(html, /role="region" aria-label="ts code" tabindex="0"/);
+  // A tab stop only once it is measured to overflow (0.12): the server has no tab stop.
+  assert.match(html, /class="fui-code-block-body" role="region" aria-label="ts code">/);
 });
 
 test("code block accepts highlighted children and hides optional actions", () => {
@@ -65,7 +66,7 @@ test("a code block highlights in CodePanel's tokens, heads a file with its name 
   );
   // The header leads with the language's logo, then the file's name and the language as a tag.
   assert.match(html, /<div class="fui-code-block-header"><svg aria-hidden="true" class="fui-language-icon" data-language="typescript"[^>]*><path d="[^"]+"><\/path><\/svg><span class="fui-code-block-title"><span class="fui-code-block-filename">sync\.ts<\/span><span class="fui-code-block-language">ts<\/span><\/span>/);
-  assert.match(html, /role="region" aria-label="sync\.ts code" tabindex="0"/);
+  assert.match(html, /class="fui-code-block-body" role="region" aria-label="sync\.ts code">/);
   assert.match(html, /data-wrap="true"/);
   assert.match(html, /<pre><code data-diff-gutter="true"><span class="fui-code-line" data-highlighted="true"><span class="fui-token-keyword">const<\/span>/);
   // A boxed name stands on its own: the c of const is not boxed.

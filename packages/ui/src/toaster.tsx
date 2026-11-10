@@ -16,17 +16,12 @@ function useDocumentTheme(): "light" | "dark" {
   return useSyncExternalStore(subscribeDocumentTheme, documentTheme, () => "light");
 }
 
-export function Toaster({
-  theme,
-  className,
-  style,
-  expand,
-  closeButton,
-  gap,
-  richColors: _richColors,
-  icons: _icons,
-  ...props
-}: ToasterProps) {
+/** Sonner's props without the two this toaster decides itself: tone is shown by the icon, never by a coloured slab, and the icons are the house's. */
+export type FabrialsToasterProps = Omit<ToasterProps, "richColors" | "icons">;
+
+export function Toaster(allProps: FabrialsToasterProps) {
+  // Still dropped at run time, for a caller that is not type-checked.
+  const { theme, className, style, expand, closeButton, gap, richColors: _richColors, icons: _icons, ...props } = allProps as ToasterProps;
   const detected = useDocumentTheme();
   return (
     <Sonner

@@ -1,14 +1,18 @@
 :root,
 .light,
 [data-theme="light"] {
-  --fui-font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  /* 0.12: --fui-font-fallback is a slot after the Plex faces for a script they lack (Arabic, Hebrew, CJK). A host sets it on
+     the root element, where these stacks are computed: `:root { --fui-font-fallback: "IBM Plex Sans Arabic"; }`. Unset, the
+     slot holds the generic family that used to stand there (an empty slot would leave two commas, which is no font-family at
+     all), so the stacks are the ones of 0.11. The label voice is the mono stack and gets the slot with it. */
+  --fui-font-sans: "IBM Plex Sans", var(--fui-font-fallback, ui-sans-serif), system-ui, sans-serif;
   --fui-font-mono:
-    "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono",
+    "IBM Plex Mono", var(--fui-font-fallback, ui-monospace), "SFMono-Regular", Consolas, "Liberation Mono",
     monospace;
   --fui-font-serif: "IBM Plex Serif", ui-serif, Georgia, serif;
   --fui-font-label: var(--fui-font-mono);
   --fui-font-display:
-    "IBM Plex Sans Condensed", "IBM Plex Sans", ui-sans-serif, system-ui,
+    "IBM Plex Sans Condensed", "IBM Plex Sans", var(--fui-font-fallback, ui-sans-serif), system-ui,
     sans-serif;
 
   --fui-text-xs: 0.75rem;
@@ -398,7 +402,11 @@
    - inset: a band inside a plate (a table head, a code bar, a segmented track);
    - hover: the fill under a pointer;
    - separator: the soft line between rows of one plate (the plate's own edge stays --border);
-   - light: the three gems of the working light, which only an agent at work or a load in progress may show. */
+   - light: the three gems of the working light, which only an agent at work or a load in progress may show;
+   - overlay (0.12): the surface, edge, shadow and backdrop-filter of everything that floats (menus, popovers, hover cards, the
+     lists of selects and comboboxes, the command palette, the navigation menu, chart tips). Dialogs and sheets read
+     --fui-dialog-surface, -border, -shadow and -filter, toasts --fui-toast-surface, -border, -shadow and -filter, and the chart
+     tip --fui-chart-tip-shadow: none of those is declared, each falls back to the overlay token or to its own shadow. */
 :root,
 .light,
 [data-theme="light"],
@@ -411,6 +419,10 @@
   --fui-light-1: var(--gem-stormlight);
   --fui-light-2: var(--gem-zircon);
   --fui-light-3: var(--gem-amethyst);
+  --fui-overlay-surface: var(--popover);
+  --fui-overlay-border: var(--border);
+  --fui-overlay-shadow: var(--fui-shadow-md), var(--fui-highlight);
+  --fui-overlay-filter: none;
 }
 
 [data-gem="stormlight"] {

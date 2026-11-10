@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type ComponentProps } from "react";
 import { Check, Copy } from "lucide-react";
 import { Button } from "./controls";
 import { classes } from "./shared";
+import { useOverflowTabStop } from "./use-overflow";
 
 export type CopyButtonProps = Omit<
   ComponentProps<typeof Button>,
@@ -81,6 +82,8 @@ export function Snippet({
     (line, index, all) => line.length > 0 || (index > 0 && index < all.length - 1),
   );
   const commands = lines.filter((line) => line.trim() && !line.trimStart().startsWith("#"));
+  const code = useRef<HTMLPreElement | null>(null);
+  const tabStop = useOverflowTabStop(code);
   return (
     <div
       data-slot="snippet"
@@ -89,7 +92,7 @@ export function Snippet({
       className={classes("fui-snippet", className)}
       {...props}
     >
-      <pre className="fui-snippet-code" tabIndex={0}>
+      <pre ref={code} className="fui-snippet-code" tabIndex={tabStop}>
         <code>
           {lines.map((line, index) => {
             const comment = line.trimStart().startsWith("#");

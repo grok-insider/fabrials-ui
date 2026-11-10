@@ -394,3 +394,87 @@ Radiant can delete `app/missing-page.tsx` (its night-sky backdrop stays Radiant'
 - `useViewportInsets({ target, threshold })` publishes `--fui-keyboard-inset` on the root (or `target`): how much of the layout viewport the on-screen keyboard covers, from `visualViewport`. It is 0 where the browser shrinks the layout viewport itself; changes of 120 px or less are browser toolbars and are ignored. `ActionBar` rises by it and `InlineConfirm` scrolls clear of it. A bar inside a scroll container that does not reach the bottom of the window sets `--fui-keyboard-inset: 0px` on that container. `keyboardInset(innerHeight, viewportHeight, offsetTop, threshold)` is the arithmetic.
 
 Radiant can delete `conversation/use-dock.ts` and the `.lang-session-bar` rules, and read the two variables instead of `--lang-dock` and `--lang-keyboard`.
+
+## Surfaces, targets and scroll regions
+
+Fixes to what exists in `@fabrials/ui` (plan A2, without the sidebar, the carousel and the right-to-left pass, which have their own sections).
+
+### One surface for everything that floats
+
+Four tokens in `tokens.css`, declared on every theme scope, with the values every overlay drew in 0.11:
+
+| Token | Default | Read by |
+| --- | --- | --- |
+| `--fui-overlay-surface` | `var(--popover)` | `background` |
+| `--fui-overlay-border` | `var(--border)` | the 1 px edge |
+| `--fui-overlay-shadow` | `var(--fui-shadow-md), var(--fui-highlight)` | `box-shadow` |
+| `--fui-overlay-filter` | `none` | `backdrop-filter` |
+
+They are read by the menu and the context menu, the lists of `Select`, `Combobox` and `MultiSelect` (`.fui-menu`), the popover, the hover card, `StatusPopover`, the date pickers and `NavSwitcher` (`.fui-popover`), the navigation menu, the chart tip and the command palette. The tooltip keeps `--fui-tooltip` and `--fui-tooltip-foreground`.
+
+Three surfaces have tokens of their own. None of them is declared: each falls back, so a host that sets the four above reaches them too.
+
+| Token | Falls back to | Surface |
+| --- | --- | --- |
+| `--fui-dialog-surface`, `-border`, `-filter` | the overlay token | `Dialog`, `AlertDialog`, `Sheet`, the command dialog |
+| `--fui-dialog-shadow` | `var(--fui-shadow-lg), var(--fui-highlight)` (the command dialog: `var(--fui-shadow-overlay), var(--fui-highlight)`) | the same |
+| `--fui-toast-surface`, `-border`, `-shadow`, `-filter` | the overlay token | toasts |
+| `--fui-chart-tip-shadow` | `var(--fui-shadow-md)` (it never had the top highlight) | the chart tip |
+
+A product that frosts its overlays sets them once per theme, where it sets its colours:
+
+```css
+:root {
+  --fui-overlay-surface: color-mix(in oklab, var(--popover) 88%, transparent);
+  --fui-overlay-border: color-mix(in oklab, var(--foreground) 16%, transparent);
+  --fui-overlay-shadow: 0 18px 44px -20px oklch(0.45 0.09 255 / 35%);
+  --fui-overlay-filter: blur(20px) saturate(1.4);
+  --fui-dialog-shadow: var(--fui-overlay-shadow);
+}
+```
+
+What a product can delete: its rule over `.fui-menu`, `.fui-popover`, `.fui-dialog`, `.fui-command`, `.fui-nav-menu-popup`, `.fui-hover-card`, `.fui-multi-select-popup` and `.fui-chart-tip`, the same block for the toaster, and the test that kept the list complete (Radiant: the "Floating surfaces" section of `globals.css`). `tests/unit/overlay-tokens.test.ts` holds the list here and fails when a rule paints a surface with `--popover` directly.
+
+Looks the same; two rules changed so that a see-through surface is not laid twice: a command palette inside a dialog or a popover has no background of its own, and the footer of a dialog with a `DialogBody` has none either, except in a short window, where it sticks over the scrolling body and takes the dialog's surface.
+
+### Buttons
+
+- `Button size="touch"`: at least 44 px tall on every pointer and in every density, with the padding and the type of the default size. `IconButton size="touch"` is the 44 px square (`Button size="icon-touch"`). For screens where every action is a learner's or a phone's; a product can delete the class it added for this.
+- `Button loadingLabel`: what the button says while `loading`, in place of its children ("Saving"). The width follows the text. `IconButton` does not take it.
+
+### Popover
+
+- `PopoverClose` (new export). With no `render` it is the corner key a dialog has: a ghost X named by `label` (default "Close"), which stays in the corner while the popover scrolls. Put it last in `PopoverContent`, so focus lands on the content first; a `PopoverHeader` leaves it room. With `render` it is your own element with only the closing behaviour (`<PopoverClose render={<Button variant="secondary" />}>Done</PopoverClose>`).
+- A popover and a hover card are never taller than the room Base UI measured for them (`max-block-size: var(--available-height)`) and scroll inside. Before, a tall popover in a short window ran off the screen. Menus and select lists already did this; `NavSwitcher` keeps its own limit.
+- Behaves differently: `.fui-popover` now has `overflow-y: auto`, so something that was drawn outside the popover's box from inside it is clipped.
+
+### Scroll regions
+
+`Table`, `CodePanel`, `CodeTabs`, `Snippet` and ai-ui's `CodeBlock` were a tab stop always. They are one only while their content overflows, as `ScrollArea` has been since 0.11: Tab no longer stops on a table or a code sample that fits. The server renders no `tabindex`; it is set after the first measure and follows every resize. The region role and label of `Table` and `CodeBlock` stay.
+
+- `useOverflowTabStop(ref)` (new export) returns `0` while the element overflows and `undefined` otherwise, for a product's own scroll region. `overflows(node)` is the measure it uses.
+- A test that asserted `tabindex="0"` on these in server markup must drop it.
+
+### Fonts and layers
+
+- `--fui-font-fallback`: a slot in `--fui-font-sans`, `--fui-font-display` and `--fui-font-mono` (and so in `--fui-font-label`), after the Plex faces and before the generic families, for a script Plex lacks. Set it on the root element, where the stacks are computed: `:root { --fui-font-fallback: "IBM Plex Sans Arabic"; }` (or the variable of a `next/font` face, when that variable is on `<html>`). Unset, the slot holds the generic family that stood there, so the computed stacks are the ones of 0.11. A product can delete its own copy of the two stacks.
+- `@fabrials/ui/layers.css` (new export) is one line, `@layer theme, base, components, utilities;`. A Tailwind host imports it first, so the order of the layers does not depend on the order in which the bundler emits the other imports.
+
+### Safe areas
+
+With `viewport-fit=cover`, on a device with a notch or a home indicator:
+
+- A `Sheet` pads its top and bottom, and the side it is docked to, by the inset when the inset is larger than its padding; its corner X moves down with it. A sheet with a `DialogBody` adds the inset around its bars. A sheet with `padding="none"` is left alone and can read `--fui-sheet-safe-block-start` and `--fui-sheet-safe-block-end` (the insets, less the sheet's own `--fui-sheet-inset-block-*`). The sheet of `SidePanel` pads its top and bottom.
+- Sticky `SiteHeader` and `AppHeader`, and the `WorkspaceShell` header, pad their top.
+- The toaster keeps its stack inside the insets, at the top and at the bottom.
+- The sticky footer of a dialog in a short window pads its bottom.
+
+Every rule is a `max()` or an `env()` with a 0 fallback: nothing moves where the inset is 0.
+
+### Housekeeping
+
+- `.fui-sparkline-area` and `.fui-spin` are gone from the stylesheet: nothing in the packages drew them. (`@keyframes fui-spin` stays.)
+- `class-variance-authority` is no longer a dependency of `@fabrials/ui`: nothing imported it. A product that relied on getting it through the package installs it itself.
+- `Toaster` no longer types `richColors` and `icons` (`FabrialsToasterProps`): it always dropped them. Passing them is now a type error; remove them.
+- `CollectionToolbar`: under 40rem of window the search takes the whole row and the filters and actions go under it. Before, a short action could share the row and squeeze the field.
+- `StatePanel` takes `children`, drawn under the description and before the actions (suggestions as chips under an empty state), in a wrapping row that centres with `align="center"`.

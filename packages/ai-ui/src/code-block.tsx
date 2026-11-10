@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type HTMLAttributes, type ReactNode } from "react";
-import { CodeLines, LanguageIcon } from "@fabrials/ui";
+import { CodeLines, LanguageIcon, useOverflowTabStop } from "@fabrials/ui";
 import { CheckIcon, CopyIcon, DownloadIcon } from "./chat-icons";
 import { codeFilename } from "./format";
 
@@ -72,7 +72,8 @@ export type CodeBlockProps = Omit<HTMLAttributes<HTMLDivElement>, "children" | "
 /**
  * A code sample in an answer, highlighted in the same inks as CodePanel and headed by its language's logo and name (or its
  * file's name), with copy and download keys and, when asked, line numbers, marked lines, a change's added and removed lines,
- * boxed words and soft wrapping. The body is a focusable region, so a long line can be scrolled from the keyboard.
+ * boxed words and soft wrapping. The body is a region, and a tab stop while a line is longer than it, so a long line can be
+ * scrolled from the keyboard.
  */
 export function CodeBlock({
   code,
@@ -97,6 +98,8 @@ export function CodeBlock({
   ...props
 }: CodeBlockProps) {
   const { copied, copy } = useCopyToClipboard();
+  const body = useRef<HTMLDivElement | null>(null);
+  const tabStop = useOverflowTabStop(body);
   const label = language?.trim() || "text";
   // A change copies and downloads as it ends up: without its removed lines.
   const kept = removedLines?.length ? code.split("\n").filter((_, index) => !removedLines.includes(index + 1)).join("\n") : code;
@@ -150,7 +153,7 @@ export function CodeBlock({
           ) : null}
         </div>
       </div>
-      <div className="fui-code-block-body" role="region" aria-label={`${filename ?? label} code`} tabIndex={0}>
+      <div ref={body} className="fui-code-block-body" role="region" aria-label={`${filename ?? label} code`} tabIndex={tabStop}>
         <pre>
           {children ? (
             <code>{children}</code>

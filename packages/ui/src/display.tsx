@@ -4,6 +4,7 @@ import { useEffect, useRef, type ComponentProps, type CSSProperties, type RefObj
 import { useRender } from "@base-ui/react/use-render";
 import { Tabs as BaseTabs } from "@base-ui/react/tabs";
 import { classes, type StyledProps } from "./shared";
+import { useOverflowTabStop } from "./use-overflow";
 
 export { Alert, AlertAction, AlertDescription, AlertTitle } from "./alert";
 export { Card, CardAction, CardCaption, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./card";
@@ -106,11 +107,14 @@ export function Table({
   stickyHeader = false,
   ...props
 }: ComponentProps<"table"> & { regionLabel?: string; stickyHeader?: boolean }) {
+  const region = useRef<HTMLDivElement | null>(null);
+  const tabStop = useOverflowTabStop(region);
   return (
     <div
+      ref={region}
       className="fui-table-scroll"
       data-sticky-header={stickyHeader || undefined}
-      tabIndex={0}
+      tabIndex={tabStop}
       role="region"
       aria-label={
         regionLabel ??
