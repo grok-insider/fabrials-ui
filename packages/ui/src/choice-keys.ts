@@ -1,5 +1,6 @@
 // Internal to the answer pieces (ChoiceGroup, RevealCard, RatingBar); not exported from the package index.
-// One set of guards for a key that acts from anywhere on the page. `useHotkeys` replaces the guards once it lands.
+// One set of guards for a key that acts from anywhere on the page. They are not `useHotkeys`': there a radio is a typing
+// target (its arrows and digits are its own), and here the options are radios whose digit picks an answer.
 
 export type ChoiceMarkers = "letters" | "numbers" | "none";
 

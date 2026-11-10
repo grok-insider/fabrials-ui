@@ -32,7 +32,9 @@ import { graphemeBoundaries, placeRanges, wordTokens, type DiffPart } from "../.
 
 const styles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
 const BLOCK_MARK = "/* 0.12: answers and steps */";
-const block = styles.slice(styles.lastIndexOf("@layer components {", styles.indexOf(BLOCK_MARK)));
+const blockAt = styles.lastIndexOf("@layer components {", styles.indexOf(BLOCK_MARK));
+const blockEnd = styles.indexOf("\n@layer", blockAt + 1);
+const block = styles.slice(blockAt, blockEnd === -1 ? undefined : blockEnd);
 const rule = (selector: string, from = block) => {
   const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const at = from.search(new RegExp(`(?:^|\\n)  ${escaped} \\{`));

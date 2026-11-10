@@ -46,7 +46,9 @@ import { VoiceInputButton, describeMicError } from "../../packages/ai-ui/src/ind
 
 const read = (path: string) => readFileSync(new URL(`../../packages/${path}`, import.meta.url), "utf8");
 const styles = read("ui/src/styles.css");
-const block = styles.slice(styles.indexOf("/* 0.12: sound */"));
+const blockAt = styles.indexOf("/* 0.12: sound */");
+const blockEnd = styles.indexOf("\n@layer", blockAt);
+const block = styles.slice(blockAt, blockEnd === -1 ? undefined : blockEnd);
 const rule = (selector: string, from = block) => {
   const at = from.indexOf(selector);
   assert.ok(at >= 0, `missing rule ${selector}`);
@@ -730,8 +732,8 @@ test("no address is written into the sound modules: the host passes its loaders"
 
 // ---------------------------------------------------------------- styles
 
-test("the sound styles are one block of the components layer, at the end of the sheet", () => {
-  const start = styles.lastIndexOf("@layer components {");
+test("the sound styles are one block of the components layer", () => {
+  const start = styles.lastIndexOf("@layer components {", blockAt);
   assert.match(styles.slice(start, start + 60), /@layer components \{\s*\/\* 0\.12: sound \*\//);
   assert.equal(styles.indexOf("/* 0.12: sound */"), styles.lastIndexOf("/* 0.12: sound */"));
 });
