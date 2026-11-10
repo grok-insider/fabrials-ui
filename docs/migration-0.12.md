@@ -797,3 +797,91 @@ Follow-ups under an answer: `items` (`{ id, label, value?, lang? }`), `onSelect(
 - A chip that arrives after the first paint rises into place, staggered; under reduced motion it is simply there.
 
 Radiant can delete `features/core/study-chips.tsx`.
+
+## Conversation
+
+The log a chat fills, written without `use-stick-to-bottom`: it opens at the latest message, stays there while an answer arrives, lets go the moment the reader scrolls away, and keeps a rail of their own messages. `@fabrials/ai-ui` had every piece of a chat message but no container for them; this is that container, and it is what Radiant built `components/ai-elements/conversation.tsx` for.
+
+```tsx
+<Conversation stickKey={messages.length}>
+  <ConversationContent measure>
+    {messages.map((message) => (
+      <ChatMessage from={message.role} id={message.id} key={message.id}>
+        …
+      </ChatMessage>
+    ))}
+  </ConversationContent>
+  <ConversationCheckpoints />
+  <ConversationScrollButton />
+  <ConversationFooter>
+    <ChatComposer onSubmit={send} />
+  </ConversationFooter>
+</Conversation>
+```
+
+The parent needs a height: the conversation fills it.
+
+### `Conversation`
+
+| Prop | What it does |
+| --- | --- |
+| `anchor` | `"end"` (default) opens at the latest message and follows it. `"start"` is an ordinary scroller for a transcript read from the top; the jump key and the rail still work. |
+| `stickKey` | Any value that changes when the reader sends a message: the conversation jumps to the end and follows it again, even if they had scrolled away. Sent before the next paint, not after it. |
+| `threshold` | How near the end still counts as being there, in px. Default 48. |
+| `actionsRef` | Receives `scrollToEnd({ behavior })` and `scrollToMessage(id \| element, { behavior, align, offset })`. |
+
+How it behaves, and what it replaces:
+
+- **It opens at the end without animating there.** The first position is set before the first paint and with `behavior: "auto"`: a smooth scroll from the top is outrun by content that keeps rendering (markdown, code, pictures).
+- **Growth is followed, not animated.** A `ResizeObserver` on the content and one on the log keep the end in view: instantly while an answer streams, one placement per frame at most, never a smooth scroll per token. Pictures that load late and change a height are covered by the same observer.
+- **The reader lets go at once.** A wheel up, a finger dragging down the screen, PageUp, ArrowUp, Home or a selection inside the log unlocks before the scroll it causes, so growth that lands in the same frame does not pull the view back under their hand. A scroll event moving away from the end also unlocks, unless it is a scroll of ours (recognised by the position it was sent to) or a pixel or two of the layout settling. Returning to the end locks again, and `stickKey` or `scrollToEnd()` locks from anywhere.
+- **The viewport changing size stays at the end** while it follows: the window, the on-screen keyboard, the composer growing.
+- No timers: Radiant's `ConversationScrollToLatest` re-asserted the end at 0, 120, 300, 600 and 1000 ms. The observer makes that unnecessary.
+- `prefers-reduced-motion: reduce` turns every scroll of ours into an instant one.
+
+### `ConversationContent`
+
+The log: `role="log"`, `aria-label` from `label` (default "Conversation"), `aria-live="off"` unless `live="polite"`. **Nothing is announced by default**: a streaming answer read token by token is noise. Announce the finished answer from the host (`useAnnounce`), or let `ChatMessage`'s own state speak.
+
+It is a tab stop only while it overflows, so the keyboard can scroll it, and its ring is drawn on the conversation, inside its edge, above the content (the scroll region would paint over an outline on itself). `overscroll-behavior: contain`, a thin scrollbar in the ink's tint, `scrollbar-gutter: stable`.
+
+`measure` (off by default) and `align`:
+
+| Prop | What it does |
+| --- | --- |
+| `measure` | Inside it, an answer is as wide as its text up to `--fui-chat-measure` (52rem) and takes the whole column when it holds a table, a `<pre>`, a `<figure>`, a `.katex-display` or anything marked `data-wide`. A reader's bubble stops at 80% of the column, or 40rem. |
+| `align` | `"start"` (default) keeps the column at the start edge, padded by the page gutter. `"center"` centres it, capped at the measure plus two gutters: a chat column is the one recognised exception to the house's rule that nothing is centred, and a product chooses it. |
+| `columnClassName` | A class for the column that holds the messages; the root is the scroll container. |
+
+The measure reads through container queries, never viewport media queries, and it changes nothing without `measure`: the rules only apply under `.fui-conversation-content[data-measure]`.
+
+### `ConversationScrollButton`
+
+The way back to the latest message: there only while the reader is away from the end, with its count of messages that arrived meanwhile (or a dot when only an answer grew) and a name that says so — "Jump to latest", "Jump to latest, 3 new messages" (`labels.jump`, `labels.unread(count)`, `labels.fresh`, plurals through `Intl.PluralRules`). `align="center"` (default) or `"end"`. It rises in and out in 150 ms, never under reduced motion, and is 44 px on a coarse pointer. A press does not take focus from the composer; pressed from the keyboard, focus goes to the log.
+
+### `ConversationCheckpoints`
+
+The rail of the reader's own messages on the end side: one small marker each, the one being read current (`aria-current`), a press brings its message to the top with 16 px of air. One tab stop, the arrow keys between markers, Home and End to the ends, and a preview on hover and on focus ("Message 3 of 12" and two lines of it, `dir="auto"`).
+
+- **Messages register themselves.** `<ConversationCheckpoint>` wraps one; `useConversationCheckpoint({ id, label })` returns a ref to put on your own. `selector` (default `[data-role="user"]`) finds the ones a `ChatMessage from="user"` already marks, so the usual case needs no wiring at all.
+- A rail with fewer than two checkpoints is not there. It keeps to 70% of the log's height, packing its markers closer as the conversation grows rather than overflowing, and it is hidden below a 40rem container (where it would sit over the words) and on coarse pointers (where a 3 px tick cannot be hit).
+- `labels`: `{ rail, position(index, count), jump(index, count, preview) }`.
+
+### `ConversationEmpty`, `ConversationFooter`, `useConversation`
+
+- `ConversationEmpty` is what a thread shows before its first message: a line (`title`, default "No messages yet", a paragraph, not a heading), a `description` and an optional `icon`, centred because it is the only thing in a large box.
+- `ConversationFooter` is the composer's dock at the end of the log, clear of the device's safe area. It publishes its height as `--fui-conversation-footer-size`, which the jump key and the rail stand on, and the last lines of the log fade out above it (the column reserves that band, so no line is ever under the fade). `fade={false}` ends them at a hard edge.
+- `useConversation()` gives `{ atEnd, locked, unread, hasNew, scrollToEnd, scrollToMessage }` to anything inside the conversation.
+
+### What Radiant can delete
+
+- `components/ai-elements/conversation.tsx` and the `use-stick-to-bottom` dependency (`StickToBottom`, `ConversationScrollToLatest`, and the re-assert timers).
+- The `chat-layout` measure rules and `CHAT_COLUMN`/`COMPOSER_COLUMN` for the message column: `ConversationContent measure` does it, and `align="center"` keeps the centred column it has today.
+- `.thin-scrollbar` in `app/globals.css`: the log carries its own thin bar.
+- Its checkpoint rail, which reads `[data-role="user"], .is-user` from the DOM on every mutation and is desktop-only: the rail here registers its messages, packs, and hides by container width instead.
+
+### What looks different
+
+- The jump key is a control key (8 px corners), not a circle: the house's radii stop at 16 px and rings are for dots and avatars.
+- The rail has no panel, blur or border: it is the ticks alone, so it never covers the words with a surface.
+- Its markers are 24 px wide on a fine pointer and the rail is not offered on touch, where the list scrolls anyway.

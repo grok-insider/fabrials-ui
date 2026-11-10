@@ -193,8 +193,13 @@ test("the agent pieces move only without reduced motion and keep a form in force
     assert.ok(before.lastIndexOf("@media (prefers-reduced-motion: no-preference)") > before.lastIndexOf("@media (prefers-reduced-motion: reduce)"), animation);
   }
   assert.match(block, /@media \(forced-colors: active\) \{[\s\S]*\.fui-agent-mark rect \{\s*fill: CanvasText;/);
-  // Gradients in the agent pieces are the dot field, the ripple and a mask: all working light, all in the light tokens.
+  // Gradients in the agent pieces are the dot field, the ripple and a mask: all working light, all in the light tokens. The
+  // conversation's edge is a mask gradient too (0.12): it lets the last lines fade into the dock without painting anything.
   for (const match of block.replace(/\/\*[\s\S]*?\*\//g, "").matchAll(/([^{}]+)\{([^{}]*gradient\([^{}]*)\}/g)) {
-    assert.match(match[1]!.trim(), /\.fui-generation-(field|ripple|refine|band|scan|page)|\.fui-generation-refine > \[data-layer\]/, match[1]);
+    assert.match(
+      match[1]!.trim(),
+      /\.fui-generation-(field|ripple|refine|band|scan|page)|\.fui-generation-refine > \[data-layer\]|\.fui-conversation:has\(> \.fui-conversation-footer\[data-fade\]\) > \.fui-conversation-content/,
+      match[1],
+    );
   }
 });
