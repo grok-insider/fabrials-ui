@@ -47,8 +47,15 @@ import { VoiceInputButton, describeMicError } from "../../packages/ai-ui/src/ind
 const read = (path: string) => readFileSync(new URL(`../../packages/${path}`, import.meta.url), "utf8");
 const styles = read("ui/src/styles.css");
 const blockAt = styles.indexOf("/* 0.12: sound */");
-const blockEnd = styles.indexOf("\n@layer", blockAt);
-const block = styles.slice(blockAt, blockEnd === -1 ? undefined : blockEnd);
+const closeOf = (text: string, from: number) => {
+  let depth = 0;
+  for (let at = text.indexOf("{", from); at >= 0 && at < text.length; at += 1) {
+    if (text[at] === "{") depth += 1;
+    if (text[at] === "}" && --depth === 0) return at + 1;
+  }
+  return text.length;
+};
+const block = styles.slice(blockAt, closeOf(styles, styles.lastIndexOf("@layer components {", blockAt)));
 const rule = (selector: string, from = block) => {
   const at = from.indexOf(selector);
   assert.ok(at >= 0, `missing rule ${selector}`);

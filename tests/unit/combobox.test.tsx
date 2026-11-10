@@ -24,8 +24,15 @@ import {
 
 const styles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
 const blockStart = styles.indexOf("/* 0.12: combobox.");
-const blockEnd = styles.indexOf("\n@layer", blockStart);
-const block = styles.slice(blockStart, blockEnd === -1 ? undefined : blockEnd);
+const closeOf = (text: string, from: number) => {
+  let depth = 0;
+  for (let at = text.indexOf("{", from); at >= 0 && at < text.length; at += 1) {
+    if (text[at] === "{") depth += 1;
+    if (text[at] === "}" && --depth === 0) return at + 1;
+  }
+  return text.length;
+};
+const block = styles.slice(blockStart, closeOf(styles, styles.lastIndexOf("@layer components {", blockStart)));
 const rule = (selector: string) => {
   const at = block.indexOf(selector);
   assert.ok(at >= 0, `missing rule ${selector}`);

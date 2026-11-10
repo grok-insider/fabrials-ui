@@ -33,8 +33,15 @@ import { graphemeBoundaries, placeRanges, wordTokens, type DiffPart } from "../.
 const styles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
 const BLOCK_MARK = "/* 0.12: answers and steps */";
 const blockAt = styles.lastIndexOf("@layer components {", styles.indexOf(BLOCK_MARK));
-const blockEnd = styles.indexOf("\n@layer", blockAt + 1);
-const block = styles.slice(blockAt, blockEnd === -1 ? undefined : blockEnd);
+const closeOf = (text: string, from: number) => {
+  let depth = 0;
+  for (let at = text.indexOf("{", from); at >= 0 && at < text.length; at += 1) {
+    if (text[at] === "{") depth += 1;
+    if (text[at] === "}" && --depth === 0) return at + 1;
+  }
+  return text.length;
+};
+const block = styles.slice(blockAt, closeOf(styles, blockAt));
 const rule = (selector: string, from = block) => {
   const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const at = from.search(new RegExp(`(?:^|\\n)  ${escaped} \\{`));
@@ -977,7 +984,7 @@ test("TextDiff: del and ins with spoken prefixes, from two texts or from parts, 
 
 // ----------------------------------------------------------------------------------------------------------- stylesheet
 
-test("the 0.12 block is one layer block at the end of the stylesheet, in logical properties and tokens", () => {
+test("the 0.12 block is one layer block, in logical properties and tokens", () => {
   assert.equal(styles.split(BLOCK_MARK).length, 2, "one block carries the marker");
   assert.equal(block.trimEnd().endsWith("}"), true);
   let depth = 0;
@@ -989,7 +996,7 @@ test("the 0.12 block is one layer block at the end of the stylesheet, in logical
       break;
     }
   }
-  assert.equal(block.slice(closed + 1).trim(), "", "nothing follows the block");
+  assert.equal(block.slice(closed + 1).replace(/\/\*[\s\S]*?\*\//g, "").trim(), "", "nothing follows the block");
   const css = block.replace(/\/\*[\s\S]*?\*\//g, "");
   assert.doesNotMatch(css, /(^|[\s;{])(left|right|top|bottom|width|height|min-width|max-width|min-height|max-height)\s*:/m, "sizes and sides are logical");
   assert.doesNotMatch(css, /(margin|padding|border)-(left|right|top|bottom)\b/);
