@@ -1,5 +1,3 @@
-"use client";
-
 import type { ComponentProps, ReactNode } from "react";
 import type { Tone } from "./display";
 import { classes } from "./shared";

@@ -1,5 +1,3 @@
-"use client";
-
 export * from "./controls";
 export * from "./select";
 export * from "./dialog";

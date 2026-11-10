@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useId, useRef, useState, type ComponentProps, type CSSProperties, type ReactNode } from "react";
 import { ShimmerText, WorkingLight, useScramble } from "@fabrials/ui";
+import { formatTokens } from "./format";
 
 function join(...values: Array<string | false | null | undefined>) {
   return values.filter(Boolean).join(" ");
@@ -490,14 +491,7 @@ export type ContextMeterProps = Omit<ComponentProps<"div">, "children"> & {
   legend?: boolean;
 };
 
-export function formatTokens(value: number): string {
-  if (!Number.isFinite(value)) return "";
-  const abs = Math.abs(value);
-  if (abs >= 1_000_000) return `${Math.round(value / 100_000) / 10}M`;
-  if (abs >= 100_000) return `${Math.round(value / 1000)}k`;
-  if (abs >= 1000) return `${Math.round(value / 100) / 10}k`;
-  return String(Math.round(value));
-}
+export { formatTokens } from "./format";
 
 /**
  * How full an agent's context window is: a stacked bar of what fills it and a legend, with a reading ("42.1k of 200k, 21 %")

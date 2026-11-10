@@ -2,13 +2,10 @@
 
 import { useCallback, useState, type CSSProperties, type ReactNode } from "react";
 import { FileText } from "lucide-react";
+import { fileTypeLabel } from "./format";
 import { classes } from "./shared";
 
-export function fileTypeLabel(filename?: string | null, mime?: string | null) {
-  const fromName = filename?.match(/\.([a-z0-9]{1,5})$/i)?.[1];
-  const fromMime = mime?.split("/")[1]?.split(/[+;.-]/)[0];
-  return (fromName || fromMime || "file").slice(0, 4).toUpperCase();
-}
+export { fileTypeLabel } from "./format";
 
 export type FileThumbProps = {
   src?: string | null;

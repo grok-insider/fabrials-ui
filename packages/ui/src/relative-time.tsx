@@ -1,70 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState, type ComponentProps } from "react";
+import { formatAbsoluteTime, formatRelativeTime, type AbsoluteTimeFormat, type RelativeTimeStyle } from "./format";
 import { classes } from "./shared";
 
-const UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
-  ["year", 365 * 86_400],
-  ["month", 30 * 86_400],
-  ["week", 7 * 86_400],
-  ["day", 86_400],
-  ["hour", 3_600],
-  ["minute", 60],
-  ["second", 1],
-];
-
-export type RelativeTimeStyle = "long" | "short" | "narrow";
-
-/**
- * "3 minutes ago" in the given locale. Under 45 seconds reads as "now";
- * beyond `absoluteAfterDays` it becomes a date.
- */
-export function formatRelativeTime(
-  date: Date | string | number,
-  now: number,
-  locale: string,
-  opts: { style?: RelativeTimeStyle; absoluteAfterDays?: number; timeZone?: string } = {},
-): string {
-  const time = new Date(date).getTime();
-  if (!Number.isFinite(time)) return "";
-  const seconds = Math.round((time - now) / 1000);
-  const abs = Math.abs(seconds);
-  const absoluteAfter = (opts.absoluteAfterDays ?? 30) * 86_400;
-  if (abs >= absoluteAfter) {
-    return new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: opts.timeZone }).format(time);
-  }
-  const format = new Intl.RelativeTimeFormat(locale, { numeric: "auto", style: opts.style ?? "long" });
-  if (abs < 45) return format.format(0, "second");
-  for (const [unit, size] of UNITS) {
-    if (abs >= size || unit === "second") return format.format(Math.round(seconds / size), unit);
-  }
-  return "";
-}
-
-/**
- * Options for `Intl.DateTimeFormat`, or a function that picks them per date: a row that drops the year when it is this
- * year needs the clock (`now`) to decide, and the caller owns that rule.
- */
-export type AbsoluteTimeFormat =
-  | Intl.DateTimeFormatOptions
-  | ((date: Date, now: number) => Intl.DateTimeFormatOptions);
-
-/**
- * A date as an absolute, deterministic string ("29 Sept, 09:41"). It reads no clock unless the format is a function,
- * which receives `opts.now` (default: the current time). Returns "" for an invalid date. Pass a `timeZone` (in the
- * format or in `opts`) for a string that is the same on the server and in the browser.
- */
-export function formatAbsoluteTime(
-  date: Date | string | number,
-  locale: string,
-  format: AbsoluteTimeFormat,
-  opts: { now?: number; timeZone?: string } = {},
-): string {
-  const value = new Date(date);
-  if (!Number.isFinite(value.getTime())) return "";
-  const options = typeof format === "function" ? format(value, opts.now ?? Date.now()) : format;
-  return new Intl.DateTimeFormat(locale, { timeZone: opts.timeZone, ...options }).format(value);
-}
+export { formatAbsoluteTime, formatRelativeTime, type AbsoluteTimeFormat, type RelativeTimeStyle } from "./format";
 
 /** How long until the text can change: seconds for recent times, minutes later. */
 function refreshMs(date: Date | string | number, now: number): number {

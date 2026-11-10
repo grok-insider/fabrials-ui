@@ -19,6 +19,7 @@ import {
   HoverCardTrigger,
 } from "@fabrials/ui";
 import { ChevronDownIcon } from "./chat-icons";
+import { hostnameFromUrl, sourcePath } from "./format";
 
 export type CitationSource = {
   url: string;
@@ -68,28 +69,7 @@ export function useLinkPreview(url: string | undefined, loader: LinkPreviewLoade
   return state;
 }
 
-export function hostnameFromUrl(value: string): string {
-  try {
-    return new URL(value).hostname.replace(/^www\./, "");
-  } catch {
-    return value;
-  }
-}
-
-export function sourcePath(value: string): string {
-  try {
-    const { pathname, search } = new URL(value);
-    const path = (pathname + search).replace(/\/+$/, "");
-    if (!path) return "";
-    try {
-      return decodeURIComponent(path);
-    } catch {
-      return path;
-    }
-  } catch {
-    return "";
-  }
-}
+export { hostnameFromUrl, sourcePath } from "./format";
 
 export function sourceLabel(source: { url: string; title?: string }): string {
   const title = source.title?.trim();

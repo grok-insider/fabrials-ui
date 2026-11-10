@@ -1,5 +1,7 @@
 "use client";
 // Origin: Fabrials, 0.8 (promoted from Open Email's ui/icon-button.tsx).
+// A client module although it has no hook: a Base UI trigger clones it (`render={<IconButton />}`) and the merged props
+// must reach the inner Button. Rendered on the server, the clone would be of the tooltip root, which drops them.
 
 import type { ReactNode } from "react";
 import { Button, type ButtonProps } from "./controls";

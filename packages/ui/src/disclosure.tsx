@@ -1,3 +1,4 @@
+"use client";
 // Origin: Fabrials, 0.8. A styled native disclosure: no JavaScript, the panel is always in the DOM.
 import type { ComponentProps, ReactNode } from "react";
 import { ChevronDown } from "lucide-react";

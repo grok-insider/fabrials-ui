@@ -1,3 +1,5 @@
+"use client";
+
 import { Button, Label, NativeSelect } from "@fabrials/ui";
 import * as React from "react";
 import {

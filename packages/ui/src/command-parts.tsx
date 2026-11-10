@@ -1,4 +1,3 @@
-"use client";
 // Origin: Fabrials, 0.8 (promoted from Open Email's ui/command-palette.tsx and app/styles/command.css).
 
 import { Search } from "lucide-react";

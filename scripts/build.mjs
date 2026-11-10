@@ -8,9 +8,18 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 // Each package builds into dist.next and then replaces dist in one rename, so a
 // running dev server (Next, Storybook) never reads a half-written package.
 const staging = "dist.next";
+// A source file is a client module when the directive is its first statement.
+const clientDirective = /^(?:\s|\/\/[^\n]*\n|\/\*[\s\S]*?\*\/)*["']use client["'];?/;
 
-for (const name of ["ui", "ai-ui"]) {
+/** Whether a source text opens with the "use client" directive (comments may come before it). */
+export function isClientSource(code) {
+  return clientDirective.test(code);
+}
+
+/** Bundles one package's modules into `outDir` (relative to the package), one file per source module. */
+export async function bundle(name, outDir) {
   const directory = resolve(root, "packages", name);
+  const clientModules = new Set();
   await build({
     configFile: false,
     root: directory,
@@ -19,16 +28,20 @@ for (const name of ["ui", "ai-ui"]) {
       {
         name: "client-entry-boundary",
         enforce: "pre",
+        // The bundler drops module-level directives, so the build remembers which
+        // sources carried one and writes it back as the banner of that module.
         transform(code, id) {
-          if (/\.[jt]sx?$/.test(id) && code.startsWith('"use client";'))
-            return { code: code.replace('"use client";', ""), map: null };
+          const directive = /\.[jt]sx?$/.test(id) ? clientDirective.exec(code) : null;
+          if (!directive) return;
+          clientModules.add(id);
+          return { code: code.replace(directive[0], directive[0].replace(/["']use client["'];?$/, "")), map: null };
         },
       },
     ],
     build: {
       target: "es2022",
       minify: false,
-      outDir: staging,
+      outDir,
       emptyOutDir: true,
       lib: {
         // Subpath exports that the index does not re-export are entries of their own,
@@ -52,15 +65,22 @@ for (const name of ["ui", "ai-ui"]) {
           preserveModules: true,
           preserveModulesRoot: resolve(directory, "src"),
           entryFileNames: "[name].js",
-          // Every component module is its own client boundary. The index barrels
-          // stay directive-free: a "use client" barrel makes bundlers keep every
-          // export (charts included) wherever one component is imported.
-          banner: chunk => /(?:button-variants|shared|moon-math|dither|dither-presets|syntax|index|spreadsheet-data|spreadsheet-read|media-logic)\.[jt]sx?$/.test(chunk.facadeModuleId ?? "") ? "" : '"use client";',
+          // A module is a client boundary when its source says so, and only then:
+          // pure helpers and hook-free components stay callable from a Server
+          // Component. The index barrels carry no directive: a "use client" barrel
+          // makes bundlers keep every export (charts included) wherever one
+          // component is imported.
+          banner: (chunk) => (clientModules.has(chunk.facadeModuleId ?? "") ? '"use client";' : ""),
         },
       },
     },
     esbuild: { jsx: "automatic" },
   });
+}
+
+async function distribute(name) {
+  const directory = resolve(root, "packages", name);
+  await bundle(name, staging);
   execFileSync(
     process.execPath,
     [
@@ -99,3 +119,6 @@ for (const name of ["ui", "ai-ui"]) {
   );
   console.log(`Built ${manifest.name}@${manifest.version}`);
 }
+
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url))
+  for (const name of ["ui", "ai-ui"]) await distribute(name);

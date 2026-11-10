@@ -1,5 +1,3 @@
-"use client";
-
 export { ProviderIcon, providerBrand } from "./provider-icon";
 export {
   ProviderCard,

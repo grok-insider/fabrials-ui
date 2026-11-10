@@ -3,51 +3,9 @@
 import { useCallback, useEffect, useRef, useState, type HTMLAttributes, type ReactNode } from "react";
 import { CodeLines, LanguageIcon } from "@fabrials/ui";
 import { CheckIcon, CopyIcon, DownloadIcon } from "./chat-icons";
+import { codeFilename } from "./format";
 
-const EXTENSIONS: Record<string, string> = {
-  bash: "sh",
-  c: "c",
-  cpp: "cpp",
-  css: "css",
-  diff: "diff",
-  go: "go",
-  golang: "go",
-  html: "html",
-  java: "java",
-  javascript: "js",
-  js: "js",
-  json: "json",
-  jsx: "jsx",
-  kotlin: "kt",
-  markdown: "md",
-  md: "md",
-  nix: "nix",
-  patch: "patch",
-  postgres: "sql",
-  postgresql: "sql",
-  python: "py",
-  py: "py",
-  ruby: "rb",
-  rust: "rs",
-  rs: "rs",
-  sh: "sh",
-  shell: "sh",
-  sql: "sql",
-  swift: "swift",
-  toml: "toml",
-  ts: "ts",
-  tsx: "tsx",
-  typescript: "ts",
-  yaml: "yaml",
-  yml: "yml",
-  zig: "zig",
-  zsh: "sh",
-};
-
-export function codeFilename(language: string | undefined, base = "snippet"): string {
-  const key = (language ?? "").trim().toLowerCase();
-  return `${base}.${EXTENSIONS[key] ?? "txt"}`;
-}
+export { codeFilename } from "./format";
 
 export function useCopyToClipboard(resetMs = 2000) {
   const [copied, setCopied] = useState(false);

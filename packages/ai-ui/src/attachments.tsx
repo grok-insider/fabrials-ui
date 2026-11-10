@@ -3,6 +3,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Spinner } from "@fabrials/ui";
 import { useArrivals } from "./agent";
+import { attachmentCategory, formatBytes, type AttachmentCategory } from "./format";
 import {
   AlertIcon,
   FileTextIcon,
@@ -30,31 +31,9 @@ function percentOf(progress: number | undefined) {
   return progress === undefined ? undefined : Math.round(Math.min(1, Math.max(0, progress)) * 100);
 }
 
-export type AttachmentCategory = "image" | "video" | "audio" | "document" | "unknown";
-
 export type AttachmentVariant = "grid" | "inline" | "list";
 
-export function attachmentCategory(mediaType: string | undefined): AttachmentCategory {
-  const type = mediaType ?? "";
-  if (type.startsWith("image/")) return "image";
-  if (type.startsWith("video/")) return "video";
-  if (type.startsWith("audio/")) return "audio";
-  if (type.startsWith("application/") || type.startsWith("text/")) return "document";
-  return "unknown";
-}
-
-export function formatBytes(bytes: number | undefined): string {
-  if (bytes === undefined || !Number.isFinite(bytes) || bytes < 0) return "";
-  if (bytes < 1024) return `${bytes} B`;
-  const units = ["KB", "MB", "GB", "TB"];
-  let value = bytes / 1024;
-  let unit = 0;
-  while (value >= 1024 && unit < units.length - 1) {
-    value /= 1024;
-    unit += 1;
-  }
-  return `${value >= 10 ? Math.round(value) : Math.round(value * 10) / 10} ${units[unit]}`;
-}
+export { attachmentCategory, formatBytes, type AttachmentCategory } from "./format";
 
 function typeLabel(mediaType: string) {
   const subtype = mediaType.split(";")[0]?.split("/")[1] ?? "";

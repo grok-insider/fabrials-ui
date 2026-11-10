@@ -6,6 +6,10 @@ import { ArrowDownRight, ArrowUpRight, Minus } from "lucide-react";
 import { classes } from "./shared";
 import type { Tone } from "./display";
 
+export { DescriptionDetails, DescriptionItem, DescriptionList, DescriptionTerm } from "./description-list";
+export { StatGroup } from "./stat-group";
+export { StatusDot } from "./status-dot";
+
 export type Trend = "up" | "down" | "flat";
 
 export type StatProps = Omit<ComponentProps<"div">, "children"> & {
@@ -86,16 +90,6 @@ export function Stat({
         <Sparkline data={sparkline} className="fui-stat-sparkline" />
       ) : null}
     </div>
-  );
-}
-
-export function StatGroup({ className, ...props }: ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="stat-group"
-      className={classes("fui-stat-group", className)}
-      {...props}
-    />
   );
 }
 
@@ -251,71 +245,5 @@ export function Meter({
       )}
       {hint ? <p className="fui-meter-hint">{hint}</p> : null}
     </BaseMeter.Root>
-  );
-}
-
-export function StatusDot({
-  tone = "neutral",
-  label,
-  hideLabel = false,
-  pulse = false,
-  className,
-  ...props
-}: Omit<ComponentProps<"span">, "children"> & {
-  tone?: Tone;
-  /** Text companion for the color. Required; hide it visually with hideLabel. */
-  label: ReactNode;
-  hideLabel?: boolean;
-  pulse?: boolean;
-}) {
-  return (
-    <span
-      data-slot="status"
-      data-tone={tone}
-      data-pulse={pulse || undefined}
-      className={classes("fui-status", className)}
-      {...props}
-    >
-      <span aria-hidden className="fui-status-dot" />
-      <span className={hideLabel ? "fui-sr-only" : "fui-status-label"}>{label}</span>
-    </span>
-  );
-}
-
-export function DescriptionList({
-  className,
-  layout = "grid",
-  ...props
-}: ComponentProps<"dl"> & {
-  /**
-   * `grid` aligns every term in one column, `stacked` puts each term above its details. `auto` follows the list's own
-   * width: stacked under 30rem, and from 30rem the term in a column of 8 to 11rem beside its details (a drawer, a sheet
-   * and a wide panel use the same markup). It makes the list a size container, so it must fill its parent's width.
-   */
-  layout?: "grid" | "stacked" | "auto";
-}) {
-  return (
-    <dl
-      data-layout={layout}
-      className={classes("fui-description-list", className)}
-      {...props}
-    />
-  );
-}
-
-export function DescriptionItem({ className, ...props }: ComponentProps<"div">) {
-  return <div className={classes("fui-description-item", className)} {...props} />;
-}
-
-export function DescriptionTerm({ className, ...props }: ComponentProps<"dt">) {
-  return <dt className={classes("fui-description-term", className)} {...props} />;
-}
-
-export function DescriptionDetails({
-  className,
-  ...props
-}: ComponentProps<"dd">) {
-  return (
-    <dd className={classes("fui-description-details", className)} {...props} />
   );
 }

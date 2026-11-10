@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardContent, CardHeader, Table } from "@fabrials/ui";
 import { ProviderCard, useClock } from "./providers";
 import type { SynchronizedAccount } from "./contracts";

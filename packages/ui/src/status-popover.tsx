@@ -1,4 +1,3 @@
-"use client";
 // Origin: Fabrials, 0.8 (promoted from Open Email's ui/status-details.tsx and its rules in app/styles/navigation.css).
 
 import type { ComponentProps, ReactNode } from "react";

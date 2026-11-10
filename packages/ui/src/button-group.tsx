@@ -1,3 +1,4 @@
+"use client";
 // Origin: shadcn/ui (Base UI render helpers), copied 2026-09-22. Restyled with fui- classes in 0.4 so it renders without Tailwind.
 import type * as React from "react";
 import { mergeProps } from "@base-ui/react/merge-props";
