@@ -1,21 +1,11 @@
+import { plural } from "@fabrials/ui";
 import type { ImportState, MigrationDirection } from "./contracts";
 
 // Every word the accounts and usage family says, one object per component, the defaults in English. A host spreads one
 // object to translate a screen; a label that interpolates or counts is a function so a language can put the parts in its
-// own order. This module has no directive: a Server Component may read a default or call `plural`.
+// own order. This module has no directive: a Server Component may read a default. Counts go through `plural` of `@fabrials/ui`.
 
 export type AccountsHeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
-
-/** The `one` or `other` form of a count in `locale` (English when none is given). */
-export function plural(
-  count: number,
-  forms: { one: string; other: string },
-  locale?: Intl.LocalesArgument,
-): string {
-  return new Intl.PluralRules(locale ?? "en").select(count) === "one"
-    ? forms.one
-    : forms.other;
-}
 
 export type RoutingExplanationLabels = { text: string };
 export const routingExplanationLabels: RoutingExplanationLabels = {

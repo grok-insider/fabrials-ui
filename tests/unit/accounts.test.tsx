@@ -28,7 +28,6 @@ import {
   linkedAccountUsageLabels,
   migrationReviewLabels,
   observationStatusLabels,
-  plural,
   privateHistoryLabels,
   providerCardLabels,
   resetInventoryLabels,
@@ -37,6 +36,7 @@ import {
   synchronizedAccountsLabels,
   synchronizedConsumptionLabels,
 } from "../../packages/ai-ui/src/index";
+import { plural } from "../../packages/ui/src/plural";
 import {
   BALANCE,
   EMPTY_REPORT,

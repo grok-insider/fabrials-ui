@@ -253,7 +253,6 @@ export {
   type ConversationScrollButtonLabels,
 } from "./conversation-logic";
 export {
-  plural,
   routingExplanationLabels,
   routingPolicyFormLabels,
   resetInventoryLabels,
