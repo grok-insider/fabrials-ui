@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore, type ComponentProps, type ReactNode } from "react";
 import { Tabs as BaseTabs } from "@base-ui/react/tabs";
+import { useLabels } from "./labels";
 import { LanguageIcon } from "./language-icon";
 import { CopyButton } from "./snippet";
 import { classes } from "./shared";
@@ -20,21 +21,47 @@ function CodeBody({ children }: { children: ReactNode }) {
 
 /** Copy with a spoken result: "Copied", or how to copy by hand when the clipboard refuses. */
 function useCopyStatus() {
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState<CopyState>("idle");
   return {
     status,
-    onCopy: () => setStatus("Copied to clipboard"),
-    onCopyError: () => setStatus("Couldn't copy. Select the code and copy it."),
+    onCopy: () => setStatus("copied"),
+    onCopyError: () => setStatus("failed"),
   };
 }
 
-function CopyStatus({ status }: { status: string }) {
+function CopyStatus({ status, labels }: { status: CopyState; labels: CodePanelLabels }) {
   return (
-    <span role="status" className={status.startsWith("Couldn't") ? "fui-code-panel-status" : "fui-sr-only"}>
-      {status}
+    <span role="status" data-state={status === "idle" ? undefined : status} className={status === "failed" ? "fui-code-panel-status" : "fui-sr-only"}>
+      {status === "copied" ? labels.copied : status === "failed" ? labels.copyFailed : ""}
     </span>
   );
 }
+
+export type CodePanelLabels = {
+  /** The name of the copy key. */
+  copy: string;
+  /** Spoken when the code is on the clipboard. */
+  copied: string;
+  /** Shown and spoken when the clipboard refuses: how to copy by hand. */
+  copyFailed: string;
+  /** The bar's title when there is neither a title nor a language. */
+  code: string;
+  /** The name of the tab list of `CodeTabs`. */
+  examples: string;
+  /** The name of the tab list of `PackageInstall`. */
+  packageManager: string;
+};
+
+const CODE_LABELS: CodePanelLabels = {
+  copy: "Copy code",
+  copied: "Copied to clipboard",
+  copyFailed: "Couldn't copy. Select the code and copy it.",
+  code: "Code",
+  examples: "Code examples",
+  packageManager: "Package manager",
+};
+
+type CopyState = "idle" | "copied" | "failed";
 
 export type CodePanelProps = Omit<ComponentProps<"figure">, "title" | "children"> & {
   code: string;
@@ -58,6 +85,8 @@ export type CodePanelProps = Omit<ComponentProps<"figure">, "title" | "children"
   children?: ReactNode;
   /** Hide the bar for inline snippets; the copy button floats instead. */
   bare?: boolean;
+  /** The words of the copy key and its result. A `LabelsProvider` sets them for every panel (scope `codePanel`). */
+  labels?: Partial<CodePanelLabels>;
 };
 
 // A name is boxed where it stands on its own: never the c inside const, nor a name inside a longer one.
@@ -137,9 +166,11 @@ export function CodePanel({
   copyValue,
   children,
   bare = false,
+  labels: ownLabels,
   className,
   ...props
 }: CodePanelProps) {
+  const labels = useLabels("codePanel", CODE_LABELS, ownLabels);
   const copy = copyValue ?? (removedLines?.length ? code.split("\n").filter((_, i) => !removedLines.includes(i + 1)).join("\n") : code);
   const copied = useCopyStatus();
   return (
@@ -154,9 +185,9 @@ export function CodePanel({
         <figcaption className="fui-code-panel-bar">
           <span className="fui-code-panel-title">
             {icon ?? <LanguageIcon language={language} />}
-            <span>{title ?? language ?? "Code"}</span>
+            <span>{title ?? language ?? labels.code}</span>
           </span>
-          <CopyButton value={copy} label="Copy code" onCopy={copied.onCopy} onCopyError={copied.onCopyError} />
+          <CopyButton value={copy} label={labels.copy} onCopy={copied.onCopy} onCopyError={copied.onCopyError} />
         </figcaption>
       )}
       <CodeBody>
@@ -172,14 +203,14 @@ export function CodePanel({
         )}
       </CodeBody>
       {bare ? (
-        <CopyButton value={copy} label="Copy code" className="fui-code-panel-float" onCopy={copied.onCopy} onCopyError={copied.onCopyError} />
+        <CopyButton value={copy} label={labels.copy} className="fui-code-panel-float" onCopy={copied.onCopy} onCopyError={copied.onCopyError} />
       ) : null}
-      <CopyStatus status={copied.status} />
+      <CopyStatus status={copied.status} labels={labels} />
     </figure>
   );
 }
 
-export type CodeTab = Omit<CodePanelProps, "title" | "bare"> & { value: string; label: ReactNode };
+export type CodeTab = Omit<CodePanelProps, "title" | "bare" | "labels"> & { value: string; label: ReactNode };
 
 /** Several versions of one sample (languages, frameworks, files) in one frame. */
 export function CodeTabs({
@@ -187,16 +218,20 @@ export function CodeTabs({
   defaultValue,
   value,
   onValueChange,
-  label = "Code examples",
+  label,
+  labels: ownLabels,
   className,
 }: {
   items: CodeTab[];
   defaultValue?: string;
   value?: string;
   onValueChange?: (value: string) => void;
+  /** The name of the tab list; `labels.examples` ("Code examples") by default. */
   label?: string;
+  labels?: Partial<CodePanelLabels>;
   className?: string;
 }) {
+  const labels = useLabels("codePanel", CODE_LABELS, ownLabels);
   const [internal, setInternal] = useState(defaultValue ?? items[0]?.value);
   const copied = useCopyStatus();
   const current = value ?? internal;
@@ -218,7 +253,7 @@ export function CodeTabs({
     >
       <div className="fui-code-panel-bar">
         {shared ? <LanguageIcon className="fui-code-tabs-language" language={shared} /> : null}
-        <BaseTabs.List aria-label={label} className="fui-code-tabs-list">
+        <BaseTabs.List aria-label={label ?? labels.examples} className="fui-code-tabs-list">
           {items.map((item) => (
             <BaseTabs.Tab key={item.value} value={item.value} className="fui-code-tab">
               {mixed ? (item.icon ?? <LanguageIcon language={item.language} />) : null}
@@ -232,7 +267,7 @@ export function CodeTabs({
               active.copyValue ??
               (active.removedLines?.length ? active.code.split("\n").filter((_, i) => !active.removedLines!.includes(i + 1)).join("\n") : active.code)
             }
-            label="Copy code"
+            label={labels.copy}
             onCopy={copied.onCopy}
             onCopyError={copied.onCopyError}
           />
@@ -254,7 +289,7 @@ export function CodeTabs({
           </CodeBody>
         </BaseTabs.Panel>
       ))}
-      <CopyStatus status={copied.status} />
+      <CopyStatus status={copied.status} labels={labels} />
     </BaseTabs.Root>
   );
 }
@@ -283,14 +318,17 @@ export function PackageInstall({
   command,
   kind = "run",
   persistKey = "fui-package-manager",
+  labels: ownLabels,
   className,
 }: {
   /** Without the runner: "shadcn@latest add @fabrials/button", or "@fabrials/ui" for kind="install". */
   command: string;
   kind?: "run" | "install";
   persistKey?: string | null;
+  labels?: Partial<CodePanelLabels>;
   className?: string;
 }) {
+  const labels = useLabels("codePanel", CODE_LABELS, ownLabels);
   const manager = useSyncExternalStore(managerStore.subscribe, managerStore.get, () => "npm" as PackageManager);
   useEffect(() => {
     if (!persistKey) return;
@@ -304,7 +342,8 @@ export function PackageInstall({
   return (
     <CodeTabs
       className={classes("fui-package-install", className)}
-      label="Package manager"
+      label={labels.packageManager}
+      labels={ownLabels}
       value={manager}
       onValueChange={(next) => {
         managerStore.set(next as PackageManager);

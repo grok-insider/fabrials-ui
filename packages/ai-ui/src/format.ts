@@ -79,6 +79,19 @@ export function formatTokens(value: number): string {
   return String(Math.round(value));
 }
 
+const percents = new Map<string, Intl.NumberFormat>();
+
+/** A whole percentage in the locale's form: "36%", "36 %", "٣٦٪". */
+export function formatPercent(percent: number, locale: Intl.LocalesArgument = "en"): string {
+  const key = Array.isArray(locale) ? locale.map(String).join(",") : String(locale ?? "en");
+  let format = percents.get(key);
+  if (!format) {
+    format = new Intl.NumberFormat(locale ?? "en", { style: "percent", maximumFractionDigits: 0 });
+    percents.set(key, format);
+  }
+  return format.format(percent / 100);
+}
+
 export type AttachmentCategory = "image" | "video" | "audio" | "document" | "unknown";
 
 export function attachmentCategory(mediaType: string | undefined): AttachmentCategory {

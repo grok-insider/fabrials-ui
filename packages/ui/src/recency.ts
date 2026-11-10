@@ -17,7 +17,8 @@ export type RecencyGroup<T> = {
 
 export type RecencyOptions = {
   timeZone?: string;
-  locale?: string;
+  /** The language of a month's name ("March", "marzo"); "en-US" when there is none. */
+  locale?: Intl.LocalesArgument;
   labels?: Partial<Record<RecencyBucket, string>>;
 };
 

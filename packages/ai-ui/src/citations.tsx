@@ -17,6 +17,9 @@ import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
+  plural,
+  useLabels,
+  useLocale,
 } from "@fabrials/ui";
 import { ChevronDownIcon } from "./chat-icons";
 import { hostnameFromUrl, sourcePath } from "./format";
@@ -70,6 +73,21 @@ export function useLinkPreview(url: string | undefined, loader: LinkPreviewLoade
 }
 
 export { hostnameFromUrl, sourcePath } from "./format";
+
+export type SourcesLabels = {
+  /** A source by its number: "Source 3". */
+  source: (number: number) => string;
+  /** The name of a citation chip: the source's number and its title. */
+  citation: (number: number, title: string) => string;
+  /** The trigger of the list: "3 sources". */
+  count: (count: number, locale: Intl.LocalesArgument) => string;
+};
+
+const SOURCES_LABELS: SourcesLabels = {
+  source: (number) => `Source ${number}`,
+  citation: (number, title) => `Source ${number}: ${title}`,
+  count: (count, locale) => plural(count, { one: "{count} source", other: "{count} sources" }, locale),
+};
 
 export function sourceLabel(source: { url: string; title?: string }): string {
   const title = source.title?.trim();
@@ -206,6 +224,8 @@ export type CitationChipProps = Omit<ComponentProps<"a">, "href" | "children"> &
   faviconUrl?: FaviconResolver;
   previewLoader?: LinkPreviewLoader;
   delay?: number;
+  /** How the chip and its card name the source. A `LabelsProvider` sets it for every citation (scope `sources`). */
+  labels?: Partial<SourcesLabels>;
 };
 
 export function CitationChip({
@@ -216,6 +236,7 @@ export function CitationChip({
   faviconUrl,
   previewLoader,
   delay = 200,
+  labels: ownLabels,
   className,
   onMouseEnter,
   onMouseLeave,
@@ -223,6 +244,7 @@ export function CitationChip({
   onBlur,
   ...rest
 }: CitationChipProps) {
+  const labels = useLabels("sources", SOURCES_LABELS, ownLabels);
   const citation = useCitation(number);
   const resolved = source ?? citation.source ?? { url: href };
   const label = sourceLabel({ url: href, title: resolved.title });
@@ -236,7 +258,7 @@ export function CitationChip({
         render={
           <a
             {...rest}
-            aria-label={`Source ${number}: ${label}`}
+            aria-label={labels.citation(number, label)}
             className={join("fui-citation-chip", className)}
             data-active={isActive || undefined}
             data-citation={number}
@@ -268,7 +290,7 @@ export function CitationChip({
         <LinkPreviewCard
           faviconUrl={icon}
           label={label}
-          meta={number != null ? `Source ${number} · ${host}` : host}
+          meta={number != null ? `${labels.source(number)} · ${host}` : host}
           previewLoader={previewLoader ?? citation.previewLoader}
           url={href}
         />
@@ -361,6 +383,8 @@ export type SourceCardProps = Omit<ComponentProps<"a">, "title" | "href"> & {
   active?: boolean;
   faviconUrl?: FaviconResolver;
   previewLoader?: LinkPreviewLoader;
+  /** How the number is named. A `LabelsProvider` sets it for every source (scope `sources`). */
+  labels?: Partial<SourcesLabels>;
 };
 
 export function SourceCard({
@@ -370,6 +394,7 @@ export function SourceCard({
   active,
   faviconUrl,
   previewLoader,
+  labels: ownLabels,
   className,
   onMouseEnter,
   onMouseLeave,
@@ -377,6 +402,7 @@ export function SourceCard({
   onBlur,
   ...props
 }: SourceCardProps) {
+  const labels = useLabels("sources", SOURCES_LABELS, ownLabels);
   const citation = useCitation(number);
   const isActive = active ?? citation.active;
   const host = hostnameFromUrl(url);
@@ -411,7 +437,7 @@ export function SourceCard({
       title={`${label} — ${url}`}
     >
       {typeof number === "number" ? (
-        <span aria-label={`Source ${number}`} className="fui-source-number">
+        <span aria-label={labels.source(number)} className="fui-source-number">
           {number}
         </span>
       ) : null}
@@ -428,13 +454,18 @@ export type SourcesProps = {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   faviconUrl?: FaviconResolver;
+  /** The trigger's text for a count; `labels.count` ("3 sources") by default. */
   label?: (count: number) => ReactNode;
   previewCount?: number;
+  /** The words of the trigger and of each source. A `LabelsProvider` sets them for every list (scope `sources`). */
+  labels?: Partial<SourcesLabels>;
+  /** The locale of the count; "en" unless a `LabelsProvider` says otherwise. */
+  locale?: Intl.LocalesArgument;
   className?: string;
 };
 
-export function sourcesLabel(count: number): string {
-  return `${count} ${count === 1 ? "source" : "sources"}`;
+export function sourcesLabel(count: number, labels: Partial<SourcesLabels> = {}, locale: Intl.LocalesArgument = "en"): string {
+  return (labels.count ?? SOURCES_LABELS.count)(count, locale);
 }
 
 export function Sources({
@@ -443,10 +474,14 @@ export function Sources({
   open: openProp,
   onOpenChange,
   faviconUrl,
-  label = sourcesLabel,
+  label,
   previewCount = 4,
+  labels: ownLabels,
+  locale: ownLocale,
   className,
 }: SourcesProps) {
+  const labels = useLabels("sources", SOURCES_LABELS, ownLabels);
+  const locale = useLocale(ownLocale);
   const [openState, setOpenState] = useState(defaultOpen);
   const open = openProp ?? openState;
   if (sources.length === 0) return null;
@@ -470,7 +505,7 @@ export function Sources({
             ))}
           </span>
         ) : null}
-        <span>{label(sources.length)}</span>
+        <span>{label ? label(sources.length) : labels.count(sources.length, locale)}</span>
         <ChevronDownIcon className="fui-activity-chevron" />
       </CollapsibleTrigger>
       <CollapsibleContent className="fui-sources-grid" render={<ol />}>
@@ -478,6 +513,7 @@ export function Sources({
           <li key={`${source.url}-${index}`}>
             <SourceCard
               faviconUrl={faviconUrl}
+              labels={ownLabels}
               number={source.number ?? index + 1}
               title={source.title}
               url={source.url}

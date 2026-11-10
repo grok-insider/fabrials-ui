@@ -113,6 +113,7 @@ export {
   attachmentCategory,
   attachmentDetail,
   formatBytes,
+  formatPercent,
   type AttachmentCategory,
   type AttachmentChipProps,
   type AttachmentItem,
@@ -176,3 +177,12 @@ export {
   type ChatComposerProps,
   type ChatComposerStatus,
 } from "./composer";
+export type {
+  AgentLabels,
+  AttachmentsLabels,
+  CodeBlockLabels,
+  ContextMeterLabels,
+  GenerationLabels,
+  SearchLabels,
+  SourcesLabels,
+} from "./labels";

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ComponentProps } from "react";
 import { Check, Copy } from "lucide-react";
 import { Button } from "./controls";
+import { useLabels } from "./labels";
 import { classes } from "./shared";
 import { useOverflowTabStop } from "./use-overflow";
 
@@ -11,16 +12,25 @@ export type CopyButtonProps = Omit<
   "onClick" | "children" | "value"
 > & {
   value: string;
+  /** "Copy" by default; a `LabelsProvider` sets it and `copiedLabel` for every copy button (scope `copyButton`). */
   label?: string;
   copiedLabel?: string;
   onCopy?: (value: string) => void;
   onCopyError?: (error: unknown) => void;
 };
 
+export type CopyButtonLabels = { copy: string; copied: string };
+
+const COPY_LABELS: CopyButtonLabels = { copy: "Copy", copied: "Copied" };
+
+export type SnippetLabels = { copy: string };
+
+const SNIPPET_LABELS: SnippetLabels = { copy: "Copy command" };
+
 export function CopyButton({
   value,
-  label = "Copy",
-  copiedLabel = "Copied",
+  label: ownLabel,
+  copiedLabel: ownCopiedLabel,
   onCopy,
   onCopyError,
   className,
@@ -28,6 +38,7 @@ export function CopyButton({
   size = "icon-sm",
   ...props
 }: CopyButtonProps) {
+  const { copy: label, copied: copiedLabel } = useLabels("copyButton", COPY_LABELS, { copy: ownLabel, copied: ownCopiedLabel });
   const [copied, setCopied] = useState(false);
   const timer = useRef<number | undefined>(undefined);
   useEffect(() => () => window.clearTimeout(timer.current), []);
@@ -66,7 +77,7 @@ export function Snippet({
   children,
   prompt = "$",
   copyValue,
-  copyLabel = "Copy command",
+  copyLabel,
   label,
   className,
   ...props
@@ -78,6 +89,7 @@ export function Snippet({
   copyLabel?: string;
   label?: string;
 }) {
+  const labels = useLabels("snippet", SNIPPET_LABELS, { copy: copyLabel });
   const lines = (typeof children === "string" ? children.split("\n") : [...children]).filter(
     (line, index, all) => line.length > 0 || (index > 0 && index < all.length - 1),
   );
@@ -111,7 +123,7 @@ export function Snippet({
       </pre>
       <CopyButton
         value={copyValue ?? commands.join("\n")}
-        label={copyLabel}
+        label={labels.copy}
         className="fui-snippet-copy"
       />
     </div>

@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState, type ComponentProps } from "react";
 import { formatAbsoluteTime, formatRelativeTime, type AbsoluteTimeFormat, type RelativeTimeStyle } from "./format";
+import { useLocale } from "./labels";
+import { localeTag } from "./plural";
 import { classes } from "./shared";
 
 export { formatAbsoluteTime, formatRelativeTime, type AbsoluteTimeFormat, type RelativeTimeStyle } from "./format";
@@ -44,7 +46,7 @@ export type RelativeTimeProps = Omit<ComponentProps<"time">, "children" | "dateT
  */
 export function RelativeTime({
   date,
-  locale = "en",
+  locale: ownLocale,
   style,
   absoluteAfterDays,
   absoluteFormat,
@@ -54,6 +56,7 @@ export function RelativeTime({
   title,
   ...props
 }: RelativeTimeProps) {
+  const locale = localeTag(useLocale(ownLocale));
   const [tick, setTick] = useState(() => (typeof now === "function" ? now() : (now ?? Date.now())));
   const clock = useRef(now);
   useEffect(() => {

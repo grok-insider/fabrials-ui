@@ -53,7 +53,7 @@ export const asCell = (cell: SheetCell | CellValue | undefined): SheetCell | und
   cell === undefined || cell === null ? undefined : typeof cell === "object" && !(cell instanceof Date) ? cell : { value: cell };
 
 /** The text a cell shows: the file's own text, else the value formatted for the locale. */
-export function cellText(cell: SheetCell | CellValue | undefined, locale?: string): string {
+export function cellText(cell: SheetCell | CellValue | undefined, locale?: Intl.LocalesArgument): string {
   const own = asCell(cell);
   if (!own) return "";
   if (own.error) return own.error;

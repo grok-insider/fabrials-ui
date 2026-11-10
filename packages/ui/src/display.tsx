@@ -3,6 +3,7 @@
 import { useEffect, useRef, type ComponentProps, type CSSProperties, type RefObject } from "react";
 import { useRender } from "@base-ui/react/use-render";
 import { Tabs as BaseTabs } from "@base-ui/react/tabs";
+import { useLabels } from "./labels";
 import { classes, type StyledProps } from "./shared";
 import { useOverflowTabStop } from "./use-overflow";
 
@@ -100,6 +101,20 @@ export function Badge({ render, ...props }: BadgeProps) {
   );
 }
 
+export type TableLabels = {
+  /** The name of the scroll region round a table, given the table's own `aria-label` when it has one. */
+  region: (name?: string) => string;
+};
+
+const TABLE_LABELS: TableLabels = {
+  region: (name) => (name ? `${name} table` : "Scrollable table"),
+};
+
+function useRegionLabel(regionLabel: string | undefined, name: unknown) {
+  const labels = useLabels("table", TABLE_LABELS);
+  return regionLabel ?? labels.region(typeof name === "string" ? name : undefined);
+}
+
 export function Table({
   className,
   children,
@@ -116,12 +131,7 @@ export function Table({
       data-sticky-header={stickyHeader || undefined}
       tabIndex={tabStop}
       role="region"
-      aria-label={
-        regionLabel ??
-        (typeof props["aria-label"] === "string"
-          ? `${props["aria-label"]} table`
-          : "Scrollable table")
-      }
+      aria-label={useRegionLabel(regionLabel, props["aria-label"])}
     >
       <table className={classes("fui-table", className)} {...props}>
         {children}

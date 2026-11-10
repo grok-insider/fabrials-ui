@@ -7,9 +7,26 @@
 
 import { Select as BaseSelect } from "@base-ui/react/select";
 import { Check, ChevronDown, X } from "lucide-react";
+import { useLabels, useLocale } from "./labels";
+import { formatCount } from "./plural";
 import { classes } from "./shared";
 
 export type MultiSelectOption = { value: string; label: string };
+
+export type MultiSelectLabels = {
+  /** The closed field with nothing chosen. */
+  placeholder: string;
+  /** What follows the first name for assistive technology: "and 2 more". The eye reads "+2". */
+  more: (count: number, locale: Intl.LocalesArgument) => string;
+  /** The clear key under the list, given the field's label. The English default lowercases the label ("Clear status"). */
+  clear: (label: string) => string;
+};
+
+const MULTI_SELECT_LABELS: MultiSelectLabels = {
+  placeholder: "Any",
+  more: (count, locale) => `and ${formatCount(count, locale)} more`,
+  clear: (label) => `Clear ${label.toLocaleLowerCase("en")}`,
+};
 
 export function MultiSelect({
   id,
@@ -17,8 +34,10 @@ export function MultiSelect({
   options,
   value,
   onValueChange,
-  placeholder = "Any",
+  placeholder,
   disabled = false,
+  labels: ownLabels,
+  locale: ownLocale,
   className,
 }: {
   id: string;
@@ -28,8 +47,14 @@ export function MultiSelect({
   onValueChange: (value: string[]) => void;
   placeholder?: string;
   disabled?: boolean;
+  /** The words of the summary and the clear key. A `LabelsProvider` sets them for every field (scope `multiSelect`). */
+  labels?: Partial<MultiSelectLabels>;
+  /** The locale of the count beside the first name. */
+  locale?: Intl.LocalesArgument;
   className?: string;
 }) {
+  const labels = useLabels("multiSelect", MULTI_SELECT_LABELS, ownLabels);
+  const locale = useLocale(ownLocale);
   const labelId = `${id}-label`;
   const chosen = options.filter((option) => value.includes(option.value));
   const unknown = value.filter((item) => !options.some((option) => option.value === item));
@@ -54,13 +79,13 @@ export function MultiSelect({
           id={id}
         >
           <span className="fui-multi-select-summary">
-            <span className="fui-multi-select-first">{names[0] ?? placeholder}</span>
+            <span className="fui-multi-select-first">{names[0] ?? placeholder ?? labels.placeholder}</span>
             {more > 0 ? (
               <>
                 <span aria-hidden="true" className="fui-multi-select-more">
-                  +{more}
+                  +{formatCount(more, locale)}
                 </span>
-                <span className="fui-sr-only">{` and ${more} more`}</span>
+                <span className="fui-sr-only">{` ${labels.more(more, locale)}`}</span>
               </>
             ) : null}
           </span>
@@ -92,7 +117,7 @@ export function MultiSelect({
                 <div className="fui-multi-select-footer">
                   <button className="fui-multi-select-clear" onClick={() => onValueChange([])} type="button">
                     <X aria-hidden size={14} />
-                    Clear {label.toLocaleLowerCase()}
+                    {labels.clear(label)}
                   </button>
                 </div>
               ) : null}

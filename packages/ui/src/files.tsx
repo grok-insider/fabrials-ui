@@ -2,6 +2,8 @@
 
 import { createContext, useContext, useState, type ComponentProps, type CSSProperties, type ReactNode } from "react";
 import { ChevronRight, File as FileIcon, Folder as FolderIcon, FolderOpen, GitFork, Star } from "lucide-react";
+import { useLabels, useLocale } from "./labels";
+import { plural } from "./plural";
 import { classes } from "./shared";
 
 const Depth = createContext(0);
@@ -74,7 +76,16 @@ export function File({
   );
 }
 
-const compact = new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 });
+export type RepoInfoLabels = {
+  /** The spoken form of each count: "1,204 stars". */
+  stars: (count: number, locale: Intl.LocalesArgument) => string;
+  forks: (count: number, locale: Intl.LocalesArgument) => string;
+};
+
+const REPO_INFO_LABELS: RepoInfoLabels = {
+  stars: (count, locale) => plural(count, { one: "{count} star", other: "{count} stars" }, locale),
+  forks: (count, locale) => plural(count, { one: "{count} fork", other: "{count} forks" }, locale),
+};
 
 function GitHubMark() {
   return (
@@ -96,6 +107,8 @@ export function RepoInfo({
   stars,
   forks,
   description,
+  labels: ownLabels,
+  locale: ownLocale,
   className,
   ...props
 }: Omit<ComponentProps<"a">, "children" | "href"> & {
@@ -105,7 +118,14 @@ export function RepoInfo({
   stars?: number | null;
   forks?: number | null;
   description?: ReactNode;
+  /** How the counts are spoken. A `LabelsProvider` sets them for every repository (scope `repoInfo`). */
+  labels?: Partial<RepoInfoLabels>;
+  /** The locale of the counts ("1.2K"); "en" unless a `LabelsProvider` says otherwise. */
+  locale?: Intl.LocalesArgument;
 }) {
+  const labels = useLabels("repoInfo", REPO_INFO_LABELS, ownLabels);
+  const locale = useLocale(ownLocale);
+  const compact = new Intl.NumberFormat(locale, { notation: "compact", maximumFractionDigits: 1 });
   const known = (value?: number | null): value is number => typeof value === "number" && Number.isFinite(value) && value >= 0;
   return (
     <a
@@ -126,12 +146,12 @@ export function RepoInfo({
       {known(stars) || known(forks) ? (
         <span className="fui-repo-info-stats">
           {known(stars) ? (
-            <span aria-label={`${stars} stars`}>
+            <span aria-label={labels.stars(stars, locale)}>
               <Star aria-hidden size={12} /> {compact.format(stars)}
             </span>
           ) : null}
           {known(forks) ? (
-            <span aria-label={`${forks} forks`}>
+            <span aria-label={labels.forks(forks, locale)}>
               <GitFork aria-hidden size={12} /> {compact.format(forks)}
             </span>
           ) : null}

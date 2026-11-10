@@ -1,6 +1,8 @@
 // Local calendar days as pure functions: no directive, so a Server Component can format or parse the day a form posts.
 // The public ones are still exported from "./calendar"; the rest are the calendar's own arithmetic.
 
+import { localeTag } from "./plural";
+
 export type DateRange = { from: Date | undefined; to?: Date | undefined };
 export type DateMatcher =
   | boolean
@@ -51,9 +53,9 @@ export function matchesDate(date: Date, matcher: DateMatcher | DateMatcher[] | u
 }
 
 /** The first day of the week for a locale (0 is Sunday), from Intl's week data; Monday when the runtime has none. */
-export function firstDayOfWeek(locale?: string): number {
+export function firstDayOfWeek(locale?: Intl.LocalesArgument): number {
   try {
-    const info = new Intl.Locale(locale ?? new Intl.DateTimeFormat().resolvedOptions().locale) as Intl.Locale & {
+    const info = new Intl.Locale(locale ? localeTag(locale) : new Intl.DateTimeFormat().resolvedOptions().locale) as Intl.Locale & {
       getWeekInfo?: () => { firstDay: number };
       weekInfo?: { firstDay: number };
     };

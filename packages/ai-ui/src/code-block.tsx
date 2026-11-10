@@ -4,8 +4,24 @@ import { useCallback, useEffect, useRef, useState, type HTMLAttributes, type Rea
 import { CodeLines, LanguageIcon, useOverflowTabStop } from "@fabrials/ui";
 import { CheckIcon, CopyIcon, DownloadIcon } from "./chat-icons";
 import { codeFilename } from "./format";
+import { useLabels } from "@fabrials/ui";
 
 export { codeFilename } from "./format";
+
+export type CodeBlockLabels = {
+  copy: string;
+  copied: string;
+  download: string;
+  /** The name of the scrolling body, given the file's name or the language. */
+  region: (name: string) => string;
+};
+
+const CODE_BLOCK_LABELS: CodeBlockLabels = {
+  copy: "Copy code",
+  copied: "Copied",
+  download: "Download file",
+  region: (name) => `${name} code`,
+};
 
 export function useCopyToClipboard(resetMs = 2000) {
   const [copied, setCopied] = useState(false);
@@ -66,6 +82,8 @@ export type CodeBlockProps = Omit<HTMLAttributes<HTMLDivElement>, "children" | "
   copyLabel?: string;
   copiedLabel?: string;
   downloadLabel?: string;
+  /** The words of the keys and the body's name; the three props above win. A `LabelsProvider` sets them (scope `codeBlock`). */
+  labels?: Partial<CodeBlockLabels>;
   actions?: ReactNode;
 };
 
@@ -90,9 +108,10 @@ export function CodeBlock({
   copyValue,
   download = false,
   filename,
-  copyLabel = "Copy code",
-  copiedLabel = "Copied",
-  downloadLabel = "Download file",
+  copyLabel: ownCopyLabel,
+  copiedLabel: ownCopiedLabel,
+  downloadLabel: ownDownloadLabel,
+  labels: ownLabels,
   actions,
   className,
   ...props
@@ -104,6 +123,10 @@ export function CodeBlock({
   // A change copies and downloads as it ends up: without its removed lines.
   const kept = removedLines?.length ? code.split("\n").filter((_, index) => !removedLines.includes(index + 1)).join("\n") : code;
   const text = copyValue ?? kept;
+  const labels = useLabels("codeBlock", CODE_BLOCK_LABELS, ownLabels);
+  const copyLabel = ownCopyLabel ?? labels.copy;
+  const copiedLabel = ownCopiedLabel ?? labels.copied;
+  const downloadLabel = ownDownloadLabel ?? labels.download;
   return (
     <div
       className={["fui-code-block", className].filter(Boolean).join(" ")}
@@ -153,7 +176,7 @@ export function CodeBlock({
           ) : null}
         </div>
       </div>
-      <div ref={body} className="fui-code-block-body" role="region" aria-label={`${filename ?? label} code`} tabIndex={tabStop}>
+      <div ref={body} className="fui-code-block-body" role="region" aria-label={labels.region(filename ?? label)} tabIndex={tabStop}>
         <pre>
           {children ? (
             <code>{children}</code>

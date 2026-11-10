@@ -1,9 +1,9 @@
 "use client";
 
 import type { CSSProperties, ReactNode } from "react";
-import { Spinner } from "@fabrials/ui";
+import { Spinner, localeTag, useLabels, useLocale, useProvidedLocale } from "@fabrials/ui";
 import { useArrivals } from "./agent";
-import { attachmentCategory, formatBytes, type AttachmentCategory } from "./format";
+import { attachmentCategory, formatBytes, formatPercent, type AttachmentCategory } from "./format";
 import {
   AlertIcon,
   FileTextIcon,
@@ -33,16 +33,41 @@ function percentOf(progress: number | undefined) {
 
 export type AttachmentVariant = "grid" | "inline" | "list";
 
-export { attachmentCategory, formatBytes, type AttachmentCategory } from "./format";
+export { attachmentCategory, formatBytes, formatPercent, type AttachmentCategory } from "./format";
 
 function typeLabel(mediaType: string) {
   const subtype = mediaType.split(";")[0]?.split("/")[1] ?? "";
   return subtype ? subtype.replace(/^x-/, "").replace(/^vnd\..*\./, "").toUpperCase() : "";
 }
 
-export function attachmentDetail(item: AttachmentItem): string {
-  return [typeLabel(item.mediaType), formatBytes(item.size)].filter(Boolean).join(" · ");
+/** The type and size of a file ("PDF · 1.5 KB"). With a `locale` the size is written in it ("1,5 kB"). */
+export function attachmentDetail(item: AttachmentItem, locale?: Intl.LocalesArgument): string {
+  return [typeLabel(item.mediaType), formatBytes(item.size, locale ? localeTag(locale) : undefined)].filter(Boolean).join(" · ");
 }
+
+export type AttachmentsLabels = {
+  /** The name of the list. */
+  label: string;
+  /** An upload with no known progress. */
+  uploading: string;
+  /** The name of an upload's spinner and progress, given the file's name. */
+  uploadingName: (name: string) => string;
+  /** An upload with its progress, given the percentage as it is written ("36%"). */
+  uploadingPercent: (percent: string) => string;
+  /** A failed upload that gives no reason. */
+  failed: string;
+  /** The name of the remove key, given the file's name. */
+  remove: (name: string) => string;
+};
+
+const ATTACHMENTS_LABELS: AttachmentsLabels = {
+  label: "Attachments",
+  uploading: "Uploading…",
+  uploadingName: (name) => `Uploading ${name}`,
+  uploadingPercent: (percent) => `Uploading ${percent}`,
+  failed: "Upload failed",
+  remove: (name) => `Remove ${name}`,
+};
 
 const ICONS = {
   audio: MusicIcon,
@@ -52,7 +77,7 @@ const ICONS = {
   video: VideoIcon,
 } satisfies Record<AttachmentCategory, unknown>;
 
-function Preview({ item, variant }: { item: AttachmentItem; variant: AttachmentVariant }) {
+function Preview({ item, variant, labels }: { item: AttachmentItem; variant: AttachmentVariant; labels: AttachmentsLabels }) {
   const category = attachmentCategory(item.mediaType);
   const Icon = item.status === "error" ? AlertIcon : ICONS[category];
   let content: ReactNode = <Icon />;
@@ -67,7 +92,7 @@ function Preview({ item, variant }: { item: AttachmentItem; variant: AttachmentV
       {content}
       {item.status === "uploading" && percent === undefined ? (
         <span className="fui-attachment-busy">
-          <Spinner label={`Uploading ${item.name}`} />
+          <Spinner label={labels.uploadingName(item.name)} />
         </span>
       ) : null}
     </span>
@@ -89,6 +114,10 @@ export type AttachmentChipProps = {
   variant?: AttachmentVariant;
   onRemove?: (id: string) => void;
   removeLabel?: (item: AttachmentItem) => string;
+  /** The words of an upload, a failure and the remove key. A `LabelsProvider` sets them for every file (scope `attachments`). */
+  labels?: Partial<AttachmentsLabels>;
+  /** The locale of the percentage and, when given here or by a `LabelsProvider`, of the size. */
+  locale?: Intl.LocalesArgument;
   className?: string;
 };
 
@@ -96,19 +125,25 @@ export function AttachmentChip({
   item,
   variant = "inline",
   onRemove,
-  removeLabel = (value) => `Remove ${value.name}`,
+  removeLabel: ownRemoveLabel,
+  labels: ownLabels,
+  locale: ownLocale,
   className,
 }: AttachmentChipProps) {
+  const labels = useLabels("attachments", ATTACHMENTS_LABELS, ownLabels);
+  const locale = useLocale(ownLocale);
+  const sizeLocale = useProvidedLocale(ownLocale);
+  const removeLabel = ownRemoveLabel ?? ((value: AttachmentItem) => labels.remove(value.name));
   const percent = percentOf(item.progress);
   const uploading = item.status === "uploading";
   const detail =
     item.status === "error"
-      ? item.error || "Upload failed"
+      ? item.error || labels.failed
       : uploading
         ? percent === undefined
-          ? "Uploading…"
-          : `Uploading ${percent}%`
-        : attachmentDetail(item);
+          ? labels.uploading
+          : labels.uploadingPercent(formatPercent(percent, locale))
+        : attachmentDetail(item, sizeLocale);
   return (
     <div
       aria-busy={uploading || undefined}
@@ -117,24 +152,24 @@ export function AttachmentChip({
       data-variant={variant}
       title={variant === "grid" ? `${item.name}${detail ? ` · ${detail}` : ""}` : undefined}
     >
-      <Preview item={item} variant={variant} />
+      <Preview item={item} labels={labels} variant={variant} />
       {percent !== undefined && variant === "grid" ? (
         <>
           {uploading ? <UploadRing percent={percent} /> : null}
           {uploading ? (
             <span
-              aria-label={`Uploading ${item.name}`}
+              aria-label={labels.uploadingName(item.name)}
               aria-valuemax={100}
               aria-valuemin={0}
               aria-valuenow={percent}
               className="fui-attachment-percent"
               role="progressbar"
             >
-              {`${percent}%`}
+              {formatPercent(percent, locale)}
             </span>
           ) : (
             <span aria-hidden="true" className="fui-attachment-percent" data-done>
-              100%
+              {formatPercent(100, locale)}
             </span>
           )}
         </>
@@ -177,7 +212,12 @@ export type AttachmentsProps = {
   onRemove?: (id: string) => void;
   removeLabel?: (item: AttachmentItem) => string;
   empty?: ReactNode;
+  /** The list's name; `labels.label` ("Attachments") by default. */
   label?: string;
+  /** The words of the list and its files. A `LabelsProvider` sets them for every list (scope `attachments`). */
+  labels?: Partial<AttachmentsLabels>;
+  /** The locale of percentages and, when given here or by a `LabelsProvider`, of sizes. */
+  locale?: Intl.LocalesArgument;
   className?: string;
 };
 
@@ -188,16 +228,19 @@ export function Attachments({
   onRemove,
   removeLabel,
   empty = null,
-  label = "Attachments",
+  label,
+  labels: ownLabels,
+  locale,
   className,
 }: AttachmentsProps) {
+  const labels = useLabels("attachments", ATTACHMENTS_LABELS, ownLabels);
   const stagger = useArrivals(items.map((item) => item.id));
   if (items.length === 0) {
     return empty ? <div className="fui-attachments-empty">{empty}</div> : null;
   }
   return (
     <ul
-      aria-label={label}
+      aria-label={label ?? labels.label}
       className={["fui-attachments", className].filter(Boolean).join(" ")}
       data-size={variant === "grid" && size === "sm" ? "sm" : undefined}
       data-variant={variant}
@@ -208,7 +251,7 @@ export function Attachments({
           key={item.id}
           style={stagger.has(item.id) ? ({ "--fui-stagger": stagger.get(item.id) } as CSSProperties) : undefined}
         >
-          <AttachmentChip item={item} onRemove={onRemove} removeLabel={removeLabel} variant={variant} />
+          <AttachmentChip item={item} labels={ownLabels} locale={locale} onRemove={onRemove} removeLabel={removeLabel} variant={variant} />
         </li>
       ))}
     </ul>

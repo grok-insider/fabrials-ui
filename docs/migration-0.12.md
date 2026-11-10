@@ -649,3 +649,76 @@ The mosaic of four is unchanged. `layout="gallery"` draws up to eight tiles: one
 - A tile that is a button describes itself with its caption (`aria-describedby`), and the caption is not part of its accessible name.
 
 Radiant can delete `components/chat/image-lightbox.tsx` and `components/chat/image-results.tsx` once it migrates (the gallery it built is `layout="gallery"` with `hideBroken`, its lightbox is the provider, and `messageGallery` in `chat-transcript.tsx` is the group), and every hand-rolled `MAX_SCALE`/`CLOSE_DRAG_PX`/`SWIPE_PX` in them. Its look stays its own.
+
+## Words and locale
+
+Every word a component says on its own is now a prop with the English default it always had, counts go through `Intl.PluralRules`, and a product can set the whole set once for its page. Nothing changes for a product that changes nothing: the defaults are the words 0.11 printed.
+
+### `plural`, `formatCount`, `localeTag`
+
+From `@fabrials/ui`, in `plural.ts` with no directive, so a Server Component can call them.
+
+- `plural(count, forms, locale = "en")` picks `zero`, `one`, `two`, `few`, `many` or `other` with the locale's `Intl.PluralRules` (cached per locale) and replaces `{count}` with the number in that locale's digits. A category a language does not have falls back to `other`. `plural(5, { one: "{count} source", other: "{count} sources" }, "ar")` gives the Arabic `many` form; `plural(1204, forms, "es")` writes `1.204`.
+- `formatCount(count, locale = "en")` is the number alone, grouped and in the locale's digits.
+- `localeTag(locale)` turns any `Intl.LocalesArgument` (a tag, an `Intl.Locale`, a list) into the one tag the APIs that insist on a string need, `"en"` when there is none.
+
+### `LabelsProvider`, `useLabels`, `useLocale`, `useProvidedLocale`
+
+```tsx
+<LabelsProvider locale="es" labels={{ chart: { only: "Solo" }, codePanel: { copy: "Copiar el código" } }}>
+  <App />
+</LabelsProvider>
+```
+
+| Piece | What it does |
+| --- | --- |
+| `LabelsProvider labels={…} locale={…}` | Sets the words, by component scope, and the locale for everything inside. Nested providers merge: a scope given again is merged key by key over the outer one, a key set to `undefined` is not given and never hides the layer below. |
+| `useLabels(scope, defaults, own?)` | What a component reads: `{ ...defaults, ...provider[scope], ...own }`, so the component's own `labels` prop always wins. The result keeps its identity while the three inputs do; pass `defaults` as a module constant. |
+| `useLocale(own?)` | The component's `locale` prop, else the provider's, else `"en"`. |
+| `useProvidedLocale(own?)` | The same, but `undefined` instead of `"en"`: for a component whose "no locale" is not a locale's (`NumberTicker` prints plain digits). |
+| `FabrialsLabels` (type) | The registry: one optional key per scope. `@fabrials/ai-ui` adds its own by declaration merging, so `labels={{ search: {…} }}` is typed wherever the token appears. |
+
+The provider is a client component, and a function cannot cross from a Server Component: render it in a client module of the product, next to the other providers. The components that already rendered on the server still do (they take plain props).
+
+### `labels` props
+
+Each one is `Partial<…>` of its scope, English by default, and reads the provider under itself.
+
+| Component | Scope and keys |
+| --- | --- |
+| `SeriesChart` | `chart`: `label`, `hide(series)`, `show(series)`, `showOnly(series)`, `only`, `showAll`, `noValue`, `total`. Plus `locale`, which formats the values when there is no `yFormat`. |
+| `CodePanel`, `CodeTabs`, `PackageInstall` | `codePanel`: `copy`, `copied`, `copyFailed`, `code`, `examples`, `packageManager`. |
+| `CopyButton`, `Snippet` | `copyButton`: `copy`, `copied`; `snippet`: `copy`. Their `label`/`copiedLabel`/`copyLabel` props still win. |
+| `MultiSelect` | `multiSelect`: `placeholder`, `more(count, locale)`, `clear(label)`. The `placeholder` prop wins; `clear` receives the caller's label as written (only the English default lowercases it) and `locale` sets the spoken count's digits. |
+| `RepoInfo` | `repoInfo`: `stars(count, locale)`, `forks(count, locale)`, both through `plural`. `locale` (default `"en"`) sets the compact number beside them. |
+| `FilterChip` | `filterChip`: `clear(label, value)`. `clearLabel` still wins. |
+| `Table` | `table`: `region(name?)`, the name of the scroll region. `regionLabel` still wins. |
+| `Calendar` | `calendar`: `previousMonth`, `nextMonth`. `previousMonthLabel` and `nextMonthLabel` still win. |
+| `DatePicker`, `DateRangePicker` | `datePicker`: `placeholder`, `clear`, `rangePlaceholder`, `clearRange`. The props still win. |
+| `ImageViewer`, `Spreadsheet`, `TaskList`, `ThemeSwitcher`, `ErrorBoundaryFallback` | `imageViewer`, `spreadsheet`, `taskList`, `themeSwitcher`, `errorBoundary`: their existing `labels` props now also read the provider, under the prop. |
+| `@fabrials/ai-ui` `SearchStepsDisclosure`, `SearchStepList`, `SourceTally` | `search`: `searching`, `reading`, `searched`, `searches(count, locale)`, `sources(count, locale)`, `searchedWeb`, `readPage`, `opened(host)`, `showQueries`, `hideQueries`, `reviewing`. |
+| `Sources`, `SourceCard`, `CitationChip` | `sources`: `source(number)`, `citation(number, title)`, `count(count, locale)`. |
+| `Attachments`, `AttachmentChip` | `attachments`: `label`, `uploading`, `uploadingName(name)`, `uploadingPercent(percent)`, `failed`, `remove(name)`. `removeLabel` and `label` still win. |
+| `AgentThinking` | `agent`: the word of each activity, used when it is given no `label`. |
+| `ReasoningDisclosure` | `reasoning`: `thinking`, `brief`, `thoughtFor(seconds)`. |
+| `ContextMeter` | `contextMeter`: `label`, `unit`, `free`, `of(used, limit)`. The `label` and `unit` props win. |
+| `GenerationFrame` | `generation`: `queued`, `image`, `document`, `imageFailed`, `documentFailed`, `imageReady`, `documentReady`. `label` and `doneLabel` win. |
+| `CodeBlock` | `codeBlock`: `copy`, `copied`, `download`, `region(name)`. `copyLabel`, `copiedLabel` and `downloadLabel` win. |
+
+The exported helpers keep their signatures and add the words at the end: `searchLabel(phase, sourceCount, searchCount, labels?, locale?)`, `searchDoneLabel(sourceCount, searchCount, labels?, locale?)`, `searchStepLabel(step, labels?)`, `searchStepKindLabel(step, labels?)`, `sourcesLabel(count, labels?, locale?)`, `attachmentDetail(item, locale?)`. `formatPercent(percent, locale)` (from `@fabrials/ai-ui`'s `format.ts`, and from `attachments`) writes a whole percentage in the locale's form, `"36%"`, `"36 %"`, `"٣٦٪"`.
+
+A code panel's copy result is no longer a sentence that its CSS inspects: `data-state` is `"copied"` or `"failed"`, and the words come from `labels.copied` and `labels.copyFailed`. A product that styled that status by its text can style it by the state.
+
+### One locale, one default
+
+`locale?: Intl.LocalesArgument` everywhere: a tag, an `Intl.Locale`, or a list. Without one a component asks the provider and then uses `"en"`.
+
+- `Calendar`, `DatePicker`, `DateRangePicker` and `Spreadsheet` used to default to the runtime's locale. They default to `useLocale()` → `"en"`, so the server and the browser draw the same month and the same numbers. **This looks different in a product whose page is not in English**: pass `locale={navigator.language}` after hydration, or set the provider's `locale`, and the old behaviour is back.
+- `Meter`, `RelativeTime` (and `FileSize` through its own prop) defaulted to `"en"` already; they now read the provider too.
+- `NumberTicker` took `locale: boolean`, meaning "use the device's locale". It now takes a locale as well: `locale="de"`, or the provider's. `locale={true}` still means the device's (deprecated: the server cannot know it and the text changes when the page hydrates) and `locale={false}` keeps the digits plain inside a provider. With no locale at all it keeps printing plain digits, as before.
+- `groupByRecency` and `recencyGroupFor` take `locale` as an `Intl.LocalesArgument` and still default to `"en-US"`.
+- File sizes keep their old English text unless a locale is given, here or by the provider (`"1.5 KB"` without one, `"1,5 kB"` with `es`): `attachmentDetail(item)` is what it was.
+
+### What a product can delete
+
+Its own copies of these sentences: the chart's legend and table words, the code panel's copy labels, the multi-select summary, the repository counts, the filter chip's clear key, the search and source sentences of the chat, the upload states, the context window's readings and the generation frame's status sentences. Radiant, in particular, builds several of them by string concatenation in its components; they become one provider.

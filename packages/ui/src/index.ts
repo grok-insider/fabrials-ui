@@ -132,3 +132,5 @@ export * from "./marked-text";
 export { diffWords, segmentText, type DiffPart, type TextRange, type TextRangeSeverity, type TextSegment } from "./text-ranges";
 export type { StepPlayerState } from "./step-player";
 export * from "./image-viewer-context";
+export * from "./plural";
+export * from "./labels";

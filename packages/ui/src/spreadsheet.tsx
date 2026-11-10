@@ -5,6 +5,7 @@
 
 import { useEffect, useId, useMemo, useRef, useState, type ComponentProps, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
 import { asCell, cellAddress, cellKind, cellText, columnName, type Worksheet, type SheetCell, type SheetMerge, type Workbook } from "./spreadsheet-data";
+import { useLabels, useLocale } from "./labels";
 import { classes } from "./shared";
 
 export type SpreadsheetLabels = {
@@ -27,8 +28,8 @@ export type SpreadsheetProps = Omit<ComponentProps<"div">, "children"> & {
   sheet?: number;
   defaultSheet?: number;
   onSheetChange?: (index: number) => void;
-  /** For numbers and dates the file did not format. */
-  locale?: string;
+  /** For numbers and dates the file did not format; "en" unless a `LabelsProvider` says otherwise. */
+  locale?: Intl.LocalesArgument;
   /** The grid's height: a CSS length or px. */
   height?: number | string;
   rowHeight?: number;
@@ -76,7 +77,7 @@ export function Spreadsheet({
   sheet: sheetProp,
   defaultSheet = 0,
   onSheetChange,
-  locale,
+  locale: ownLocale,
   height = 420,
   rowHeight = 28,
   columnWidth = 96,
@@ -86,7 +87,8 @@ export function Spreadsheet({
   "aria-label": ariaLabel,
   ...props
 }: SpreadsheetProps) {
-  const text = { ...LABELS, ...labels };
+  const text = useLabels("spreadsheet", LABELS, labels);
+  const locale = useLocale(ownLocale);
   const id = useId();
   const [ownSheet, setOwnSheet] = useState(defaultSheet);
   const index = Math.min(Math.max(sheetProp ?? ownSheet, 0), Math.max(workbook.sheets.length - 1, 0));

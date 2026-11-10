@@ -13,6 +13,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useLabels, useProvidedLocale } from "./labels";
+import { formatCount } from "./plural";
 import { classes } from "./shared";
 import { useElementSize } from "./use-element-size";
 
@@ -46,6 +48,29 @@ export type ChartSeries = {
   dashed?: boolean;
 };
 
+export type SeriesChartLabels = {
+  /** The heading of the first column of the table a screen reader reads. */
+  label: string;
+  hide: (series: string) => string;
+  show: (series: string) => string;
+  showOnly: (series: string) => string;
+  only: string;
+  showAll: string;
+  noValue: string;
+  total: string;
+};
+
+const CHART_LABELS: SeriesChartLabels = {
+  label: "Label",
+  hide: (series) => `Hide ${series}`,
+  show: (series) => `Show ${series}`,
+  showOnly: (series) => `Show only ${series}`,
+  only: "Only",
+  showAll: "Show all",
+  noValue: "No value",
+  total: "Total",
+};
+
 export type SeriesChartProps = {
   data: Array<Record<string, string | number | null | undefined>>;
   xKey: string;
@@ -59,6 +84,10 @@ export type SeriesChartProps = {
   height?: number;
   /** `dither` (default) draws the Fabrials series material; `solid` fills with the chart hues. */
   texture?: "dither" | "solid";
+  /** The words of the legend, the tooltip and the table. A `LabelsProvider` sets them for every chart (scope `chart`). */
+  labels?: Partial<SeriesChartLabels>;
+  /** The locale values are written in when there is no `yFormat`. Without one (here or from a provider) a value is plain digits. */
+  locale?: Intl.LocalesArgument;
   className?: string;
 };
 
@@ -69,13 +98,18 @@ export function SeriesChart({
   kind = "bar",
   stacked = false,
   lineType = "monotone",
-  yFormat = (value) => String(value),
+  yFormat: yFormatProp,
   titleKey,
   caption,
   height = 288,
   texture = "dither",
+  labels: ownLabels,
+  locale: ownLocale,
   className,
 }: SeriesChartProps) {
+  const labels = useLabels("chart", CHART_LABELS, ownLabels);
+  const locale = useProvidedLocale(ownLocale);
+  const yFormat = yFormatProp ?? ((value: number) => (locale ? formatCount(value, locale) : String(value)));
   const uid = useId().replace(/[^a-zA-Z0-9_-]/g, "");
   const { ref: frameRef, width: frameWidth } = useElementSize<HTMLDivElement>(undefined, { measure: frameSize });
   const [hidden, setHidden] = useState<ReadonlySet<string>>(new Set());
@@ -133,6 +167,7 @@ export function SeriesChart({
             paints={new Map(painted.map((item) => [item.label, kind === "bar" ? item.fill : item.color]))}
             titleKey={titleKey}
             yFormat={yFormat}
+            labels={labels}
           />
         )}
       />
@@ -199,7 +234,7 @@ export function SeriesChart({
         <caption>{caption}</caption>
         <thead>
           <tr>
-            <th>Label</th>
+            <th>{labels.label}</th>
             {painted.map((item) => (
               <th key={item.key}>{item.label}</th>
             ))}
@@ -226,7 +261,7 @@ export function SeriesChart({
                 <button
                   type="button"
                   aria-pressed={shown}
-                  aria-label={shown ? `Hide ${item.label}` : `Show ${item.label}`}
+                  aria-label={shown ? labels.hide(item.label) : labels.show(item.label)}
                   className="fui-chart-legend-toggle"
                   onClick={() => toggle(item.key)}
                 >
@@ -235,11 +270,11 @@ export function SeriesChart({
                 </button>
                 <button
                   type="button"
-                  aria-label={`Show only ${item.label}`}
+                  aria-label={labels.showOnly(item.label)}
                   className="fui-chart-legend-only"
                   onClick={() => setHidden(new Set(painted.filter((entry) => entry.key !== item.key).map((entry) => entry.key)))}
                 >
-                  Only
+                  {labels.only}
                 </button>
               </span>
             );
@@ -250,7 +285,7 @@ export function SeriesChart({
               className="fui-chart-legend-reset"
               onClick={() => setHidden(new Set())}
             >
-              Show all
+              {labels.showAll}
             </button>
           ) : null}
         </div>
@@ -292,8 +327,10 @@ function SeriesTooltip({
   paints,
   titleKey,
   yFormat,
+  labels,
 }: {
   paints: ReadonlyMap<string, string>;
+  labels: SeriesChartLabels;
   active?: boolean;
   label?: unknown;
   titleKey?: string;
@@ -327,11 +364,11 @@ function SeriesTooltip({
           ))}
         </ul>
       ) : (
-        <p>No value</p>
+        <p>{labels.noValue}</p>
       )}
       {payload.length > 1 ? (
         <p className="fui-chart-tip-total">
-          <span>Total</span>
+          <span>{labels.total}</span>
           <span>{yFormat(total)}</span>
         </p>
       ) : null}

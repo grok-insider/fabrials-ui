@@ -51,6 +51,7 @@ import {
 } from "./media-logic";
 import { Image, type ImageProps } from "./image";
 import { classes } from "./shared";
+import { useLabels } from "./labels";
 import { PixelSpinner } from "./pixel-spinner";
 import { useHydrated } from "./use-hydrated";
 
@@ -200,7 +201,7 @@ export function ImageViewer({
   dragToClose = true,
   returnFocus,
 }: ImageViewerProps) {
-  const text = { ...LABELS, ...labels };
+  const text = useLabels("imageViewer", LABELS, labels);
   const open = index !== null && index >= 0 && index < items.length;
   const current = open ? items[index]! : null;
   const total = items.length;
@@ -755,7 +756,7 @@ export function ImageViewerProvider({ children, label, labels, thumbnails, rende
   const [shown, setShown] = useState<{ items: ViewerItem[]; index: number } | null>(null);
   const [opener, setOpener] = useState<HTMLElement | null>(null);
   const groups = useRef(new Map<string, Set<ImageViewerMember>>()).current;
-  const text = { ...LABELS, ...labels };
+  const text = useLabels("imageViewer", LABELS, labels);
   const control = useMemo<ImageViewerControl>(
     () => ({
       open: (items, index = 0, options) => {
@@ -884,7 +885,7 @@ export function ZoomableImage({
     return control.join(name, { node: () => node.current, item: () => latest.current });
   }, [linked, control, name]);
   if (!viewer || !control) return <Image alt={alt} src={src} className={className} style={style} {...image} />;
-  const text = { ...LABELS, ...labels };
+  const text = useLabels("imageViewer", LABELS, labels);
   // The button, not the wrapper: focus comes back to what was pressed, and a div cannot take it.
   const press = (element: HTMLElement) => {
     const set = name ? control.members(name) : [];

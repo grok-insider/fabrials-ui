@@ -3,6 +3,7 @@
 import { useId, type CSSProperties, type ComponentProps, type ReactNode } from "react";
 import { Meter as BaseMeter } from "@base-ui/react/meter";
 import { ArrowDownRight, ArrowUpRight, Minus } from "lucide-react";
+import { useLocale } from "./labels";
 import { classes } from "./shared";
 import type { Tone } from "./display";
 
@@ -160,7 +161,7 @@ export type MeterProps = Omit<BaseMeter.Root.Props, "className" | "children"> & 
   variant?: "bar" | "ruler";
   /** Ticks on the ruler. */
   ticks?: number;
-  /** The language the value is written in ("42%", "42 %"). Default `"en"`, so the server and the browser write it alike; pass the page's. */
+  /** The language the value is written in ("42%", "42 %"). Default: a `LabelsProvider`'s, else `"en"`, so the server and the browser write it alike. */
   locale?: Intl.LocalesArgument;
 };
 
@@ -177,9 +178,10 @@ export function Meter({
   value,
   min = 0,
   max = 100,
-  locale = "en",
+  locale: ownLocale,
   ...props
 }: MeterProps) {
+  const locale = useLocale(ownLocale);
   const percent = ((value - min) / (max - min || 1)) * 100;
   const filled = Math.round((Math.min(100, Math.max(0, percent)) / 100) * ticks);
   const resolved: Tone =

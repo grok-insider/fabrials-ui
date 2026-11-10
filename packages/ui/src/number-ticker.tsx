@@ -3,6 +3,8 @@
 
 import { animate, motion, useInView, useReducedMotion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useProvidedLocale } from "./labels";
+import { formatCount } from "./plural";
 import { classes } from "./shared";
 
 const EASE_OUT = [0.16, 1, 0.3, 1] as const;
@@ -20,7 +22,14 @@ export type NumberTickerProps = {
   blur?: boolean;
   className?: string;
   digitClassName?: string;
-  locale?: boolean;
+  /**
+   * The locale the number is grouped in ("12,480", "12.480"). Without one, here or from a `LabelsProvider`, the digits are
+   * plain; `false` keeps them plain inside a provider.
+   *
+   * @deprecated `true` is the device's locale, which the server cannot know and which changes the text when the page
+   * hydrates. Pass a locale, or set one in a `LabelsProvider`.
+   */
+  locale?: Intl.LocalesArgument | boolean;
   format?: (value: number) => string;
 };
 
@@ -35,9 +44,10 @@ export function NumberTicker({
   blur = false,
   className,
   digitClassName,
-  locale,
+  locale: ownLocale,
   format,
 }: NumberTickerProps) {
+  const provided = useProvidedLocale(typeof ownLocale === "boolean" ? undefined : ownLocale);
   const containerRef = useRef<HTMLSpanElement>(null);
   const inView = useInView(containerRef, { once: true, amount: 0.6 });
   const [armed, setArmed] = useState(!startOnView);
@@ -50,9 +60,9 @@ export function NumberTicker({
   const text = useMemo(() => {
     if (format) return format(value);
     const rounded = Math.round(value);
-    const formatted = locale ? rounded.toLocaleString() : rounded.toString();
+    const formatted = ownLocale === true ? rounded.toLocaleString() : ownLocale === false || !provided ? rounded.toString() : formatCount(rounded, provided);
     return pad ? formatted.padStart(pad, "0") : formatted;
-  }, [value, pad, format, locale]);
+  }, [value, pad, format, ownLocale, provided]);
   const glyphs = useMemo(
     () => text.split("").map((char, index, chars) => ({ char, id: `g-${chars.length - 1 - index}` })),
     [text],

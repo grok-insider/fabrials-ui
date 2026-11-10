@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type ComponentProps, type CSSProperties, type ReactNode } from "react";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger, Readout, ShimmerText, useScramble } from "@fabrials/ui";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger, Readout, ShimmerText, formatCount, plural, useLabels, useLocale, useScramble } from "@fabrials/ui";
 import {
   BrainIcon,
   ChevronDownIcon,
@@ -122,10 +122,16 @@ export type ReasoningLabels = {
   thoughtFor?: (seconds: number) => string;
 };
 
+const REASONING_LABELS: Required<ReasoningLabels> = {
+  thinking: "Thinking…",
+  brief: "Thought for a few seconds",
+  thoughtFor: (seconds) => `Thought for ${seconds}s`,
+};
+
 export function reasoningLabel(streaming: boolean, seconds: number | undefined, labels: ReasoningLabels = {}): string {
-  if (streaming || seconds === 0) return labels.thinking ?? "Thinking…";
-  if (seconds === undefined) return labels.brief ?? "Thought for a few seconds";
-  return labels.thoughtFor?.(seconds) ?? `Thought for ${seconds}s`;
+  if (streaming || seconds === 0) return labels.thinking ?? REASONING_LABELS.thinking;
+  if (seconds === undefined) return labels.brief ?? REASONING_LABELS.brief;
+  return (labels.thoughtFor ?? REASONING_LABELS.thoughtFor)(seconds);
 }
 
 const AUTO_CLOSE_MS = 1000;
@@ -138,6 +144,7 @@ export type ReasoningDisclosureProps = {
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
   autoClose?: boolean;
+  /** The words of the row. A `LabelsProvider` sets them for every reasoning row (scope `reasoning`). */
   labels?: ReasoningLabels;
   icon?: ReactNode;
   /** The time spent thinking ticks beside the label while it streams (default on). */
@@ -153,11 +160,12 @@ export function ReasoningDisclosure({
   defaultOpen,
   onOpenChange,
   autoClose = true,
-  labels,
+  labels: ownLabels,
   icon = <BrainIcon />,
   timer = true,
   className,
 }: ReasoningDisclosureProps) {
+  const labels = useLabels("reasoning", REASONING_LABELS, ownLabels);
   const explicitlyClosed = defaultOpen === false;
   const [open, setOpen] = useControllable(openProp, defaultOpen ?? streaming, onOpenChange);
   const [measured, setMeasured] = useState<number | undefined>(undefined);
@@ -223,17 +231,58 @@ export function searchPhase(input: { pending: boolean; streaming: boolean; isLas
   return input.isLast ? "reading" : "done";
 }
 
-export function searchDoneLabel(sourceCount: number, searchCount = 0): string {
-  const bits = ["Searched the web"];
-  if (searchCount > 0) bits.push(`${searchCount} ${searchCount === 1 ? "search" : "searches"}`);
-  if (sourceCount > 0) bits.push(`${sourceCount} ${sourceCount === 1 ? "source" : "sources"}`);
+export type SearchLabels = {
+  /** The row while the search runs, while its results are read, and once it is done. */
+  searching: string;
+  reading: string;
+  searched: string;
+  /** The counts after "Searched the web": "2 searches", "5 sources". */
+  searches: (count: number, locale: Intl.LocalesArgument) => string;
+  sources: (count: number, locale: Intl.LocalesArgument) => string;
+  /** What kind of step each one is. */
+  searchedWeb: string;
+  readPage: string;
+  /** A page that was opened and has no title, by its host. */
+  opened: (host: string) => string;
+  /** What the row's key does, said after its label. */
+  showQueries: string;
+  hideQueries: string;
+  /** The words of `SourceTally` while sources arrive. */
+  reviewing: string;
+};
+
+const SEARCH_LABELS: SearchLabels = {
+  searching: "Searching the web…",
+  reading: "Reading results…",
+  searched: "Searched the web",
+  searches: (count, locale) => plural(count, { one: "{count} search", other: "{count} searches" }, locale),
+  sources: (count, locale) => plural(count, { one: "{count} source", other: "{count} sources" }, locale),
+  searchedWeb: "Searched web",
+  readPage: "Read page",
+  opened: (host) => `Opened ${host}`,
+  showQueries: "Show search queries",
+  hideQueries: "Hide search queries",
+  reviewing: "Reviewing sources",
+};
+
+export function searchDoneLabel(sourceCount: number, searchCount = 0, labels: Partial<SearchLabels> = {}, locale: Intl.LocalesArgument = "en"): string {
+  const text = { ...SEARCH_LABELS, ...labels };
+  const bits = [text.searched];
+  if (searchCount > 0) bits.push(text.searches(searchCount, locale));
+  if (sourceCount > 0) bits.push(text.sources(sourceCount, locale));
   return bits.join(" · ");
 }
 
-export function searchLabel(phase: SearchPhase, sourceCount: number, searchCount = 0): string {
-  if (phase === "searching") return "Searching the web…";
-  if (phase === "reading") return "Reading results…";
-  return searchDoneLabel(sourceCount, searchCount);
+export function searchLabel(
+  phase: SearchPhase,
+  sourceCount: number,
+  searchCount = 0,
+  labels: Partial<SearchLabels> = {},
+  locale: Intl.LocalesArgument = "en",
+): string {
+  if (phase === "searching") return labels.searching ?? SEARCH_LABELS.searching;
+  if (phase === "reading") return labels.reading ?? SEARCH_LABELS.reading;
+  return searchDoneLabel(sourceCount, searchCount, labels, locale);
 }
 
 export function countSearches(steps: readonly SearchStep[]): number {
@@ -248,16 +297,16 @@ function stepHost(url: string) {
   }
 }
 
-export function searchStepLabel(step: SearchStep): string {
-  return step.type === "search" ? step.query : step.title?.trim() || `Opened ${stepHost(step.url)}`;
+export function searchStepLabel(step: SearchStep, labels: Partial<SearchLabels> = {}): string {
+  return step.type === "search" ? step.query : step.title?.trim() || (labels.opened ?? SEARCH_LABELS.opened)(stepHost(step.url));
 }
 
 function uniqueUrls(urls: readonly string[] | undefined) {
   return [...new Set((urls ?? []).map((url) => url.trim()).filter(Boolean))];
 }
 
-export function searchStepKindLabel(step: SearchStep): string {
-  return step.type === "search" ? "Searched web" : "Read page";
+export function searchStepKindLabel(step: SearchStep, labels: Partial<SearchLabels> = {}): string {
+  return step.type === "search" ? (labels.searchedWeb ?? SEARCH_LABELS.searchedWeb) : (labels.readPage ?? SEARCH_LABELS.readPage);
 }
 
 function SearchResults({
@@ -302,7 +351,9 @@ function SearchStepItem({
   faviconUrl,
   id,
   stagger,
+  labels,
 }: {
+  labels: SearchLabels;
   step: SearchStep;
   last: boolean;
   live: boolean;
@@ -314,8 +365,8 @@ function SearchStepItem({
   const [open, setOpen] = useState(false);
   const results = step.type === "search" ? uniqueUrls(step.sources) : [];
   const pageTitle = step.type === "open_page" ? step.title?.trim() || titleFor?.(step.url)?.trim() : undefined;
-  const label = step.type === "open_page" && pageTitle ? pageTitle : searchStepLabel(step);
-  const kind = searchStepKindLabel(step);
+  const label = step.type === "open_page" && pageTitle ? pageTitle : searchStepLabel(step, labels);
+  const kind = searchStepKindLabel(step, labels);
   const icon = step.type === "search" ? <SearchIcon /> : <FileTextIcon />;
   const text = (
     <span className="fui-search-step-text">
@@ -396,13 +447,16 @@ export type SearchStepListProps = {
   live?: boolean;
   titleFor?: SearchResultTitle;
   faviconUrl?: FaviconResolver;
+  /** The words of each step. A `LabelsProvider` sets them for every search (scope `search`). */
+  labels?: Partial<SearchLabels>;
 };
 
 function stepKey(step: SearchStep, index: number) {
   return `${step.type}-${step.type === "search" ? step.query : step.url}-${index}`;
 }
 
-export function SearchStepList({ steps, live = false, titleFor, faviconUrl }: SearchStepListProps) {
+export function SearchStepList({ steps, live = false, titleFor, faviconUrl, labels: ownLabels }: SearchStepListProps) {
+  const labels = useLabels("search", SEARCH_LABELS, ownLabels);
   const uid = useId().replace(/:/g, "");
   const keys = steps.map(stepKey);
   const stagger = useArrivals(keys);
@@ -413,6 +467,7 @@ export function SearchStepList({ steps, live = false, titleFor, faviconUrl }: Se
           faviconUrl={faviconUrl}
           id={`fui-search-${uid}-${index}`}
           key={keys[index]}
+          labels={labels}
           last={index === steps.length - 1}
           live={live && index === steps.length - 1}
           stagger={stagger.get(keys[index]!)}
@@ -437,6 +492,10 @@ export type SearchStepsDisclosureProps = {
   /** While searching, the time it has taken beside the label (default on). */
   timer?: boolean;
   startedAt?: number | Date;
+  /** The words of the row and its steps. A `LabelsProvider` sets them for every search (scope `search`). */
+  labels?: Partial<SearchLabels>;
+  /** The locale of the counts; "en" unless a `LabelsProvider` says otherwise. */
+  locale?: Intl.LocalesArgument;
 };
 
 export function SearchStepsDisclosure({
@@ -451,8 +510,12 @@ export function SearchStepsDisclosure({
   faviconUrl,
   timer = true,
   startedAt,
+  labels: ownLabels,
+  locale: ownLocale,
 }: SearchStepsDisclosureProps) {
-  const text = label ?? searchLabel(phase, sourceCount, countSearches(steps));
+  const labels = useLabels("search", SEARCH_LABELS, ownLabels);
+  const locale = useLocale(ownLocale);
+  const text = label ?? searchLabel(phase, sourceCount, countSearches(steps), labels, locale);
   return (
     <ActivityDisclosure
       className={join("fui-search-activity", className)}
@@ -462,10 +525,10 @@ export function SearchStepsDisclosure({
       live={phase !== "done"}
       startedAt={startedAt}
       timer={timer}
-      toggleLabel={(open) => `${open ? "Hide" : "Show"} search queries`}
+      toggleLabel={(open) => (open ? labels.hideQueries : labels.showQueries)}
     >
       {steps.length > 0 ? (
-        <SearchStepList faviconUrl={faviconUrl} live={phase !== "done"} steps={steps} titleFor={titleFor} />
+        <SearchStepList faviconUrl={faviconUrl} labels={ownLabels} live={phase !== "done"} steps={steps} titleFor={titleFor} />
       ) : null}
     </ActivityDisclosure>
   );
@@ -476,6 +539,8 @@ export type SourceTallyProps = Omit<ComponentProps<"div">, "children"> & {
   sources: readonly string[];
   /** What the agent is doing with them: "Reviewing sources" while it searches, "Read" once it has. */
   label?: string;
+  /** The locale of the count. */
+  locale?: Intl.LocalesArgument;
   /** How many tiles to draw; the count covers the rest. 8 by default. */
   max?: number;
   faviconUrl?: FaviconResolver;
@@ -486,13 +551,15 @@ export type SourceTallyProps = Omit<ComponentProps<"div">, "children"> & {
  * whose digits settle when it changes) and a tile for each, its site's mark or initial. A tile that arrives after the line is
  * shown rises into place; nothing moves between arrivals. Not a live region: say the state in an `AgentThinking` beside it.
  */
-export function SourceTally({ sources, label = "Reviewing sources", max = 8, faviconUrl, className, ...props }: SourceTallyProps) {
+export function SourceTally({ sources, label, locale: ownLocale, max = 8, faviconUrl, className, ...props }: SourceTallyProps) {
+  const labels = useLabels("search", SEARCH_LABELS);
+  const locale = useLocale(ownLocale);
   const unique = uniqueUrls(sources);
   const stagger = useArrivals(unique);
   return (
     <div className={join("fui-source-tally", className)} {...props}>
-      <span className="fui-source-tally-label">{label}</span>
-      <Readout className="fui-source-tally-count" value={String(unique.length)} />
+      <span className="fui-source-tally-label">{label ?? labels.reviewing}</span>
+      <Readout className="fui-source-tally-count" value={formatCount(unique.length, locale)} />
       {unique.length > 0 ? (
         <span aria-hidden="true" className="fui-source-tally-tiles">
           {unique.slice(0, Math.max(0, max)).map((url) => (

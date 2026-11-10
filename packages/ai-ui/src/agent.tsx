@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useId, useRef, useState, type ComponentProps, type CSSProperties, type ReactNode } from "react";
-import { ShimmerText, WorkingLight, useScramble } from "@fabrials/ui";
-import { formatTokens } from "./format";
+import { ShimmerText, WorkingLight, formatCount, plural, useLabels, useLocale, useScramble } from "@fabrials/ui";
+import { formatPercent, formatTokens } from "./format";
 
 function join(...values: Array<string | false | null | undefined>) {
   return values.filter(Boolean).join(" ");
@@ -69,6 +69,19 @@ export const agentActivities: Record<AgentActivity, { variant: AgentMarkVariant;
   running: { variant: "orbit", label: "Running" },
   rendering: { variant: "raster", label: "Rendering" },
   uploading: { variant: "fill", label: "Uploading" },
+};
+
+/** The words of each kind of work, when an `AgentThinking` is given no `label`. */
+export type AgentLabels = Record<AgentActivity, string>;
+
+const AGENT_LABELS: AgentLabels = {
+  thinking: agentActivities.thinking.label,
+  searching: agentActivities.searching.label,
+  reading: agentActivities.reading.label,
+  writing: agentActivities.writing.label,
+  running: agentActivities.running.label,
+  rendering: agentActivities.rendering.label,
+  uploading: agentActivities.uploading.label,
 };
 
 // The 3x3 grid of the busy mark (11 px, cells of 3 with 1 px between), by diagonal.
@@ -200,6 +213,8 @@ export type AgentThinkingProps = Omit<ComponentProps<"div">, "children"> & {
   activity?: AgentActivity;
   /** What the agent is doing, in words ("Thinking", "Searching the docs"). Read out when it changes. */
   label?: string;
+  /** The words of each activity, used when there is no `label`. A `LabelsProvider` sets them (scope `agent`). */
+  labels?: Partial<AgentLabels>;
   /** The mark, when it should differ from the activity's: `wave`, `orbit`, `dither`, `scan`, `lines`, `type`, `raster`, `fill`. */
   variant?: AgentMarkVariant;
   /** `light` (default): the mark and the label carry the working light. `ink`: a quieter, muted line. */
@@ -228,6 +243,7 @@ export type AgentThinkingProps = Omit<ComponentProps<"div">, "children"> & {
 export function AgentThinking({
   activity = "thinking",
   label,
+  labels: ownLabels,
   variant,
   tone = "light",
   shimmer = true,
@@ -238,9 +254,10 @@ export function AgentThinking({
   className,
   ...props
 }: AgentThinkingProps) {
+  const labels = useLabels("agent", AGENT_LABELS, ownLabels);
   const working = status === "working";
   const kind = agentActivities[activity] ?? agentActivities.thinking;
-  const words = label ?? kind.label;
+  const words = label ?? labels[activity] ?? labels.thinking;
   // A line that worked here counts its own time; one that arrives settled shows a time only when it was given one.
   const worked = useRef(working);
   if (working) worked.current = true;
@@ -347,9 +364,9 @@ export type TaskListLabels = {
   done: string;
   failed: string;
   skipped: string;
-  /** The count in the header and the summary read out when everything has settled. */
-  progress: (done: number, total: number) => string;
-  complete: (total: number) => string;
+  /** The count in the header and the summary read out when everything has settled. Both are given the list's locale. */
+  progress: (done: number, total: number, locale?: Intl.LocalesArgument) => string;
+  complete: (total: number, locale?: Intl.LocalesArgument) => string;
 };
 
 const TASK_LABELS: TaskListLabels = {
@@ -358,8 +375,8 @@ const TASK_LABELS: TaskListLabels = {
   done: "Done",
   failed: "Failed",
   skipped: "Skipped",
-  progress: (done, total) => `${done} of ${total}`,
-  complete: (total) => `All ${total} ${total === 1 ? "task" : "tasks"} settled`,
+  progress: (done, total, locale) => `${formatCount(done, locale)} of ${formatCount(total, locale)}`,
+  complete: (total, locale) => plural(total, { one: "All {count} task settled", other: "All {count} tasks settled" }, locale),
 };
 
 function TaskMark({ status, activity }: { status: TaskStatus; activity?: AgentActivity }) {
@@ -382,8 +399,10 @@ export type TaskListProps = Omit<ComponentProps<"section">, "title" | "children"
   title?: ReactNode;
   /** The list's accessible name when there is no title. */
   label?: string;
-  /** The words for each state, the count and the closing summary, in the reader's language. */
+  /** The words for each state, the count and the closing summary, in the reader's language. A `LabelsProvider` sets them (scope `taskList`). */
   labels?: Partial<TaskListLabels>;
+  /** The locale of the counts; "en" unless a `LabelsProvider` says otherwise. */
+  locale?: Intl.LocalesArgument;
 };
 
 /**
@@ -391,9 +410,10 @@ export type TaskListProps = Omit<ComponentProps<"section">, "title" | "children"
  * its mark to the eye; the running row carries the working light and `aria-current="step"`. Rows that arrive after the list
  * is shown rise into place, a done tick is drawn, and one polite status announces the step that started, failed or the end.
  */
-export function TaskList({ tasks, title, label = "Tasks", labels: labelOverrides, className, ...props }: TaskListProps) {
+export function TaskList({ tasks, title, label = "Tasks", labels: labelOverrides, locale: ownLocale, className, ...props }: TaskListProps) {
   const titleId = useId();
-  const labels = { ...TASK_LABELS, ...labelOverrides };
+  const labels = useLabels("taskList", TASK_LABELS, labelOverrides);
+  const locale = useLocale(ownLocale);
   const stagger = useArrivals(tasks.map((task) => task.id));
   const settled = tasks.filter((task) => task.status === "done" || task.status === "skipped").length;
   const running = tasks.find((task) => task.status === "running");
@@ -404,7 +424,7 @@ export function TaskList({ tasks, title, label = "Tasks", labels: labelOverrides
     : failed
       ? `${labels.failed}: ${failed.title}`
       : allSettled
-        ? labels.complete(tasks.length)
+        ? labels.complete(tasks.length, locale)
         : "";
   return (
     <section
@@ -419,7 +439,7 @@ export function TaskList({ tasks, title, label = "Tasks", labels: labelOverrides
           <span className="fui-task-list-title" id={titleId}>
             {title}
           </span>
-          <span className="fui-task-list-count">{labels.progress(settled, tasks.length)}</span>
+          <span className="fui-task-list-count">{labels.progress(settled, tasks.length, locale)}</span>
           <span aria-hidden="true" className="fui-task-list-bar">
             {tasks.map((task) => (
               <span data-status={task.status} key={task.id} />
@@ -489,6 +509,26 @@ export type ContextMeterProps = Omit<ComponentProps<"div">, "children"> & {
   dangerAt?: number;
   /** Hide the legend under the bar (the meter keeps its accessible value). */
   legend?: boolean;
+  /** The meter's words; `label` and `unit` win over theirs. A `LabelsProvider` sets them for every meter (scope `contextMeter`). */
+  labels?: Partial<ContextMeterLabels>;
+  /** The locale of the percentage and of the spoken counts; "en" unless a `LabelsProvider` says otherwise. */
+  locale?: Intl.LocalesArgument;
+};
+
+export type ContextMeterLabels = {
+  label: string;
+  unit: string;
+  /** The room left, in the legend. */
+  free: string;
+  /** How much of the window is used, given the two numbers as they are written: "42.1k of 200k". */
+  of: (used: string, limit: string) => string;
+};
+
+const CONTEXT_METER_LABELS: ContextMeterLabels = {
+  label: "Context window",
+  unit: "tokens",
+  free: "Free",
+  of: (used, limit) => `${used} of ${limit}`,
 };
 
 export { formatTokens } from "./format";
@@ -500,28 +540,34 @@ export { formatTokens } from "./format";
 export function ContextMeter({
   parts,
   limit,
-  label = "Context window",
+  label: ownLabel,
   format = formatTokens,
-  unit = "tokens",
+  unit: ownUnit,
   warnAt = 0.8,
   dangerAt = 0.95,
   legend = true,
+  labels: ownLabels,
+  locale: ownLocale,
   className,
   ...props
 }: ContextMeterProps) {
+  const labels = useLabels("contextMeter", CONTEXT_METER_LABELS, ownLabels);
+  const locale = useLocale(ownLocale);
+  const label = ownLabel ?? labels.label;
+  const unit = ownUnit ?? labels.unit;
   const used = parts.reduce((sum, part) => sum + Math.max(0, part.value), 0);
   const safeLimit = Math.max(1, limit);
   const share = Math.min(1, used / safeLimit);
   const tone = share >= dangerAt ? "danger" : share >= warnAt ? "warning" : undefined;
-  const percent = Math.round(share * 100);
-  const reading = `${format(used)} of ${format(limit)}`;
+  const percent = formatPercent(Math.round(share * 100), locale);
+  const reading = labels.of(format(used), format(limit));
   return (
     <div className={join("fui-context-meter", className)} data-tone={tone} {...props}>
       <div className="fui-context-meter-head">
         <span className="fui-context-meter-label">{label}</span>
         <span className="fui-context-meter-reading">
           {reading}
-          <span className="fui-context-meter-percent">{`${percent}%`}</span>
+          <span className="fui-context-meter-percent">{percent}</span>
         </span>
       </div>
       <div
@@ -529,7 +575,7 @@ export function ContextMeter({
         aria-valuemax={limit}
         aria-valuemin={0}
         aria-valuenow={Math.min(used, limit)}
-        aria-valuetext={`${used.toLocaleString("en")} of ${limit.toLocaleString("en")} ${unit}, ${percent}%`}
+        aria-valuetext={`${labels.of(formatCount(used, locale), formatCount(limit, locale))} ${unit}, ${percent}`}
         className="fui-context-meter-track"
         role="meter"
       >
@@ -554,7 +600,7 @@ export function ContextMeter({
           ))}
           <li data-free>
             <span aria-hidden="true" className="fui-context-meter-swatch" data-free />
-            <span className="fui-context-meter-name">Free</span>
+            <span className="fui-context-meter-name">{labels.free}</span>
             <span className="fui-context-meter-value">{format(Math.max(0, limit - used))}</span>
           </li>
         </ul>
@@ -600,6 +646,32 @@ export type GenerationFrameProps = Omit<ComponentProps<"figure">, "children"> & 
   doneLabel?: string;
   /** When the work began, for the time shown without a known progress. */
   startedAt?: number | Date;
+  /** The status sentences; `label` and `doneLabel` win over them. A `LabelsProvider` sets them (scope `generation`). */
+  labels?: Partial<GenerationLabels>;
+  /** The locale of the percentage; "en" unless a `LabelsProvider` says otherwise. */
+  locale?: Intl.LocalesArgument;
+};
+
+export type GenerationLabels = {
+  queued: string;
+  /** While it works, for an image and for a document. */
+  image: string;
+  document: string;
+  imageFailed: string;
+  documentFailed: string;
+  /** Read out when the result is ready. */
+  imageReady: string;
+  documentReady: string;
+};
+
+const GENERATION_LABELS: GenerationLabels = {
+  queued: "Waiting to start",
+  image: "Making the image",
+  document: "Writing the document",
+  imageFailed: "The image could not be made",
+  documentFailed: "The document could not be written",
+  imageReady: "Image ready",
+  documentReady: "Document ready",
 };
 
 /**
@@ -622,10 +694,14 @@ export function GenerationFrame({
   error,
   doneLabel,
   startedAt,
+  labels: ownLabels,
+  locale: ownLocale,
   className,
   style,
   ...props
 }: GenerationFrameProps) {
+  const labels = useLabels("generation", GENERATION_LABELS, ownLabels);
+  const locale = useLocale(ownLocale);
   const working = status === "queued" || status === "generating";
   const page = kind === "document";
   const elapsed = useWorkTime(startedAt, working);
@@ -639,14 +715,14 @@ export function GenerationFrame({
   const words =
     label ??
     (status === "queued"
-      ? "Waiting to start"
+      ? labels.queued
       : status === "failed"
         ? page
-          ? "The document could not be written"
-          : "The image could not be made"
+          ? labels.documentFailed
+          : labels.imageFailed
         : page
-          ? "Writing the document"
-          : "Making the image");
+          ? labels.document
+          : labels.image);
   // A known progress places the field instead of the clock: how far down the page, or which pass and how far down it.
   const pass = share === undefined ? undefined : Math.min(2, Math.floor(share * 3));
   const field: CSSProperties | undefined =
@@ -655,7 +731,7 @@ export function GenerationFrame({
       : page
         ? ({ "--fui-page-t": share * PAGE_ROWS.length } as CSSProperties)
         : ({ "--fui-refine-pass": pass, "--fui-refine-band": `${(share * 3 - pass!) * 100}%`, "--fui-scan-band": `${share * 100}%` } as CSSProperties);
-  const reading = working ? (percent !== undefined ? `${percent}%` : elapsed === null ? "" : formatWorkTime(elapsed)) : "";
+  const reading = working ? (percent !== undefined ? formatPercent(percent, locale) : elapsed === null ? "" : formatWorkTime(elapsed)) : "";
   return (
     <figure
       className={join("fui-generation", className)}
@@ -721,7 +797,7 @@ export function GenerationFrame({
               </span>
               {percent !== undefined ? (
                 <>
-                  <span className="fui-sr-only">{`${percent}%`}</span>
+                  <span className="fui-sr-only">{formatPercent(percent, locale)}</span>
                   <span aria-hidden="true" className="fui-generation-progress">
                     <span style={{ inlineSize: `${percent}%` }} />
                   </span>
@@ -729,7 +805,7 @@ export function GenerationFrame({
               ) : null}
             </>
           ) : status === "done" ? (
-            (doneLabel ?? (page ? "Document ready" : "Image ready"))
+            (doneLabel ?? (page ? labels.documentReady : labels.imageReady))
           ) : null}
         </span>
         {status === "failed" ? (

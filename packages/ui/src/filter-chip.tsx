@@ -4,13 +4,25 @@ import { useEffect, useRef, type ComponentProps, type ReactNode, type Ref } from
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
 import { X } from "lucide-react";
+import { useLabels } from "./labels";
 import { classes } from "./shared";
+
+export type FilterChipLabels = {
+  /** The name of the clear key, given the filter's label and value. The English default lowercases the label. */
+  clear: (label: string, value: string) => string;
+};
+
+const FILTER_CHIP_LABELS: FilterChipLabels = {
+  clear: (label, value) => `Clear ${label.toLowerCase()} filter (${value})`,
+};
 
 type FilterChipBase = {
   label: string;
   value: string;
   /** The accessible name of the clear key. `Clear <label> filter (<value>)` by default. */
   clearLabel?: string;
+  /** The clear key's name as a function of the label and value. A `LabelsProvider` sets it for every chip (scope `filterChip`). */
+  labels?: Partial<FilterChipLabels>;
   /** On the chip; the other props go to its clear key. */
   className?: string;
 };
@@ -29,10 +41,6 @@ export type FilterChipButtonProps = FilterChipBase &
   };
 
 export type FilterChipProps = FilterChipLinkProps | FilterChipButtonProps;
-
-function defaultClearLabel(label: string, value: string) {
-  return `Clear ${label.toLowerCase()} filter (${value})`;
-}
 
 function Chip({ label, value, className, leaving, chipRef, children }: {
   label: string;
@@ -53,14 +61,15 @@ function Chip({ label, value, className, leaving, chipRef, children }: {
   );
 }
 
-function FilterChipLink({ label, value, clearLabel, className, render, ...props }: FilterChipLinkProps) {
+function FilterChipLink({ label, value, clearLabel, labels: ownLabels, className, render, ...props }: FilterChipLinkProps) {
+  const labels = useLabels("filterChip", FILTER_CHIP_LABELS, ownLabels);
   const key = useRender({
     defaultTagName: "a",
     render,
     props: mergeProps<"a">(
       {
         className: "fui-filter-chip-remove",
-        "aria-label": clearLabel ?? defaultClearLabel(label, value),
+        "aria-label": clearLabel ?? labels.clear(label, value),
         children: <X aria-hidden />,
       },
       props,
@@ -92,7 +101,8 @@ function exitDuration(chip: HTMLElement) {
   return Number.isFinite(length) ? length : 0;
 }
 
-function FilterChipButton({ label, value, clearLabel, className, onRemove, ...props }: FilterChipButtonProps) {
+function FilterChipButton({ label, value, clearLabel, labels: ownLabels, className, onRemove, ...props }: FilterChipButtonProps) {
+  const labels = useLabels("filterChip", FILTER_CHIP_LABELS, ownLabels);
   const chip = useRef<HTMLSpanElement | null>(null);
   const mounted = useRef(true);
   const restore = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -139,7 +149,7 @@ function FilterChipButton({ label, value, clearLabel, className, onRemove, ...pr
       <button
         type="button"
         className="fui-filter-chip-remove"
-        aria-label={clearLabel ?? defaultClearLabel(label, value)}
+        aria-label={clearLabel ?? labels.clear(label, value)}
         {...props}
         onClick={remove}
       >

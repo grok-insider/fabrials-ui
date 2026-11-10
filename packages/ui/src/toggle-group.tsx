@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, type ReactNode, type Ref } from "react"
 import { Toggle as BaseToggle } from "@base-ui/react/toggle";
 import { ToggleGroup as BaseToggleGroup } from "@base-ui/react/toggle-group";
 import { Monitor, Moon, Sun } from "lucide-react";
+import { useLabels } from "./labels";
 import { classes, type StyledProps } from "./shared";
 
 /**
@@ -110,6 +111,8 @@ export function ToggleGroupItem({
 
 export type ThemePreference = "system" | "light" | "dark";
 
+const THEME_LABELS: Record<ThemePreference, ReactNode> = { system: "System", light: "Light", dark: "Dark" };
+
 const themeOptions: Array<{ value: ThemePreference; icon: typeof Sun }> = [
   { value: "system", icon: Monitor },
   { value: "light", icon: Sun },
@@ -122,7 +125,7 @@ const themeOptions: Array<{ value: ThemePreference; icon: typeof Sun }> = [
 export function ThemeSwitcher({
   value,
   onValueChange,
-  labels = { system: "System", light: "Light", dark: "Dark" },
+  labels: ownLabels,
   showLabels = false,
   label = "Theme",
   size = "sm",
@@ -137,6 +140,7 @@ export function ThemeSwitcher({
   size?: "default" | "sm" | "lg";
   className?: string;
 }) {
+  const labels = useLabels("themeSwitcher", THEME_LABELS, ownLabels);
   return (
     <ToggleGroup
       aria-label={label}

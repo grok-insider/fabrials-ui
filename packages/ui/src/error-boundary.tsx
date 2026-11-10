@@ -3,6 +3,7 @@
 
 import { Component, createRef, type ErrorInfo, type ReactNode } from "react";
 import { Button } from "./controls";
+import { useLabels } from "./labels";
 import { StatePanel, type StatePanelProps } from "./patterns";
 
 export type ErrorBoundaryLabels = {
@@ -25,7 +26,7 @@ export type ErrorBoundaryFallbackProps = Omit<StatePanelProps, "state" | "title"
 
 /** What `ErrorBoundary` shows by default: an inline error with "Try again". Also the body of a route's error file. */
 export function ErrorBoundaryFallback({ reset, labels, headingLevel = 3, size = "sm", variant = "inline", ...props }: ErrorBoundaryFallbackProps) {
-  const text = { ...LABELS, ...labels };
+  const text = useLabels("errorBoundary", LABELS, labels);
   return (
     <StatePanel
       data-slot="error-boundary-fallback"

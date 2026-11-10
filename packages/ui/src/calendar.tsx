@@ -6,6 +6,7 @@
 import { useEffect, useId, useRef, useState, type ComponentProps, type KeyboardEvent, type ReactNode, type Ref } from "react";
 import { CalendarDays, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { IconButton } from "./icon-button";
+import { useLabels, useLocale } from "./labels";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import {
   addDays,
@@ -25,6 +26,25 @@ import { classes } from "./shared";
 
 export { firstDayOfWeek, isSameDay, matchesDate, parseISODate, toISODate, type DateMatcher, type DateRange } from "./dates";
 
+export type CalendarLabels = { previousMonth: string; nextMonth: string };
+
+const CALENDAR_LABELS: CalendarLabels = { previousMonth: "Previous month", nextMonth: "Next month" };
+
+export type DatePickerLabels = {
+  placeholder: string;
+  clear: string;
+  /** The same two for `DateRangePicker`. */
+  rangePlaceholder: string;
+  clearRange: string;
+};
+
+const DATE_PICKER_LABELS: DatePickerLabels = {
+  placeholder: "Pick a date",
+  clear: "Clear date",
+  rangePlaceholder: "Pick dates",
+  clearRange: "Clear dates",
+};
+
 type CalendarCommon = Omit<ComponentProps<"div">, "onSelect" | "defaultValue" | "children"> & {
   /** The month on show (the first one when several are shown). */
   month?: Date;
@@ -38,14 +58,18 @@ type CalendarCommon = Omit<ComponentProps<"div">, "onSelect" | "defaultValue" | 
   /** A single date cannot be unselected by choosing it again. */
   required?: boolean;
   weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
-  /** A BCP 47 locale for month and weekday names. Pass it when the page is rendered on the server. */
-  locale?: string;
+  /**
+   * The locale of month and weekday names and of the week's first day. Default: a `LabelsProvider`'s, else "en", so the
+   * server and the browser draw the same month. Until 0.11 the default was the device's locale.
+   */
+  locale?: Intl.LocalesArgument;
   numberOfMonths?: number;
   showOutsideDays?: boolean;
   /** Today, for tests and for a host in another time zone. */
   today?: Date;
   /** Focus the active day when the calendar mounts. */
   autoFocus?: boolean;
+  /** "Previous month" and "Next month" by default; a `LabelsProvider` sets both (scope `calendar`). */
   previousMonthLabel?: string;
   nextMonthLabel?: string;
 };
@@ -94,17 +118,22 @@ export function Calendar(props: CalendarProps) {
     disabled,
     required = false,
     weekStartsOn,
-    locale,
+    locale: ownLocale,
     numberOfMonths = 1,
     showOutsideDays = true,
     today: todayProp,
     autoFocus = false,
-    previousMonthLabel = "Previous month",
-    nextMonthLabel = "Next month",
+    previousMonthLabel: ownPreviousMonthLabel,
+    nextMonthLabel: ownNextMonthLabel,
     className,
     ref,
     ...rest
   } = props;
+  const locale = useLocale(ownLocale);
+  const { previousMonth: previousMonthLabel, nextMonth: nextMonthLabel } = useLabels("calendar", CALENDAR_LABELS, {
+    previousMonth: ownPreviousMonthLabel,
+    nextMonth: ownNextMonthLabel,
+  });
   const range = mode === "range";
   const today = startOfDay(todayProp ?? new Date());
   const [ownSelection, setOwnSelection] = useState<Date | DateRange | undefined>(defaultSelected);
@@ -305,8 +334,10 @@ type PickerCalendarProps = Pick<CalendarCommon, "startMonth" | "endMonth" | "wee
 type PickerBase = PickerCalendarProps & {
   /** Days that cannot be chosen (the calendar's `disabled` matcher). */
   disabledDates?: DateMatcher | DateMatcher[];
+  /** "Pick a date" (or "Pick dates") by default; a `LabelsProvider` sets it and `clearLabel` (scope `datePicker`). */
   placeholder?: string;
-  locale?: string;
+  /** The locale of the date on the trigger and of the calendar. Default: a `LabelsProvider`'s, else "en". */
+  locale?: Intl.LocalesArgument;
   /** How the chosen date is written on the trigger. */
   format?: Intl.DateTimeFormatOptions;
   /** Posts the value as `yyyy-mm-dd` (a range posts `name` and `name` + "End"). */
@@ -429,14 +460,14 @@ export function DatePicker({
   value,
   defaultValue = null,
   onValueChange,
-  placeholder = "Pick a date",
-  locale,
+  placeholder: ownPlaceholder,
+  locale: ownLocale,
   format = { dateStyle: "medium" },
   name,
   id,
   disabled,
   clearable = false,
-  clearLabel = "Clear date",
+  clearLabel: ownClearLabel,
   className,
   disabledDates,
   ref,
@@ -449,6 +480,8 @@ export function DatePicker({
   "aria-invalid": invalid,
   ...aria
 }: DatePickerProps) {
+  const locale = useLocale(ownLocale);
+  const { placeholder, clear: clearLabel } = useLabels("datePicker", DATE_PICKER_LABELS, { placeholder: ownPlaceholder, clear: ownClearLabel });
   const [own, setOwn] = useState<Date | null>(defaultValue);
   const [open, setOpen] = useState(false);
   const date = value !== undefined ? value : own;
@@ -507,14 +540,14 @@ export function DateRangePicker({
   value,
   defaultValue = null,
   onValueChange,
-  placeholder = "Pick dates",
-  locale,
+  placeholder: ownPlaceholder,
+  locale: ownLocale,
   format = { dateStyle: "medium" },
   name,
   id,
   disabled,
   clearable = false,
-  clearLabel = "Clear dates",
+  clearLabel: ownClearLabel,
   className,
   disabledDates,
   ref,
@@ -527,6 +560,11 @@ export function DateRangePicker({
   "aria-invalid": invalid,
   ...aria
 }: DateRangePickerProps) {
+  const locale = useLocale(ownLocale);
+  const { rangePlaceholder: placeholder, clearRange: clearLabel } = useLabels("datePicker", DATE_PICKER_LABELS, {
+    rangePlaceholder: ownPlaceholder,
+    clearRange: ownClearLabel,
+  });
   const [own, setOwn] = useState<DateRange | null>(defaultValue);
   const [open, setOpen] = useState(false);
   const range = value !== undefined ? value : own;
