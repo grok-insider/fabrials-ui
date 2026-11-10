@@ -181,16 +181,13 @@ Merged means: on `feat/0.12`, with `bun run check` green on the merged branch an
 | Package | State |
 | --- | --- |
 | Phase 1 documents | merged, except 1.8 (the catalogue test) and the 0.12 pieces of `DESIGN.md` and the skill, which go with E3 |
-| A1 | merged |
-| A2 | merged (two parts: surfaces and targets; sidebar, carousel and right to left) |
-| A3 | merged; `Combobox` is also the root component, so its shim exists |
-| A4 | in progress |
-| B1 | merged |
-| B2 | merged |
-| B3, B4 | in progress |
-| C1, C2 | in progress |
-| C3, C4 | not started |
-| D1 | in progress (`ImageViewer`, `MediaGrid`; `GenerationFrame` after A4) |
-| D2, D3 | not started |
-| E1 to E3 | not started |
-| Phase 7 | not started |
+| A1, A2, A3, A4 | merged |
+| B1, B2, B3, B4 | merged |
+| C1, C2, C3 | merged |
+| C4 | in progress |
+| D1, D2, D3 | merged (`GenerationFrame` went with D2) |
+| E1 | merged |
+| E2 | in progress |
+| E3 | in progress, in two parts: the new pieces of `@fabrials/ui` first, then the chat pieces and the rest |
+| 7.4 | in progress |
+| 7.1, 7.2, 7.3, 7.5 | not started: after the last package that adds styles |
