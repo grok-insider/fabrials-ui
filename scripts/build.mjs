@@ -54,7 +54,10 @@ export async function bundle(name, outDir) {
                 "spreadsheet-read": resolve(directory, "src/spreadsheet-read.ts"),
                 export: resolve(directory, "src/export.ts"),
               }
-            : resolve(directory, "src/index.tsx"),
+            : {
+                index: resolve(directory, "src/index.tsx"),
+                markdown: resolve(directory, "src/markdown.ts"),
+              },
         formats: ["es"],
       },
       rollupOptions: {

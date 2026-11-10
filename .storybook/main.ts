@@ -24,6 +24,7 @@ const sources = [
   { find: /^@fabrials\/ui\/button-variants$/, replacement: resolve(root, "packages/ui/src/button-variants.ts") },
   { find: /^@fabrials\/ui\/(tokens|styles|layers)\.css$/, replacement: resolve(root, "packages/ui/src/$1.css") },
   { find: /^@fabrials\/ai-ui$/, replacement: resolve(root, "packages/ai-ui/src/index.tsx") },
+  { find: /^@fabrials\/ai-ui\/markdown$/, replacement: resolve(root, "packages/ai-ui/src/markdown.ts") },
   { find: /^@fabrials\/ai-ui\/styles\.css$/, replacement: resolve(root, "packages/ai-ui/src/styles.css") },
 ];
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useLayoutEffect, useRef, type ComponentProps, type HTMLAttributes, type ReactNode } from "react";
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from "@fabrials/ui";
+import { Button, LocalTime, Tooltip, TooltipContent, TooltipTrigger } from "@fabrials/ui";
 import { useCopyToClipboard } from "./code-block";
 import { CheckIcon, CopyIcon } from "./chat-icons";
 
@@ -180,17 +180,32 @@ export function CopyMessageAction({
   );
 }
 
-export function MessageTimestamp({
-  dateTime,
-  label,
-  detail,
-  className,
-}: {
-  dateTime: string;
-  label: string;
+export type MessageTimestampProps = {
+  /** The instant as text ("2026-09-27T09:31:00Z"). Kept for a host that already formatted its own label. */
+  dateTime?: string;
+  /** The words of a ready-made label. */
+  label?: string;
+  /** A tooltip of your own for the ready-made label. */
   detail?: ReactNode;
+  /**
+   * When the message was sent. Rendered in the reader's zone and locale, with the server's text hidden until the page has
+   * hydrated, so nothing moves and no server time is ever shown. It wins over `dateTime` and `label`.
+   */
+  date?: Date | string | number | null;
+  /** The reader's language for `date`: the provider's, else the browser's. */
+  locale?: Intl.LocalesArgument;
+  /** Fixes the zone of `date` (a screenshot, a transcript). Default: the reader's own. */
+  timeZone?: string;
+  /** What `date` shows: "09:31" today and "Sep 26, 09:31" another day (the default), the time, or the whole date and time. */
+  format?: "message" | "time" | "dateTime";
   className?: string;
-}) {
+};
+
+export function MessageTimestamp({ dateTime, label, detail, date, locale, timeZone, format = "message", className }: MessageTimestampProps) {
+  if (date !== undefined && date !== null) {
+    return <LocalTime className={join("fui-message-time", className)} format={format} locale={locale} timeZone={timeZone} titleFormat="dateTime" value={date} />;
+  }
+  if (dateTime === undefined || label === undefined) return null;
   const time = <time className={join("fui-message-time", className)} dateTime={dateTime} />;
   if (!detail) {
     return (

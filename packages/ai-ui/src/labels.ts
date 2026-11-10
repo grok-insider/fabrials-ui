@@ -2,6 +2,7 @@
 import type { ReasoningLabels, SearchLabels } from "./activity";
 import type { AgentLabels, ContextMeterLabels, GenerationLabels, TaskListLabels } from "./agent";
 import type { AttachmentsLabels } from "./attachments";
+import type { MarkdownCalloutLabels } from "./callout";
 import type { SourcesLabels } from "./citations";
 import type { CodeBlockLabels } from "./code-block";
 
@@ -12,6 +13,7 @@ declare module "@fabrials/ui" {
     codeBlock?: Partial<CodeBlockLabels>;
     contextMeter?: Partial<ContextMeterLabels>;
     generation?: Partial<GenerationLabels>;
+    markdownCallout?: Partial<MarkdownCalloutLabels>;
     reasoning?: ReasoningLabels;
     search?: Partial<SearchLabels>;
     sources?: Partial<SourcesLabels>;

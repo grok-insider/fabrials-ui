@@ -4258,3 +4258,205 @@
     }
   }
 }
+
+@layer components {
+  /* 0.12: a callout in an answer, and a sent message edited in place */
+
+  /* A callout is a tinted plate of its kind's tone — the tone mixed into the surface at --fui-tint-strength, its edge at
+     --fui-tint-edge, the title and the icon in the tone's ink — never a coloured side bar. The five GitHub kinds and the
+     four a lesson adds share five tones: a note, an example and a question stay neutral, so a warning still stands out. The
+     classes are the whole contract, so a host's own markdown renderer can write this markup without React. */
+  .fui-callout {
+    --fui-callout-tone: var(--muted-foreground);
+    --fui-callout-ink: var(--muted-foreground);
+    --fui-callout-tint: color-mix(in oklab, var(--fui-callout-tone) var(--fui-tint-strength), var(--card));
+    --fui-callout-edge: color-mix(in oklab, var(--fui-callout-tone) var(--fui-tint-edge), var(--card));
+    display: flow-root;
+    margin-block: var(--fui-space-3);
+    padding: var(--fui-space-3) var(--fui-space-4);
+    border: 1px solid var(--fui-callout-edge);
+    border-radius: var(--fui-radius-plate);
+    background: var(--fui-callout-tint);
+    color: var(--foreground);
+    overflow-wrap: anywhere;
+  }
+  .fui-callout[data-kind="tip"],
+  .fui-callout[data-kind="summary"] {
+    --fui-callout-tone: var(--success);
+    --fui-callout-ink: var(--fui-success-ink);
+  }
+  .fui-callout[data-kind="important"],
+  .fui-callout[data-kind="definition"] {
+    --fui-callout-tone: var(--brand);
+    --fui-callout-ink: var(--fui-info-ink);
+  }
+  .fui-callout[data-kind="warning"] {
+    --fui-callout-tone: var(--warning);
+    --fui-callout-ink: var(--fui-warning-ink);
+  }
+  .fui-callout[data-kind="caution"] {
+    --fui-callout-tone: var(--destructive);
+    --fui-callout-ink: var(--fui-danger-ink);
+  }
+  .fui-callout-title {
+    display: flex;
+    align-items: center;
+    gap: var(--fui-space-1-5);
+    margin: 0;
+    color: var(--fui-callout-ink);
+    font-weight: var(--fui-weight-semibold);
+    line-height: var(--fui-leading-sm);
+  }
+  .fui-callout-icon {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+  }
+  .fui-callout-icon > svg {
+    inline-size: 1rem;
+    block-size: 1rem;
+  }
+  /* The words keep the markdown's own type and colours; only the rhythm between them is the callout's. */
+  .fui-callout-body {
+    margin-block-start: var(--fui-space-1-5);
+  }
+  .fui-callout-body > :first-child {
+    margin-block-start: 0;
+  }
+  .fui-callout-body > :last-child {
+    margin-block-end: 0;
+  }
+  .fui-callout-body > * + * {
+    margin-block-start: var(--fui-space-2);
+  }
+  /* A list or a code block inside keeps the whole indentation of the answer inside the plate. */
+  .fui-callout-body :is(ul, ol) {
+    margin-block: 0;
+  }
+  .fui-callout-body :is(pre, .fui-code-block) {
+    margin-block: 0;
+  }
+  /* A fenced block a renderer leaves as a bare pre keeps the answer's own well, one step smaller inside the plate. */
+  .fui-callout-body pre {
+    direction: ltr;
+    max-inline-size: 100%;
+    margin-block: 0;
+    padding: var(--fui-space-2) var(--fui-space-3);
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--fui-radius-sm);
+    background: var(--fui-code);
+    font-family: var(--fui-font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.7;
+    overflow-wrap: normal;
+  }
+
+  /* A sent message edited in place: the same bubble, sized like the one it replaces so the thread does not reflow. */
+  .fui-editable-message {
+    display: flex;
+    inline-size: min(100%, 36rem);
+    margin-inline-start: auto;
+    flex-direction: column;
+    gap: var(--fui-space-2);
+    padding: var(--fui-space-2);
+    border: 1px solid var(--border);
+    border-radius: var(--fui-radius-lg);
+    background: var(--muted);
+    transition:
+      border-color var(--fui-duration) var(--fui-ease),
+      box-shadow var(--fui-duration) var(--fui-ease);
+  }
+  /* The plate is the field: focus is the Stormlight edge and its halo, as the composer draws it. */
+  .fui-editable-message:has(.fui-textarea:focus-visible) {
+    border-color: var(--fui-focus);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--fui-focus) 20%, transparent);
+  }
+  .fui-editable-message .fui-textarea {
+    margin: 0;
+    padding: var(--fui-space-1-5) var(--fui-space-2);
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    color: var(--foreground);
+    font-size: var(--fui-text-sm);
+  }
+  .fui-editable-message .fui-textarea:focus,
+  .fui-editable-message .fui-textarea:focus-visible {
+    outline: none;
+  }
+  .fui-editable-message .fui-textarea:read-only {
+    color: var(--muted-foreground);
+  }
+  .fui-editable-message-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--fui-space-2);
+  }
+  .fui-editable-message-hint {
+    flex: 1 1 12rem;
+    min-inline-size: 0;
+    margin: 0;
+    padding-inline-start: var(--fui-space-2);
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+    line-height: var(--fui-leading-sm);
+    text-wrap: pretty;
+  }
+  .fui-editable-message-error {
+    margin: 0;
+    padding: var(--fui-space-1-5) var(--fui-space-2);
+    border-radius: var(--fui-radius-sm);
+    background: color-mix(in oklab, var(--destructive) var(--fui-tint-strength), var(--card));
+    color: var(--fui-danger-ink);
+    font-size: var(--fui-text-xs);
+    line-height: var(--fui-leading-sm);
+  }
+  @media (max-width: 767px), (pointer: coarse) {
+    .fui-editable-message .fui-textarea {
+      font-size: 1rem;
+    }
+    .fui-editable-message-bar .fui-button {
+      min-block-size: 2.75rem;
+    }
+  }
+
+  /* Forced colors drop a tint, so a callout keeps its edge and its icon in the system's ink. */
+  @media (forced-colors: active) {
+    .fui-callout {
+      border-color: CanvasText;
+      background: Canvas;
+      color: CanvasText;
+    }
+    .fui-callout-title {
+      color: CanvasText;
+    }
+    .fui-editable-message {
+      border-color: CanvasText;
+      background: Canvas;
+    }
+    .fui-editable-message:has(.fui-textarea:focus-visible) {
+      border-color: Highlight;
+      box-shadow: none;
+    }
+    .fui-editable-message-error {
+      border: 1px solid CanvasText;
+      background: Canvas;
+      color: CanvasText;
+    }
+  }
+
+  /* On paper a callout keeps its words and its edge, never a tint a printer drops, and it does not split across pages. */
+  @media print {
+    .fui-callout {
+      break-inside: avoid;
+      border-color: var(--fui-callout-ink);
+      background: none;
+    }
+    .fui-editable-message {
+      display: none;
+    }
+  }
+}

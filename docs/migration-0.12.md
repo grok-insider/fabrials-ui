@@ -1293,3 +1293,114 @@ Nothing at rest, and the roll is the same curve and the same length. Three thing
 - The digit span carries `--fui-ticker-delay` and the root carries `--fui-ticker-duration`; `motion`'s generated inline styles are gone (`transform: none` at rest, as before).
 - With `blur`, the column no longer keeps an inline `filter: blur(0px)` after the fade; the animation ends and the property goes back to what the host sets.
 - The first paint of a number is still the value at rest (all columns at zero), which is what the server has always sent; nothing about that changed.
+
+## Callouts, an edited message and a stamp in the reader's zone
+
+Three pieces for the small things an answer is made of, and one new subpath. All additive: nothing existing changes and nothing is renamed.
+
+### `MarkdownCallout` and `.fui-callout` (`@fabrials/ai-ui`)
+
+The note, tip and warning of an answer — GitHub's `> [!NOTE]` and the kinds a lesson adds.
+
+```tsx
+<MarkdownCallout kind="warning" title="Check the deployment first">
+  <p>Three steps, in this order:</p>
+  <ol>…</ol>
+</MarkdownCallout>
+```
+
+| Prop | What it does |
+| --- | --- |
+| `kind` | `note`, `tip`, `important`, `warning`, `caution`, `example`, `definition`, `summary` or `question`. An alias from another document (`info`, `hint`, `danger`, `error`, `key`, `key-idea`, `remember`, `mistake`, `common-mistake`, `pitfall`, `def`) resolves to its kind at runtime. |
+| `title` | In place of the kind's own word. Its text names the callout for a screen reader (`aria-labelledby` on the title), so a custom title needs nothing else. |
+| `icon` | A mark of your own, or `false` for none. The default is the kind's own glyph (Lucide's, ISC, copied as `chat-icons` does, so the package keeps no icon dependency). |
+| `labels` | The nine titles, over the provider's (`markdownCallout`) and under `title`. Defaults: Note, Tip, Important, Warning, Caution, Example, Definition, Summary, Question. |
+
+Every kind settles on one of the house tones, and the plate is a tint of it — never a coloured side bar:
+
+| Kind | Tone |
+| --- | --- |
+| `note`, `example`, `question` | neutral (the muted ink) |
+| `tip`, `summary` | success (verdigris) |
+| `important`, `definition` | info (Stormlight) |
+| `warning` | warning (brass) |
+| `caution` | danger (garnet) |
+
+- A tinted plate: `--fui-tint-strength` into the surface, an edge at `--fui-tint-edge`, the title and the icon in the tone's ink, 12 px corners. The body keeps the answer's own typography (`.fui-markdown`), so a nested list, a table or a code block inside looks like the rest of the answer; only the rhythm and the room are the callout's.
+- `role="note"`, named by the title; the icon is decorative. The title row carries `dir="auto"`, so an Arabic title mirrors with its mark; the body's own paragraphs carry theirs (see `textDirection`).
+- Forced colors: the tint becomes `Canvas`, the edge and the words `CanvasText`, and the mark keeps its ink. Printed: the tint goes, the edge and the words stay, and a callout never splits across pages.
+- **A host's own renderer writes the markup**, with no React at all — the classes are the whole contract:
+
+```html
+<aside class="fui-callout" data-kind="warning" role="note" aria-label="Warning">
+  <p class="fui-callout-title" dir="auto">
+    <span aria-hidden="true" class="fui-callout-icon"><svg …></svg></span>
+    Warning
+  </p>
+  <div class="fui-callout-body"><p>…</p></div>
+</aside>
+```
+
+The same classes with `data-kind` set are all the styling needs; `aria-label` is how that markup names itself when the title is not on the page as an id.
+
+### `@fabrials/ai-ui/markdown`
+
+A subpath of pure functions a host wires into its own markdown pipeline (a remark plugin, a string pass before `dangerouslySetInnerHTML`, a build step). It imports nothing at all: not `remark`, not `mdast`, not even `@fabrials/ui`, so a Node renderer can use it without React.
+
+| Export | What it does |
+| --- | --- |
+| `calloutOf(text)` | Reads the first line of a blockquote: `"[!TIP]"`, `"[!TIP] A title"`, `"> [!warning] Body"`, any case. Returns `{ kind, title, rest }` (the title trimmed or `null`, the remaining lines as they were) or `null`, which is what keeps a plain quote a quote. |
+| `calloutKind(word)` | The kind a word names, or `null`. |
+| `CALLOUT_KINDS` | The nine kinds, in the order the catalogue lists them. |
+| `textDirection(text)` | `"rtl"`, `"ltr"` or `null` from the first strong letter, as `dir="auto"` decides it — with code spans, fences, mathematics, tags and URLs left out. This is what keeps "an Arabic paragraph that opens with a URL or a number" laid out right to left. |
+| `normalizeMath(markdown)` | Rewrites `\(…\)` to `$…$`, and `\[…\]` or a bare `\begin{align}` to `$$…$$`, never inside code, never for a currency (`"$5 and $10"`) and never for an escaped citation (`\[3\]`). Running it twice changes nothing more. |
+
+- `textDirection` keeps its own twenty lines of the first-strong-letter rule rather than importing `scriptDirection` from `@fabrials/ui` (`scriptDirection` counts the letters of inline code, which is exactly what a paragraph's direction must not do). A unit test holds the two together on prose.
+- `speakableText` is in `@fabrials/ui`, not here.
+- Radiant can wire `remarkCallouts` and `remarkBidi` to these two functions and drop its own `segments.ts`, `callouts.ts`, `bidi.ts` and `normalize-math.ts`.
+
+### `EditableMessage` and `EditMessageAction` (`@fabrials/ai-ui`)
+
+A sent message edited where it stands, in the bubble it replaces.
+
+| Prop | What it does |
+| --- | --- |
+| `value` | The message as it was sent. The draft starts from it; sending it back unchanged is not a change. |
+| `onSubmit(next)` | Sends the trimmed draft, as a value or a promise. While the promise waits the key is busy and the field read only; a rejection shows the reason in `role="alert"`, keeps the draft and does not close the editor. |
+| `onCancel` | Escape, the Cancel key, or whatever the host does. |
+| `label` | The field's name. Default "Edit message". |
+| `hint` | A line under the field, in the host's words. There is no default sentence: what sending costs (that it replaces the replies after it) is the host's to say. |
+| `submitLabel`, `cancelLabel` | Default "Save and send" and "Cancel". |
+| `pending` | The host is sending: the key is busy, the field read only, the form `aria-busy`. |
+| `error` | A failure the host already knows, shown where a refused send is. |
+| `maxLength`, `autoFocus`, `returnFocusRef` | The field's limit; whether it takes focus when it appears (on by default: with the caret at the end of the message); and where focus goes when the editor closes after a cancel or a send. A host that keeps several editors open passes `autoFocus={false}`. |
+| `labels` | The four reasons: `{ empty, unchanged, pending, failed }`. |
+
+- Enter is a new line and Ctrl or ⌘ with Enter sends, and a key pressed while an input method is composing never sends. An empty draft, or the message as it was, cannot be sent — the key keeps focus with `aria-disabled` and the hint says why in words ("Type a message to send.", "Change the message to send it."), pointed at by `aria-describedby`, rather than a greyed key with no reason.
+- Escape stops propagating, so a sheet or a dialog around it does not also close.
+- `EditMessageAction` is the key of the action row: a `MessageAction` with a pencil and the name "Edit" (44 px on a coarse pointer, like every message action).
+
+### `MessageTimestamp date` (`@fabrials/ai-ui`)
+
+`MessageTimestamp` takes the instant of a message and formats it in the reader's zone and language, through `LocalTime`.
+
+| Prop | What it does |
+| --- | --- |
+| `date` | `Date | string | number`. Rendered in the reader's zone and locale; until the page has hydrated, a hidden stand-in of the same shape, so nothing moves and the server's zone is never shown. It wins over `dateTime` and `label`. |
+| `locale`, `timeZone` | The reader's language (the provider's, else the browser's), and a zone the host fixes for a screenshot, a transcript or an export. A fixed zone is rendered at once, hidden by nothing. |
+| `format` | `"message"` (default: "09:31" today, "Sep 26, 09:31" another day), `"time"` or `"dateTime"`. The tooltip is always the whole date and time. |
+
+`dateTime`, `label` and `detail` keep working exactly as before, byte for byte, for a host that formats its own label; `date` is only what a host adds when it has the instant.
+
+### What Radiant can delete
+
+- `components/ai-elements/callout.tsx` and the `.md-callout` rules in `app/features.css`.
+- `lib/markdown/{callouts,bidi,normalize-math,segments}.ts` and the three remark plugins that use them: `calloutKind`, `calloutOf`, `textDirection` and `normalizeMath` replace them.
+- `components/chat/message-timestamp.tsx` (the wrapper around `useHydrated` and `formatTime`) and its `invisible` class: `MessageTimestamp date` does it.
+- The editing branch of `components/chat/chat-thread.tsx` (`ThreadMessage` while `editing`), including its own `form`, key handler and hint line.
+
+### What looks different
+
+- A callout has no coloured side bar and no large radius: it is a plate with an edge in its tone, 12 px corners, and the tone's ink on the title and the icon.
+- The teaching kinds stay quiet: a note, an example and a question are neutral, so colour keeps meaning something.
+- The editor is the bubble: the same muted fill, the same 10 px corners and the same cap, so opening it does not reflow the thread; its focus is a Stormlight edge and a halo on the plate, as the composer draws it.

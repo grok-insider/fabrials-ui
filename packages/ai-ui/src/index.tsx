@@ -324,3 +324,7 @@ export {
   type ComposerSelectProps,
 } from "./composer-select";
 export { ReadAloudAction, type ReadAloudActionProps, type ReadAloudLabels } from "./read-aloud";
+export { MarkdownCallout, type MarkdownCalloutLabels, type MarkdownCalloutProps } from "./callout";
+export { CALLOUT_KINDS, calloutKind, calloutOf, normalizeMath, textDirection, type CalloutKind, type CalloutParse } from "./markdown";
+export { EditableMessage, EditMessageAction, type EditableMessageLabels, type EditableMessageProps, type EditMessageActionProps } from "./editable-message";
+export type { MessageTimestampProps } from "./chat-message";
