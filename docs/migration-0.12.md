@@ -1545,3 +1545,7 @@ Nothing a product imports changes. `@fabrials/ui/styles.css` and `@fabrials/ai-u
 - It does rewrite spellings that mean the same: `0.5rem` → `.5rem`, `transparent` → `#0000`, `oklch(1 0 0 / 12%)` → `oklch(100% 0 0/.12)`, `translateX(1rem)` → `translate(1rem)`, and a width query to range form (`(max-width: 47.99rem)` → `(width<=47.99rem)`, `(min-width: 40rem)` → `(width>=40rem)`). All of it is inside the browser baseline `DESIGN.md` states: Chrome 120, Safari 16.4, Firefox 128.
 - The notices a licence requires beside adapted code are written `/*! … */` in the parts (the Radix Themes recipes, in `070-material.css`) and the build puts them back at the top of the minified sheet.
 - The whole visual suite runs against the minified sheets as well as against the parts (`FUI_STYLES=dist`), with no reference changed: the two render the same.
+
+## Loading: a platform checkbox in a line of words
+
+Found by the skeleton suite on the new page of `RoutingPolicyForm`, in Firefox only. A `NativeCheckbox` or `NativeRadio` set inline in a line of text (not in its own `label` prop, which is a flex row) made that line 1 px taller while `Loading` was on: Firefox puts the baseline of a platform checkbox 1 px above its lower edge, and at the edge once the skeleton turns it into a plain box. The skeleton now keeps the platform's baseline there (`vertical-align: -1px`, under `@supports (-moz-appearance: none)`, with no specificity, so an alignment of your own stands). Nothing changes in Chromium or WebKit, nor outside `Loading`.

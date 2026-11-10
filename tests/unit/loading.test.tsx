@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { renderToString } from "react-dom/server";
 import { Loading, placeholderList, placeholderText, useLoading } from "../../packages/ui/src/index";
+import { uiStyles } from "./read-styles";
 
 function Probe() {
   return <p>{useLoading() ? "skeleton" : "content"}</p>;
@@ -45,4 +46,14 @@ test("placeholder copy is deterministic and wraps like words", () => {
   assert.equal(placeholderText(0), "");
   assert.deepEqual(placeholderList(3, (i) => ({ id: i })), [{ id: 0 }, { id: 1 }, { id: 2 }]);
   assert.deepEqual(placeholderList(-1, (i) => i), []);
+});
+
+test("a platform checkbox set in a line of words keeps Firefox's baseline while loading, by a rule anyone can override", () => {
+  const styles = uiStyles();
+  const at = styles.indexOf("@supports (-moz-appearance: none) {\n    :where([data-fui-loading] > .fui-loading-content :is(.fui-native-checkbox, .fui-native-radio)");
+  assert.notEqual(at, -1);
+  const rule = styles.slice(at, styles.indexOf("\n  }\n", at));
+  assert.match(rule, /vertical-align: -1px;/);
+  assert.doesNotMatch(rule, /!important/);
+  assert.match(rule, /:not\(\[data-skeleton="keep"\], \[data-skeleton="keep"\] \*\)/);
 });

@@ -6491,6 +6491,14 @@
   [data-fui-loading] > .fui-loading-content .fui-native-radio:not(:where([data-skeleton="keep"], [data-skeleton="keep"] *)) {
     border-radius: var(--fui-radius-full);
   }
+  /* Firefox puts the baseline of a platform checkbox or radio 1 px above its lower edge, and at the edge once it is a plain
+     box, so one set inline in a line of words made that line 1 px taller while loading. The shape keeps the platform's
+     baseline; the rule has no specificity, so an alignment anyone else gives the box stands. */
+  @supports (-moz-appearance: none) {
+    :where([data-fui-loading] > .fui-loading-content :is(.fui-native-checkbox, .fui-native-radio):not([data-skeleton="keep"], [data-skeleton="keep"] *)) {
+      vertical-align: -1px;
+    }
+  }
   /* Fields keep their frame and show a short bar where the value would be. */
   [data-fui-loading]
     > .fui-loading-content
