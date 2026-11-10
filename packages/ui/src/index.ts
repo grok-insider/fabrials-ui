@@ -135,3 +135,4 @@ export * from "./image-viewer-context";
 export * from "./plural";
 export * from "./labels";
 export * from "./zoom-pan";
+export * from "./drop-overlay";

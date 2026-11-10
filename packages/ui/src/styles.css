@@ -12272,3 +12272,83 @@
     }
   }
 }
+
+@layer components {
+  /* 0.12: the panel that says files can be dropped here */
+
+  .fui-drop-overlay {
+    position: relative;
+    min-inline-size: 0;
+  }
+  /* It covers its own area only, takes no pointer events (the pointer keeps crossing what it covers), and goes away with
+     visibility so its words are never read while they are not there. */
+  .fui-drop-overlay-panel {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--fui-space-2);
+    padding: var(--fui-space-4);
+    border: 2px dashed var(--brand);
+    border-radius: var(--fui-radius-plate);
+    background: var(--brand-soft);
+    color: var(--foreground);
+    text-align: center;
+    pointer-events: none;
+    opacity: 1;
+    transition:
+      opacity var(--fui-duration) var(--fui-ease),
+      visibility var(--fui-duration) var(--fui-ease);
+  }
+  .fui-drop-overlay-panel[aria-hidden="true"] {
+    visibility: hidden;
+    opacity: 0;
+  }
+  .fui-drop-overlay-icon {
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    color: var(--brand-ink);
+  }
+  .fui-drop-overlay-label {
+    margin: 0;
+    font-size: var(--fui-text-sm);
+    font-weight: var(--fui-weight-medium);
+    line-height: var(--fui-leading-sm);
+  }
+  .fui-drop-overlay-description {
+    margin: 0;
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+    line-height: var(--fui-leading-xs);
+  }
+  /* A drag of the wrong kind is not a place to drop: the edge stops being a promise, and the words say why. */
+  .fui-drop-overlay-panel[data-refused] {
+    border-style: solid;
+    border-color: var(--fui-danger-ink);
+    background: color-mix(in oklab, var(--destructive) 8%, var(--card));
+  }
+  .fui-drop-overlay-panel[data-refused] .fui-drop-overlay-icon {
+    color: var(--fui-danger-ink);
+  }
+
+  @media (forced-colors: active) {
+    .fui-drop-overlay-panel {
+      border-color: Highlight;
+      background: Canvas;
+      outline: 1px solid CanvasText;
+      outline-offset: -3px;
+    }
+    .fui-drop-overlay-panel[data-refused] {
+      border-color: CanvasText;
+    }
+    .fui-drop-overlay-icon {
+      color: Highlight;
+    }
+    .fui-drop-overlay-panel[data-refused] .fui-drop-overlay-icon {
+      color: CanvasText;
+    }
+  }
+}
