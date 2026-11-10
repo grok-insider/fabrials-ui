@@ -932,3 +932,101 @@ The default render is unchanged. Three things a host will see once it uses the n
 A product that translates these screens no longer needs a wrapper component to rename "Quota reading" or to reformat a date: it passes `labels` and `locale`. A product that composes its own provider card from `fb-` classes loses nothing: the classes and their names are as they were.
 
 What stays the product's: the data (`MetricLine.label` is the provider's own word, not the library's), the money's currency (USD here), and which reading is authoritative.
+
+## Uploads, a pill that picks, and reading an answer aloud
+
+Five pieces for the composer of a chat product: the files it holds and their way up, the panel that says files can be dropped, a pill that picks a value, a pill that opens a menu, and a key that reads an answer aloud.
+
+### `useAttachments` (`@fabrials/ai-ui`)
+
+The library draws attachments and now also keeps their state, but it never uploads: the host passes the function, and no URL or `fetch` is written into the package.
+
+```tsx
+const files = useAttachments({
+  upload: (file, { signal, onProgress }) => api.upload(file, { signal, onProgress }),
+  accept: "image/*,.pdf",
+  maxSize: 20_000_000,
+  maxFiles: 8,
+});
+```
+
+| Option | What it does |
+| --- | --- |
+| `upload(file, { signal, onProgress })` | The host's uploader, returning whatever it wants as a result (an id, a URL, a part). `onProgress` takes 0 to 1. Aborting `signal` gives the file up. |
+| `accept`, `maxSize`, `maxFiles` | The same rules `sortFiles` applies. A refused file is reported, never silently dropped. |
+| `concurrency` | Uploads in flight at once. Three by default. |
+| `onReject({ file, reason })` | A file that was not added, with `reason` `"type"`, `"size"` or `"count"`. Every one is reported; the accepted files still go up. |
+| `onError(error, { id, name })` | An upload that failed, for a toast. The item says so too. |
+| `pageDrop` | Take a file dropped anywhere on the page. Otherwise spread `dropProps` on the area that takes one. |
+| `labels` | `failed` (why an upload failed when it threw nothing readable) and `uploadFailed(names)`, the one sentence `waitForUploads` rejects with. |
+| `name` | The name of the hidden file input, for a form. |
+
+| Return | What it is |
+| --- | --- |
+| `entries` | Every file with what happened to it: `id`, `file`, `name`, `mediaType`, `size`, `url` (an object URL for a picture or a video), `status` (`pending`, `uploading`, `done`, `failed`), `progress`, `error`, `result`. |
+| `items` | The same files in the shape `<Attachments items>` takes. |
+| `add(files)`, `remove(id)`, `removeLast()`, `retry(id)`, `clear()` | `add` returns `{ ids, rejected }`. `remove` aborts the upload, revokes the preview and ignores the result that comes back late. `removeLast` is the composer's Backspace. `retry` uploads a failed file again. |
+| `waitForUploads()` | Waits for the files there are at that moment and resolves `{ ids, results, items }` for exactly that snapshot; a file added while it waits goes with the next message. It rejects with one `AttachmentsError` naming every file that failed (`error.failed` is `[{ id, name, error }]`). |
+| `uploading` | Some file is queued or on its way up. |
+| `inputProps`, `openPicker()` | For a hidden `<input type="file">`: it empties its value after a pick, so the same file can be picked twice. |
+| `dropProps`, `paste` | `onDragOver`/`onDrop` for the area that takes a drop, and `onPaste` for a field that takes a pasted screenshot. Both ignore a dragged link, a selection of text and a clipboard with no file. |
+
+The pure half is in `attachments-logic.ts` (no directive, so a test or a worker can call it): `reduceAttachments` (the state of each file, which ignores anything about a file that is gone), `createLimiter(limit)` (at most *n* at once, in order, a finishing task handing its slot straight on), `toAttachmentItems`, `isUploading`, `hasPreview`, `clampProgress`, `uploadErrorText`, `AttachmentsError`, `failureMessage`, `DEFAULT_ATTACHMENT_LABELS`.
+
+Something to know: `AttachmentItem` speaks three states (`ready`, `uploading`, `error`), while a file has four — a queued one is its own state. `items` is the view, so a queued file looks busy there; `entries` is what a host reads to know the difference.
+
+A product can delete its own `useComposerFiles` (Radiant: `components/chat/composer-attachments.tsx`), its `acceptComposerFiles`, its `createLimiter` and its whole-page drop listeners. The uploader and its route stay the product's.
+
+### `DropOverlay` (`@fabrials/ui`)
+
+The panel over the piece of screen that takes a drop: it never covers the window, it takes no pointer events, it is `aria-hidden` while it is not there and a polite region says when it appeared (a drag cannot be heard).
+
+| Prop | What it does |
+| --- | --- |
+| `children` | What it covers. |
+| `label`, `description` | The words in the middle, and the line under them. |
+| `refusedLabel` | What it says when the dragged files are not accepted ("That kind of file is not accepted"). |
+| `scope` | `"self"` watches this area; `"page"` watches the whole page, for a chat that takes a file anywhere. |
+| `accept` | Used to say "not accepted" while a drag is over. A drag shows the kinds of its files and never their names, so a list of extensions cannot be judged and lets the drag through. |
+| `active`, `refused` | Shown or hidden by the host instead of by a drag: a story, or a host that watches its own drags. |
+| `disabled`, `onDrop(files)`, `className`, `id` | |
+
+`carriesFiles(types)` and `draggedFilesRefused(kinds, accept)` are exported for a host that drives `active`/`refused` itself. The drag is counted by depth, not tested with `relatedTarget`, so crossing a child does not flicker.
+
+Give the overlay's `onDrop` **or** the hook's `pageDrop`, not both, or a drop is added twice.
+
+A product can delete its own chat drop zone (Radiant: `components/chat/chat-drop-zone.tsx`).
+
+### `ComposerSelect` and `ComposerMenu` (`@fabrials/ai-ui`)
+
+A composer has pills that toggle (`ComposerToggle`) and act (`ComposerButton`); now one picks and one opens a menu, in the same pill.
+
+| `ComposerSelect` | |
+| --- | --- |
+| `value`, `onValueChange` | |
+| `options` | `{ value, label, hint?, icon? }`: two lines in the list, with the mark and a tick on the one in use. |
+| `label` | What is being picked. The pill's accessible name is `"Reasoning effort: High"`; `labels.name(label, value)` writes it otherwise. |
+| `icon`, `formatValue(option)`, `defaultValue`, `disabled`, `defaultOpen`, `name`, `id`, `className` | `defaultValue` (the first option when not given) is the value that is not worth a tint: away from it the pill carries the pressed pill's tint. |
+
+| `ComposerMenu` | |
+| --- | --- |
+| `label` | The pill's name, and its title while it is the mark alone. |
+| `icon`, `text` | The mark, and the words beside it. Without `text` it is the icon alone, as a "More" key is. |
+| `menuLabel` | The menu's own name, when the pill's is not enough. |
+| `align`, `side`, `disabled`, `children` | The children are menu items: `DropdownMenuItem`, `DropdownMenuCheckboxItem`, `DropdownMenuRadioItem`, `DropdownMenuLabel` inside a `DropdownMenuGroup`, separators. |
+
+Both are built on the library's `Select` and `DropdownMenu`, so typeahead, the arrows, Home and End, Enter and Escape come with them. In a narrow composer (a `.fui-composer` under 22rem — a container query, not the window) the select keeps its mark and drops its words; its name still says the value.
+
+`.fui-composer` is now a container (`container: fui-composer / inline-size`), which changes nothing on screen.
+
+The open list of a select is a story of its own (`Tests/Composer 0.12` › `Open`): a select is modal, so a page that opens one and keeps it open is inert around it.
+
+A product can delete the copied pill class (Radiant: the same string in `composer-controls.tsx` and `composer-immersion.tsx`) and its `Select`/`DropdownMenu` restyling.
+
+### `ReadAloudAction` (`@fabrials/ai-ui`)
+
+A message action, the same look as copy, that reads an answer aloud: `text` (markdown, read as plain words through `speakableText`), `lang`, `loadClip` (the host's loader, from `useSpeech`), `labels` (`read`, `stop`), `id`, `speech` (a reader the host already has, or a fixed one for a bench), `className`.
+
+It is `aria-pressed` while it reads, shows a spinner while the first piece loads, and the same key stops it. One reader sounds at a time on the page and it stops when it leaves the screen, because that is `useSpeech`'s job. In a browser that cannot speak and with no loader it draws nothing — there is never a key that does nothing.
+
+A product can delete its own read-aloud action (Radiant: `features/core/read-aloud.tsx`); the loader's route stays the product's.

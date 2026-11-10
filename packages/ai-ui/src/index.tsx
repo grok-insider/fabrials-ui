@@ -288,3 +288,39 @@ export {
   type HostedMigrationLabels,
   type MigrationReviewLabels,
 } from "./accounts-labels";
+export {
+  useAttachments,
+  type AttachmentUpload,
+  type AttachmentUploadContext,
+  type AttachmentsWait,
+  type UseAttachmentsOptions,
+  type UseAttachmentsResult,
+} from "./use-attachments";
+export {
+  AttachmentsError,
+  DEFAULT_ATTACHMENT_LABELS,
+  EMPTY_ATTACHMENTS,
+  clampProgress,
+  createLimiter,
+  failureMessage,
+  hasPreview,
+  isUploading,
+  reduceAttachments,
+  toAttachmentItems,
+  uploadErrorText,
+  type AttachmentAction,
+  type AttachmentEntry,
+  type AttachmentLabels,
+  type AttachmentState,
+  type AttachmentStatus,
+  type Limiter,
+} from "./attachments-logic";
+export {
+  ComposerMenu,
+  ComposerSelect,
+  type ComposerMenuProps,
+  type ComposerOption,
+  type ComposerSelectLabels,
+  type ComposerSelectProps,
+} from "./composer-select";
+export { ReadAloudAction, type ReadAloudActionProps, type ReadAloudLabels } from "./read-aloud";
