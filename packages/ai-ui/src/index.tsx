@@ -186,3 +186,38 @@ export type {
   SearchLabels,
   SourcesLabels,
 } from "./labels";
+export {
+  ArtifactFrame,
+  asyncRenderReducer,
+  deriveArtifactStatus,
+  downloadFormats,
+  reasonText,
+  sourceExtensionFor,
+  useAsyncRender,
+  type ArtifactExporters,
+  type ArtifactFrameProps,
+  type ArtifactLabels,
+  type ArtifactSlot,
+  type ArtifactStatus,
+  type ArtifactView,
+  type AsyncRender,
+  type AsyncRenderAction,
+  type AsyncRenderState,
+  type AsyncRenderStatus,
+  type DownloadFormat,
+} from "./artifact-frame";
+export {
+  ToolCall,
+  toolCallLabel,
+  toolPayload,
+  type ToolCallLabels,
+  type ToolCallProps,
+  type ToolCallState,
+  type ToolPayload,
+} from "./tool-call";
+export {
+  SuggestionChips,
+  type SuggestionChipsLabels,
+  type SuggestionChipsProps,
+  type SuggestionItem,
+} from "./suggestion-chips";

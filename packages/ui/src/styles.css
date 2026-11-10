@@ -12184,3 +12184,91 @@
     }
   }
 }
+
+@layer components {
+  /* 0.12: zoom pan */
+  /* A viewport that zooms and pans what it holds. Zoomed, the content is a transform inside a box of the enlarged size, so
+     the scroll bars, the keys and momentum scrolling are the browser's own; the transform is not an animation and not
+     promoted to a layer of its own, so a drawing is rasterised again at the new size and stays sharp. */
+  .fui-zoom-pan {
+    display: flex;
+    flex-direction: column;
+    gap: var(--fui-space-2);
+    min-inline-size: 0;
+    max-inline-size: 100%;
+  }
+  .fui-zoom-pan-viewport {
+    position: relative;
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    min-block-size: 0;
+    max-inline-size: 100%;
+    border-radius: var(--fui-radius-md);
+  }
+  .fui-zoom-pan[data-interactive] > .fui-zoom-pan-viewport {
+    overflow: auto;
+    overscroll-behavior: contain;
+    touch-action: pan-x pan-y;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .fui-zoom-pan[data-interactive] > .fui-zoom-pan-viewport:focus-visible {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: -2px;
+  }
+  .fui-zoom-pan-viewport[data-pannable] {
+    cursor: grab;
+  }
+  .fui-zoom-pan-viewport[data-dragging] {
+    cursor: grabbing;
+    user-select: none;
+  }
+  /* At its natural size in a viewport taller than it, the content sits in the middle like a picture in a stage; taller than
+     the viewport, it starts at the top and scrolls (`safe`). */
+  .fui-zoom-pan-sizer {
+    position: relative;
+    display: grid;
+    align-content: safe center;
+    min-inline-size: 100%;
+    min-block-size: 100%;
+  }
+  .fui-zoom-pan[data-zoomed] > .fui-zoom-pan-viewport > .fui-zoom-pan-sizer {
+    position: absolute;
+  }
+  /* Keeps the height the content has at its natural size, so zooming in does not make the box grow. */
+  .fui-zoom-pan-ghost {
+    pointer-events: none;
+    visibility: hidden;
+  }
+  .fui-zoom-pan-content {
+    min-inline-size: 0;
+    transform-origin: 0 0;
+  }
+  .fui-zoom-pan-content:dir(rtl) {
+    transform-origin: 100% 0;
+  }
+  .fui-zoom-pan-controls {
+    justify-content: flex-end;
+  }
+  .fui-zoom-pan-level {
+    min-inline-size: 3.25rem;
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+  }
+  /* A small cluster under the drawing: 32 px keys where a pointer is precise, the toolbar's 44 px everywhere else. */
+  @media (hover: hover) and (pointer: fine) and (min-width: 768px) {
+    .fui-zoom-pan-controls .fui-button:is([data-size], [class*="fui-button-size"]) {
+      min-block-size: 2rem;
+      min-inline-size: 2rem;
+      block-size: 2rem;
+    }
+  }
+  @media print {
+    .fui-zoom-pan-controls {
+      display: none;
+    }
+  }
+}

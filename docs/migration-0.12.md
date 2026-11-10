@@ -722,3 +722,78 @@ A code panel's copy result is no longer a sentence that its CSS inspects: `data-
 ### What a product can delete
 
 Its own copies of these sentences: the chart's legend and table words, the code panel's copy labels, the multi-select summary, the repository counts, the filter chip's clear key, the search and source sentences of the chat, the upload states, the context window's readings and the generation frame's status sentences. Radiant, in particular, builds several of them by string concatenation in its components; they become one provider.
+
+## Artifacts: the frame, the viewport, a tool call and the follow-ups
+
+Four pieces for an answer that draws something, runs a tool or offers what to ask next. All four are new exports; nothing existing changes.
+
+### `ArtifactFrame` (`@fabrials/ai-ui`)
+
+The plate around a rendered thing inside an answer: a header with the notation and the title, a toolbar (source, copy, the downloads the rendering offers, full screen), a body of reserved height, and a failure that shows the reason and the source instead of an empty box.
+
+```tsx
+<ArtifactFrame kind="Chart" title="Sign-ups" source={source} pending={!data} ratio={2}>
+  {({ expanded, onReady, onError, onExport }) => (
+    <TheChart expanded={expanded} onReady={onReady} onError={onError} onExport={onExport} />
+  )}
+</ArtifactFrame>
+```
+
+| Prop | What it does |
+| --- | --- |
+| `kind`, `title` | A short word for the notation in the label voice ("Diagram", "Chart") and the title, isolated with `<bdi>` so a title in another script keeps its own direction. |
+| `source`, `sourceLanguage`, `sourceExtension` | The text the drawing was made from, its language for highlighting and the extension a downloaded source takes (from the language when not given: `xml`, `mmd`, `py`…). With a source there is a source toggle, a copy and a source download. |
+| `status` | `loading`, `ready` or `error`, when the host knows. Without it the status follows `pending`, `streaming` and what the children said. |
+| `pending`, `streaming` | The rendering has not arrived (`pending`: loading until `slot.onReady`), or its source is still arriving (`streaming`: a failure is held back and the label says "Drawing…"). |
+| `error`, `onRetry` | A reason the host already knows, and the key that tries again. A child that throws is caught inside the frame and shown the same way; a new `source` clears the failure. |
+| `minHeight`, `ratio` | The height both the skeleton and the body keep, so nothing shifts when the drawing arrives. Default `10rem`. |
+| `contentDir` | The direction of the rendering area: left to right by default, whatever the answer's language. |
+| `fullScreen`, `zoomable`, `zoomableLabel` | Full screen (on): a dialog near the window that renders the children again with `slot.expanded`, inside `ZoomPan` when `zoomable`. |
+| `view`, `defaultView`, `onViewChange` | The source view, controlled or not. |
+| `actions`, `labels` | The host's own keys at the end of the toolbar, and every word. |
+
+The children are a render function given `{ expanded, onError, onExport, onReady }`: `onExport({ svg, png })` with what a download can offer (a PNG is made from the SVG at twice the size when only an SVG was offered), `onReady()` once the drawing is worth showing, `onError(reason)`. Plain children are accepted too, and then there are no downloads and no ready state. The slot keeps its identity between renders, so a renderer can register in an effect.
+
+`useAsyncRender(loader, deps)` is the hook the same frame is built for: `{ status, value, error, retry }`, with the load cancelled when the deps change, the previous value kept while the next one runs, and an answer to a replaced run dropped. `asyncRenderReducer`, `deriveArtifactStatus`, `downloadFormats`, `reasonText` and `sourceExtensionFor` are exported for hosts that keep their own state.
+
+**Note for a host**: the frame is a size container (its toolbar folds its lesser keys into one menu below 34rem), so it takes its width from its parent. Put it in a block, not in a place where it is shrunk to fit: a size container measured without its contents would be nothing but its borders.
+
+### `ZoomPan` (`@fabrials/ui`)
+
+A viewport that zooms and pans anything, on the same maths as `ImageViewer`.
+
+| Prop | What it does |
+| --- | --- |
+| `minScale`, `maxScale`, `defaultScale` | The range and where it starts. 1 is the content laid out as wide as the viewport. Default 1 to 4. |
+| `scale`, `onScaleChange` | Controlled scale. |
+| `interactive` | Default `true`. `false` makes it an ordinary box: no key, no wheel, no touch, no controls. Use it for a drawing inside a page that scrolls, and make it interactive in the full-screen view. |
+| `wheel` | `ctrl` (default): a plain turn of the wheel scrolls the page and Ctrl or ⌘ with it, or a pinch, zooms. `zoom`: every turn zooms, for a view that owns the screen. |
+| `label`, `labels`, `controls` | The region's name, every word, and the keys under the viewport (zoom out, the level, zoom in, Fit). |
+| `ref` | `{ zoomTo(scale, at?), fit(), reset() }`. |
+
+- The wheel steps the same on every device (a notch is a quarter) and zooms around the pointer, which stays under it; two fingers pinch; a drag pans once there is more to see, and a click that did not move still reaches a control inside the content.
+- With focus: `+` and `=` zoom in, `-` zooms out, `0` fits, `Home` goes back to the start, and the arrows pan where there is more that way (otherwise they scroll the page as usual).
+- The content is drawn at its natural layout and enlarged by a transform inside a box of the enlarged size: the scroll bars, the keys and momentum scrolling are the browser's own, any content works (a table does not reflow) and a drawing is rasterised again at the new size, so it stays sharp. The box keeps the height the content has at scale 1, so zooming does not make the frame grow.
+- A touch screen keeps its one-finger scroll (`touch-action: pan-x pan-y`), and nothing is animated.
+
+Radiant can replace the `pan`/`zoom` of its plots' full-screen view with this; the rest of its `feature-frame` becomes `ArtifactFrame`.
+
+### `ToolCall` (`@fabrials/ai-ui`)
+
+A tool call in an answer, on `ActivityDisclosure`: `name`, `state` (`pending`, `running`, `done`, `error`, `denied`), `input` and `output` (strings or JSON, shown as highlighted JSON in a code well, capped in height), `error`, `duration`, `icon`, `defaultOpen`, `labels`.
+
+- The state is said in words with the library's mark: an orbit while it runs, a tick or a cross when it settles, and a still mark while it waits. Never a stock colour.
+- It opens by itself only on error, where the reason is what a reader wants first. `duration` adds the time ("Ran search_docs in 1.2s").
+- `toolCallLabel(state, name, duration, labels)` and `toolPayload(value)` are exported for hosts that render their own row.
+
+Radiant can delete `components/ai-elements/tool.tsx` and `features/core/tool-part.tsx`.
+
+### `SuggestionChips` (`@fabrials/ai-ui`)
+
+Follow-ups under an answer: `items` (`{ id, label, value?, lang? }`), `onSelect(item)`, `disabled`, `label` (the group's name, "Follow-ups" by default) and `labels`; also `icon(item)`.
+
+- A wrapping row of soft tags that are buttons (6 px corners, a tint of the muted ink, a deeper tint under the pointer), with `dir="auto"` and `lang` per chip.
+- One tab stop: the arrows move between them (following the direction), Home and End go to the ends; a disabled group blocks every chip, and 44 px tall on a coarse pointer.
+- A chip that arrives after the first paint rises into place, staggered; under reduced motion it is simply there.
+
+Radiant can delete `features/core/study-chips.tsx`.

@@ -3296,3 +3296,365 @@
     }
   }
 }
+
+@layer components {
+  /* 0.12: artifacts, tool calls and follow-ups */
+
+  /* ---------------------------------------------------------- artifact */
+  /* The frame of a thing drawn inside an answer: a plate of 12 px, a header bar on the card, a body of reserved height. */
+  .fui-artifact {
+    position: relative;
+    container: fui-artifact / inline-size;
+    display: flex;
+    flex-direction: column;
+    /* A size container is measured without its contents, so it has to take its width from its parent: shrunk to fit, it
+       would be nothing but its borders. */
+    inline-size: 100%;
+    min-inline-size: 0;
+    max-inline-size: 100%;
+    margin-block: var(--fui-space-4);
+    overflow: clip;
+    border: 1px solid var(--border);
+    border-radius: var(--fui-radius-plate);
+    background: var(--card);
+    color: var(--foreground);
+    font-size: var(--fui-text-sm);
+  }
+  .fui-artifact-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--fui-space-1) var(--fui-space-2);
+    min-block-size: 2.5rem;
+    padding-inline: var(--fui-space-4) var(--fui-space-1);
+    border-block-end: 1px solid var(--fui-separator);
+  }
+  /* The notation in the label voice: sentence case, as a kind is written, not an uppercase eyebrow. */
+  .fui-artifact-kind {
+    flex: none;
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    line-height: 1.25rem;
+  }
+  .fui-artifact-title {
+    flex: 1 0 8rem;
+    min-inline-size: 0;
+    overflow: hidden;
+    font-weight: var(--fui-weight-medium);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .fui-artifact-toolbar {
+    flex: none;
+    flex-wrap: nowrap;
+    margin-inline-start: auto;
+  }
+  .fui-artifact-body {
+    position: relative;
+    display: grid;
+    align-content: start;
+    min-inline-size: 0;
+    padding: var(--fui-space-3);
+  }
+  .fui-artifact-body[hidden] {
+    display: none;
+  }
+  .fui-artifact-render {
+    min-inline-size: 0;
+  }
+  .fui-artifact-render[hidden] {
+    display: none;
+  }
+  .fui-artifact-placeholder {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    gap: var(--fui-space-3);
+    padding: var(--fui-space-4);
+  }
+  .fui-artifact-placeholder-frame {
+    display: grid;
+    gap: var(--fui-space-2);
+    inline-size: min(100%, 18rem);
+    justify-self: center;
+  }
+  .fui-artifact-placeholder-block {
+    block-size: 4.5rem;
+  }
+  .fui-artifact-placeholder-line {
+    block-size: 0.5rem;
+  }
+  .fui-artifact-placeholder-label {
+    margin: 0;
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    text-align: center;
+  }
+  /* A failure names its reason and keeps the source: a tinted strip, not an alert (the answer is fine, the drawing is not). */
+  .fui-artifact-error {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--fui-space-2);
+    margin: 0;
+    padding: var(--fui-space-2) var(--fui-space-4);
+    border-block-end: 1px solid color-mix(in oklab, var(--destructive) var(--fui-tint-edge), var(--card));
+    background: color-mix(in oklab, var(--destructive) var(--fui-tint-strength), var(--card));
+    color: var(--foreground);
+  }
+  .fui-artifact-error-icon {
+    flex: none;
+    margin-block-start: 0.15rem;
+    color: var(--fui-danger-ink);
+  }
+  .fui-artifact-error-text {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+  }
+  .fui-artifact-retry {
+    flex: none;
+    min-block-size: 2rem;
+    padding-inline: var(--fui-space-3);
+    border: 1px solid color-mix(in oklab, var(--fui-danger-ink) 32%, transparent);
+    border-radius: var(--fui-radius-md);
+    background: var(--fui-surface-hover);
+    color: var(--fui-danger-ink);
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: var(--fui-weight-medium);
+    cursor: pointer;
+  }
+  .fui-artifact-source {
+    margin: 0;
+    max-block-size: 24rem;
+    background: var(--fui-code);
+  }
+  .fui-artifact-source:focus-visible {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: -2px;
+  }
+  /* Full screen: near the window, the drawing to itself, the header still saying what it is. */
+  .fui-artifact-dialog {
+    display: flex;
+    flex-direction: column;
+    inline-size: min(96vw, 90rem);
+    max-inline-size: min(96vw, 90rem);
+    block-size: min(90dvh, 60rem);
+    max-block-size: calc(100dvh - 2rem);
+    overflow: hidden;
+  }
+  .fui-artifact-dialog-header {
+    display: flex;
+    flex: none;
+    align-items: baseline;
+    gap: var(--fui-space-2);
+    margin: 0;
+    padding-block: var(--fui-space-3);
+    border-block-end: 1px solid var(--fui-separator);
+  }
+  .fui-artifact-dialog-title {
+    min-inline-size: 0;
+    overflow: hidden;
+    font-size: var(--fui-text-md);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .fui-artifact-dialog-body {
+    display: flex;
+    flex: 1 1 auto;
+    min-block-size: 0;
+    padding: 0;
+  }
+  .fui-artifact-zoom {
+    flex: 1 1 auto;
+    min-block-size: 0;
+    padding: var(--fui-space-3);
+  }
+  .fui-artifact-zoom > .fui-zoom-pan-viewport {
+    flex: 1 1 auto;
+    min-block-size: 0;
+  }
+  @media (max-width: 47.99rem) {
+    .fui-artifact-dialog {
+      inline-size: 100vw;
+      max-inline-size: 100vw;
+      block-size: 100dvh;
+      max-block-size: 100dvh;
+      border: 0;
+      border-radius: 0;
+    }
+  }
+  @media (pointer: coarse) {
+    .fui-artifact-retry {
+      min-block-size: 2.75rem;
+    }
+  }
+
+  /* --------------------------------------------------------- tool call */
+  .fui-tool-call {
+    min-inline-size: 0;
+    max-inline-size: 100%;
+  }
+  .fui-tool-call-mark {
+    display: inline-flex;
+  }
+  /* A call that has not started yet waits: its mark holds still. */
+  .fui-tool-call[data-state="pending"] .fui-agent-mark rect {
+    animation: none !important;
+  }
+  .fui-tool-call[data-state="denied"] .fui-agent-mark {
+    color: var(--muted-foreground);
+  }
+  .fui-tool-call-parts {
+    display: grid;
+    gap: var(--fui-space-3);
+    padding-block: var(--fui-space-1) var(--fui-space-2);
+  }
+  .fui-tool-call-part {
+    display: grid;
+    gap: var(--fui-space-1);
+    min-inline-size: 0;
+  }
+  .fui-tool-call-part-label {
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+  }
+  .fui-tool-call-code {
+    margin: 0;
+    max-block-size: 14rem;
+    border-radius: var(--fui-radius-sm);
+    background: var(--fui-code);
+    box-shadow: var(--fui-shadow-well);
+  }
+  .fui-tool-call-code:focus-visible {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: -2px;
+  }
+  .fui-tool-call-failure {
+    display: grid;
+    gap: var(--fui-space-1);
+    min-inline-size: 0;
+  }
+  .fui-tool-call-error {
+    margin: 0;
+    padding: var(--fui-space-2) var(--fui-space-3);
+    border-radius: var(--fui-radius-sm);
+    background: color-mix(in oklab, var(--destructive) var(--fui-tint-strength), var(--card));
+    color: var(--fui-danger-ink);
+    overflow-wrap: anywhere;
+  }
+
+  /* ---------------------------------------------------- follow-ups */
+  .fui-suggestion-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--fui-space-2);
+    min-inline-size: 0;
+    max-inline-size: 100%;
+  }
+  /* A tag that is a button: 6 px corners, a tint of the muted ink, the ink itself, and a deeper tint under the pointer. */
+  .fui-suggestion-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--fui-space-1-5);
+    max-inline-size: 100%;
+    min-block-size: 1.75rem;
+    padding-inline: var(--fui-space-3);
+    border: 0;
+    border-radius: var(--fui-radius-sm);
+    background: color-mix(in oklab, var(--muted-foreground) var(--fui-tint-strong), var(--card));
+    color: color-mix(in oklab, var(--foreground) 80%, var(--muted-foreground));
+    font-family: inherit;
+    font-size: var(--fui-text-xs);
+    font-weight: var(--fui-weight-medium);
+    line-height: 1.25;
+    text-align: start;
+    cursor: pointer;
+    transition: background-color var(--fui-duration) var(--fui-ease);
+  }
+  .fui-suggestion-chip-label {
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+  }
+  .fui-suggestion-chip > svg {
+    flex: none;
+    inline-size: 0.875rem;
+    block-size: 0.875rem;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .fui-suggestion-chip:hover:not(:disabled) {
+      background: color-mix(in oklab, var(--muted-foreground) var(--fui-tint-edge), var(--card));
+    }
+  }
+  /* A disabled chip is not a press waiting to happen: its tint goes, its edge says it is a control that is off. */
+  .fui-suggestion-chip:disabled {
+    background: transparent;
+    box-shadow: inset 0 0 0 1px var(--fui-separator);
+    color: var(--muted-foreground);
+    cursor: not-allowed;
+  }
+  @media (max-width: 767px), (pointer: coarse) {
+    .fui-suggestion-chip {
+      min-block-size: 2.75rem;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .fui-artifact {
+      border-color: CanvasText;
+    }
+    .fui-artifact-error {
+      border-block-end-color: CanvasText;
+    }
+    .fui-artifact-error-icon {
+      color: CanvasText;
+    }
+    .fui-artifact-retry,
+    .fui-suggestion-chip {
+      border: 1px solid ButtonText;
+    }
+    /* The source toggle is a pressed key: a bar under it, not a fill (a fill behind text paints a backplate in forced colors). */
+    .fui-artifact-toolbar .fui-button[aria-pressed="true"] {
+      position: relative;
+      border-color: Highlight;
+    }
+    .fui-artifact-toolbar .fui-button[aria-pressed="true"]::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0.25rem;
+      inset-block-end: 3px;
+      block-size: 2px;
+      background: Highlight;
+    }
+    .fui-tool-call-error {
+      border: 1px solid CanvasText;
+    }
+    .fui-tool-call-code {
+      outline: 1px solid CanvasText;
+      outline-offset: -1px;
+    }
+  }
+
+  @media print {
+    .fui-artifact-toolbar,
+    .fui-artifact-placeholder,
+    .fui-artifact-retry {
+      display: none;
+    }
+    .fui-artifact {
+      break-inside: avoid;
+      border-color: var(--border);
+      background: none;
+      box-shadow: none;
+    }
+    .fui-artifact-source,
+    .fui-tool-call-code {
+      max-block-size: none;
+      overflow: visible;
+    }
+  }
+}
