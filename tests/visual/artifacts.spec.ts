@@ -95,7 +95,7 @@ test("the source toggle swaps the drawing and its source, and says so as a press
 });
 
 test("copy puts the source on the clipboard and says it did", async ({ page, context }) => {
-  await context.grantPermissions(["clipboard-read", "clipboard-write"], { origin: "http://127.0.0.1:6061" });
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await openBase(page);
   const artifact = frame(page, "artifact-ready");
   await artifact.getByRole("button", { name: "Copy source" }).click();
