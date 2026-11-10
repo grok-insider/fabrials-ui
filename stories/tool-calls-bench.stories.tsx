@@ -1,10 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { ZoomPan } from "@fabrials/ui";
-import { ArtifactFrame, SuggestionChips, ToolCall, type ArtifactSlot, type ToolCallState } from "@fabrials/ai-ui";
+import { SuggestionChips, ToolCall, type ToolCallState } from "@fabrials/ai-ui";
 import { Block, Frame, Page } from "./story-frame";
 
-// A synthetic drawing and its source, written once: the frame shows the markup and offers it as a download.
 const CHART_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="480" height="270" viewBox="0 0 480 270" style="max-width:100%;height:auto" role="img" aria-label="Sign-ups each month">
   <rect width="480" height="270" fill="none"/>
   <g stroke="#8b93a0" stroke-width="1" opacity="0.35">
@@ -51,42 +50,6 @@ const WIDE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="6
   <circle cx="1320" cy="180" r="9" fill="#2a63c4"/>
 </svg>`;
 
-/** The frame's child: draws the markup, offers it, and says when it is there. Renders `slot.expanded` for the suite. */
-function Chart({ slot, source = CHART_SVG, testId, width }: { slot: ArtifactSlot; source?: string; testId?: string; width?: string }) {
-  const ready = useRef(slot.onReady);
-  const exportIt = useRef(slot.onExport);
-  useEffect(() => {
-    exportIt.current({ svg: () => source });
-    ready.current();
-  }, [source]);
-  return <div dangerouslySetInnerHTML={{ __html: source }} data-expanded={slot.expanded} data-testid={testId} style={width ? { maxInlineSize: width } : undefined} />;
-}
-
-function Boom({ slot }: { slot: ArtifactSlot }): never {
-  useEffect(() => slot.onReady(), [slot]);
-  throw new Error("The drawing came back empty: the generator stopped after 12 tokens.");
-}
-
-function Recovery() {
-  const [broken, setBroken] = useState(true);
-  const source = broken ? "svg: <rect width=\"10\" height=\"10\"" : CHART_SVG;
-  return (
-    <div data-testid="artifact-recovery" style={{ display: "grid", gap: "var(--fui-space-3)" }}>
-      <ArtifactFrame
-        kind="Diagram"
-        source={source}
-        sourceLanguage="xml"
-        title="Sign-ups"
-      >
-        {(slot) => (broken ? <Boom slot={slot} /> : <Chart slot={slot} />)}
-      </ArtifactFrame>
-      <button onClick={() => setBroken(false)} type="button">
-        Change the source
-      </button>
-    </div>
-  );
-}
-
 function InsideButton() {
   const [clicks, setClicks] = useState(0);
   return (
@@ -130,58 +93,9 @@ const TOOL_STATES: { state: ToolCallState; name: string; duration?: number }[] =
 function Bench() {
   return (
     <Page
-      description="The frame of a drawing inside an answer, the viewport that zooms and pans it, a tool call in each state and the follow-up chips: fixed states for the visual suite."
-      title="Artifacts"
+      description="The viewport that zooms and pans a drawing, a tool call in each state and the follow-up chips: fixed states for the visual suite."
+      title="Tool calls and follow-ups"
     >
-      <Block description="A plate with its title bar, the source toggle, the downloads the drawing offers and a full-screen view. Then the same frame showing its source, one that is loading with its height reserved, one still streaming, and two that failed." title="The frame">
-        <Frame width={720}>
-          <ArtifactFrame data-testid="artifact-ready" kind="Chart" source={CHART_SVG} sourceLanguage="xml" title="Sign-ups each month">
-            {(slot) => <Chart slot={slot} testId="chart-ready" />}
-          </ArtifactFrame>
-          <ArtifactFrame data-testid="artifact-source" defaultView="source" kind="Diagram" source={CHART_SVG} sourceLanguage="xml" title="Room plan">
-            {(slot) => <Chart slot={slot} />}
-          </ArtifactFrame>
-          <ArtifactFrame data-testid="artifact-loading" kind="Chart" minHeight={220} pending source={CHART_SVG} title="Retention by cohort">
-            {() => null}
-          </ArtifactFrame>
-          <ArtifactFrame data-testid="artifact-streaming" kind="Diagram" pending source={"svg: <circle cx=\"10\""} streaming title="Drawing as it arrives">
-            {() => null}
-          </ArtifactFrame>
-          <ArtifactFrame data-testid="artifact-error" error="Unexpected token '<' at line 3." kind="Diagram" source={"svg: <rect width=\"10\" height=\"10\""} sourceLanguage="xml" title="Floor plan">
-            {() => null}
-          </ArtifactFrame>
-          <ArtifactFrame data-testid="artifact-throws" kind="Chart" source={CHART_SVG} sourceLanguage="xml" title="A drawing that throws">
-            {(slot) => <Boom slot={slot} />}
-          </ArtifactFrame>
-        </Frame>
-      </Block>
-      <Block description="A drawing of the same size in both frames: the place is kept while it arrives, so nothing moves when it does." title="A height kept">
-        <Frame width={358}>
-          <ArtifactFrame data-testid="artifact-height-loading" kind="Chart" minHeight={220} pending source={CHART_SVG} title="Retention">
-            {() => null}
-          </ArtifactFrame>
-          <ArtifactFrame data-testid="artifact-height-ready" kind="Chart" minHeight={220} source={CHART_SVG} sourceLanguage="xml" title="Retention">
-            {(slot) => <Chart slot={slot} width="18rem" />}
-          </ArtifactFrame>
-        </Frame>
-      </Block>
-      <Block description="A title in Arabic, and the same frame in a 358 px pane where the lesser keys fold into one menu." title="Languages and narrow panes">
-        <Frame width={720}>
-          <ArtifactFrame data-testid="artifact-arabic" kind="Diagram" lang="ar" source={CHART_SVG} sourceLanguage="xml" title="خريطة الشبكة">
-            {(slot) => <Chart slot={slot} />}
-          </ArtifactFrame>
-        </Frame>
-        <Frame width={358}>
-          <ArtifactFrame data-testid="artifact-narrow" kind="Chart" source={CHART_SVG} sourceLanguage="xml" title="Sign-ups in a narrow column">
-            {(slot) => <Chart slot={slot} />}
-          </ArtifactFrame>
-        </Frame>
-      </Block>
-      <Block description="A failure that clears when the source changes, and the full-screen view of the same drawing." title="Recovery">
-        <Frame width={480}>
-          <Recovery />
-        </Frame>
-      </Block>
       <Block description="The same wide drawing in a plain box, which leaves the page's scroll alone, and in the interactive viewport at 100 %." title="Zoom and pan">
         <Frame width={640}>
           <ZoomPan data-testid="zoom-static" interactive={false}>
@@ -240,10 +154,9 @@ function Bench() {
 }
 
 const meta = {
-  title: "Tests/Artifacts",
-  component: ArtifactFrame,
+  title: "Tests/Tool calls",
   parameters: { layout: "fullscreen" },
-} satisfies Meta<typeof ArtifactFrame>;
+} satisfies Meta;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

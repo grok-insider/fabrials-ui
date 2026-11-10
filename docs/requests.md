@@ -22,7 +22,7 @@ Paths are under `src/` of `grok-insider/radiant`.
 | The font stacks have no place for a script Plex lacks, and no stylesheet declares the layer order a Tailwind host needs | `app/globals.css` (`--fui-font-sans`, `--fui-font-display`), `app/layers.css` | 0.12 A2 |
 | No chat scroll container: staying at the end while an answer streams, a "jump to latest" key, a rail of the reader's own messages | `components/ai-elements/conversation.tsx` (on `use-stick-to-bottom`) | 0.12 C1 |
 | Answers have no reading measure: a paragraph runs the full width of a wide window | `app/globals.css` `.chat-layout` | 0.12 C1 |
-| No frame for a rendered thing (a diagram, a chart, a drawing): title, source, copy, download, full screen, an error that keeps the source | `features/core/feature-frame.tsx`, used by 28 kinds of visual | 0.12 C2 |
+| No frame for a rendered thing (a diagram, a chart, a drawing): title, source, copy, download, full screen, an error that keeps the source | `features/core/feature-frame.tsx`, used by 28 kinds of visual | owner: left out of 0.12. The frame draws nothing by itself and what goes inside needs the product's own renderer; generative UI from a catalog of our own components is being looked at instead |
 | No error boundary, no export helpers (SVG and PNG), no way to hand token colours to a third-party renderer | `features/core/error-boundary.tsx`, `export.ts`, `renderer-theme.ts` | 0.12 B1 |
 | No upload lifecycle for the composer: `Attachments` draws a file, nothing uploads it | `components/chat/composer-attachments.tsx` | 0.12 C3 |
 | No confirmation in place: `ConfirmDialog` is modal | eleven copies in `components/lang/**` | 0.12 B2 |

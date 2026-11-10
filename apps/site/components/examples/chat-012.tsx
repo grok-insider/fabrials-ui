@@ -1,11 +1,10 @@
 "use client";
 
-// Ways of using what 0.12 added to the chat pieces: the log, the frame of a drawing, the files of a composer, the callouts,
-// the two pills and the message edited in place. Synthetic data, fixed dates, and nothing runs until a person presses.
-import { useEffect, useRef, useState, type ReactNode } from "react";
+// Ways of using what 0.12 added to the chat pieces: the log, the files of a composer, the callouts, the two pills and the
+// message edited in place. Synthetic data, fixed dates, and nothing runs until a person presses.
+import { useRef, useState, type ReactNode } from "react";
 import { Paperclip, Terminal } from "lucide-react";
 import {
-  ArtifactFrame,
   Attachments,
   ChatComposer,
   ChatMessage,
@@ -23,7 +22,6 @@ import {
   MarkdownCallout,
   MessageActions,
   useAttachments,
-  type ArtifactSlot,
 } from "@fabrials/ai-ui";
 import {
   Button,
@@ -267,123 +265,6 @@ export function Rail({ turns }: { turns: Turn[] }) {
   );
 }`,
       render: () => <RailExample />,
-      align: "start",
-    },
-  ],
-};
-
-/* ---------------------------------------------------------------- artifact frame */
-
-const DRAWING = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 220" width="400" height="220" role="img" aria-label="Two bars">
-  <g style="fill: var(--brand)">
-    <rect x="60" y="120" width="60" height="80" rx="3"/>
-    <rect x="180" y="60" width="60" height="140" rx="3"/>
-  </g>
-  <g fill="currentColor" fill-opacity="0.6" font-size="11">
-    <text x="60" y="216">March</text>
-    <text x="180" y="216">April</text>
-  </g>
-</svg>`;
-
-function Drawing({ slot, source }: { slot: ArtifactSlot; source: string }) {
-  const { onExport, onReady } = slot;
-  useEffect(() => {
-    onExport({ svg: () => source });
-    onReady();
-  }, [onExport, onReady, source]);
-  return <div dangerouslySetInnerHTML={{ __html: source }} />;
-}
-
-export const artifactFrameExamples: ExampleSet = {
-  examples: [
-    {
-      id: "loading",
-      title: "Loading, with its height kept",
-      description:
-        "pending reserves the body and says what it is loading; the drawing that arrives does not move the answer around it.",
-      code: `<ArtifactFrame kind="Chart" minHeight={220} pending source={source} title="Sign-ups">
-  {() => null}
-</ArtifactFrame>`,
-      render: () => (
-        <ArtifactFrame kind="Chart" minHeight={200} pending source={DRAWING} title="Sign-ups">
-          {() => null}
-        </ArtifactFrame>
-      ),
-      align: "start",
-    },
-    {
-      id: "error",
-      title: "An error that keeps the source",
-      description:
-        "A failure says the reason and still offers the source, so a reader can see what was drawn from and try again.",
-      code: `<ArtifactFrame
-  error="Unexpected token '<' at line 3."
-  kind="Chart"
-  onRetry={retry}
-  source={source}
-  sourceLanguage="xml"
-  title="Sign-ups"
->
-  {() => null}
-</ArtifactFrame>`,
-      render: () => (
-        <ArtifactFrame
-          error="Unexpected token '<' at line 3."
-          kind="Chart"
-          onRetry={() => undefined}
-          source={DRAWING}
-          sourceLanguage="xml"
-          title="Sign-ups"
-        >
-          {() => null}
-        </ArtifactFrame>
-      ),
-      align: "start",
-    },
-    {
-      id: "streaming",
-      title: "Still arriving",
-      description:
-        "While the source streams in, a failure is held back and the label says the drawing is being made, so half a file is never reported as an error.",
-      code: `<ArtifactFrame kind="Chart" pending source={partial} streaming title="Sign-ups">
-  {() => null}
-</ArtifactFrame>`,
-      render: () => (
-        <ArtifactFrame kind="Chart" minHeight={200} pending source={'<svg xmlns="http://www.w3.org/2000/svg">'} streaming title="Sign-ups">
-          {() => null}
-        </ArtifactFrame>
-      ),
-      align: "start",
-    },
-    {
-      id: "host-action",
-      title: "A key of the host's own",
-      description:
-        "actions adds the host's keys at the end of the toolbar, after the source, the copy and the downloads the drawing offered.",
-      code: `<ArtifactFrame
-  actions={<Button size="sm" variant="outline">Open in the editor</Button>}
-  kind="Chart"
-  source={source}
-  sourceLanguage="xml"
-  title="Sign-ups"
->
-  {(slot) => <Drawing slot={slot} source={source} />}
-</ArtifactFrame>`,
-      render: () => (
-        <ArtifactFrame
-          actions={
-            <Button size="sm" variant="outline">
-              Open in the editor
-            </Button>
-          }
-          kind="Chart"
-          source={DRAWING}
-          sourceLanguage="xml"
-          title="Sign-ups"
-        >
-          {(slot) => <Drawing slot={slot} source={DRAWING} />}
-        </ArtifactFrame>
-      ),
       align: "start",
     },
   ],

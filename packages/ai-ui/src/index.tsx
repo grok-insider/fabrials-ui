@@ -187,26 +187,6 @@ export type {
   SourcesLabels,
 } from "./labels";
 export {
-  ArtifactFrame,
-  asyncRenderReducer,
-  deriveArtifactStatus,
-  downloadFormats,
-  reasonText,
-  sourceExtensionFor,
-  useAsyncRender,
-  type ArtifactExporters,
-  type ArtifactFrameProps,
-  type ArtifactLabels,
-  type ArtifactSlot,
-  type ArtifactStatus,
-  type ArtifactView,
-  type AsyncRender,
-  type AsyncRenderAction,
-  type AsyncRenderState,
-  type AsyncRenderStatus,
-  type DownloadFormat,
-} from "./artifact-frame";
-export {
   ToolCall,
   toolCallLabel,
   toolPayload,

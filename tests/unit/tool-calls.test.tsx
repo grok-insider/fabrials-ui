@@ -3,19 +3,7 @@ import assert from "node:assert/strict";
 import { renderToStaticMarkup } from "react-dom/server";
 import { ZoomPan } from "../../packages/ui/src/index";
 import { clampZoom, fitZoom, sameZoom, wheelZooms, zoomByPinch, zoomByStep, zoomByWheel, zoomPercent, zoomRange } from "../../packages/ui/src/zoom-pan-logic";
-import {
-  sourceExtensionFor,
-  ArtifactFrame,
-  SuggestionChips,
-  ToolCall,
-  asyncRenderReducer,
-  deriveArtifactStatus,
-  downloadFormats,
-  reasonText,
-  toolCallLabel,
-  toolPayload,
-  type AsyncRenderState,
-} from "../../packages/ai-ui/src/index";
+import { SuggestionChips, ToolCall, toolCallLabel, toolPayload } from "../../packages/ai-ui/src/index";
 import { uiStyles, aiStyles } from "./read-styles";
 
 const ui = uiStyles();
@@ -85,58 +73,6 @@ test("fit shows the whole content up to its natural width, and 1 when nothing wa
   assert.equal(fitZoom({ width: 0, height: 0 }, { width: 300, height: 200 }, { min: 1, max: 4 }), 1);
 });
 
-test("an async render drops the answer of a run that was replaced, and keeps the last value while the next loads", () => {
-  const initial: AsyncRenderState<string> = { run: 0, status: "loading", value: null, error: null };
-  const started = asyncRenderReducer(initial, { type: "start", run: 1 });
-  assert.equal(started.status, "loading");
-  const done = asyncRenderReducer(started, { type: "done", run: 1, value: "first" });
-  assert.deepEqual(done, { run: 1, status: "ready", value: "first", error: null });
-  const again = asyncRenderReducer(done, { type: "start", run: 2 });
-  assert.equal(again.status, "loading");
-  assert.equal(again.value, "first", "a redraw never blanks");
-  // The first run answers late: nothing happens.
-  assert.deepEqual(asyncRenderReducer(again, { type: "done", run: 1, value: "stale" }), again);
-  assert.deepEqual(asyncRenderReducer(again, { type: "fail", run: 1, error: new Error("stale") }), again);
-  const failed = asyncRenderReducer(again, { type: "fail", run: 2, error: new Error("boom") });
-  assert.equal(failed.status, "error");
-  assert.equal(failed.value, "first");
-  assert.deepEqual(asyncRenderReducer(failed, { type: "done", run: 2, value: "second" }), { run: 2, status: "ready", value: "second", error: null });
-});
-
-test("the downloads a frame offers come from what the rendering gave it", () => {
-  const svg = () => "<svg/>";
-  const png = () => new Blob();
-  assert.deepEqual(downloadFormats({ exporters: null, source: "x" }), ["source"]);
-  assert.deepEqual(downloadFormats({ exporters: { svg } }), ["svg", "png"]);
-  assert.deepEqual(downloadFormats({ exporters: { png } }), ["png"]);
-  assert.deepEqual(downloadFormats({ exporters: { svg, png }, source: "x" }), ["svg", "png", "source"]);
-  // A failed drawing offers its source only.
-  assert.deepEqual(downloadFormats({ exporters: { svg, png }, source: "x", failed: true }), ["source"]);
-  assert.deepEqual(downloadFormats({ exporters: null }), []);
-});
-
-test("a downloaded source takes its extension from its language when the host does not name one", () => {
-  assert.equal(sourceExtensionFor("xml"), "xml");
-  assert.equal(sourceExtensionFor("SVG"), "svg");
-  assert.equal(sourceExtensionFor("python"), "py");
-  assert.equal(sourceExtensionFor("mermaid"), "mmd");
-  assert.equal(sourceExtensionFor(undefined), "txt");
-  assert.equal(sourceExtensionFor("cobol"), "txt");
-  assert.equal(sourceExtensionFor("cobol", "cbl"), "cbl");
-});
-
-test("the status shown follows the host or the children, and a failure waits for the source to stop arriving", () => {
-  assert.equal(deriveArtifactStatus({ ready: false, failed: false, pending: true, streaming: false }), "loading");
-  assert.equal(deriveArtifactStatus({ ready: false, failed: false, pending: false, streaming: true }), "loading");
-  assert.equal(deriveArtifactStatus({ ready: true, failed: false, pending: true, streaming: false }), "ready");
-  assert.equal(deriveArtifactStatus({ ready: false, failed: true, pending: false, streaming: false }), "error");
-  assert.equal(deriveArtifactStatus({ ready: false, failed: false, pending: false, streaming: false }), "ready");
-  assert.equal(deriveArtifactStatus({ status: "error", ready: true, failed: false, pending: false, streaming: false }), "error");
-  assert.equal(reasonText(new Error("no closing brace")), "no closing brace");
-  assert.equal(reasonText("  the browser refused  "), "the browser refused");
-  assert.equal(reasonText({}), "It failed without a reason.");
-});
-
 test("a tool call says its state in words, and its payload as JSON only when it is JSON", () => {
   assert.equal(toolCallLabel("pending", "search_docs", undefined), "Waiting to run search_docs");
   assert.equal(toolCallLabel("running", "search_docs", undefined), "Running search_docs");
@@ -154,65 +90,6 @@ test("a tool call says its state in words, and its payload as JSON only when it 
 });
 
 /* ------------------------------------------------------------ the markup */
-
-test("a frame names its notation and title, and keeps the body busy until the drawing is there", () => {
-  const html = renderToStaticMarkup(
-    <ArtifactFrame kind="Chart" pending source="<svg/>" title="Sign-ups">
-      {() => null}
-    </ArtifactFrame>,
-  );
-  assert.match(html, /<figure[^>]*class="fui-artifact"[^>]*data-status="loading"/);
-  assert.match(html, /aria-busy="true"/);
-  assert.match(html, /class="fui-artifact-kind">Chart</);
-  // The title is isolated from the header's direction, so a title in another script keeps its own.
-  assert.match(html, /class="fui-artifact-title"[^>]*><bdi>Sign-ups<\/bdi></);
-  assert.match(html, /role="status"[^>]*>Loading the chart…</);
-  // The body reserves its height, so nothing moves when the drawing arrives.
-  assert.match(html, /class="fui-artifact-body"[^>]*style="min-height:10rem"/);
-  // The toolbar is one named group, and its source toggle is a pressed key.
-  assert.match(html, /role="toolbar"[^>]*aria-label="Drawing actions: Sign-ups"/);
-  assert.match(html, /aria-pressed="false"/);
-  assert.match(html, /aria-hidden="true" class="fui-skeleton/);
-  // No dialog is in the page until it is opened.
-  assert.doesNotMatch(html, /fui-artifact-dialog/);
-});
-
-test("a failure says its reason in a status and keeps the source, never an empty box", () => {
-  const html = renderToStaticMarkup(
-    <ArtifactFrame error="Unexpected token '<'." kind="Diagram" source={'svg: <rect width="10"'} title="Floor plan">
-      {() => null}
-    </ArtifactFrame>,
-  );
-  assert.match(html, /data-status="error"/);
-  assert.match(html, /role="status"[^>]*class="fui-artifact-error"|class="fui-artifact-error"[^>]*role="status"/);
-  assert.match(html, /Couldn’t draw this diagram:/);
-  assert.match(html, /Unexpected token/);
-  assert.match(html, /class="fui-artifact-source fui-code-panel-body"[^>]*tabindex="0"/);
-  assert.match(html, /<code>/);
-  // A retry key only when the host can try again.
-  assert.doesNotMatch(html, /fui-artifact-retry/);
-  assert.match(
-    renderToStaticMarkup(
-      <ArtifactFrame error="nope" onRetry={() => {}} source="x" title="t">
-        {() => null}
-      </ArtifactFrame>,
-    ),
-    /class="fui-artifact-retry"[^>]*>Try again</,
-  );
-});
-
-test("plain children are allowed, and the source view is a tab stop of its own", () => {
-  const html = renderToStaticMarkup(
-    <ArtifactFrame defaultView="source" source="<svg/>" title="With children">
-      <p>Drawn by the host</p>
-    </ArtifactFrame>,
-  );
-  assert.match(html, /Drawn by the host/);
-  assert.match(html, /data-view="source"/);
-  assert.match(html, /aria-pressed="true"/);
-  // The body is there but hidden; the source is the visible half.
-  assert.match(html, /class="fui-artifact-body"[^>]*hidden=""/);
-});
 
 test("the viewport is a named tab stop only while it is interactive", () => {
   const plain = renderToStaticMarkup(
@@ -284,45 +161,6 @@ test("follow-up chips are one tab stop with the arrows between them", () => {
 
 /* --------------------------------------------------------------- the styles */
 
-test("the artifact is a plate whose header and body keep their shape in every state", () => {
-  const frame = rule(ai, ".fui-artifact {");
-  assert.match(frame, /container: fui-artifact \/ inline-size;/);
-  assert.match(frame, /border-radius: var\(--fui-radius-plate\);/);
-  assert.match(frame, /border: 1px solid var\(--border\);/);
-  assert.match(frame, /overflow: clip;/);
-  // The notation is the label voice, in sentence case: no uppercase eyebrow.
-  const kind = rule(ai, ".fui-artifact-kind {");
-  assert.match(kind, /font-family: var\(--fui-font-label\);/);
-  assert.doesNotMatch(kind, /text-transform/);
-  // The title gives way before the keys do, and the keys wrap under it rather than shrinking it to nothing.
-  assert.match(rule(ai, ".fui-artifact-header {"), /flex-wrap: wrap;/);
-  assert.match(rule(ai, ".fui-artifact-title {"), /flex: 1 0 8rem;/);
-  // A failure is a tinted strip in the danger tone with the tone's ink, not a box.
-  const strip = rule(ai, ".fui-artifact-error {");
-  assert.match(strip, /background: color-mix\(in oklab, var\(--destructive\) var\(--fui-tint-strength\), var\(--card\)\);/);
-  assert.match(strip, /border-block-end: 1px solid color-mix\(in oklab, var\(--destructive\) var\(--fui-tint-edge\), var\(--card\)\);/);
-  // The source sits in the code well, left to right whatever the answer's language.
-  assert.match(rule(ai, ".fui-artifact-source {"), /background: var\(--fui-code\);/);
-  // The full-screen dialog takes the window, and the drawing is the scroller.
-  assert.match(rule(ai, ".fui-artifact-dialog {"), /inline-size: min\(96vw, 90rem\);/);
-  assert.match(rule(ai, ".fui-artifact-zoom > .fui-zoom-pan-viewport {"), /flex: 1 1 auto;/);
-});
-
-test("forced colors give the pressed source toggle and the error strip a form that is not a fill", () => {
-  const forced = blockAt(ai, "@media (forced-colors: active) {\n    .fui-artifact {");
-  assert.match(forced, /\.fui-artifact \{[\s\S]*?border-color: CanvasText;/);
-  assert.match(forced, /\.fui-artifact-error \{[\s\S]*?border-block-end-color: CanvasText;/);
-  // A pressed key is a bar under it, drawn on ::after, never a Highlight fill behind the text.
-  assert.match(forced, /\.fui-artifact-toolbar \.fui-button\[aria-pressed="true"\]::after \{[\s\S]*?background: Highlight;/);
-  assert.match(forced, /\.fui-tool-call-error \{[\s\S]*?border: 1px solid CanvasText;/);
-});
-
-test("on paper the frame is flattened and its keys are gone", () => {
-  const print = blockAt(ai, "@media print {\n    .fui-artifact-toolbar,");
-  assert.match(print, /\.fui-artifact-toolbar,[\s\S]*?display: none;/);
-  assert.match(print, /\.fui-artifact \{[\s\S]*?break-inside: avoid;[\s\S]*?background: none;/);
-});
-
 test("the zoom viewport takes a touch only where it can zoom, and its ring is drawn inside", () => {
   assert.match(rule(ui, ".fui-zoom-pan[data-interactive] > .fui-zoom-pan-viewport {"), /touch-action: pan-x pan-y;/);
   assert.match(rule(ui, ".fui-zoom-pan[data-interactive] > .fui-zoom-pan-viewport {"), /overflow: auto;/);
@@ -354,6 +192,14 @@ test("a follow-up chip is a soft tag that is a button, and a 44 px target on a c
   // A long payload stops at 14rem and scrolls inside, and its tab stop draws the ring inside.
   assert.match(rule(ai, ".fui-tool-call-code {"), /max-block-size: 14rem;/);
   assert.match(rule(ai, ".fui-tool-call-code:focus-visible {"), /outline-offset: -2px;/);
+  // In forced colors a chip and a failed call keep an edge, because a tint is repainted away.
+  const forced = blockAt(ai, "@media (forced-colors: active) {\n    .fui-suggestion-chip {");
+  assert.match(forced, /\.fui-suggestion-chip \{\s*border: 1px solid ButtonText;/);
+  assert.match(forced, /\.fui-tool-call-error \{[\s\S]*?border: 1px solid CanvasText;/);
+  assert.match(forced, /\.fui-tool-call-code \{[\s\S]*?outline: 1px solid CanvasText;/);
+  // On paper the payload is shown whole.
+  const print = blockAt(ai, "@media print {\n    .fui-tool-call-code {");
+  assert.match(print, /max-block-size: none;[\s\S]*?overflow: visible;/);
   // A chip that arrives later rises only where motion is allowed: `.fui-rise` lives inside that query, and under the
   // system's reduced motion nothing is started.
   const rise = ui.indexOf(".fui-rise {");

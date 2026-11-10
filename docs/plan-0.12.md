@@ -121,7 +121,7 @@ Radiant paths are under `src/` of `radiant` at `adde470`.
 | Package | Export | From Radiant | Notes |
 | --- | --- | --- | --- |
 | C1 | `Conversation`, `ConversationContent`, `ConversationScrollButton`, `ConversationCheckpoints`, `useConversation` | `components/ai-elements/conversation.tsx` | Stays at the end while an answer streams and lets go the moment the reader scrolls away, written without a dependency; a named "Jump to latest" key; the rail of the reader's own messages; a reading measure for answers (`fit-content` up to 52rem, full width for a table, code or figure) |
-| C2 | `ArtifactFrame`, `ZoomPan` | `features/core/feature-frame.tsx`, `fence-host.tsx` | The frame of a rendered thing: title, a toolbar (source, copy, download as SVG, PNG or source, full screen), a status with a reserved height, an error that shows the source and the reason and never blanks; `ZoomPan` on the viewer's maths for the full-screen view |
+| C2 | `ZoomPan` | `features/core/feature-frame.tsx`, `fence-host.tsx` | `ZoomPan` on the viewer's maths, for a full-screen view of a drawing. The frame it was planned inside left the release by the owner's decision: see *Status* |
 | C2 | `ToolCall`, `SuggestionChips` | `components/ai-elements/tool.tsx`, `features/core/study-chips.tsx` | A tool call on `ActivityDisclosure` (name, state, input, output); follow-up chips |
 | C3 | `useAttachments`, `DropOverlay` | `components/chat/composer-attachments.tsx`, `chat-drop-zone.tsx`, `lib/persist-composer-files.ts` | Uploads start when a file is added, with progress, abort and retry, a limit of three at once, `waitForUploads()` before sending, and clean-up |
 | C3 | `ComposerSelect`, `ComposerMenu`, `ReadAloudAction` | `components/chat/composer-controls.tsx`, `features/core/read-aloud.tsx` | A pill that picks a model, an effort or a mode, with its value in its name |
@@ -183,7 +183,7 @@ Merged means: on `feat/0.12`, with `bun run check` green on the merged branch an
 | Phase 1 documents | merged; the catalogue test of 1.8 is `tests/unit/docs-coverage.test.ts` |
 | A1, A2, A3, A4 | merged |
 | B1, B2, B3, B4 | merged |
-| C1, C2, C3, C4 | merged |
+| C1, C2, C3, C4 | merged; `ArtifactFrame` and `useAsyncRender` were built in C2 and removed before the release, by the owner's decision (2026-11-10) |
 | D1, D2, D3 | merged (`GenerationFrame` went with D2) |
 | E1, E2 | merged |
 | F1 (not in the first plan): the bugs E2's keyboard specs found | merged |

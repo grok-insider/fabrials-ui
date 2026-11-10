@@ -6,7 +6,7 @@
   "040-agent-pieces.css",
   "050-0.12-right-to-left.css",
   "060-katex.css",
-  "070-artifact.css",
+  "070-tool-calls-and-follow-ups.css",
   "080-conversation.css",
   "090-0.12-accounts-forced-colors.css",
   "100-0.12-composer.css",

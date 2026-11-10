@@ -1,0 +1,134 @@
+@layer components {
+  /* 0.12: tool calls and follow-ups */
+
+  /* --------------------------------------------------------- tool call */
+  .fui-tool-call {
+    min-inline-size: 0;
+    max-inline-size: 100%;
+  }
+  .fui-tool-call-mark {
+    display: inline-flex;
+  }
+  /* A call that has not started yet waits: its mark holds still. */
+  .fui-tool-call[data-state="pending"] .fui-agent-mark rect {
+    animation: none !important;
+  }
+  .fui-tool-call[data-state="denied"] .fui-agent-mark {
+    color: var(--muted-foreground);
+  }
+  .fui-tool-call-parts {
+    display: grid;
+    gap: var(--fui-space-3);
+    padding-block: var(--fui-space-1) var(--fui-space-2);
+  }
+  .fui-tool-call-part {
+    display: grid;
+    gap: var(--fui-space-1);
+    min-inline-size: 0;
+  }
+  .fui-tool-call-part-label {
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+  }
+  .fui-tool-call-code {
+    margin: 0;
+    max-block-size: 14rem;
+    border-radius: var(--fui-radius-sm);
+    background: var(--fui-code);
+    box-shadow: var(--fui-shadow-well);
+  }
+  .fui-tool-call-code:focus-visible {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: -2px;
+  }
+  .fui-tool-call-failure {
+    display: grid;
+    gap: var(--fui-space-1);
+    min-inline-size: 0;
+  }
+  .fui-tool-call-error {
+    margin: 0;
+    padding: var(--fui-space-2) var(--fui-space-3);
+    border-radius: var(--fui-radius-sm);
+    background: color-mix(in oklab, var(--destructive) var(--fui-tint-strength), var(--card));
+    color: var(--fui-danger-ink);
+    overflow-wrap: anywhere;
+  }
+
+  /* ---------------------------------------------------- follow-ups */
+  .fui-suggestion-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--fui-space-2);
+    min-inline-size: 0;
+    max-inline-size: 100%;
+  }
+  /* A tag that is a button: 6 px corners, a tint of the muted ink, the ink itself, and a deeper tint under the pointer. */
+  .fui-suggestion-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--fui-space-1-5);
+    max-inline-size: 100%;
+    min-block-size: 1.75rem;
+    padding-inline: var(--fui-space-3);
+    border: 0;
+    border-radius: var(--fui-radius-sm);
+    background: color-mix(in oklab, var(--muted-foreground) var(--fui-tint-strong), var(--card));
+    color: color-mix(in oklab, var(--foreground) 80%, var(--muted-foreground));
+    font-family: inherit;
+    font-size: var(--fui-text-xs);
+    font-weight: var(--fui-weight-medium);
+    line-height: 1.25;
+    text-align: start;
+    cursor: pointer;
+    transition: background-color var(--fui-duration) var(--fui-ease);
+  }
+  .fui-suggestion-chip-label {
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+  }
+  .fui-suggestion-chip > svg {
+    flex: none;
+    inline-size: 0.875rem;
+    block-size: 0.875rem;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .fui-suggestion-chip:hover:not(:disabled) {
+      background: color-mix(in oklab, var(--muted-foreground) var(--fui-tint-edge), var(--card));
+    }
+  }
+  /* A disabled chip is not a press waiting to happen: its tint goes, its edge says it is a control that is off. */
+  .fui-suggestion-chip:disabled {
+    background: transparent;
+    box-shadow: inset 0 0 0 1px var(--fui-separator);
+    color: var(--muted-foreground);
+    cursor: not-allowed;
+  }
+  @media (max-width: 767px), (pointer: coarse) {
+    .fui-suggestion-chip {
+      min-block-size: 2.75rem;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .fui-suggestion-chip {
+      border: 1px solid ButtonText;
+    }
+    .fui-tool-call-error {
+      border: 1px solid CanvasText;
+    }
+    .fui-tool-call-code {
+      outline: 1px solid CanvasText;
+      outline-offset: -1px;
+    }
+  }
+
+  @media print {
+    .fui-tool-call-code {
+      max-block-size: none;
+      overflow: visible;
+    }
+  }
+}
+

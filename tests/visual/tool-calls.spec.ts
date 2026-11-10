@@ -1,11 +1,9 @@
-// Artifacts in a real browser: the frame around a drawing (toolbar, source, downloads, full screen, failures that keep the
-// source), the viewport that zooms and pans, a tool call's disclosure and the follow-up chips. Assertions read state, focus
-// and geometry; the six references are of the bench.
-import { readFileSync } from "node:fs";
+// Tool calls and follow-ups in a real browser: the viewport that zooms and pans a drawing, a tool call's disclosure and the
+// follow-up chips. Assertions read state, focus and geometry; the six references are of the bench.
 import { expect, test, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-const STORY = "/iframe.html?id=tests-artifacts--pieces&viewMode=story";
+const STORY = "/iframe.html?id=tests-tool-calls--pieces&viewMode=story";
 const NOW = new Date("2026-11-10T09:00:00Z");
 
 // Storybook's own accessibility panel may be running axe in the same frame: wait for it rather than fail.
@@ -29,166 +27,24 @@ async function open(page: Page, theme = "light") {
 
 for (const theme of ["light", "dark"] as const) {
   for (const width of [390, 768, 1440]) {
-    test(`artifacts ${theme} ${width}`, async ({ page }) => {
+    test(`tool calls ${theme} ${width}`, async ({ page }) => {
       await page.setViewportSize({ width, height: 1200 });
       await open(page, theme);
       await expect(page.locator("html")).toHaveClass(theme === "dark" ? /dark/ : /^(?!.*dark).*$/);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       const result = await audit(page);
       expect(result.violations).toEqual([]);
-      await expect(page).toHaveScreenshot(`artifacts-${theme}-${width}.png`, { fullPage: true });
+      await expect(page).toHaveScreenshot(`tool-calls-${theme}-${width}.png`, { fullPage: true });
     });
   }
 }
 
-// ------------------------------------------------------------------- the frame
-
 const frame = (page: Page, id: string) => page.getByTestId(id);
-const toolbar = (page: Page, id: string) => frame(page, id).getByRole("toolbar");
 
 async function openBase(page: Page) {
   await page.setViewportSize({ width: 1280, height: 900 });
   await open(page);
 }
-
-test("the toolbar is one tab stop: Tab enters it once and leaves it, the arrows move between its keys", async ({ page }) => {
-  await openBase(page);
-  const bar = toolbar(page, "artifact-ready");
-  const keys = bar.locator("button");
-  const count = await keys.count();
-  expect(count).toBeGreaterThanOrEqual(4);
-  // Tab reaches the bar once; every key after the first is behind an arrow, not a Tab.
-  let tabs = 0;
-  for (; tabs < 40; tabs += 1) {
-    await page.keyboard.press("Tab");
-    if (await bar.evaluate((node) => node.contains(document.activeElement))) break;
-  }
-  expect(tabs).toBeLessThan(40);
-  await expect(keys.first()).toBeFocused();
-  await page.keyboard.press("Tab");
-  expect(await bar.evaluate((node) => node.contains(document.activeElement))).toBe(false);
-  // Back in, and the arrows stay inside.
-  await keys.first().focus();
-  await page.keyboard.press("ArrowRight");
-  await expect(keys.nth(1)).toBeFocused();
-  // The overflow trigger is disabled while it is CSS-hidden, so End lands on the last key a person can reach.
-  await page.keyboard.press("End");
-  await expect(bar.locator("button:not([disabled])").last()).toBeFocused();
-});
-
-test("the source toggle swaps the drawing and its source, and says so as a pressed key", async ({ page }) => {
-  await openBase(page);
-  const artifact = frame(page, "artifact-ready");
-  const toggle = artifact.getByRole("button", { name: "Show source" });
-  await expect(toggle).toHaveAttribute("aria-pressed", "false");
-  await expect(artifact.locator(".fui-artifact-source")).toHaveCount(0);
-  await toggle.click();
-  const pressed = artifact.getByRole("button", { name: "Show rendering" });
-  await expect(pressed).toHaveAttribute("aria-pressed", "true");
-  await expect(artifact.locator(".fui-artifact-render")).toBeHidden();
-  const source = artifact.locator(".fui-artifact-source");
-  await expect(source).toBeVisible();
-  await expect(source).toContainText("viewBox=\"0 0 480 270\"");
-  await pressed.click();
-  await expect(artifact.locator(".fui-artifact-render")).toBeVisible();
-  await expect(artifact.locator(".fui-artifact-source")).toHaveCount(0);
-});
-
-test("copy puts the source on the clipboard and says it did", async ({ page, context }) => {
-  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-  await openBase(page);
-  const artifact = frame(page, "artifact-ready");
-  await artifact.getByRole("button", { name: "Copy source" }).click();
-  const clipboard = await page.evaluate(() => navigator.clipboard.readText());
-  expect(clipboard).toContain("<svg");
-  expect(clipboard).toContain('viewBox="0 0 480 270"');
-  await expect(page.locator('[data-slot="announcer"][data-live="polite"]')).toHaveText(/Copied/);
-});
-
-test("download offers the SVG, a PNG at twice the size and the source, each named from the title", async ({ page }) => {
-  await openBase(page);
-  const artifact = frame(page, "artifact-ready");
-  const openMenu = async () => {
-    await artifact.getByRole("button", { name: "Download" }).click();
-    await expect(page.getByRole("menu")).toBeVisible();
-  };
-  await openMenu();
-  await expect(page.getByRole("menuitem")).toHaveText(["SVG image", "PNG image", "Source (.xml)"]);
-  const svgDownload = page.waitForEvent("download");
-  await page.getByRole("menuitem", { name: "SVG image" }).click();
-  const svg = await svgDownload;
-  expect(svg.suggestedFilename()).toBe("sign-ups-each-month.svg");
-  const svgText = readFileSync((await svg.path())!, "utf8");
-  expect(svgText.startsWith("<svg")).toBe(true);
-  expect(svgText).toContain('viewBox="0 0 480 270"');
-
-  await openMenu();
-  const pngDownload = page.waitForEvent("download");
-  await page.getByRole("menuitem", { name: "PNG image" }).click();
-  const png = await pngDownload;
-  expect(png.suggestedFilename()).toBe("sign-ups-each-month.png");
-  const bytes = readFileSync((await png.path())!);
-  expect(bytes.subarray(0, 8).toString("hex")).toBe("89504e470d0a1a0a");
-  // Rasterised at twice the drawing's size.
-  expect(bytes.readUInt32BE(16)).toBe(960);
-  expect(bytes.readUInt32BE(20)).toBe(540);
-
-  await openMenu();
-  const sourceDownload = page.waitForEvent("download");
-  await page.getByRole("menuitem", { name: "Source (.xml)" }).click();
-  const source = await sourceDownload;
-  expect(source.suggestedFilename()).toBe("sign-ups-each-month.xml");
-  expect(readFileSync((await source.path())!, "utf8")).toContain("<svg");
-});
-
-test("full screen opens a dialog where the child was given expanded, and Escape gives focus back to its key", async ({ page }) => {
-  await openBase(page);
-  const artifact = frame(page, "artifact-ready");
-  const key = artifact.getByRole("button", { name: "Full screen" });
-  await key.click();
-  const dialog = page.getByRole("dialog");
-  await expect(dialog).toBeVisible();
-  await expect(dialog.getByTestId("chart-ready")).toHaveAttribute("data-expanded", "true");
-  await expect(dialog.locator(".fui-zoom-pan-viewport")).toHaveAttribute("role", "region");
-  await page.keyboard.press("Escape");
-  await expect(dialog).toBeHidden();
-  await expect(key).toBeFocused();
-  await expect(artifact.getByTestId("chart-ready")).toHaveAttribute("data-expanded", "false");
-});
-
-test("a child that throws shows its reason and the source, and a new source clears the failure", async ({ page }) => {
-  await openBase(page);
-  const thrown = frame(page, "artifact-throws");
-  const strip = thrown.locator(".fui-artifact-error");
-  await expect(strip).toBeVisible();
-  await expect(strip).toContainText("The drawing came back empty");
-  await expect(thrown.locator(".fui-artifact-source")).toBeVisible();
-  await expect(thrown.locator(".fui-artifact-body")).toBeHidden();
-  // Never an empty box: the header, the reason and the source are all there.
-  expect((await thrown.boundingBox())!.height).toBeGreaterThan(80);
-
-  const recovery = frame(page, "artifact-recovery");
-  await expect(recovery.locator(".fui-artifact-error")).toBeVisible();
-  await expect(recovery.locator(".fui-artifact-source")).toBeVisible();
-  await recovery.getByRole("button", { name: "Change the source" }).click();
-  await expect(recovery.locator(".fui-artifact-error")).toHaveCount(0);
-  await expect(recovery.locator(".fui-artifact-render")).toBeVisible();
-  await expect(recovery.locator(".fui-artifact-source")).toHaveCount(0);
-});
-
-test("the loading state keeps the height of the drawing that arrives", async ({ page }) => {
-  await openBase(page);
-  const loading = (await frame(page, "artifact-height-loading").boundingBox())!;
-  const ready = (await frame(page, "artifact-height-ready").boundingBox())!;
-  expect(Math.round(loading.height)).toBe(Math.round(ready.height));
-  const busy = frame(page, "artifact-height-loading");
-  await expect(busy).toHaveAttribute("aria-busy", "true");
-  await expect(busy.getByRole("status")).toContainText("Loading the chart");
-  // A drawing still streaming says it is drawing, and the same box holds.
-  const streaming = frame(page, "artifact-streaming");
-  await expect(streaming.getByRole("status")).toContainText("Drawing the diagram");
-  expect(Math.round((await streaming.boundingBox())!.height)).toBeGreaterThan(0);
-});
 
 // ------------------------------------------------------------------- zoom and pan
 
@@ -220,15 +76,19 @@ test("Ctrl with the wheel zooms around the pointer, which stays under it", async
 test("a plain wheel scrolls the page and never zooms in ctrl mode", async ({ page }) => {
   await openBase(page);
   const region = zoomRegion(page);
-  await region.scrollIntoViewIfNeeded();
+  await expect(region).toBeVisible();
   await scrollTop(page);
   await expect(level(page)).toHaveText("100%");
-  const box = (await region.boundingBox())!;
+  // Over the page's own text a plain turn scrolls the page, and the viewport is where it was. (Over the viewport itself the
+  // wheel is contained by the box, which is what keeps a page from scrolling under a drawing that is being panned.)
+  const prose = page.locator("#storybook-root p").first();
+  const box = (await prose.boundingBox())!;
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.mouse.wheel(0, 240);
   await page.waitForTimeout(150);
   await expect(level(page)).toHaveText("100%");
   expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+  expect(await page.locator(".fui-zoom-pan[data-zoomed]").count()).toBe(0);
 });
 
 test("the keys zoom, fit and pan while the region has focus", async ({ page }) => {
@@ -347,24 +207,16 @@ test("a disabled group blocks every chip", async ({ page }) => {
 
 // --------------------------------------------------------------- forced colors
 
-test("in forced colors a pressed source toggle and an error strip keep a form", async ({ page }) => {
+test("in forced colors a failed call keeps an edge instead of a tint", async ({ page }) => {
   await page.emulateMedia({ forcedColors: "active" });
   await openBase(page);
-  const artifact = frame(page, "artifact-ready");
-  await artifact.getByRole("button", { name: "Show source" }).click();
-  const pressed = artifact.getByRole("button", { name: "Show rendering" });
-  const bar = await pressed.evaluate((node) => {
-    const style = getComputedStyle(node, "::after");
-    return { content: style.content, background: style.backgroundColor, position: getComputedStyle(node).position };
-  });
-  expect(bar.position).toBe("relative");
-  expect(bar.content).not.toBe("none");
-  expect(bar.background).not.toBe("rgba(0, 0, 0, 0)");
-  const strip = frame(page, "artifact-error").locator(".fui-artifact-error");
-  const border = await strip.evaluate((node) => getComputedStyle(node).borderBottomColor);
+  const strip = frame(page, "tool-error").locator(".fui-tool-call-error");
+  await expect(strip).toBeVisible();
+  const border = await strip.evaluate((node) => getComputedStyle(node).borderTopColor);
   expect(border).not.toBe("rgba(0, 0, 0, 0)");
-  const frameEdge = await frame(page, "artifact-error").evaluate((node) => getComputedStyle(node).borderTopColor);
-  expect(frameEdge).not.toBe("rgba(0, 0, 0, 0)");
+  const code = frame(page, "tool-error").locator(".fui-tool-call-code").first();
+  const outline = await code.evaluate((node) => getComputedStyle(node).outlineStyle);
+  expect(outline).not.toBe("none");
 });
 
 test("with reduced motion neither the chips nor the arrivals animate", async ({ page }) => {

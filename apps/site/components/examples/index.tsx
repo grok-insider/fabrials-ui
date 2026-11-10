@@ -84,7 +84,6 @@ import {
 } from "./data-012";
 import { sidebarAccountExamples, sidebarExamples } from "./shell-012";
 import {
-  artifactFrameExamples,
   composerSelectExamples,
   conversationExamples,
   editableMessageExamples,
@@ -166,7 +165,6 @@ export const exampleSets: Record<string, ExampleSet> = {
   sidebar: sidebarExamples,
   "sidebar-account": sidebarAccountExamples,
   conversation: conversationExamples,
-  "artifact-frame": artifactFrameExamples,
   "use-attachments": useAttachmentsExamples,
   "markdown-callout": markdownCalloutExamples,
   "composer-select": composerSelectExamples,

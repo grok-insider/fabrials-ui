@@ -72,7 +72,6 @@ export const exampleSlugs = [
   "sidebar",
   "sidebar-account",
   "conversation",
-  "artifact-frame",
   "use-attachments",
   "markdown-callout",
   "composer-select",

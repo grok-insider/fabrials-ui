@@ -1,13 +1,12 @@
 "use client";
 
-// Previews for what 0.12 added to @fabrials/ai-ui — the conversation, the frame of a drawing, a tool call, the follow-ups,
-// the files a composer uploads, the pills that pick and open a menu, reading an answer aloud, callouts, the pure markdown
-// helpers and a message edited where it stands — and for the accounts and usage family, which had no page at all.
+// Previews for what 0.12 added to @fabrials/ai-ui — the conversation, a tool call, the follow-ups, the files a composer
+// uploads, the pills that pick and open a menu, reading an answer aloud, callouts, the pure markdown helpers and a message
+// edited where it stands — and for the accounts and usage family, which had no page at all.
 // Synthetic data only, every date fixed, and nothing runs until a person presses something.
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { Paperclip, Terminal } from "lucide-react";
 import {
-  ArtifactFrame,
   Attachments,
   ApiKeyFields,
   ApiKeyForm,
@@ -42,9 +41,7 @@ import {
   SynchronizedAccounts,
   SynchronizedConsumption,
   ToolCall,
-  useAsyncRender,
   useAttachments,
-  type ArtifactSlot,
   type AttachmentItem,
   type ConsumptionSnapshot,
   type HostedMigrationApi,
@@ -183,72 +180,6 @@ function ConversationDemo() {
           Send a message
         </Button>
         <span style={note}>A sent message locks the end again, even from up here. The rail lists your own turns.</span>
-      </div>
-    </Frame>
-  );
-}
-
-/* ---------------------------------------------------------------- the frame of a drawing */
-
-// A made-up chart, drawn with the page's own inks so it reads in both themes. Nothing is fetched and nothing is generated.
-const CHART = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 260" width="480" height="260" role="img" aria-label="Sign-ups each month">
-  <g stroke="currentColor" stroke-opacity="0.18" stroke-width="1">
-    <line x1="40" y1="40" x2="464" y2="40"/>
-    <line x1="40" y1="90" x2="464" y2="90"/>
-    <line x1="40" y1="140" x2="464" y2="140"/>
-    <line x1="40" y1="190" x2="464" y2="190"/>
-    <line x1="40" y1="212" x2="464" y2="212"/>
-  </g>
-  <g fill="var(--brand)" style="fill: var(--brand)">
-    <rect x="58" y="150" width="34" height="62" rx="3"/>
-    <rect x="118" y="122" width="34" height="90" rx="3"/>
-    <rect x="178" y="134" width="34" height="78" rx="3"/>
-    <rect x="238" y="86" width="34" height="126" rx="3"/>
-    <rect x="298" y="66" width="34" height="146" rx="3"/>
-    <rect x="358" y="44" width="34" height="168" rx="3"/>
-  </g>
-  <g fill="currentColor" fill-opacity="0.6" font-family="var(--fui-font-label)" font-size="11">
-    <text x="58" y="232">Jan</text>
-    <text x="118" y="232">Feb</text>
-    <text x="178" y="232">Mar</text>
-    <text x="238" y="232">Apr</text>
-    <text x="298" y="232">May</text>
-    <text x="358" y="232">Jun</text>
-  </g>
-</svg>`;
-
-function Drawn({ slot, source }: { slot: ArtifactSlot; source: string }) {
-  const { onExport, onReady } = slot;
-  useEffect(() => {
-    onExport({ svg: () => source });
-    onReady();
-  }, [onExport, onReady, source]);
-  return <div dangerouslySetInnerHTML={{ __html: source }} />;
-}
-
-function ArtifactFrameDemo() {
-  const [run, setRun] = useState(0);
-  const drawing = useAsyncRender(async () => CHART, [run]);
-  return (
-    <Frame width="wide">
-      <ArtifactFrame
-        kind="Chart"
-        onRetry={() => setRun((value) => value + 1)}
-        source={CHART}
-        sourceLanguage="xml"
-        status={drawing.status}
-        title="Sign-ups each month"
-      >
-        {(slot) => <Drawn slot={slot} source={drawing.value ?? CHART} />}
-      </ArtifactFrame>
-      <div style={rows}>
-        <Button onClick={() => setRun((value) => value + 1)} size="sm" variant="outline">
-          Draw it again
-        </Button>
-        <span style={note}>
-          The frame&apos;s own toggle shows the source; copy, the two downloads and full screen are in its toolbar. The body
-          keeps its height while the drawing is on its way.
-        </span>
       </div>
     </Frame>
   );
@@ -1129,7 +1060,6 @@ function MotionDemo() {
 
 export const demos012c: Record<string, () => ReactNode> = {
   conversation: () => <ConversationDemo />,
-  "artifact-frame": () => <ArtifactFrameDemo />,
   "tool-call": () => <ToolCallDemo />,
   "suggestion-chips": () => <SuggestionChipsDemo />,
   "use-attachments": () => <UseAttachmentsDemo />,
