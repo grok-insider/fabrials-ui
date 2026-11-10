@@ -23,7 +23,9 @@ import {
 } from "../../packages/ui/src/index";
 
 const styles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
-const block = styles.slice(styles.indexOf("/* 0.12: combobox."));
+const blockStart = styles.indexOf("/* 0.12: combobox.");
+const blockEnd = styles.indexOf("\n@layer", blockStart);
+const block = styles.slice(blockStart, blockEnd === -1 ? undefined : blockEnd);
 const rule = (selector: string) => {
   const at = block.indexOf(selector);
   assert.ok(at >= 0, `missing rule ${selector}`);
