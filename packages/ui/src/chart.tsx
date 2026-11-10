@@ -1,7 +1,7 @@
 "use client";
 // Origin: shadcn/ui chart (Recharts), adapted 2026-09-22 for Fabrials metric series. Restyled with fui- classes in 0.4.
 
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -14,6 +14,10 @@ import {
   YAxis,
 } from "recharts";
 import { classes } from "./shared";
+import { useElementSize } from "./use-element-size";
+
+/** The plot is as wide as the frame's padding box in whole pixels; its height is the `height` prop, never measured. */
+const frameSize = (element: HTMLElement) => ({ width: Math.round(element.clientWidth), height: 0 });
 
 const PALETTE = [
   "var(--chart-1)",
@@ -73,17 +77,7 @@ export function SeriesChart({
   className,
 }: SeriesChartProps) {
   const uid = useId().replace(/[^a-zA-Z0-9_-]/g, "");
-  const frameRef = useRef<HTMLDivElement>(null);
-  const [frameWidth, setFrameWidth] = useState(0);
-  useEffect(() => {
-    const element = frameRef.current;
-    if (!element) return;
-    const update = () => setFrameWidth(Math.round(element.clientWidth));
-    update();
-    const observer = new ResizeObserver(update);
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, []);
+  const { ref: frameRef, width: frameWidth } = useElementSize<HTMLDivElement>(undefined, { measure: frameSize });
   const [hidden, setHidden] = useState<ReadonlySet<string>>(new Set());
   const painted = useMemo(
     () =>

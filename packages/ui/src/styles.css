@@ -10476,5 +10476,10 @@
     .fui-combobox-chip-remove:is(:hover, :active) {
       color: Highlight;
     }
+@layer components {
+  /* 0.12: foundations */
+  .fui-local-time {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
 }

@@ -20,6 +20,7 @@ const sources = [
   { find: /^@fabrials\/ui\/dither$/, replacement: resolve(root, "packages/ui/src/dither.ts") },
   { find: /^@fabrials\/ui\/moon$/, replacement: resolve(root, "packages/ui/src/moon-math.ts") },
   { find: /^@fabrials\/ui\/spreadsheet$/, replacement: resolve(root, "packages/ui/src/spreadsheet-read.ts") },
+  { find: /^@fabrials\/ui\/export$/, replacement: resolve(root, "packages/ui/src/export.ts") },
   { find: /^@fabrials\/ui\/button-variants$/, replacement: resolve(root, "packages/ui/src/button-variants.ts") },
   { find: /^@fabrials\/ui\/(tokens|styles)\.css$/, replacement: resolve(root, "packages/ui/src/$1.css") },
   { find: /^@fabrials\/ai-ui$/, replacement: resolve(root, "packages/ai-ui/src/index.tsx") },

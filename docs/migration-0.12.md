@@ -181,3 +181,116 @@ Worth knowing:
 What a product can delete: the portal, positioner and popup wiring around `Combobox.Popup`, and its own tick and clear button. `apps/site` gains the `combobox` shim (47 shims), so shadcn code that imports `@/components/ui/combobox` runs on these parts.
 
 What looks or behaves differently: nothing for code that uses `Combobox.Root`, `Combobox.Input` and the other dotted parts; they are the same components and are marked `@deprecated` one by one. `Combobox` itself is now a component (the root) with those parts on it, where it was a plain object.
+## Small foundations
+
+Nine small pieces that Radiant (and other products) had written for themselves, now in `@fabrials/ui`. They are all new exports; nothing existing changes its behaviour. Hooks and components live in client modules; every pure helper lives in a module without `"use client"`, so a Server Component can call it.
+
+### `LocalTime`, `formatLocalTime`, `useHydrated`
+
+`<LocalTime value={sentAt} format="message" />` renders a `<time dateTime>` in the reader's own zone and locale. A server knows neither, so until the page has hydrated the element is a hidden stand-in of the same shape (the same instant in UTC, in `locale` or English, `visibility: hidden`, `aria-hidden`): nothing moves when the real text arrives, and the server's clock is never shown. It renders nothing for an empty or invalid value.
+
+| Prop | What it does |
+| --- | --- |
+| `value` | A `Date`, an ISO string or a timestamp; `null`, `undefined`, `""` or an invalid date render nothing. |
+| `format` | `"time"` (09:31), `"message"` (the time today, "Sep 26, 09:31" on another day, with the year in another year), `"dateTime"` (default), `"date"`, `"shortDate"` (the year only when it is not this year), or `Intl.DateTimeFormat` options. The hour has two digits in a 24-hour locale and one in a 12-hour one ("9:31 AM"). |
+| `locale` | Default: the reader's own. Pass the page's language when the server knows it; the stand-in then has exactly the final shape. |
+| `timeZone` | Fixes the zone. The text is then the same on the server and in the browser, so it is rendered at once with no stand-in; without `locale` it is in English. |
+| `now` | The clock `message` and `shortDate` compare with (a fixed one for tests and screenshots). |
+| `prefix` | Words before the time, inside the same element ("Sent "). |
+| `title`, `titleFormat` | The tooltip: your own text, `false` for none, or by default the full date and time (`titleFormat`, default full date and long time). |
+
+`formatLocalTime(value, format, { locale, timeZone, now })` is the same formatting as a pure function (`time-format.ts`, no directive); it returns `""` for an invalid value. `localTimeIso(value)` gives the ISO instant or `null`. `useHydrated()` is `false` on the server and during hydration and `true` afterwards.
+
+`RelativeTime` stays what it was ("3 minutes ago", ticking). Use `LocalTime` for an absolute time.
+
+Radiant can delete `components/app/local-time.tsx` and `lib/time-format.ts`. Three differences from its version: `title` is text or `false`, and the format of the tooltip moved to `titleFormat`; `message` adds the year when the day is in another year; and the hour of `time` and `message` has one digit in a 12-hour locale.
+
+### `useHotkeys`, `matchHotkey`, `isTypingTarget`, `ariaKeyshortcuts`
+
+```tsx
+useHotkeys({
+  "1": () => pick(0),
+  Enter: check,
+  "mod+k": { handler: openSearch, whenTyping: true },
+});
+```
+
+One hook with the guards every key handler of a screen needs. A key is ignored:
+
+- while text is being composed (an IME) and when another handler already called `preventDefault`;
+- with a modifier the hotkey does not list (`"1"` does not answer Ctrl+1);
+- while it repeats (`ignoreRepeat`, default true; `repeat: true` on one binding for a stepper);
+- while a field has focus (`ignoreWhenTyping`, default true: inputs, `textarea`, `select`, editable regions, `role="textbox|combobox|searchbox|spinbutton"`; radios and sliders count as fields because the arrows and digits are theirs; `whenTyping: true` on one binding for Escape or a chord);
+- Enter and Space on a button, a link, `summary` or another control that uses them (`ignoreOnControls`, default true; a string is your own selector; `onControls: true` on one binding);
+- outside `scope` (a ref: only while focus is inside it; default the whole document);
+- anywhere inside `[data-hotkeys="off"]`, always;
+- when `enabled` is false.
+
+A key that fires gets `preventDefault()` (`preventDefault: false` to leave it). Handlers are always the latest ones, so they may close over state. Hotkeys are written `"Enter"`, `"Space"`, `"ArrowLeft"`, `"1"`, `"mod+k"` (Ctrl or ⌘), `"shift+?"`. Shift is compared for letters and named keys; a digit or a symbol is the character the layout produced, however it was reached (1 is Shift+& on a French keyboard). A letter also matches its physical key on a layout of another script.
+
+The pure half is in `hotkeys.ts` (no directive): `matchHotkey(event, combo)`, `parseHotkey(combo)`, `isTypingTarget(target)`, `isControlTarget(target, selector?)`, `HOTKEY_CONTROLS`, and `ariaKeyshortcuts("mod+k")`, which gives `"Control+K Meta+K"` for the `aria-keyshortcuts` attribute.
+
+Radiant can delete `typingTarget` and `useDigitKeys` (`components/lang/exercise/choice.tsx`), the key effects of `review-session.tsx` and `session/player.tsx`, and `inReportPanel` (`report/state.ts`): the report control carries `data-hotkeys="off"` instead of `data-report-problem`. Its lesson screen lets Enter go on from a radio drawn as a button; that is `ignoreOnControls: 'a[href], summary, button:not([role="radio"])'`.
+
+### `useElementSize`
+
+`const { ref, width, height } = useElementSize<HTMLDivElement>()` gives the size of an element's content box, kept current by a `ResizeObserver`: 0 by 0 on the server and until measured, rounded to device pixels, and it re-renders only when the size changes. Pass your own ref as the first argument to measure an element you already hold. `{ measure }` as the second reads another box (`clientWidth`, a scroll size). `SeriesChart` now measures its frame with it; what it measures and when did not change.
+
+Radiant can delete `features/core/use-width.ts` (`useElementWidth(ref, fallback)` becomes `useElementSize(ref).width || fallback`).
+
+### `ErrorBoundary`, `ErrorBoundaryFallback`
+
+```tsx
+<ErrorBoundary resetKey={spec.id} onError={report}>
+  <Diagram spec={spec} />
+</ErrorBoundary>
+```
+
+| Prop | What it does |
+| --- | --- |
+| `fallback` | A node, or `({ error, reset }) => node`. Default: `ErrorBoundaryFallback`, an inline `StatePanel state="error"` with "Try again". |
+| `resetKey` | When it changes, the children get a fresh attempt. |
+| `onError(error, info)` | For the host's reporting. |
+| `onReset()` | Called when "Try again" (or a fallback's `reset`) clears the error. |
+| `labels` | `{ title, description, retry }` of the default fallback. English defaults. |
+| `headingLevel` | Of the default fallback's title: 2, 3 (default) or 4. |
+
+After "Try again", focus goes to the start of the restored part (focusable for that one visit) instead of falling to the top of the page; if the part is still broken, focus stays on the button. A custom fallback manages its own focus. `ErrorBoundaryFallback` can be used alone, for a route's error file: `<ErrorBoundaryFallback reset={reset} />`.
+
+Radiant can delete `features/core/error-boundary.tsx`. Its `onError` received a message; this one receives the error and React's info.
+
+### `@fabrials/ui/export`
+
+A new subpath (also exported from the index), with no directive: `downloadFile(name, data, type?)`, `serializeSvg(svg, { background, width, height })`, `svgToPng(svg, { scale = 2, background })`, `fileStem(title, fallback, maxLength = 60)`, `copyImage(source)` and `copyText(text)`. They work on what is already in the page and never read the network. Called without a browser they throw (or reject with) an `ExportError` whose `code` is `no-dom`, `unsupported`, `refused` or `invalid`.
+
+- `serializeSvg` writes the computed paint on every element in plain sRGB, so token colours survive in a file; web fonts and the HTML inside a `foreignObject` do not travel.
+- `svgToPng` takes an element (serialised first) or a string, and returns a PNG blob `scale` times the drawing's size.
+- `fileStem` keeps letters and digits of any language, turns everything else into one hyphen, lowers the case and caps the length: `fileStem("Ventas / Q3 — «مبيعات» 2026", "chart")` is `ventas-q3-مبيعات-2026`.
+- `copyImage` takes a blob or the address of a picture and writes PNG to the clipboard (another type is redrawn through a canvas). A picture from another origin must allow CORS. Call it from the click itself.
+
+Radiant can delete `features/core/export.ts` (keeping its own `parseFenceMeta`) and the `copyImage` of `components/chat/generated-media.tsx`. The argument order of `downloadFile` is the name first, and `svgToPng` takes its background in an options object.
+
+### `useResolvedTokens`, `resolveColor`
+
+`const { theme, colors, fontSans, fontMono } = useResolvedTokens(CHART_TOKENS, ref)` gives tokens as `#rrggbb` (`#rrggbbaa` when not opaque) for what cannot read a custom property: a canvas, a chart library, a diagram renderer. Names are custom properties or any CSS colour. They are resolved for `ref`'s element (default: the root), so a part with its own theme gets its own colours, and again when the theme, the system scheme or a style above the element changes. The object keeps its identity until a value really changes, and is empty on the server. `resolveColor(value, element?)` is the single conversion (`oklch()`, `color-mix()`, `var(--token)`, `currentColor`); `colorToRgba(value)` gives bytes. `CHART_TOKENS` is the list `--chart-1` … `--chart-6`.
+
+Radiant can delete `features/core/renderer-theme.ts`; its fixed fields become the names it asks for (`colors["--card"]`, …).
+
+### `ForeignText`, `Bdi`, `dirOf`, `scriptDirection`, `isolate`, `interpolate`
+
+- `<ForeignText lang="ar">كتاب</ForeignText>` renders `<bdi lang dir>`: a fragment in another language, isolated from the line around it, in its own direction. `dir` comes from `lang`, else from the first letter of a string child, else `auto`. `as` picks another element.
+- `<Bdi>` is for text whose language nobody knows (a name, a title): `dir="auto"`.
+- `dirOf("ar-EG")` is `"rtl"`: by script subtag when the tag has one, else by language, with the few whose script follows the country (`pa-PK`). The tables are fixed, so the server and the browser agree.
+- `scriptDirection(text)` is the direction of the first letter, or `undefined` when there is none.
+- `isolate(text)` wraps a string in U+2068 … U+2069 for places that take only a string: an `aria-label`, a `title`, a toast.
+- `interpolate("The word {word} means {meaning}", { word: <ForeignText lang="ar">كتاب</ForeignText>, meaning })` returns keyed nodes for a translated message with markup in it. A string slot is wrapped in `<bdi>`; a placeholder with no slot stays as written.
+
+These components have no hooks and no directive: they render on the server.
+
+Radiant can replace `targetTag` and `textTag` of `exercise/lang-text.ts` with `dirOf`, and `isolate` of `import/api.ts`. Its `ForeignText` that finds quoted fragments in a note by script (`lib/lang/foreign.ts`) is a different tool and stays in the product.
+
+### `Announcer`, `useAnnounce`
+
+`<Announcer>` near the root renders one polite and one assertive live region, always in the page and only clipped from view. `const announce = useAnnounce()` then says a sentence without moving focus: `announce("Draft saved")`, `announce("The connection was lost", { assertive: true })`. The same sentence twice is read twice (the region is emptied and filled a frame later), and a message leaves the region after `clearAfter` milliseconds (default 7000, 0 keeps it). Without an `Announcer` above, `useAnnounce` speaks through a pair of regions of its own at the end of the body.
+
+Radiant's step players can drop their own `aria-live` regions and call `announce`.

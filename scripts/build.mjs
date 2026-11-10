@@ -52,6 +52,7 @@ export async function bundle(name, outDir) {
                 index: resolve(directory, "src/index.ts"),
                 dither: resolve(directory, "src/dither.ts"),
                 "spreadsheet-read": resolve(directory, "src/spreadsheet-read.ts"),
+                export: resolve(directory, "src/export.ts"),
               }
             : resolve(directory, "src/index.tsx"),
         formats: ["es"],

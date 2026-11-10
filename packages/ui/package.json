@@ -31,6 +31,10 @@
       "types": "./dist/spreadsheet-read.d.ts",
       "import": "./dist/spreadsheet-read.js"
     },
+    "./export": {
+      "types": "./dist/export.d.ts",
+      "import": "./dist/export.js"
+    },
     "./button-variants": {
       "types": "./dist/button-variants.d.ts",
       "import": "./dist/button-variants.js"

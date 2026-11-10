@@ -3,6 +3,7 @@
 import { useEffect, useRef, useSyncExternalStore, type CSSProperties } from "react";
 import { hexToRgb, paintField, paintRampField, seeded, type BrightnessField, type Rgb } from "./dither";
 import { DITHER_BACKGROUND } from "./dither-presets";
+import { colorToRgba } from "./resolve-color";
 import { classes } from "./shared";
 import { documentTheme, subscribeDocumentTheme, themeOf } from "./theme";
 
@@ -49,13 +50,8 @@ export type DitherCanvasProps = {
 
 /** Any CSS colour (oklch, var-substituted) as RGB, read back from a 1×1 canvas. */
 function cssColor(value: string): Rgb | undefined {
-  const probe = document.createElement("canvas").getContext("2d", { willReadFrequently: true });
-  if (!probe || !value) return undefined;
-  probe.fillStyle = "#000";
-  probe.fillStyle = value;
-  probe.fillRect(0, 0, 1, 1);
-  const [r, g, b] = probe.getImageData(0, 0, 1, 1).data;
-  return [r!, g!, b!];
+  const rgba = colorToRgba(value);
+  return rgba && [rgba[0], rgba[1], rgba[2]];
 }
 
 function resolveRamp(canvas: HTMLCanvasElement, colors: string[]): Rgb[] {

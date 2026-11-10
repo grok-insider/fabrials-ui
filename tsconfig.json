@@ -16,6 +16,7 @@
       "@fabrials/ui/dither": ["./packages/ui/src/dither.ts"],
       "@fabrials/ui/moon": ["./packages/ui/src/moon-math.ts"],
       "@fabrials/ui/spreadsheet": ["./packages/ui/src/spreadsheet-read.ts"],
+      "@fabrials/ui/export": ["./packages/ui/src/export.ts"],
       "@fabrials/ai-ui": ["./packages/ai-ui/src/index.tsx"]
     }
   },
