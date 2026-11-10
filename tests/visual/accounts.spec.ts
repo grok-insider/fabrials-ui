@@ -243,6 +243,20 @@ test("the right-to-left frame mirrors the rows and the labels", async ({ page })
   expect(credit.name).toBeGreaterThan(credit.when);
 });
 
+test("forced colors: a row that is a button draws an edge, and the warning keeps its bar", async ({ page }) => {
+  await page.emulateMedia({ forcedColors: "active" });
+  await open(page);
+  const row = page.locator(".fb-log-button").first();
+  await row.hover();
+  const edge = await row.evaluate((node) => {
+    const style = getComputedStyle(node);
+    return { width: style.outlineWidth, style: style.outlineStyle, offset: style.outlineOffset };
+  });
+  expect(edge).toEqual({ width: "2px", style: "solid", offset: "-2px" });
+  const warning = await page.locator(".fb-reset-warning").first().evaluate((node) => getComputedStyle(node).borderInlineStartWidth);
+  expect(warning).toBe("3px");
+});
+
 /** The word on its own, never the front of a longer one: "Client" is not inside "Cliente". */
 function whole(text: string, word: string) {
   return new RegExp(`(^|[^\\p{L}\\p{N}])${word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}([^\\p{L}\\p{N}]|$)`, "u").test(text);
