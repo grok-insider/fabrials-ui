@@ -15,6 +15,10 @@ const CLIENT_LIBRARIES = /^(@base-ui\/react\/|cmdk$|embla-carousel-react$|motion
 // Directive-free on purpose although the scan finds a browser global.
 const PLAIN_BY_DESIGN: Record<string, string> = {
   "ui/theme.ts": "reads `document` behind a typeof guard, and its subscription is only ever called from a client module",
+  "ui/resolve-color.ts":
+    "reads a colour through a canvas when one exists and returns the value untouched when none does; `DitherCanvas` and `useResolvedTokens`, both client modules, are its callers",
+  "ui/export.ts":
+    "downloads, serialises and copies in the browser, and every function says so when called without a DOM; the module itself must import on the server, where a Server Component reads `fileStem`",
 };
 
 // Client on purpose although the scan finds no hook, handler or browser API.

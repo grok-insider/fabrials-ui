@@ -10336,6 +10336,9 @@
   .fui-carousel:focus-visible > .fui-carousel-viewport {
     outline: 2px solid var(--fui-focus);
     outline-offset: -2px;
+  }
+}
+
 @layer components {
   /* 0.12: combobox. The flat parts: the field (an input group the list opens under), its keys, the empty line, and the
      box of chips of a multiple one. The list and its rows are the menu's. */
@@ -10476,6 +10479,9 @@
     .fui-combobox-chip-remove:is(:hover, :active) {
       color: Highlight;
     }
+  }
+}
+
 @layer components {
   /* 0.12: foundations */
   .fui-local-time {

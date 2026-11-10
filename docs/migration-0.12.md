@@ -44,6 +44,7 @@ As with `@fabrials/ui`, a right-to-left app sets both `dir="rtl"` on its root an
 **Pointer.** The message actions brighten under the pointer only where there is one (`@media (hover: hover)`), so a tap no longer leaves an action highlighted.
 
 Nothing to delete in a product unless it carried its own right-to-left overrides for these pieces (`[dir="rtl"] .fui-markdown ul { padding-right: … }` and the like): those can go.
+
 ## Sidebar
 
 New, all optional:
@@ -110,6 +111,7 @@ Left physical on purpose: positions measured in script (`--active-tab-left`, `--
 - The region's focus ring is drawn inside its viewport.
 
 A product can delete: a wrapper that stopped arrow keys from reaching the carousel (`onKeyDown={(event) => event.stopPropagation()}` around a field in a slide), and its own visually hidden names for the two keys.
+
 ## Server and client
 
 Until 0.11 the build wrote `"use client"` on top of every module except ten it knew by name. A formatter such as `formatBytes` therefore lived in a client module, and a Server Component that called it failed at render: on the server a client module's exports are references, not functions. Components without a hook were client components for the same reason.
@@ -181,6 +183,7 @@ Worth knowing:
 What a product can delete: the portal, positioner and popup wiring around `Combobox.Popup`, and its own tick and clear button. `apps/site` gains the `combobox` shim (47 shims), so shadcn code that imports `@/components/ui/combobox` runs on these parts.
 
 What looks or behaves differently: nothing for code that uses `Combobox.Root`, `Combobox.Input` and the other dotted parts; they are the same components and are marked `@deprecated` one by one. `Combobox` itself is now a component (the root) with those parts on it, where it was a plain object.
+
 ## Small foundations
 
 Nine small pieces that Radiant (and other products) had written for themselves, now in `@fabrials/ui`. They are all new exports; nothing existing changes its behaviour. Hooks and components live in client modules; every pure helper lives in a module without `"use client"`, so a Server Component can call it.

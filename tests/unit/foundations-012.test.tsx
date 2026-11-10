@@ -587,17 +587,11 @@ test("the export module has no directive, reads no network and is a subpath of i
   assert.match(build, /export: resolve\(directory, "src\/export\.ts"\)/);
 });
 
-test("the build keeps the pure modules free of the client directive, and only them", () => {
-  const build = readFileSync(new URL("../../scripts/build.mjs", import.meta.url), "utf8");
-  const pattern = new RegExp(build.match(/banner: chunk => \/(.+?)\/\.test/)![1]!);
-  for (const file of ["time-format.ts", "hotkeys.ts", "export.ts", "resolve-color.ts", "bidi.ts", "foreign-text.tsx"]) {
-    assert.equal(pattern.test(`/repo/packages/ui/src/${file}`), true, file);
+test("the pure modules carry no client directive, and the ones with hooks do (the build marks a module by its source)", () => {
+  for (const file of ["time-format.ts", "hotkeys.ts", "export.ts", "resolve-color.ts", "bidi.ts", "foreign-text.tsx"])
     assert.doesNotMatch(source(file), /^"use client"/, file);
-  }
-  for (const file of ["use-hotkeys.ts", "use-hydrated.ts", "local-time.tsx", "use-element-size.ts", "error-boundary.tsx", "use-resolved-tokens.ts", "announcer.tsx"]) {
-    assert.equal(pattern.test(`/repo/packages/ui/src/${file}`), false, file);
+  for (const file of ["use-hotkeys.ts", "use-hydrated.ts", "local-time.tsx", "use-element-size.ts", "error-boundary.tsx", "use-resolved-tokens.ts", "announcer.tsx"])
     assert.match(source(file), /^"use client";/, file);
-  }
 });
 
 // --- Announcer -------------------------------------------------------------------------------------------------------
