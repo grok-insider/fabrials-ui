@@ -22,6 +22,7 @@ import { bufferedEnd, clamp, formatClock, keyAction, mayAnimate, playbackProblem
 import { PixelSpinner } from "./pixel-spinner";
 import { classes } from "./shared";
 import { Slider } from "./slider";
+import { claimSound, releaseSound } from "./sound-bus";
 
 export type PlayerLabels = {
   play: string;
@@ -72,8 +73,8 @@ const AUDIO_PROBLEMS: PlayerLabels["problems"] = {
 };
 
 const IDLE_MS = 2500;
-// One video plays at a time: starting one pauses the one before. Muted loops (animations) are part of the page, not videos.
-let playing: HTMLMediaElement | null = null;
+// One video plays at a time: starting one pauses the one before, through the sound bus it shares with clips, the recorder and
+// the reader. Muted loops (animations) are part of the page, not videos.
 // The volume people chose stays for the next player in this page.
 const preference = { volume: 1, muted: false };
 
@@ -133,14 +134,11 @@ function useMedia(media: RefObject<HTMLMediaElement | null>, options: { exclusiv
     const offs = [
       ...["loadedmetadata", "durationchange", "timeupdate", "progress", "seeked", "volumechange", "ratechange"].map((name) => on(name, sync)),
       on("play", () => {
-        if (options.exclusive) {
-          if (playing && playing !== element) playing.pause();
-          playing = element;
-        }
+        if (options.exclusive) claimSound(element, () => element.pause());
         setState((now) => ({ ...now, playing: true, started: true, ended: false, error: null }));
       }),
       on("pause", () => {
-        if (playing === element) playing = null;
+        releaseSound(element);
         setState((now) => ({ ...now, playing: false }));
       }),
       on("ended", () => setState((now) => ({ ...now, playing: false, ended: true }))),
@@ -152,7 +150,7 @@ function useMedia(media: RefObject<HTMLMediaElement | null>, options: { exclusiv
     sync();
     return () => {
       for (const off of offs) off();
-      if (playing === element) playing = null;
+      releaseSound(element);
     };
   }, [media, options.exclusive]);
   return state;

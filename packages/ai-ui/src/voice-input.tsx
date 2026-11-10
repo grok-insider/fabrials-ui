@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
-import { Spinner, Tooltip, TooltipContent, TooltipTrigger } from "@fabrials/ui";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { Spinner, Tooltip, TooltipContent, TooltipTrigger, useRecorder } from "@fabrials/ui";
 import { MicIcon } from "./chat-icons";
 
 export type VoiceInputStatus = "idle" | "requesting" | "recording" | "transcribing" | "error";
@@ -26,24 +26,25 @@ export function pickRecorderMimeType(isTypeSupported: ((type: string) => boolean
   });
 }
 
-export function describeMicError(error: unknown): string {
+export function describeMicError(error: unknown, labels: VoiceInputLabels = {}): string {
+  const text = { ...DEFAULT_LABELS, ...labels };
   const name = error instanceof Error || (typeof error === "object" && error && "name" in error) ? String((error as { name: unknown }).name) : "";
   switch (name) {
     case "NotAllowedError":
     case "PermissionDeniedError":
     case "SecurityError":
-      return "Microphone access is blocked. Allow it in your browser's site settings to dictate.";
+      return text.denied;
     case "NotFoundError":
     case "DevicesNotFoundError":
     case "OverconstrainedError":
-      return "No microphone was found.";
+      return text.noMicrophone;
     case "NotReadableError":
     case "TrackStartError":
-      return "The microphone is busy in another app.";
+      return text.busy;
     case "AbortError":
-      return "Recording was interrupted.";
+      return text.interrupted;
     default:
-      return "Couldn't start the microphone.";
+      return text.micFailed;
   }
 }
 
@@ -88,6 +89,15 @@ export type VoiceInputLabels = {
   empty?: string;
   noSpeech?: string;
   failed?: string;
+  /** The microphone is blocked, by the browser or by the person. */
+  denied?: string;
+  noMicrophone?: string;
+  /** Another app holds the microphone. */
+  busy?: string;
+  interrupted?: string;
+  /** The microphone did not start, for a reason the browser does not name. */
+  micFailed?: string;
+  recordingFailed?: string;
 };
 
 const DEFAULT_LABELS: Required<VoiceInputLabels> = {
@@ -99,6 +109,12 @@ const DEFAULT_LABELS: Required<VoiceInputLabels> = {
   empty: "Nothing was recorded.",
   noSpeech: "Didn't catch that — try again a little closer to the mic.",
   failed: "Transcription failed.",
+  denied: "Microphone access is blocked. Allow it in your browser's site settings to dictate.",
+  noMicrophone: "No microphone was found.",
+  busy: "The microphone is busy in another app.",
+  interrupted: "Recording was interrupted.",
+  micFailed: "Couldn't start the microphone.",
+  recordingFailed: "Recording failed.",
 };
 
 export type VoiceInputButtonViewProps = {
@@ -174,12 +190,6 @@ export function VoiceInputButtonView({
   );
 }
 
-const noopSubscribe = () => () => {};
-
-function stopTracks(stream: MediaStream | null) {
-  for (const track of stream?.getTracks() ?? []) track.stop();
-}
-
 export type VoiceInputButtonProps = {
   onRecorded: (blob: Blob) => Promise<string>;
   onTranscript: (text: string) => void;
@@ -189,9 +199,15 @@ export type VoiceInputButtonProps = {
   showLevel?: boolean;
   disabled?: boolean;
   labels?: VoiceInputLabels;
+  /** What stands in the button's place in a browser that cannot record. Nothing by default. */
+  unsupportedFallback?: ReactNode;
   className?: string;
 };
 
+/**
+ * Dictation on the house recorder (`useRecorder` of `@fabrials/ui`): press to record, press again to stop, and the take
+ * goes to `onRecorded` at once. While it records it holds the page's sound, so a clip or a player stops.
+ */
 export function VoiceInputButton({
   onRecorded,
   onTranscript,
@@ -201,173 +217,94 @@ export function VoiceInputButton({
   showLevel = false,
   disabled,
   labels: labelOverrides,
+  unsupportedFallback = null,
   className,
 }: VoiceInputButtonProps) {
-  const supported = useSyncExternalStore(noopSubscribe, isVoiceInputSupported, () => false);
   const labels = { ...DEFAULT_LABELS, ...labelOverrides };
-  const [status, setStatus] = useState<VoiceInputStatus>("idle");
   const [error, setError] = useState<string | undefined>();
-  const [elapsedMs, setElapsedMs] = useState(0);
-  const [level, setLevel] = useState<number | undefined>(undefined);
-  const recorderRef = useRef<MediaRecorder | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
-  const audioRef = useRef<{ context?: AudioContext; frame?: number }>({});
-  const timersRef = useRef<{ tick?: ReturnType<typeof setInterval>; stop?: ReturnType<typeof setTimeout> }>({});
   const mountedRef = useRef(true);
+  const handled = useRef<Blob | null>(null);
   const callbacks = useRef({ onRecorded, onTranscript, onError, onNotice, labels });
   useEffect(() => {
     callbacks.current = { onRecorded, onTranscript, onError, onNotice, labels };
   });
-
-  const teardown = useCallback(() => {
-    clearInterval(timersRef.current.tick);
-    clearTimeout(timersRef.current.stop);
-    timersRef.current = {};
-    if (audioRef.current.frame !== undefined) cancelAnimationFrame(audioRef.current.frame);
-    void audioRef.current.context?.close().catch(() => undefined);
-    audioRef.current = {};
-    stopTracks(streamRef.current);
-    streamRef.current = null;
-    recorderRef.current = null;
-  }, []);
-
   useEffect(() => {
     mountedRef.current = true;
     return () => {
       mountedRef.current = false;
-      const recorder = recorderRef.current;
-      if (recorder && recorder.state !== "inactive") {
-        recorder.onstop = null;
-        recorder.stop();
-      }
-      teardown();
     };
-  }, [teardown]);
+  }, []);
 
   const fail = useCallback((message: string, cause?: unknown) => {
     setError(message);
-    setStatus("error");
     callbacks.current.onError?.(message, cause);
   }, []);
 
-  const stop = useCallback(() => {
-    const recorder = recorderRef.current;
-    if (recorder && recorder.state !== "inactive") recorder.stop();
-  }, []);
+  const recorder = useRecorder({
+    maxDurationMs,
+    // Dictation keeps whatever was said, however short; only an empty take is dropped.
+    minDurationMs: 0,
+    mimeTypes: RECORDER_MIME_CANDIDATES,
+    constraints: true,
+    level: showLevel,
+    onError: (failure) => {
+      const text = callbacks.current.labels;
+      fail(failure.during === "recording" ? text.recordingFailed : describeMicError(failure.cause, text), failure.cause);
+    },
+  });
+  const { blob, tooShort, reset } = recorder;
 
-  const transcribe = useCallback(
-    async (blob: Blob) => {
-      const { onRecorded: record, onTranscript: deliver, onNotice: notice, labels: text } = callbacks.current;
-      if (blob.size === 0) {
-        notice?.(text.empty);
-        setStatus("idle");
-        return;
-      }
-      setStatus("transcribing");
+  // The take goes straight to the host: there is no listening back in a dictation key.
+  useEffect(() => {
+    if (!blob || handled.current === blob) return;
+    handled.current = blob;
+    const { onRecorded: record, onTranscript: deliver, onNotice: notice, labels: text } = callbacks.current;
+    void (async () => {
       try {
         const transcript = (await record(blob)).trim();
         if (!mountedRef.current) return;
         if (!transcript) notice?.(text.noSpeech);
         else deliver(transcript);
-        setStatus("idle");
+        reset();
       } catch (cause) {
         if (!mountedRef.current) return;
+        reset();
         fail(cause instanceof Error && cause.message ? cause.message : text.failed, cause);
       }
-    },
-    [fail],
-  );
+    })();
+  }, [blob, fail, reset]);
 
-  const meter = useCallback((stream: MediaStream) => {
-    const Context = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!Context) return;
-    try {
-      const context = new Context();
-      const analyser = context.createAnalyser();
-      analyser.fftSize = 256;
-      context.createMediaStreamSource(stream).connect(analyser);
-      const data = new Uint8Array(analyser.fftSize);
-      const read = () => {
-        analyser.getByteTimeDomainData(data);
-        let sum = 0;
-        for (const sample of data) sum += ((sample - 128) / 128) ** 2;
-        setLevel(Math.round(Math.min(1, Math.sqrt(sum / data.length) * 3) * 20) / 20);
-        audioRef.current.frame = requestAnimationFrame(read);
-      };
-      audioRef.current = { context, frame: requestAnimationFrame(read) };
-    } catch {
-      setLevel(undefined);
-    }
-  }, []);
+  useEffect(() => {
+    if (tooShort) callbacks.current.onNotice?.(callbacks.current.labels.empty);
+  }, [tooShort]);
 
-  const start = useCallback(async () => {
-    if (recorderRef.current) return;
-    setError(undefined);
-    setStatus("requesting");
-    let stream: MediaStream;
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    } catch (cause) {
-      if (mountedRef.current) fail(describeMicError(cause), cause);
-      return;
-    }
-    if (!mountedRef.current) {
-      stopTracks(stream);
-      return;
-    }
-    const mimeType = pickRecorderMimeType(
-      typeof MediaRecorder.isTypeSupported === "function" ? (type) => MediaRecorder.isTypeSupported(type) : undefined,
-    );
-    let recorder: MediaRecorder;
-    try {
-      recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
-    } catch (cause) {
-      stopTracks(stream);
-      fail(describeMicError(cause), cause);
-      return;
-    }
-    chunksRef.current = [];
-    recorder.ondataavailable = (event) => {
-      if (event.data.size > 0) chunksRef.current.push(event.data);
-    };
-    recorder.onerror = (event) => {
-      recorder.onstop = null;
-      teardown();
-      if (mountedRef.current) fail("Recording failed.", event);
-    };
-    recorder.onstop = () => {
-      const blob = new Blob(chunksRef.current, { type: recorder.mimeType || mimeType || "audio/webm" });
-      chunksRef.current = [];
-      teardown();
-      setLevel(undefined);
-      if (mountedRef.current) void transcribe(blob);
-    };
-    recorderRef.current = recorder;
-    streamRef.current = stream;
-    recorder.start(250);
-    const startedAt = Date.now();
-    setElapsedMs(0);
-    setStatus("recording");
-    if (showLevel) meter(stream);
-    timersRef.current.tick = setInterval(() => setElapsedMs(Date.now() - startedAt), 250);
-    timersRef.current.stop = setTimeout(stop, maxDurationMs);
-  }, [fail, maxDurationMs, meter, showLevel, stop, teardown, transcribe]);
+  if (recorder.status === "unsupported") return <>{unsupportedFallback}</>;
+  if (!recorder.supported) return null;
 
-  if (!supported) return null;
+  const status: VoiceInputStatus =
+    recorder.status === "requesting" || recorder.status === "recording"
+      ? recorder.status
+      : recorder.status === "recorded"
+        ? "transcribing"
+        : error
+          ? "error"
+          : "idle";
 
   return (
     <VoiceInputButtonView
       className={className}
       disabled={disabled}
-      elapsedMs={elapsedMs}
+      elapsedMs={recorder.elapsedMs}
       error={error}
       labels={labelOverrides}
-      level={status === "recording" ? level : undefined}
+      level={showLevel && status === "recording" ? recorder.level : undefined}
       maxDurationMs={maxDurationMs}
       onPress={() => {
-        if (status === "recording") stop();
-        else void start();
+        if (status === "recording") recorder.stop();
+        else {
+          setError(undefined);
+          void recorder.start();
+        }
       }}
       status={status}
     />

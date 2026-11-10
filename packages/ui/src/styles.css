@@ -10943,3 +10943,175 @@
     padding-left: max(0px, calc(env(safe-area-inset-left, 0px) - var(--fui-space-5)));
   }
 }
+@layer components {
+  /* 0.12: sound */
+  /* A clip's button keeps its words on one side of its glyph and never squeezes the glyph. */
+  .fui-clip-button-label {
+    min-inline-size: 0;
+  }
+  /* The line under a clip that did not play. Empty, it leaves the flow (it stays in the page for the announcement to
+     come), so the gap of a row or a stack does not count it. */
+  .fui-clip-note {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--fui-space-1) var(--fui-space-2);
+    margin: 0;
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+    line-height: var(--fui-leading-xs);
+  }
+  .fui-clip-note:empty {
+    position: absolute;
+  }
+  .fui-clip-note-retry {
+    position: relative;
+    padding: 0;
+    border: 0;
+    border-radius: var(--fui-radius-xs);
+    background: none;
+    color: var(--brand-ink);
+    font: inherit;
+    font-weight: var(--fui-weight-medium);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in oklab, var(--brand-ink) 40%, transparent);
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+  .fui-clip-note-retry:focus-visible {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: 2px;
+  }
+  @media (hover: hover) {
+    .fui-clip-note-retry:hover {
+      text-decoration-color: currentColor;
+    }
+  }
+
+  /* The recorder: a status line, the live row while it listens, the take, then the keys of the step the speaker is on. */
+  .fui-recorder {
+    display: grid;
+    gap: var(--fui-space-3);
+    min-inline-size: 0;
+  }
+  .fui-recorder-line {
+    min-inline-size: 0;
+  }
+  .fui-recorder-status,
+  .fui-recorder-hint {
+    margin: 0;
+    font-size: var(--fui-text-sm);
+    line-height: var(--fui-leading-sm);
+    overflow-wrap: anywhere;
+  }
+  .fui-recorder-status:empty {
+    position: absolute;
+  }
+  .fui-recorder-hint {
+    color: var(--muted-foreground);
+  }
+  .fui-recorder-status[data-tone="problem"] {
+    color: var(--fui-danger-ink);
+  }
+  .fui-recorder-live {
+    display: flex;
+    align-items: center;
+    gap: var(--fui-space-2);
+    min-inline-size: 0;
+  }
+  .fui-recorder-dot {
+    flex: none;
+    inline-size: 0.5rem;
+    block-size: 0.5rem;
+    border-radius: var(--fui-radius-full);
+    background: var(--destructive);
+  }
+  /* A clock reads minutes then seconds in every script. */
+  .fui-recorder-clock {
+    flex: none;
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    font-variant-numeric: tabular-nums;
+    unicode-bidi: isolate;
+  }
+  .fui-recorder-meter {
+    flex: 1 1 auto;
+    max-inline-size: 12rem;
+    block-size: 0.375rem;
+    overflow: hidden;
+    border-radius: var(--fui-radius-full);
+    background: var(--muted);
+  }
+  .fui-recorder-meter-fill {
+    display: block;
+    inline-size: calc(var(--fui-recorder-level, 0) * 100%);
+    block-size: 100%;
+    border-radius: inherit;
+    background: var(--foreground);
+    transition: inline-size var(--fui-duration-fast) linear;
+  }
+  .fui-recorder-take {
+    min-inline-size: 0;
+  }
+  .fui-recorder-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--fui-space-2);
+    min-inline-size: 0;
+  }
+  .fui-recorder-action {
+    display: contents;
+  }
+  .fui-recorder-fallback {
+    display: inline-flex;
+    align-items: center;
+    min-inline-size: 0;
+  }
+
+  @media (pointer: coarse) {
+    .fui-clip-button.fui-button,
+    .fui-speed-toggle.fui-button,
+    .fui-recorder-actions .fui-button {
+      min-block-size: 2.75rem;
+    }
+    .fui-clip-button[data-icon-only].fui-button {
+      min-inline-size: 2.75rem;
+    }
+    /* The retry key stays a word in its line; under a finger its target is 44 px tall, centred on the word. */
+    .fui-clip-note-retry::after {
+      content: "";
+      position: absolute;
+      inset-block: calc((100% - 2.75rem) / 2);
+      inset-inline: calc(var(--fui-space-2) * -1);
+    }
+  }
+
+  /* Forced colors: a clip that plays and the slow speed lose their tint, so each carries a Highlight edge and a bar under
+     its label; the recording dot and the level are Highlight on a drawn track. */
+  @media (forced-colors: active) {
+    .fui-clip-button[aria-pressed="true"],
+    .fui-speed-toggle.fui-button[aria-pressed="true"] {
+      border-color: Highlight;
+    }
+    .fui-clip-button[aria-pressed="true"]::after,
+    .fui-speed-toggle.fui-button[aria-pressed="true"]::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0.25rem;
+      inset-block-end: 2px;
+      block-size: 3px;
+      background: Highlight;
+    }
+    .fui-recorder-dot,
+    .fui-recorder-meter-fill {
+      background: Highlight;
+    }
+    .fui-recorder-meter {
+      outline: 1px solid CanvasText;
+      outline-offset: -1px;
+      background: Canvas;
+    }
+  }
+}

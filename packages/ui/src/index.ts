@@ -107,3 +107,21 @@ export * from "./theme-provider";
 export * from "./state-page";
 export * from "./action-bar";
 export * from "./use-overflow";
+export * from "./sound-bus";
+// The reducers and guards of the clip player and the recorder stay inside their modules (their tests import them from there).
+export { ClipError, clipFailureOfStatus, clipRetryable, type ClipFailure, type ClipFailureKind, type ClipPhase, type ClipSpeed } from "./clip-logic";
+export * from "./clip-player";
+export {
+  canRecord,
+  classifyMicError,
+  DEFAULT_MIN_RECORDING_MS,
+  formatRecordingClock,
+  pickRecordingMimeType,
+  RECORDER_MIME_TYPES,
+  type MicFailure,
+  type RecorderStatus,
+  type RecorderTake,
+} from "./recorder-logic";
+export * from "./recorder";
+export * from "./speech-text";
+export * from "./speech";

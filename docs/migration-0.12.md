@@ -478,3 +478,31 @@ Every rule is a `max()` or an `env()` with a 0 fallback: nothing moves where the
 - `Toaster` no longer types `richColors` and `icons` (`FabrialsToasterProps`): it always dropped them. Passing them is now a type error; remove them.
 - `CollectionToolbar`: under 40rem of window the search takes the whole row and the filters and actions go under it. Before, a short action could share the row and squeeze the field.
 - `StatePanel` takes `children`, drawn under the description and before the actions (suggestions as chips under an empty state), in a wrapping row that centres with `align="center"`.
+
+## Sound
+
+New. A clip, a recording and a reader, and one bus that keeps them from sounding at once. Nothing in the library asks the network for a clip, records or transcribes by itself: the host passes loader functions and receives a `Blob`.
+
+| Export | What it is |
+| --- | --- |
+| `claimSound(owner, stop)`, `releaseSound(owner)`, `silenceAll(except?)`, `holdsSound(owner)` | The page's one sound. Whatever starts making or taking sound claims it and the holder before is stopped. `AudioPlayer` and `VideoPlayer` already paused each other this way; that mechanism is now the bus, so a player, a clip, a reader and the microphone all follow it. Plain functions, no React. |
+| `useClipPlayer({ load, speeds, cache, onError })` | Plays clips the host loads. `state(ref)` is `"idle"`, `"loading"` or `"playing"`; `played(ref)`, `failure(ref?)`, `play`, `stop`, `toggle`, `retry`, `speed`, `setSpeed`, `speeds`. A load that comes back after a newer request never plays (it is kept), URLs are cached per clip and speed and revoked when the player goes, and a clip refused for the allowance is not asked for again. |
+| `ClipButton` | One button for one clip: a speaker, a spinner while it loads, a square while it plays (`aria-pressed`). `clip`, `player` (or its own `load`), `speed`, `label`, `labels`, `size` (`sm`, `default`, `lg`), `iconOnly`, `labelContent`. The name never changes with the state, so a screen reader hears one button; once heard, the words become "Listen again". |
+| `SpeedToggle` | The slow rendering: one key pressed while it is on (`variant="button"`), or a segment per speed (`variant="segmented"`). `labels`: `slow`, `normal`, and the control's name. Changing it stops what plays. |
+| `ClipNote` | The line under a clip that failed: `role="status"` from the first paint, what happened, and a "Try again" key only when asking again can help (not for `unavailable`, and not for `quota`). |
+| `useRecorder({ maxDurationMs, minDurationMs, mimeTypes, constraints, getStream, level, onLevel, onError })` | Records one take. `status` is `idle`, `requesting`, `recording`, `recorded`, `denied`, `no-microphone`, `unsupported`, `busy` or `error`; plus `elapsedMs`, `level`, `blob`, `url`, `durationMs`, `tooShort`, `autoStopped`, `failure`, `start`, `stop`, `reset`, `supported`. The take stays on the device with a URL to hear it; nothing leaves it. It stops itself at the limit, a take under the minimum is a mis-tap, an attempt counter drops a `getUserMedia` that resolves late, tracks are stopped and URLs revoked, and the microphone holds the sound bus while it listens. `getStream` brings a stream of the host's own (a test, another source). |
+| `RecorderPanel` | The surface of a spoken answer: one polite status line (the ticking clock and the level meter are `aria-hidden`), a clock in the reader's digits with `dir="ltr"`, the take in the house `AudioPlayer`, and the keys of the step the person is on. `onSubmit(blob, take)`, `submitLabel`, `pending`, `slowAfterMs`, `action`, `fallback`, `showLevel`, `labels`. The focus follows the flow: Stop while recording, the primary action once there is a take, Record after a take is dropped. |
+| `RecorderPanelView` | The same surface with every state given to it, so a host can show each one without a microphone. |
+| `useSlow(active, afterMs)` | True once `active` has lasted; the time to say the work is still going. |
+| `useSpeech({ loadClip, lang, rate, fallback, chunkSize, onError })` | Reads text aloud: the host's clips a chunk at a time, the browser's own voice when there is no loader or it fails (`fallback: "browser"`). `speaking`, `loading`, `currentId`, `speak(text, { id })`, `stop`. One reader at a time on the page, and clips are kept and their URLs revoked (the reference product leaked them). |
+| `speakableText(markdown)`, `speechChunks(text, max)`, `matchVoice(voices, lang)` | Plain words for speech; a split at sentence ends (Latin, Arabic `؟` `۔`, Chinese and Japanese `。！？`), then commas, then spaces, never inside a word or a written character; and the browser's voice for a language. Pure, no directive. |
+| `ClipError` | What a loader throws to say why there is no clip: `unavailable`, `rateLimited`, `quota`, `offline`, `failed`. `clipRetryable(kind)` and `clipFailureOfStatus(status)` help a loader built on a request. |
+
+Changed:
+
+- **`VoiceInputButton` is built on `useRecorder`**: one recorder in the house. Its props, markup, classes and behaviour are as they were. Two additions: `unsupportedFallback` (a node shown in a browser that cannot record, `null` by default, so nothing changes unless a host opts in — before it rendered nothing), and `labels.denied`, `noMicrophone`, `busy`, `interrupted`, `micFailed`, `recordingFailed` (English defaults keep the old wording).
+- **`AudioPlayer` and `VideoPlayer`** follow the bus: same one-at-a-time behaviour, now shared with clips, the reader and the microphone, so an `AudioPlayer` starting stops a clip and a recording stops both.
+
+A product can delete: its own audio-note components, its silence helper (Radiant's `components/lang/exercise/silence.ts`), its clip cache and turn counter, its recorder state machine, its slow-work timer, and its speech chunker. What stays the product's: the loader functions (its own routes), what it does with a recording, and its strings.
+
+Nothing looks different on a page that uses none of this. A page that uses a player now also goes quiet when a clip starts, which is the same rule it already followed with another player.
