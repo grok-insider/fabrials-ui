@@ -51,7 +51,7 @@ Each product signs its mark with a gem, set as `data-gem` on the document root a
 
 | Gem | Signs |
 | --- | --- |
-| Stormlight | The Fabrials house mark, Radiant |
+| Stormlight | The Fabrials house mark, Radiant, admin.fabrials.com |
 | Heliodor | fabrials.com, Usage AI |
 | Sapphire | Syl |
 | Ruby | Spanreed (spanreeds are ruby fabrials) |
@@ -59,6 +59,8 @@ Each product signs its mark with a gem, set as `data-gem` on the document root a
 | Zircon | Fabrials UI, Urithiru |
 | Smokestone | News, guides |
 | Amethyst | ai.fabrials.com |
+
+A product the table does not name borrows a gem until the owner gives it one, and says so in its own `DESIGN.md`: today Open Email and Wyndle borrow emerald and Palanaeum borrows smokestone. Two products with the same gem never share a screen.
 
 ## Typography
 
@@ -236,9 +238,11 @@ Import once, in this order, and set the theme and gem on the root element:
 
 Shared styles use the `fui-` prefix in the `components` cascade layer and work without Tailwind. Host overrides come after them and express a documented product requirement, not a restyle of an equivalent control. A product that retints tokens (Radiant's night sky) does it in its global CSS for both themes and records it in its own `DESIGN.md`. Do not read `localStorage` or browser globals while rendering shared components.
 
-Fabrials products consume a verified copy (`bun run vendor <product> --write`), never edited by hand. Other apps install from the registry.
+Fabrials products take the packages from npm (`@fabrials/ui`, `@fabrials/ai-ui`) or, where a product builds without a registry, from a verified copy (`bun run vendor <product> --write`), never edited by hand. Other apps install from the registry. A product pins one version of both packages and moves to the next one on purpose, by its migration note.
 
 Serve `fonts.css` and the font files as files. A bundler that inlines small assets (Bun 1.4 inlines anything under 128 KB as base64) puts all 39 faces into the stylesheet and defeats `unicode-range`; copy `dist/fonts` and link `fonts.css` instead (Palanaeum does).
+
+**Browsers.** The styles rely on `:has()`, `:dir()`, `@property`, `color-mix()`, `oklch()`, container queries and cascade layers, with no fallback for a browser that lacks them. The oldest that have them all are Chrome and Edge 120, Safari 16.4 and Firefox 128 (Firefox 121 to 127 draw everything but step the few animations that count through a registered property). This is read from the features the styles use, not from a test on those versions; the suites run current Chromium, Firefox and WebKit.
 
 For a system theme with no script, set `data-theme="system"` on the root (and no `.dark` class): tokens, dither canvases and toasts follow `prefers-color-scheme`. A Tailwind host covers it in its dark variant:
 

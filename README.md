@@ -1,6 +1,6 @@
 # Fabrials UI
 
-The Fabrials design system, 0.9, the "Highstorm" line: the interface every Fabrials product shares, and the shadcn registry at [ui.fabrials.com](https://ui.fabrials.com) that lets any React app use it.
+The Fabrials design system, "Instrument with life" (the line that began with 0.11): the interface every Fabrials product shares, and the shadcn registry at [ui.fabrials.com](https://ui.fabrials.com) that lets any React app use it.
 
 Read [DESIGN.md](DESIGN.md) before changing anything visible.
 
@@ -15,10 +15,17 @@ Read [DESIGN.md](DESIGN.md) before changing anything visible.
 | `stories` | Storybook stories, all with synthetic data |
 | `tests` | Unit tests and the visual suite (Playwright in a container, with axe) |
 | `skills/fabrials-design-system` | The agent skill that points at this repository |
+| `docs` | A migration note per version, the registry, and what products have asked for |
 
-## Two ways to use it
+## Three ways to use it
 
-**As packages.** Fabrials products import `@fabrials/ui` and `@fabrials/ai-ui` from a verified copy in their `vendor/` folder:
+**From npm.** `@fabrials/ui` and `@fabrials/ai-ui` are public packages:
+
+```sh
+bun add @fabrials/ui @fabrials/ai-ui
+```
+
+**As a verified copy.** A Fabrials product that builds without the registry keeps the same packages in its `vendor/` folder, never edited by hand:
 
 ```sh
 bun run vendor radiant --write   # writes radiant/vendor/fabrials-{ui,ai-ui}-<version>
@@ -51,12 +58,18 @@ bun run registry:build         # regenerate the shims and public/r
 
 ## Who consumes which version
 
-| Product | Version |
-| --- | --- |
-| ui.fabrials.com (this repository) | workspace |
-| fabrials.com, admin.fabrials.com, X Tracker, Radiant, AI Relay, Open Email, Spanreed desktop, Ditox | 0.8.2 |
+Read on 2026-11-10 from each product's deployed branch. Nobody is on 0.10 or later yet.
 
-Upgrading a product is that product's decision; read [docs/migration-0.9.md](docs/migration-0.9.md) first (it lists the hosts that must change a line), then [0.8](docs/migration-0.8.md) and 0.7 if the product is older. The 0.3 delivery record is [docs/delivery-0.3.md](docs/delivery-0.3.md).
+| Product | Version | How |
+| --- | --- | --- |
+| ui.fabrials.com (this repository) | workspace | workspace |
+| fabrials.com, X Tracker, Aion Companion | 0.9.0 | vendored copy |
+| AI Relay dashboard, Palanaeum, Wyndle | 0.9.0 | npm |
+| admin.fabrials.com, Radiant, Open Email | 0.8.2 | vendored copy |
+| Ditox | 0.8.2 | vendored copy |
+| Spanreed desktop | 0.8.2 on `dev`; the last release (`master`) still carries 0.4.0 | vendored copy |
+
+Upgrading a product is that product's decision. Read the migration notes from its version up: [0.9](docs/migration-0.9.md) (lists the hosts that must change a line), [0.10](docs/migration-0.10.md), [0.11](docs/migration-0.11.md) and [0.12](docs/migration-0.12.md); 0.12 is additive. What products have asked of the library, and what they can delete once they upgrade, is in [docs/requests.md](docs/requests.md).
 
 ## Licenses
 

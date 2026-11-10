@@ -17,12 +17,13 @@ Resolve this skill directory's real path (`readlink -f`, it is usually a symlink
 | Token values (oklch, both themes, density, breakpoints, reduced motion) | `packages/ui/src/tokens.css` |
 | Component source and exports | `packages/ui/src/*.tsx`, `packages/ui/src/index.ts`, `packages/ai-ui/src/index.tsx` |
 | Catalogue: what each component is for, its exports and notes | `apps/site/lib/ui-catalog.ts` (packages), `apps/site/lib/catalog.ts` (registry blocks) |
-| Reference layouts | `stories/instrument.stories.tsx` + `instrument.css` (0.10 landing, product overview, pieces), `stories/highstorm.stories.tsx` + `highstorm.css`, `apps/site/app/page.tsx`, `apps/site/components/docs/` |
+| Reference layouts | `stories/instrument.stories.tsx` + `instrument.css` (landing, product overview, pieces), `stories/highstorm.stories.tsx` + `highstorm.css` (sign-in), `apps/site/app/page.tsx`, `apps/site/components/docs/` |
 | Component usage in context | Storybook (`bun run storybook`, port 6041), `apps/site/components/ui-demos*.tsx` |
-| Upgrading or adopting 0.7, 0.8, 0.8.1, 0.8.2, 0.9 or 0.10 | `docs/migration-0.7.md`, `docs/migration-0.8.md`, `docs/migration-0.9.md`, `docs/migration-0.10.md` (why 0.10 looks as it does: `docs/identity-proposals.md`) |
+| Upgrading or adopting a version | `docs/migration-<version>.md`, one per version from 0.7 to 0.12 (why 0.10 looks as it does: `docs/identity-proposals.md`) |
+| What products have asked for, and what a product can delete after upgrading | `docs/requests.md` |
 | Registry, shims, adopting a component from another library | `docs/registry.md` |
 
-The Patterns stories (`stories/patterns.stories.tsx`: PublicSite, Settings, Console, SignIn) follow the 0.7 layout rules and are safe references for page composition.
+The Patterns stories (`stories/patterns.stories.tsx`: PublicSite, Settings, Console, SignIn) are safe references for page composition: the layout rules have not changed since 0.7, and they render in the current look.
 
 Precedence: the user's explicit instruction, then the product's own `AGENTS.md` and `DESIGN.md`, then the design-system `DESIGN.md`, then this skill. When this skill and `DESIGN.md` disagree, `DESIGN.md` wins; say so in your report. Code wins over prose for values: read the token or the component instead of guessing.
 
@@ -48,7 +49,7 @@ The full list with checks: [references/style-rules.md](references/style-rules.md
 
 ## Decision flow for a UI task
 
-1. **Read the context.** The product's `AGENTS.md` and `DESIGN.md`; the installed version (`vendor/fabrials-ui-<version>` in a Fabrials product, `package.json` elsewhere). An older version is not permission to migrate; migrating is the product's decision and follows the migration notes from its version up (`docs/migration-0.7.md` to `docs/migration-0.10.md`). Until then the product follows the `DESIGN.md` shipped inside its vendored copy.
+1. **Read the context.** The product's `AGENTS.md` and `DESIGN.md`; the installed version (`vendor/fabrials-ui-<version>` in a Fabrials product, `package.json` elsewhere). An older version is not permission to migrate; migrating is the product's decision and follows the migration notes from its version up (`docs/migration-<version>.md`, one per version). Until then the product follows the `DESIGN.md` shipped inside its vendored copy.
 2. **Name the surface.** Landing, product index, docs, app workspace, settings, sign-in, or a state (empty, loading, error). Each has a recipe in [references/layout.md](references/layout.md); start from it instead of a blank page.
 3. **Pick components before writing markup.** Patterns first (`PageHeader`, `SectionHeader`, `CollectionToolbar`, `Table`, `BulkActions`, `StatePanel`, `SettingsSection`), then controls. See [references/components.md](references/components.md). Do not rebuild a control the package has; do not add a universal component with many flags.
 4. **Compose with tokens.** Spacing on the 4 px grid (`--fui-space-*`), radii from `--fui-radius-*`, colours from roles. In Tailwind hosts use the bridge (`bg-card`, `text-muted-foreground`, `text-brand-ink`, `font-display`, `font-label`, `rounded-md`, `rounded-plate`, `px-(--fui-page-padding)`).
