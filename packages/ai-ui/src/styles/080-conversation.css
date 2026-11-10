@@ -1,0 +1,334 @@
+@layer components {
+  /* 0.12: conversation — a log that follows the end, the rail of the reader's messages, the measure and the dock */
+
+  .fui-conversation {
+    --fui-conversation-gutter: var(--fui-space-4);
+    --fui-conversation-gap: var(--fui-space-4);
+    --fui-conversation-footer-size: 0px;
+    --fui-conversation-fade: 1.5rem;
+    --fui-chat-measure: 52rem;
+    position: relative;
+    display: flex;
+    min-block-size: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+    container-type: inline-size;
+  }
+
+  /* The scroller. Its thin bar is a tint of the ink, deeper under the pointer; it never scrolls the page behind it. */
+  .fui-conversation-content {
+    min-block-size: 0;
+    flex: 1 1 auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklab, var(--foreground) 26%, transparent) transparent;
+    outline: none;
+  }
+  @media (hover: hover) {
+    .fui-conversation-content:hover {
+      scrollbar-color: color-mix(in oklab, var(--foreground) 42%, transparent) transparent;
+    }
+  }
+  /* The last lines soften out above the dock, so the log says it goes on. The column reserves that band. */
+  .fui-conversation:has(> .fui-conversation-footer[data-fade]) > .fui-conversation-content {
+    mask-image: linear-gradient(to bottom, var(--foreground) calc(100% - var(--fui-conversation-fade)), transparent);
+  }
+  .fui-conversation:has(> .fui-conversation-footer[data-fade]) .fui-conversation-column {
+    padding-block-end: var(--fui-conversation-fade);
+  }
+  /* While it overflows the log is a tab stop. Its ring is drawn on the conversation, inside its edge and above the log's
+     own content, which would paint over an outline on the scroller itself. */
+  .fui-conversation::after {
+    content: "";
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline: 0;
+    block-size: calc(100% - var(--fui-conversation-footer-size));
+    border-radius: var(--fui-radius-md);
+    outline: 2px solid var(--fui-focus);
+    outline-offset: -2px;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .fui-conversation:has(> .fui-conversation-content:focus-visible)::after {
+    opacity: 1;
+  }
+
+  .fui-conversation-column {
+    display: flex;
+    box-sizing: border-box;
+    inline-size: 100%;
+    min-inline-size: 0;
+    flex-direction: column;
+    gap: var(--fui-conversation-gap);
+    padding-block: var(--fui-space-4) var(--fui-space-6);
+    padding-inline: var(--fui-conversation-gutter);
+  }
+
+  /* The measure: an answer as wide as its text up to --fui-chat-measure, the whole column for a table, code, a figure or
+     display maths. A reader's bubble keeps to 80% of it. Only with `measure`: nothing changes without it. */
+  .fui-conversation-content[data-measure] > .fui-conversation-column {
+    padding-inline: var(--fui-page-padding);
+  }
+  .fui-conversation-content[data-measure][data-align="center"] > .fui-conversation-column {
+    max-inline-size: calc(var(--fui-chat-measure) + 2 * var(--fui-page-padding));
+    margin-inline: auto;
+  }
+  .fui-conversation-content[data-measure] .fui-chat-message[data-role="assistant"] > .fui-chat-message-body {
+    inline-size: fit-content;
+    min-inline-size: min(100%, 18rem);
+    max-inline-size: min(100%, var(--fui-chat-measure));
+  }
+  .fui-conversation-content[data-measure]
+    .fui-chat-message[data-role="assistant"]
+    > .fui-chat-message-body:is(:has(table), :has(pre), :has(figure), :has(.katex-display), :has([data-wide]), [data-wide]) {
+    inline-size: 100%;
+    max-inline-size: 100%;
+  }
+  .fui-conversation-content[data-measure] .fui-chat-message[data-role="user"] > .fui-chat-message-body {
+    max-inline-size: min(80%, 40rem);
+  }
+  @container (max-width: 29.99rem) {
+    .fui-conversation-content[data-measure] .fui-chat-message[data-role="user"] > .fui-chat-message-body {
+      max-inline-size: 88%;
+    }
+    .fui-conversation-column,
+    .fui-conversation-footer {
+      padding-inline: var(--fui-space-3);
+    }
+  }
+
+  /* The way back to the latest message: there only while the reader is away from the end. */
+  .fui-conversation-jump.fui-button {
+    position: absolute;
+    inset-block-end: calc(var(--fui-conversation-footer-size) + var(--fui-space-3));
+    z-index: 1;
+    width: fit-content;
+    border-radius: var(--fui-radius-md);
+    background: var(--card);
+    box-shadow: var(--fui-shadow-sm);
+    opacity: 0;
+    visibility: hidden;
+    translate: 0 4px;
+  }
+  .fui-conversation-jump.fui-button[data-align="center"] {
+    inset-inline: 0;
+    margin-inline: auto;
+  }
+  .fui-conversation-jump.fui-button[data-align="end"] {
+    inset-inline-end: var(--fui-space-2);
+  }
+  .fui-conversation-jump.fui-button[data-visible] {
+    opacity: 1;
+    visibility: visible;
+    translate: 0 0;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .fui-conversation-jump.fui-button {
+      transition:
+        opacity var(--fui-duration) var(--fui-ease),
+        translate var(--fui-duration) var(--fui-ease-out),
+        visibility 0s linear var(--fui-duration);
+    }
+    .fui-conversation-jump.fui-button[data-visible] {
+      transition:
+        opacity var(--fui-duration) var(--fui-ease-out),
+        translate var(--fui-duration) var(--fui-ease-out),
+        visibility 0s linear 0s;
+    }
+  }
+  .fui-conversation-jump-count {
+    position: absolute;
+    inset-block-start: calc(-1 * var(--fui-space-2));
+    inset-inline-end: calc(-1 * var(--fui-space-2));
+    display: inline-flex;
+    min-inline-size: 1.125rem;
+    block-size: 1.125rem;
+    align-items: center;
+    justify-content: center;
+    padding-inline: var(--fui-space-1);
+    border: 1px solid var(--card);
+    border-radius: var(--fui-radius-full);
+    background: var(--primary);
+    color: var(--primary-foreground);
+    font-size: var(--fui-text-label);
+    font-variant-numeric: tabular-nums;
+  }
+  .fui-conversation-jump-dot {
+    position: absolute;
+    inset-block-start: calc(-1 * var(--fui-space-1));
+    inset-inline-end: calc(-1 * var(--fui-space-1));
+    inline-size: 0.5rem;
+    block-size: 0.5rem;
+    border: 1px solid var(--card);
+    border-radius: var(--fui-radius-full);
+    background: var(--brand-ink);
+  }
+
+  /* The rail of the reader's own messages, on the end side, centred on the log and never past 70% of its height. */
+  .fui-conversation-rail {
+    position: absolute;
+    inset-block-start: calc((100% - var(--fui-conversation-footer-size)) / 2);
+    inset-inline-end: var(--fui-space-1);
+    z-index: 1;
+    display: none;
+    flex-direction: column;
+    align-items: flex-end;
+    max-block-size: 70%;
+    padding: var(--fui-space-1) 0;
+    overflow-y: auto;
+    scrollbar-width: none;
+    translate: 0 -50%;
+  }
+  .fui-conversation-rail::-webkit-scrollbar {
+    display: none;
+  }
+  .fui-conversation-marker {
+    display: flex;
+    inline-size: 1.5rem;
+    block-size: var(--fui-conversation-slot, 22px);
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0;
+    border: 0;
+    border-radius: var(--fui-radius-xs);
+    background: none;
+    color: var(--muted-foreground);
+  }
+  .fui-conversation-marker-tick {
+    display: block;
+    inline-size: 0.5rem;
+    block-size: 0.125rem;
+    border-radius: var(--fui-radius-full);
+    background: color-mix(in oklab, var(--foreground) 38%, transparent);
+  }
+  .fui-conversation-marker[aria-current="true"] .fui-conversation-marker-tick {
+    inline-size: 1.25rem;
+    background: var(--fui-focus);
+  }
+  @media (hover: hover) {
+    .fui-conversation-marker:hover .fui-conversation-marker-tick {
+      inline-size: 0.75rem;
+      background: color-mix(in oklab, var(--foreground) 62%, transparent);
+    }
+  }
+  .fui-conversation-marker:focus-visible {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: -2px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .fui-conversation-marker-tick {
+      transition:
+        inline-size var(--fui-duration) var(--fui-ease-out),
+        background-color var(--fui-duration) var(--fui-ease-out);
+    }
+  }
+  /* Where it would sit over the text, and where a finger cannot pick a 3 px tick, it stays away: the log scrolls anyway. */
+  @media (pointer: fine) {
+    @container (min-width: 40rem) {
+      .fui-conversation-rail {
+        display: flex;
+      }
+      .fui-conversation:has(> .fui-conversation-rail) > .fui-conversation-content > .fui-conversation-column {
+        padding-inline-end: calc(var(--fui-conversation-gutter) + var(--fui-space-6));
+      }
+    }
+  }
+  .fui-conversation-preview {
+    display: grid;
+    gap: var(--fui-space-1);
+    max-inline-size: 18rem;
+  }
+  .fui-conversation-preview-position {
+    opacity: 0.72;
+    font-variant-numeric: tabular-nums;
+  }
+  .fui-conversation-preview-text {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  /* The composer's dock: in the flow under the log, clear of the device's safe area. */
+  .fui-conversation-footer {
+    flex: none;
+    padding-block: var(--fui-space-2) max(var(--fui-space-3), env(safe-area-inset-bottom, 0px));
+    padding-inline: var(--fui-conversation-gutter);
+    scrollbar-gutter: stable;
+  }
+
+  .fui-conversation-empty {
+    display: flex;
+    min-block-size: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--fui-space-2);
+    padding: var(--fui-space-8) var(--fui-conversation-gutter);
+    color: var(--muted-foreground);
+    text-align: center;
+  }
+  .fui-conversation-empty-icon {
+    color: var(--muted-foreground);
+  }
+  .fui-conversation-empty-title {
+    max-inline-size: 32rem;
+    color: var(--foreground);
+    font-size: var(--fui-text-md);
+    font-weight: var(--fui-weight-medium);
+  }
+  .fui-conversation-empty-description {
+    max-inline-size: 32rem;
+    font-size: var(--fui-text-sm);
+  }
+
+  @media (pointer: coarse) {
+    .fui-conversation-jump.fui-button {
+      min-inline-size: 2.75rem;
+      min-block-size: 2.75rem;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .fui-conversation-marker-tick {
+      background: CanvasText;
+    }
+    .fui-conversation-marker[aria-current="true"] .fui-conversation-marker-tick,
+    .fui-conversation-jump-dot {
+      background: Highlight;
+    }
+    .fui-conversation-jump-count {
+      border-color: CanvasText;
+      background: Canvas;
+      color: CanvasText;
+    }
+    .fui-conversation-jump.fui-button {
+      border-color: ButtonText;
+    }
+  }
+
+  /* On paper the log is its words: no keys, no rail, no dock, and no edge to fade. */
+  @media print {
+    .fui-conversation-content {
+      overflow: visible;
+      mask-image: none;
+    }
+    :is(.fui-conversation-jump, .fui-conversation-rail, .fui-conversation-footer) {
+      display: none;
+    }
+    .fui-conversation::after {
+      content: none;
+    }
+  }
+
+  /* A skeleton draws its lines whole. */
+  [data-fui-loading] .fui-conversation-content {
+    mask-image: none;
+  }
+}
+

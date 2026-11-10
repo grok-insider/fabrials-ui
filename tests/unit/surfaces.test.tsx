@@ -17,9 +17,10 @@ import {
   overflows,
 } from "../../packages/ui/src/index";
 import { CodeBlock } from "../../packages/ai-ui/src/index";
+import { uiStyles } from "./read-styles";
 
 const read = (path: string) => readFileSync(new URL(`../../${path}`, import.meta.url), "utf8");
-const styles = read("packages/ui/src/styles.css");
+const styles = uiStyles();
 const tokens = read("packages/ui/src/tokens.css");
 const rule = (selector: string) => {
   const at = styles.indexOf(selector);

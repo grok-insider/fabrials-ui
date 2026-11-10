@@ -1,12 +1,13 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { uiStyles } from "./read-styles";
 
 // 0.12: everything that floats reads one set of tokens, so a host restyles its overlays by setting four custom properties
 // instead of overriding every popup class and the toaster. This file holds the list of surfaces; tests/visual/surfaces.spec.ts
 // sets the tokens in Chromium and reads each surface back.
 const source = (path: string) => readFileSync(new URL(`../../packages/ui/src/${path}`, import.meta.url), "utf8");
-const styles = source("styles.css");
+const styles = uiStyles();
 const tokens = source("tokens.css");
 
 /** The body of the rule whose selector list is exactly `selector` (at the start of a line, so a longer selector is not taken for it). */

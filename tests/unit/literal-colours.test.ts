@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
+import { uiStyles, aiStyles } from "./read-styles";
 
 // Components paint with tokens so a theme, a gem or a host's retint reaches every pixel. tokens.css is out of scope on purpose:
 // the oklch literals there ARE the palette. A data-URI icon is a literal too (a `url()` cannot read a custom property), which is
@@ -78,9 +79,12 @@ function allowed(hit: Hit) {
 
 const packages = new URL("../../packages/", import.meta.url);
 
-for (const sheet of ["ui/src/styles.css", "ai-ui/src/styles.css"]) {
+for (const [sheet, text] of [
+  ["ui/src/styles.css", uiStyles()],
+  ["ai-ui/src/styles.css", aiStyles()],
+] as const) {
   test(`${sheet} paints with tokens: the only literal colours are the moon, shadow alphas and a mask's tile`, () => {
-    const hits = cssLiterals(readFileSync(new URL(sheet, packages), "utf8")).filter((hit) => !allowed(hit));
+    const hits = cssLiterals(text).filter((hit) => !allowed(hit));
     assert.deepEqual(
       hits.map((hit) => `${hit.selector} { ${hit.property}: … ${hit.literal} }`),
       [],

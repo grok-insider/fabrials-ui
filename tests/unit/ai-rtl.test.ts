@@ -1,11 +1,11 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { ActivityDisclosure, Sources } from "../../packages/ai-ui/src/index";
+import { aiStyles } from "./read-styles";
 
-const source = readFileSync(new URL("../../packages/ai-ui/src/styles.css", import.meta.url), "utf8");
+const source = aiStyles();
 const styles = source.replace(/\/\*[\s\S]*?\*\//g, "");
 
 /** The body of the block that opens at `marker`, between its braces. */

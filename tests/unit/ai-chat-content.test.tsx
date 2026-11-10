@@ -1,6 +1,5 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import {
   CitationChip,
@@ -17,6 +16,7 @@ import {
   LinkPreviewCard,
   LinkWithPreview,
 } from "../../packages/ai-ui/src/index";
+import { aiStyles as aiSheet } from "./read-styles";
 
 test("code block renders language, one line per span and accessible actions", () => {
   const html = renderToStaticMarkup(
@@ -49,7 +49,7 @@ test("code block accepts highlighted children and hides optional actions", () =>
   assert.equal(codeFilename(undefined, "answer"), "answer.txt");
 });
 
-const aiStyles = readFileSync(new URL("../../packages/ai-ui/src/styles.css", import.meta.url), "utf8");
+const aiStyles = aiSheet();
 
 test("a code block highlights in CodePanel's tokens, heads a file with its name and marks a change", () => {
   const html = renderToStaticMarkup(

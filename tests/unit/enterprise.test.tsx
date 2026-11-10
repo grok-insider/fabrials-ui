@@ -4,6 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { readFileSync } from "node:fs";
 import { Alert, AlertTitle, Card, CardHeader, CardTitle, CardContent, NativeCheckbox, NativeSelect, StatePanel, Table, TableHeader, TableHead, TableBody, TableRow, TableCell, BulkActions } from "../../packages/ui/src/index";
 import { buttonVariants } from "../../packages/ui/src/button-variants";
+import { uiStyles } from "./read-styles";
 
 test("native controls preserve form names, values and disabled semantics", () => {
   const html = renderToStaticMarkup(<form><NativeSelect name="account" defaultValue="support" required><option value="support">Support</option></NativeSelect><NativeCheckbox name="confirmed" value="yes" defaultChecked disabled /></form>);
@@ -39,7 +40,7 @@ test("server link styles have no client boundary and dark mode supports either h
 });
 
 test("segmented toggles get a 44 px hit area on touch and narrow screens without growing their group", () => {
-  const styles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
+  const styles = uiStyles();
   const at = styles.indexOf(".fui-toggle::before");
   assert.ok(at > 0, "the toggle extends its hit area with a pseudo-element");
   assert.match(styles.slice(styles.lastIndexOf("@media", at), at), /^@media \(max-width: 767px\), \(pointer: coarse\)/);

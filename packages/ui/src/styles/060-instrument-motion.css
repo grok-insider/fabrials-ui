@@ -1,0 +1,267 @@
+/* 0.10: Instrument motion. Every movement answers what a person did or what data did; nothing moves on its own except the
+   busy mark. All of it stops under reduced motion, where the same states show at once. */
+@layer components {
+  /* The busy mark: a ring of eight square cells, one lit at a time. */
+  .fui-pixel-spinner {
+    display: inline-block;
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+    color: currentColor;
+  }
+  .fui-pixel-spinner rect {
+    fill: currentColor;
+    opacity: 0.22;
+  }
+  .fui-pixel-spinner rect:first-child {
+    opacity: 1;
+  }
+  .fui-state-icon.fui-pixel-spinner {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  .fui-button .fui-pixel-spinner {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+  /* The other busy marks hold a still frame (what reduced motion shows); the line is five cells, as wide as a word. */
+  .fui-pixel-spinner[data-variant] rect {
+    opacity: var(--fui-spinner-still);
+  }
+  .fui-pixel-spinner[data-variant="line"] {
+    width: 1.75rem;
+    height: auto;
+    aspect-ratio: 19 / 3;
+  }
+
+  /* One plate under the pressed item of a single-choice group (a toggle group, a theme switcher) or the active tab of a
+     segmented list. It is placed by its four edges, so each edge can move on its own (0.11). */
+  .fui-toggle-group,
+  .fui-tabs-list[data-variant="segmented"] {
+    position: relative;
+    isolation: isolate;
+  }
+  .fui-toggle-group[data-indicator]::before,
+  .fui-tabs-plate {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    border-radius: calc(var(--fui-radius-md) - 2px);
+    background: var(--fui-segment);
+    box-shadow:
+      var(--fui-shadow-xs),
+      0 0 0 1px color-mix(in oklab, var(--foreground) 8%, transparent);
+    pointer-events: none;
+  }
+  .fui-toggle-group[data-indicator]::before {
+    top: var(--fui-toggle-y);
+    left: var(--fui-toggle-x);
+    right: var(--fui-toggle-r);
+    height: var(--fui-toggle-h);
+  }
+  .fui-tabs-plate {
+    top: var(--active-tab-top);
+    left: var(--active-tab-left);
+    right: var(--active-tab-right);
+    height: var(--active-tab-height);
+  }
+  /* A list that scrolls measures its right edge from its scroll width, which the plate cannot use: it keeps a width. */
+  .fui-tabs-list[data-scrollable] > .fui-tabs-plate {
+    right: auto;
+    width: var(--active-tab-width);
+  }
+  .fui-toggle-group[data-indicator] > .fui-toggle,
+  .fui-tabs-list[data-variant="segmented"]:has(> .fui-tabs-plate) > .fui-tab {
+    position: relative;
+    z-index: 1;
+  }
+  @media (forced-colors: none) {
+    .fui-toggle-group[data-indicator] > .fui-toggle[data-pressed],
+    .fui-tabs-list[data-variant="segmented"]:has(> .fui-tabs-plate) > .fui-tab[data-active] {
+      background: transparent;
+      box-shadow: none;
+    }
+  }
+  @media (forced-colors: active) {
+    .fui-toggle-group[data-indicator]::before,
+    .fui-tabs-plate {
+      display: none;
+    }
+  }
+
+  /* Data and images arriving: the dither as a dissolve, in four 2 px steps (TR, then the checkerboard, then three quarters). */
+  @keyframes fui-dither-in {
+    0% {
+      mask-image: linear-gradient(transparent, transparent);
+    }
+    25% {
+      mask-image: conic-gradient(var(--foreground) 0 25%, transparent 0);
+    }
+    50% {
+      mask-image: conic-gradient(var(--foreground) 0 25%, transparent 0 50%, var(--foreground) 0 75%, transparent 0);
+    }
+    75% {
+      mask-image: conic-gradient(var(--foreground) 0 75%, transparent 0);
+    }
+    100% {
+      mask-image: linear-gradient(var(--foreground), var(--foreground));
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes fui-pixel {
+      0%,
+      12% {
+        opacity: 1;
+      }
+      40%,
+      100% {
+        opacity: 0.22;
+      }
+    }
+    .fui-pixel-spinner rect,
+    .fui-pixel-spinner rect:first-child {
+      animation: fui-pixel 800ms steps(1, end) infinite;
+      animation-timing-function: linear;
+    }
+    @keyframes fui-pixel-dot {
+      0% {
+        opacity: 1;
+      }
+      33.333% {
+        opacity: 0.22;
+      }
+    }
+    @keyframes fui-pixel-bar-2 {
+      0% {
+        opacity: 0.22;
+      }
+      25%,
+      100% {
+        opacity: 1;
+      }
+    }
+    @keyframes fui-pixel-bar-3 {
+      0%,
+      75%,
+      100% {
+        opacity: 0.22;
+      }
+      50% {
+        opacity: 1;
+      }
+    }
+    @keyframes fui-pixel-grid {
+      0% {
+        opacity: 1;
+      }
+      20% {
+        opacity: 0.5;
+      }
+      40%,
+      100% {
+        opacity: 0.22;
+      }
+    }
+    @keyframes fui-pixel-line {
+      from {
+        --fui-spinner-t: 0;
+      }
+      to {
+        --fui-spinner-t: 7;
+      }
+    }
+    .fui-pixel-spinner[data-variant="dots"] rect {
+      animation: fui-pixel-dot 1.05s steps(1, end) infinite;
+      animation-delay: calc(var(--fui-spinner-step) * 350ms - 1.05s);
+    }
+    .fui-pixel-spinner[data-variant="bars"] rect[data-level="1"] {
+      animation: none;
+      opacity: 1;
+    }
+    .fui-pixel-spinner[data-variant="bars"] rect[data-level="2"] {
+      animation: fui-pixel-bar-2 1s steps(1, end) infinite;
+      animation-delay: calc(var(--fui-spinner-step) * -250ms);
+    }
+    .fui-pixel-spinner[data-variant="bars"] rect[data-level="3"] {
+      animation: fui-pixel-bar-3 1s steps(1, end) infinite;
+      animation-delay: calc(var(--fui-spinner-step) * -250ms);
+    }
+    .fui-pixel-spinner[data-variant="grid"] rect {
+      animation: fui-pixel-grid 1.25s steps(1, end) infinite;
+      animation-delay: calc(var(--fui-spinner-step) * 125ms - 1.25s);
+    }
+    .fui-pixel-spinner[data-variant="line"] {
+      animation: fui-pixel-line 1.2s steps(8, jump-none) infinite;
+    }
+    .fui-pixel-spinner[data-variant="line"] rect {
+      animation: none;
+      opacity: calc(0.22 + clamp(0, (var(--fui-spinner-t) - var(--fui-spinner-step) - 0.5) * 1000, 1) * 0.78);
+    }
+
+    /* A key goes down when it is pressed. */
+    .fui-button:active:not(:disabled, [aria-disabled="true"], [data-loading]) {
+      transform: translateY(1px);
+    }
+
+    /* The plate slides to the new choice on a quick-out curve. Its leading edge leaves first and the trailing edge follows
+       a beat later, so it stretches toward the choice and settles there; the labels change colour as it arrives. */
+    .fui-toggle-group[data-indicator="ready"]::before,
+    .fui-tabs-plate {
+      transition:
+        left var(--fui-duration-slow) var(--fui-ease-out),
+        right var(--fui-duration-slow) var(--fui-ease-out),
+        top var(--fui-duration-slow) var(--fui-ease-out),
+        width var(--fui-duration-slow) var(--fui-ease-out),
+        height var(--fui-duration-slow) var(--fui-ease-out);
+    }
+    .fui-toggle-group[data-indicator="ready"][data-direction="right"]::before,
+    .fui-tabs-plate[data-activation-direction="right"] {
+      transition-delay: 70ms, 0ms, 0ms, 0ms, 0ms;
+    }
+    .fui-toggle-group[data-indicator="ready"][data-direction="left"]::before,
+    .fui-tabs-plate[data-activation-direction="left"] {
+      transition-delay: 0ms, 70ms, 0ms, 0ms, 0ms;
+    }
+    .fui-toggle-group[data-indicator] > .fui-toggle,
+    .fui-tabs-list[data-variant="segmented"]:has(> .fui-tabs-plate) > .fui-tab {
+      transition-duration: var(--fui-duration-slow);
+    }
+    /* A theme's icon turns into place when it is chosen; not on the first paint (data-direction comes with the first move). */
+    @keyframes fui-theme-icon {
+      from {
+        rotate: -40deg;
+        scale: 0.7;
+      }
+    }
+    .fui-theme-switcher[data-direction] > .fui-toggle[data-pressed] > svg {
+      animation: fui-theme-icon var(--fui-duration-slow) var(--fui-ease-spring);
+    }
+
+    /* The check is drawn, not switched on. */
+    .fui-checkbox .fui-control-indicator svg path {
+      stroke-dasharray: 24;
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset var(--fui-duration) var(--fui-ease);
+    }
+    @starting-style {
+      .fui-checkbox .fui-control-indicator svg path {
+        stroke-dashoffset: 24;
+      }
+    }
+
+    /* A ruler inks its ticks in order and its mark travels to the new value. */
+    .fui-meter-ruler rect:is(.fui-meter-tick, .fui-meter-tick-on) {
+      transition: fill var(--fui-duration-fast) var(--fui-ease) calc(var(--i, 0) * 6ms);
+    }
+    .fui-meter-mark {
+      transition: transform var(--fui-duration-slow) var(--fui-ease);
+    }
+
+    [data-fui-reveal="in"] {
+      mask-size: 4px 4px;
+      animation: fui-dither-in var(--fui-duration-slow) steps(1, end) both;
+    }
+  }
+}
+

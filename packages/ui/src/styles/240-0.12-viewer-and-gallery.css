@@ -1,0 +1,287 @@
+/* 0.12: the viewer and the gallery. The viewer clears the notch and the home bar; a finger drags a fitted picture down to
+   close it; the small copy of a picture stands under it, softly blurred, until the picture arrives; a line of credit and
+   its source under the caption; and a gallery of up to eight tiles with a lead one and a line over each tile. */
+@layer components {
+  .fui-viewer {
+    padding-block-start: max(0px, env(safe-area-inset-top, 0px));
+    padding-block-end: max(0px, env(safe-area-inset-bottom, 0px));
+    padding-inline-start: max(0px, env(safe-area-inset-left, 0px));
+    padding-inline-end: max(0px, env(safe-area-inset-right, 0px));
+  }
+
+  /* Fitted, a finger (or a pen) drags the picture down: the stage follows the finger, so the browser does not pan instead. */
+  .fui-viewer[data-drag-close]:not([data-zoomed]) .fui-viewer-stage {
+    touch-action: none;
+  }
+  .fui-viewer[data-dragging] .fui-viewer-canvas,
+  .fui-viewer[data-settling] .fui-viewer-canvas {
+    translate: 0 var(--fui-viewer-drag, 0px);
+    scale: var(--fui-viewer-drag-scale, 1);
+  }
+  .fui-viewer[data-dragging] {
+    background: color-mix(in oklab, var(--background) var(--fui-viewer-drag-fade, 100%), transparent);
+  }
+  .fui-viewer-backdrop[data-dragging] {
+    opacity: var(--fui-viewer-drag-fade, 1);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .fui-viewer[data-settling] .fui-viewer-canvas {
+      transition:
+        translate var(--fui-duration-slow) var(--fui-ease-spring),
+        scale var(--fui-duration-slow) var(--fui-ease-spring);
+    }
+    .fui-viewer[data-settling] {
+      transition:
+        background-color var(--fui-duration-slow) var(--fui-ease),
+        opacity var(--fui-duration) var(--fui-ease);
+    }
+    .fui-viewer-backdrop[data-settling] {
+      transition: opacity var(--fui-duration-slow) var(--fui-ease);
+    }
+    .fui-viewer :is(.fui-viewer-bar, .fui-viewer-caption, .fui-viewer-credit, .fui-viewer-strip) {
+      transition: opacity var(--fui-duration) var(--fui-ease);
+    }
+    .fui-media-grid-caption {
+      transition: opacity var(--fui-duration-fast) var(--fui-ease);
+    }
+  }
+
+  /* The small copy of a picture that has not arrived, at the place and size the picture will take. */
+  .fui-viewer-under {
+    grid-area: 1 / 1;
+    place-self: center;
+    inline-size: auto;
+    block-size: auto;
+    max-inline-size: min(100%, var(--fui-viewer-under-width, 100%));
+    max-block-size: min(100%, var(--fui-viewer-under-height, 100%));
+    object-fit: contain;
+    opacity: 0.6;
+    filter: blur(6px);
+  }
+
+  .fui-viewer-credit {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    gap: var(--fui-space-1) var(--fui-space-2);
+    max-inline-size: var(--fui-content-narrow, 42rem);
+    margin-inline: auto;
+    padding: var(--fui-space-2) var(--fui-space-4) 0;
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    letter-spacing: var(--fui-tracking-label);
+    text-align: center;
+  }
+  .fui-viewer-source {
+    color: var(--brand-ink);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in oklab, var(--brand-ink) 40%, transparent);
+    text-underline-offset: 3px;
+  }
+  .fui-viewer-source::before {
+    content: "·";
+    margin-inline-end: var(--fui-space-1);
+    color: var(--muted-foreground);
+  }
+  .fui-viewer-source:focus-visible {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: 2px;
+    border-radius: var(--fui-radius-xs);
+  }
+  @media (hover: hover) {
+    .fui-viewer-source:hover {
+      text-decoration-color: var(--brand-ink);
+    }
+  }
+
+  /* Dots stand for the strip on a phone of eight pictures or fewer; the strip itself stays for more. */
+  .fui-viewer-dots {
+    display: none;
+    justify-content: center;
+    gap: var(--fui-space-2);
+    padding-block: var(--fui-space-2) var(--fui-space-1);
+  }
+  .fui-viewer-dot {
+    inline-size: 0.5rem;
+    block-size: 0.5rem;
+    border-radius: var(--fui-radius-full);
+    background: color-mix(in oklab, var(--fui-media-ink) 32%, transparent);
+  }
+  .fui-viewer-dot[data-current] {
+    background: var(--fui-media-ink);
+  }
+
+  /* A tap of a finger shows and hides the bars (`zoomOn="double"`). A key brings them back: focus inside one shows it. */
+  .fui-viewer[data-chrome="hidden"] :is(.fui-viewer-bar, .fui-viewer-caption, .fui-viewer-credit, .fui-viewer-strip, .fui-viewer-dots) {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .fui-viewer[data-chrome="hidden"] :is(.fui-viewer-bar, .fui-viewer-strip):focus-within {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .fui-media {
+    display: grid;
+    gap: var(--fui-space-2);
+    min-inline-size: 0;
+    margin: 0;
+    container-type: inline-size;
+  }
+  .fui-media-footer {
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+    line-height: var(--fui-leading-xs, 1.5);
+  }
+
+  .fui-media-grid[data-layout="gallery"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: none;
+    grid-auto-rows: auto;
+    aspect-ratio: auto;
+  }
+  .fui-media-grid[data-layout="gallery"][data-columns="1"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .fui-media-grid[data-layout="gallery"][data-columns="2"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .fui-media-grid[data-layout="gallery"][data-columns="4"] {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .fui-media-grid[data-layout="gallery"] > .fui-media-grid-tile {
+    aspect-ratio: 4 / 3;
+  }
+  .fui-media-grid[data-layout="gallery"][data-lead] > .fui-media-grid-tile:first-child {
+    grid-column: span 2;
+    grid-row: span 2;
+    aspect-ratio: auto;
+  }
+  @container (max-width: 30rem) {
+    .fui-media-grid[data-layout="gallery"],
+    .fui-media-grid[data-layout="gallery"][data-columns="3"],
+    .fui-media-grid[data-layout="gallery"][data-columns="4"] {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .fui-media-grid[data-layout="gallery"][data-columns="1"] {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .fui-media-grid[data-layout="gallery"][data-span-first] > .fui-media-grid-tile:first-child {
+      grid-column: span 2;
+      aspect-ratio: 16 / 9;
+    }
+  }
+
+  .fui-media-grid-caption {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    display: grid;
+    gap: var(--fui-space-1);
+    padding: var(--fui-space-2);
+    background: var(--fui-media-scrim);
+    color: var(--fui-media-ink);
+    font-size: var(--fui-text-xs);
+    line-height: var(--fui-leading-xs, 1.5);
+    text-align: start;
+  }
+  .fui-media-grid-caption-text {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .fui-media-grid-credit {
+    display: block;
+    overflow: hidden;
+    color: color-mix(in oklab, var(--fui-media-ink) 72%, transparent);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    letter-spacing: var(--fui-tracking-label);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  @media (hover: hover) {
+    /* A tile that is a button keeps its line for the pointer and the keyboard; a still one has no other way to show it. */
+    button.fui-media-grid-tile > .fui-media-grid-caption {
+      opacity: 0;
+    }
+    button.fui-media-grid-tile:is(:hover, :focus-visible) > .fui-media-grid-caption {
+      opacity: 1;
+    }
+  }
+  .fui-media-grid-empty {
+    grid-column: 1 / -1;
+    display: grid;
+    place-items: center;
+    padding: var(--fui-space-4);
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+    text-align: center;
+  }
+
+  /* A picture that opens a viewer is a button: the frame keeps its shape, and nothing about it looks like a form key. */
+  .fui-zoomable {
+    display: block;
+    min-inline-size: 0;
+  }
+  button.fui-image-frame {
+    display: block;
+    inline-size: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    cursor: zoom-in;
+    text-align: start;
+  }
+  button.fui-image-frame:focus-visible {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: 2px;
+  }
+  @media (pointer: coarse) {
+    button.fui-image-frame {
+      min-block-size: 2.75rem;
+    }
+    .fui-viewer-thumb {
+      inline-size: 2.75rem;
+      block-size: 2.75rem;
+    }
+  }
+
+  @media (max-width: 47.99rem) {
+    .fui-viewer[data-compact] .fui-viewer-zoom {
+      display: none;
+    }
+    .fui-viewer-strip[data-dots] {
+      display: none;
+    }
+    .fui-viewer-dots {
+      display: flex;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .fui-media-grid-caption {
+      border-block-start: 1px solid CanvasText;
+      background: Canvas;
+      color: CanvasText;
+    }
+    .fui-viewer-dot {
+      border: 1px solid CanvasText;
+      background: Canvas;
+    }
+    .fui-viewer-dot[data-current] {
+      background: CanvasText;
+    }
+    .fui-viewer-source {
+      color: LinkText;
+    }
+    button.fui-image-frame:focus-visible {
+      outline-color: Highlight;
+    }
+  }
+}
+

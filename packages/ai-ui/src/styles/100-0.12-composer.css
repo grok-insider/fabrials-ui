@@ -1,0 +1,152 @@
+@layer components {
+  /* 0.12: the composer pill that picks, its list, and the key that reads an answer aloud */
+
+  /* A composer is a container, so a pill folds to its mark when the composer is narrow, whatever the window is. */
+  .fui-composer {
+    container: fui-composer / inline-size;
+  }
+
+  /* The trigger of a select, wearing the pill of a toggle: the same height, radius, padding and type, and none of the
+     field's well, border or full width. Three compounds beat the field rule wherever the two sheets are loaded in any order. */
+  .fui-composer-select.fui-select-trigger:not(.fui-button) {
+    inline-size: auto;
+    min-inline-size: 2rem;
+    block-size: 2rem;
+    min-block-size: 0;
+    gap: var(--fui-space-1-5);
+    padding: 0 var(--fui-space-2-5);
+    justify-content: flex-start;
+    border: 1px solid transparent;
+    border-radius: var(--fui-radius-md);
+    background: transparent;
+    color: var(--muted-foreground);
+    box-shadow: none;
+    font-size: var(--fui-text-xs);
+    font-weight: var(--fui-weight-medium);
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .fui-composer-select.fui-select-trigger:not(.fui-button) svg {
+    inline-size: 1rem;
+    block-size: 1rem;
+    color: currentColor;
+  }
+  .fui-composer-select.fui-select-trigger:not(.fui-button) > span:last-child {
+    display: inline-flex;
+    opacity: 0.6;
+  }
+  .fui-composer-select-value {
+    display: inline-block;
+    max-inline-size: 16ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  /* Away from its usual value the pill carries the tint of a pressed toggle, which the reset above would otherwise paint
+     over. The same compounds, so it wins wherever the two sheets are loaded in any order. */
+  .fui-composer-select.fui-select-trigger[data-state="on"]:not(.fui-button) {
+    border-color: color-mix(in oklab, var(--brand) 30%, transparent);
+    background: color-mix(in oklab, var(--brand) 10%, transparent);
+    color: var(--brand-ink);
+  }
+  @media (hover: hover) {
+    .fui-composer-select.fui-select-trigger[data-state="on"]:not(.fui-button):hover {
+      background: color-mix(in oklab, var(--brand) 15%, transparent);
+    }
+  }
+  .fui-composer-select.fui-select-trigger:not(.fui-button):focus-visible,
+  .fui-composer-select.fui-select-trigger[data-popup-open] {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    border-color: var(--fui-focus);
+    box-shadow:
+      0 0 0 1px var(--fui-focus),
+      0 0 0 4px color-mix(in oklab, var(--fui-focus) 18%, transparent);
+  }
+
+  /* The options read on two lines, with the mark of what they choose and a check for the one in use. */
+  .fui-composer-select-menu {
+    min-inline-size: 15rem;
+    max-inline-size: min(22rem, calc(100vw - 2rem));
+  }
+  .fui-composer-option > :first-child {
+    display: flex;
+    align-items: center;
+    gap: var(--fui-space-2-5);
+    min-inline-size: 0;
+  }
+  .fui-composer-option-icon {
+    display: inline-flex;
+    color: var(--muted-foreground);
+  }
+  .fui-composer-option-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--fui-space-0-5);
+    min-inline-size: 0;
+  }
+  .fui-composer-option-label {
+    font-size: var(--fui-text-sm);
+    line-height: var(--fui-leading-sm);
+  }
+  .fui-composer-option-hint {
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+    line-height: var(--fui-leading-xs);
+  }
+
+  /* A narrow composer keeps the mark and drops the words; the pill's name still says what is chosen. */
+  @container fui-composer (max-width: 22rem) {
+    .fui-composer-select.fui-select-trigger:not(.fui-button) {
+      inline-size: 2rem;
+      padding-inline: 0;
+      gap: 0;
+      justify-content: center;
+    }
+    .fui-composer-select.fui-select-trigger:not(.fui-button) > span:last-child,
+    .fui-composer-select-value {
+      display: none;
+    }
+  }
+
+  @media (max-width: 767px), (pointer: coarse) {
+    .fui-composer-select.fui-select-trigger:not(.fui-button) {
+      min-inline-size: 2.75rem;
+      block-size: 2.75rem;
+      padding-inline: var(--fui-space-3);
+    }
+    @container fui-composer (max-width: 22rem) {
+      .fui-composer-select.fui-select-trigger:not(.fui-button) {
+        inline-size: 2.75rem;
+        padding-inline: 0;
+      }
+    }
+  }
+
+  /* Forced colors: the tint of a pill that is away from its usual value cannot be seen, so it carries a Highlight ring
+     and a bar under its label, as a pressed toggle does. A button's border colour is the system's to choose here, so the
+     ring is an outline. */
+  @media (forced-colors: active) {
+    .fui-composer-select.fui-select-trigger[data-state="on"] {
+      position: relative;
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+    .fui-composer-select.fui-select-trigger[data-state="on"]::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0.25rem;
+      inset-block-end: 2px;
+      block-size: 3px;
+      background: Highlight;
+    }
+    .fui-composer-select.fui-select-trigger:focus-visible {
+      outline: 2px solid Highlight;
+      outline-offset: 2px;
+    }
+    .fui-message-action[data-reading] {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+  }
+}
+

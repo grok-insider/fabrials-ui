@@ -1,0 +1,228 @@
+/* 0.10 spreadsheet: a read-only grid in the instrument's voice. Hairline gridlines, letters and row numbers in the label
+   voice that stay in view (with the file's frozen panes), numbers in tabular mono to the end, the active cell an inset
+   Stormlight ring, and only the cells on screen drawn. */
+@layer components {
+  .fui-spreadsheet {
+    display: grid;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--fui-radius-lg);
+    background: var(--card);
+    box-shadow: var(--fui-shadow-sm), var(--fui-highlight);
+  }
+  .fui-spreadsheet-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--fui-space-3);
+    min-height: 2.25rem;
+    padding: 0 var(--fui-space-3);
+    border-block-end: 1px solid var(--border);
+    font-size: var(--fui-text-sm);
+  }
+  .fui-spreadsheet-address {
+    flex: none;
+    min-width: 4.5rem;
+    padding-inline-end: var(--fui-space-3);
+    border-inline-end: 1px solid var(--border);
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    letter-spacing: var(--fui-tracking-label);
+  }
+  .fui-spreadsheet-contents {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .fui-spreadsheet-formula {
+    color: var(--brand-ink);
+    font-family: var(--fui-font-mono);
+    font-size: var(--fui-text-xs);
+  }
+  .fui-spreadsheet-note {
+    margin: 0;
+    padding: var(--fui-space-2) var(--fui-space-3);
+    border-block-end: 1px solid var(--border);
+    color: var(--fui-warning-ink);
+    font-size: var(--fui-text-xs);
+  }
+  .fui-spreadsheet-grid {
+    position: relative;
+    min-height: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+    outline: none;
+    font-size: var(--fui-text-xs);
+  }
+  .fui-spreadsheet-grid:focus-visible {
+    box-shadow: inset 0 0 0 1px var(--fui-focus);
+  }
+  .fui-spreadsheet-canvas {
+    position: relative;
+  }
+  .fui-spreadsheet-row {
+    position: absolute;
+    inset-inline-start: 0;
+    top: 0;
+    width: 100%;
+  }
+  .fui-spreadsheet-head {
+    position: sticky;
+    z-index: 2;
+    top: 0;
+    background: var(--card);
+  }
+  .fui-spreadsheet-letters {
+    position: relative;
+    border-block-end: 1px solid var(--border);
+    background: var(--muted);
+  }
+  .fui-spreadsheet-pinned {
+    position: sticky;
+    z-index: 1;
+    inset-inline-start: 0;
+    height: 100%;
+    background: var(--card);
+  }
+  .fui-spreadsheet-letters > .fui-spreadsheet-pinned {
+    background: var(--muted);
+  }
+  .fui-spreadsheet-row[data-frozen] {
+    border-block-end: 0;
+  }
+  .fui-spreadsheet-head > .fui-spreadsheet-row[data-frozen]:last-child .fui-spreadsheet-cell,
+  .fui-spreadsheet-head > .fui-spreadsheet-row[data-frozen]:last-child .fui-spreadsheet-rowheader {
+    box-shadow: inset 0 -2px 0 var(--fui-control-border);
+  }
+  .fui-spreadsheet-corner,
+  .fui-spreadsheet-rowheader,
+  .fui-spreadsheet-letter,
+  .fui-spreadsheet-cell {
+    position: absolute;
+    top: 0;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    overflow: hidden;
+    border-inline-end: 1px solid var(--border);
+    border-block-end: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .fui-spreadsheet-corner {
+    inset-inline-start: 0;
+    background: var(--muted);
+  }
+  .fui-spreadsheet-rowheader,
+  .fui-spreadsheet-letter {
+    justify-content: center;
+    background: var(--muted);
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: var(--fui-tracking-label);
+  }
+  .fui-spreadsheet-rowheader {
+    inset-inline-start: 0;
+  }
+  .fui-spreadsheet-rowheader[data-active],
+  .fui-spreadsheet-letter[data-active] {
+    background: var(--brand-soft);
+    color: var(--brand-ink);
+    box-shadow: inset 0 -2px 0 var(--brand-ink);
+  }
+  .fui-spreadsheet-rowheader[data-active] {
+    box-shadow: inset -2px 0 0 var(--brand-ink);
+  }
+  .fui-spreadsheet-cell {
+    padding: 0 var(--fui-space-2);
+    background: var(--card);
+    color: var(--foreground);
+    cursor: cell;
+    text-overflow: ellipsis;
+  }
+  .fui-spreadsheet-cell > * {
+    min-width: 0;
+  }
+  .fui-spreadsheet-cell:is([data-kind="number"], [data-kind="date"]) {
+    justify-content: flex-end;
+    font-family: var(--fui-font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+  .fui-spreadsheet-cell[data-kind="boolean"] {
+    justify-content: center;
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+  }
+  .fui-spreadsheet-cell[data-kind="error"] {
+    color: var(--fui-danger-ink);
+    font-family: var(--fui-font-mono);
+  }
+  .fui-spreadsheet-cell[data-merged] {
+    z-index: 1;
+    white-space: normal;
+  }
+  .fui-spreadsheet-cell[aria-selected="true"] {
+    z-index: 1;
+    box-shadow: inset 0 0 0 2px var(--fui-control-border);
+  }
+  .fui-spreadsheet-grid:focus-visible .fui-spreadsheet-cell[aria-selected="true"] {
+    box-shadow: inset 0 0 0 2px var(--fui-focus);
+  }
+  .fui-spreadsheet-empty {
+    margin: 0;
+    padding: var(--fui-space-6) var(--fui-space-4);
+    color: var(--muted-foreground);
+  }
+  .fui-spreadsheet-tabs {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    border-block-start: 1px solid var(--border);
+    background: var(--muted);
+    scrollbar-width: thin;
+  }
+  .fui-spreadsheet-tab {
+    flex: none;
+    min-height: 2.25rem;
+    padding: 0 var(--fui-space-4);
+    border: 0;
+    border-inline-end: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted-foreground);
+    font: inherit;
+    font-size: var(--fui-text-sm);
+    cursor: pointer;
+  }
+  .fui-spreadsheet-tab:hover {
+    color: var(--foreground);
+  }
+  .fui-spreadsheet-tab[aria-selected="true"] {
+    background: var(--card);
+    color: var(--foreground);
+    box-shadow: inset 0 2px 0 var(--brand-ink);
+  }
+  .fui-spreadsheet-tab:focus-visible {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: -2px;
+  }
+  @media (pointer: coarse) {
+    .fui-spreadsheet-tab {
+      min-height: 2.75rem;
+    }
+  }
+  @media (forced-colors: active) {
+    .fui-spreadsheet-cell[aria-selected="true"] {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+    .fui-spreadsheet-tab[aria-selected="true"] {
+      outline: 1px solid Highlight;
+      outline-offset: -1px;
+    }
+  }
+}
+

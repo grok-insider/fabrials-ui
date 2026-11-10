@@ -21,8 +21,9 @@ import {
   ComboboxTrigger,
   ComboboxValue,
 } from "../../packages/ui/src/index";
+import { uiStyles } from "./read-styles";
 
-const styles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
+const styles = uiStyles();
 const blockStart = styles.indexOf("/* 0.12: combobox.");
 const closeOf = (text: string, from: number) => {
   let depth = 0;

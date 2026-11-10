@@ -1,10 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import { AnimatedImage, AudioPlayer, mayAnimate, playbackProblem, VideoPlayer } from "@fabrials/ui";
+import { uiStyles } from "./read-styles";
 
-const styles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
+const styles = uiStyles();
 
 test("video: a named, focusable player on the dark tokens, our controls over a video without the browser's", () => {
   const html = renderToStaticMarkup(

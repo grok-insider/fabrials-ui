@@ -1,0 +1,305 @@
+/* 0.12: the shell pieces — the dither canvas's picture sources, the sidebar's account row, the inset's header and frame, a
+   title renamed in place, and the keyboard for a script the device lacks. */
+@layer components {
+  /* The canvas is at 0 opacity until it has painted; a picture that failed keeps the surface it was drawn on. */
+  .fui-dither-canvas[data-failed] {
+    opacity: 1;
+  }
+
+  /* ---- the account row at the foot of a sidebar ---- */
+  .fui-sidebar-account-trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--fui-space-2);
+    inline-size: 100%;
+    min-block-size: var(--fui-control-height-lg);
+    padding: var(--fui-space-1) var(--fui-space-2);
+    border: 0;
+    border-radius: var(--fui-radius-md);
+    background: transparent;
+    color: var(--sidebar-foreground);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+    transition:
+      background-color var(--fui-duration) var(--fui-ease),
+      box-shadow var(--fui-duration) var(--fui-ease);
+  }
+  .fui-sidebar-account-trigger:focus-visible {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: -2px;
+  }
+  @media (hover: hover) {
+    .fui-sidebar-account-trigger:hover {
+      background: color-mix(in oklab, var(--sidebar-foreground) 6%, transparent);
+    }
+  }
+  .fui-sidebar-account-trigger[data-popup-open] {
+    background: color-mix(in oklab, var(--sidebar-foreground) 8%, transparent);
+  }
+  /* The row is the page a person is on: the same raised plate as a current navigation row. */
+  .fui-sidebar-account-trigger[data-active] {
+    background: var(--fui-sidebar-active);
+    box-shadow: var(--fui-sidebar-active-shadow, var(--fui-shadow-xs), var(--fui-highlight));
+    color: var(--fui-sidebar-active-ink, var(--sidebar-accent-foreground));
+  }
+  .fui-sidebar-account-text {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-inline-size: 0;
+  }
+  .fui-sidebar-account-name,
+  .fui-sidebar-account-email {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .fui-sidebar-account-name {
+    font-size: var(--fui-text-sm);
+    font-weight: var(--fui-weight-medium);
+    line-height: var(--fui-leading-sm);
+  }
+  .fui-sidebar-account-email {
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+    line-height: var(--fui-leading-xs);
+  }
+  .fui-sidebar-account-chevron {
+    flex: none;
+    color: var(--muted-foreground);
+  }
+  @media (max-width: 767px) {
+    .fui-sidebar-account-trigger {
+      min-block-size: 3rem;
+    }
+  }
+  /* Folded to icons, the picture is the row: the name, the second line and the chevron leave the markup's flow. */
+  .fui-sidebar[data-collapsible="icon"] .fui-sidebar-account-trigger {
+    justify-content: center;
+    inline-size: 2.5rem;
+    min-block-size: 2.5rem;
+    padding: 0;
+  }
+  .fui-sidebar[data-collapsible="icon"] :is(.fui-sidebar-account-text, .fui-sidebar-account-chevron) {
+    display: none;
+  }
+  .fui-sidebar-account-menu {
+    min-inline-size: 15rem;
+  }
+  .fui-sidebar-account-identity {
+    display: flex;
+    flex-direction: column;
+    gap: var(--fui-space-0-5);
+    padding-block: var(--fui-space-1);
+  }
+  .fui-sidebar-account-identity-name,
+  .fui-sidebar-account-identity-email {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .fui-sidebar-account-identity-name {
+    color: var(--popover-foreground);
+    font-size: var(--fui-text-sm);
+    font-weight: var(--fui-weight-medium);
+  }
+  .fui-sidebar-account-identity-email {
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+  }
+  @media (forced-colors: active) {
+    .fui-sidebar-account-trigger[data-active] {
+      box-shadow: none;
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+  }
+
+  /* ---- the inset: a bar that does not blur, and a frame whose content scrolls ---- */
+  .fui-sidebar-inset-framed {
+    block-size: 100dvh;
+    min-block-size: 0;
+    overflow: hidden;
+  }
+  .fui-sidebar-inset-header {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--fui-space-1);
+    min-block-size: calc(3.5rem + env(safe-area-inset-top, 0px));
+    padding-block-start: env(safe-area-inset-top, 0px);
+    padding-inline: var(--fui-space-1-5);
+    border-block-end: 1px solid var(--border);
+    background: var(--background);
+    color: var(--foreground);
+  }
+  .fui-sidebar-inset-title {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    margin: 0;
+    overflow: hidden;
+    font-size: var(--fui-text-sm);
+    font-weight: var(--fui-weight-semibold);
+    line-height: var(--fui-leading-sm);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .fui-sidebar-inset-header-actions,
+  .fui-sidebar-inset-header-end {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--fui-space-1);
+  }
+  .fui-sidebar-inset-header-actions:empty {
+    display: none;
+  }
+  .fui-sidebar-inset-header-end {
+    margin-inline-start: auto;
+  }
+  @media (min-width: 768px) {
+    .fui-sidebar-inset-header[data-visibility="mobile"] {
+      display: none;
+    }
+  }
+  .fui-sidebar-inset-content {
+    flex: 1 1 auto;
+    min-block-size: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .fui-sidebar-inset-content:focus-visible {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: -2px;
+  }
+
+  /* ---- a title renamed where it is read ---- */
+  .fui-editable-text {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--fui-space-1);
+    min-inline-size: 0;
+    max-inline-size: 100%;
+  }
+  .fui-editable-text-value {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    border-radius: var(--fui-radius-xs);
+  }
+  .fui-editable-text-value:focus-visible {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: 2px;
+  }
+  .fui-editable-text-field {
+    flex: 1 1 auto;
+    inline-size: 100%;
+    min-inline-size: 0;
+    block-size: var(--fui-control-height-sm);
+    padding-inline: var(--fui-space-2);
+    border: 1px solid var(--input-border, var(--border));
+    border-radius: var(--fui-radius-md);
+    background: var(--background);
+    color: var(--foreground);
+    font: inherit;
+    font-size: var(--fui-text-sm);
+  }
+  .fui-editable-text-field:focus-visible {
+    border-color: var(--fui-focus);
+    outline: 2px solid var(--fui-focus);
+    outline-offset: 0;
+  }
+  .fui-editable-text[data-pending] .fui-editable-text-value {
+    color: var(--muted-foreground);
+  }
+  .fui-editable-text-trigger.fui-button {
+    flex: none;
+    color: var(--muted-foreground);
+  }
+  .fui-editable-text-spinner.fui-pixel-spinner {
+    flex: none;
+    inline-size: 0.875rem;
+    block-size: 0.875rem;
+    color: var(--muted-foreground);
+  }
+  @media (forced-colors: active) {
+    .fui-editable-text-field:focus-visible,
+    .fui-editable-text-value:focus-visible {
+      outline-color: Highlight;
+    }
+  }
+
+  /* ---- a keyboard for a script the device's own keyboard lacks ---- */
+  .fui-keyboard {
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+    gap: min(1cqi, var(--fui-space-1));
+    inline-size: 100%;
+    padding: var(--fui-space-1);
+    border: 1px solid var(--border);
+    border-radius: var(--fui-radius-lg);
+    background: var(--card);
+  }
+  .fui-keyboard-row {
+    display: flex;
+    gap: min(1cqi, var(--fui-space-1));
+  }
+  /* The gaps give way before the keys do (1cqi is a hundredth of the keyboard's own width). */
+  .fui-keyboard-key {
+    display: flex;
+    flex: var(--fui-key-width, 1) 1 0;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: 2rem;
+    min-block-size: 2rem;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--fui-radius-sm);
+    background: var(--background);
+    color: var(--foreground);
+    font: inherit;
+    font-size: var(--fui-text-sm);
+    cursor: pointer;
+    transition:
+      background-color var(--fui-duration) var(--fui-ease),
+      transform var(--fui-duration-fast) var(--fui-ease);
+  }
+  .fui-keyboard-key:focus-visible {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: 1px;
+    z-index: 1;
+  }
+  .fui-keyboard-key:active:not(:disabled) {
+    background: var(--accent);
+  }
+  .fui-keyboard-key:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  .fui-keyboard-key-glyph {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: 0;
+    overflow: hidden;
+    font-size: var(--fui-text-md);
+    line-height: 1;
+  }
+  @media (pointer: coarse) {
+    .fui-keyboard-key {
+      min-inline-size: 2.75rem;
+      min-block-size: 2.75rem;
+    }
+  }
+  @media (forced-colors: active) {
+    .fui-keyboard-key:focus-visible {
+      outline-color: Highlight;
+    }
+    .fui-keyboard-key:active:not(:disabled) {
+      background: Highlight;
+      color: HighlightText;
+    }
+  }
+}
+

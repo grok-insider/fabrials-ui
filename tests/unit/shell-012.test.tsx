@@ -1,6 +1,5 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import {
   DitherCanvas,
@@ -25,8 +24,9 @@ import {
   toneLuma,
   type Rgb,
 } from "../../packages/ui/src/dither";
+import { uiStyles } from "./read-styles";
 
-const styles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
+const styles = uiStyles();
 const BLOCK_MARK = "/* 0.12: the shell pieces";
 const block = styles.slice(styles.lastIndexOf("@layer components {", styles.indexOf(BLOCK_MARK)));
 const rule = (selector: string) => {

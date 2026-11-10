@@ -30,8 +30,9 @@ import {
   type ThemeWindow,
   type UseCountdownOptions,
 } from "../../packages/ui/src/index";
+import { uiStyles } from "./read-styles";
 
-const styles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
+const styles = uiStyles();
 const marker = styles.indexOf("0.12: states and time");
 assert.ok(marker > 0, "the block carries its marker comment");
 // The block's own text: from its marker to the brace that closes its layer.

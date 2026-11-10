@@ -1,12 +1,11 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { uiStyles, aiStyles } from "./read-styles";
 
 // @fabrials/ui and @fabrials/ai-ui are loaded on the same page, in the same layer, so a class both of them define on its own
 // is styled by whichever sheet comes last. That is how ai-ui's chevron once shrank and faded the chevron of Disclosure.
-const read = (path: string) => readFileSync(new URL(path, import.meta.url), "utf8");
-const ui = read("../../packages/ui/src/styles.css");
-const ai = read("../../packages/ai-ui/src/styles.css");
+const ui = uiStyles();
+const ai = aiStyles();
 
 // A class may be defined on its own in both sheets only with a reason.
 const SHARED_ON_PURPOSE: Record<string, string> = {};

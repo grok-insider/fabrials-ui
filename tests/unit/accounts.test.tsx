@@ -47,6 +47,7 @@ import {
   RESET_CREDITS,
   SYNCHRONIZED,
 } from "../../stories/accounts-fixtures";
+import { aiStyles } from "./read-styles";
 
 // What 0.11 shipped for the accounts and usage family, frozen byte for byte. Every change of 0.12 is additive, so a default
 // render that moves is a regression, not a new look: the files under __baselines__/accounts were written from the sources of
@@ -218,7 +219,7 @@ test("every word is a label: a marked set of labels leaves no English behind", (
 });
 
 test("the accounts rules are logical, the dead ones are gone, and forced colors has its own block", () => {
-  const styles = readFileSync(new URL("../../packages/ai-ui/src/styles.css", import.meta.url), "utf8");
+  const styles = aiStyles();
   const family = styles.slice(0, styles.indexOf("\n@layer utilities"));
   assert.doesNotMatch(family, /(^|[\s;{])(left|right|margin-(left|right)|padding-(left|right)|min-(width|height)|border-top)\s*:/);
   assert.doesNotMatch(family, /text-align:\s*(left|right)/);

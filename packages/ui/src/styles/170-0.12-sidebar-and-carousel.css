@@ -1,0 +1,97 @@
+/* 0.12: the sidebar's ring, targets and sheet key; right to left for the pieces that were physical; the carousel's region. */
+@layer components {
+  /* A row sits against the edge of a scroll area, which clips a ring drawn outside it: every row size, the sub rows and the
+     two action keys draw theirs inside (touch rows already did, hugging their band). */
+  .fui-sidebar-menu-button:focus-visible,
+  .fui-sidebar-menu-sub-button:focus-visible,
+  .fui-sidebar-menu-action:focus-visible,
+  .fui-sidebar-group-action:focus-visible,
+  .fui-sidebar-group-label:focus-visible {
+    outline-offset: -2px;
+  }
+  /* The icon of the active row follows the row's ink unless it is given its own; in a touch row it stays quiet unless given one. */
+  .fui-sidebar-menu-button[data-size="touch"][data-active] svg {
+    color: var(--fui-sidebar-active-icon, var(--muted-foreground));
+  }
+  /* The two action keys paint 20 px; under a finger their target is 44 px, centred on them. A group label that has a key
+     beside it grows to that height, so the key's target does not reach into the first row. */
+  @media (pointer: coarse) {
+    .fui-sidebar-menu-action::after,
+    .fui-sidebar-group-action::after {
+      content: "";
+      position: absolute;
+      inset: calc((100% - var(--fui-control-height-lg)) / 2);
+    }
+    .fui-sidebar-group:has(> .fui-sidebar-group-action) > .fui-sidebar-group-label {
+      height: var(--fui-control-height-lg);
+    }
+    .fui-sidebar-group-action {
+      top: calc(var(--fui-space-2) + (var(--fui-control-height-lg) - 1.25rem) / 2);
+    }
+    .fui-sidebar[data-collapsible="icon"] .fui-sidebar-group:has(> .fui-sidebar-group-action) > .fui-sidebar-group-label {
+      margin-top: calc(-1 * var(--fui-control-height-lg));
+    }
+  }
+  .fui-sidebar-sheet-bar {
+    display: flex;
+    flex: none;
+    justify-content: flex-end;
+    padding: var(--fui-space-1) var(--fui-space-1) 0;
+  }
+  .fui-sidebar-close.fui-button {
+    flex: none;
+    color: var(--muted-foreground);
+  }
+  .fui-sidebar-search .fui-input {
+    background: var(--background);
+    box-shadow: none;
+  }
+  .fui-sidebar[data-collapsible="icon"] .fui-sidebar-search {
+    display: none;
+  }
+  .fui-sidebar-trigger-icon:dir(rtl) {
+    transform: scaleX(-1);
+  }
+
+  /* Glyphs that point along the line turn with it. */
+  .fui-pagination-step svg:dir(rtl),
+  .fui-files-row:not([aria-expanded="true"]) .fui-files-chevron:dir(rtl),
+  .fui-carousel-control[data-orientation="horizontal"] svg:dir(rtl) {
+    transform: scaleX(-1);
+  }
+  /* The thumb rests at the inline start, so it travels the other way. */
+  .fui-switch[data-checked] .fui-switch-thumb:dir(rtl) {
+    transform: translateX(-1rem);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .fui-switch[data-checked]:active:not([data-disabled]) .fui-switch-thumb:dir(rtl) {
+      transform: translateX(-0.75rem);
+    }
+  }
+  /* The bar a loading field shows where its value would be starts at the inline start (background-position has no logical keyword). */
+  [data-fui-loading]
+    > .fui-loading-content
+    :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="hidden"]), textarea, select):not(
+      :where([data-skeleton="keep"], [data-skeleton="keep"] *)
+    ):dir(rtl) {
+    background-position: right 0.75rem center !important;
+  }
+  [data-fui-loading] > .fui-loading-content textarea:not(:where([data-skeleton="keep"], [data-skeleton="keep"] *)):dir(rtl) {
+    background-position: right 0.75rem top 0.7rem !important;
+  }
+
+  /* A command reads left to right in any page, as code does; its copy key stays at the right, where its lines end. */
+  .fui-snippet-code {
+    direction: ltr;
+  }
+
+  /* The carousel region takes focus for its arrow keys; its ring is drawn inside the viewport, where no frame clips it. */
+  .fui-carousel:focus-visible {
+    outline: none;
+  }
+  .fui-carousel:focus-visible > .fui-carousel-viewport {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: -2px;
+  }
+}
+

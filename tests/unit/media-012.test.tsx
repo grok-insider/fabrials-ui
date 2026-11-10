@@ -1,6 +1,5 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import {
   closesOnRelease,
@@ -16,8 +15,9 @@ import {
   ZoomableImage,
   type MediaGridItem,
 } from "@fabrials/ui";
+import { uiStyles } from "./read-styles";
 
-const styles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
+const styles = uiStyles();
 // The block this package appends, so a rule of 0.10 with the same selector is not the one read.
 const ownAt = styles.indexOf("/* 0.12: the viewer and the gallery.");
 const own = styles.slice(ownAt, (() => {

@@ -1,10 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import { DirectionProvider, InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot, NumberField, PasswordInput, SearchInput, Slider, Textarea, useDirection } from "@fabrials/ui";
+import { uiStyles } from "./read-styles";
 
-const styles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
+const styles = uiStyles();
 
 test("search: a real search input, a clear button only with text, the shortcut only while empty, busy while loading", () => {
   const empty = renderToStaticMarkup(<SearchInput aria-label="Search" shortcut={<kbd>/</kbd>} />);

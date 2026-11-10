@@ -1,6 +1,5 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import {
   Alert,
@@ -36,9 +35,10 @@ import { GenerationFrame } from "../../packages/ai-ui/src/index";
 import { sliderDecimals } from "../../packages/ui/src/slider";
 import { countLimit } from "../../packages/ui/src/field-count";
 import { rampColors } from "../../packages/ui/src/chart";
+import { uiStyles, aiStyles as aiSheet } from "./read-styles";
 
-const styles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
-const aiStyles = readFileSync(new URL("../../packages/ai-ui/src/styles.css", import.meta.url), "utf8");
+const styles = uiStyles();
+const aiStyles = aiSheet();
 
 /** The 0.12 block of a stylesheet, up to the next one: another package appends its own after it. */
 function block(sheet: string, marker: string) {

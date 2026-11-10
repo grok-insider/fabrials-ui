@@ -20,8 +20,9 @@ import {
   useMediaQuery,
 } from "../../packages/ui/src/index";
 import { sidebarEdge, sidebarTooltipSide } from "../../packages/ui/src/sidebar-side";
+import { uiStyles } from "./read-styles";
 
-const styles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
+const styles = uiStyles();
 const source = readFileSync(new URL("../../packages/ui/src/sidebar.tsx", import.meta.url), "utf8");
 const rule = (selector: string) => {
   const at = styles.indexOf(selector);

@@ -18,8 +18,9 @@ import {
   DialogFooter,
   StatusPopover,
 } from "../../packages/ui/src/index";
+import { uiStyles } from "./read-styles";
 
-const styles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
+const styles = uiStyles();
 
 /** The declarations of the first rule whose selector is written exactly as `selector` (up to its closing brace). */
 const rule = (selector: string, from = 0) => {

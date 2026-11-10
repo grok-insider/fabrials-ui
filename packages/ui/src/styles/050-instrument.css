@@ -1,0 +1,100 @@
+/* 0.10: Instrument. Plates, corner marks, the drawn grid and caption strips. */
+@layer components {
+  .fui-corner-marks {
+    position: relative;
+    min-width: 0;
+  }
+  .fui-corner-mark {
+    position: absolute;
+    width: var(--fui-mark-size);
+    height: var(--fui-mark-size);
+    pointer-events: none;
+  }
+  .fui-corner-mark::before,
+  .fui-corner-mark::after {
+    content: "";
+    position: absolute;
+    background: var(--fui-mark);
+  }
+  .fui-corner-mark::before {
+    inset-inline-start: calc(var(--fui-mark-size) / 2 - 0.5px);
+    top: 0;
+    width: 1px;
+    height: 100%;
+  }
+  .fui-corner-mark::after {
+    top: calc(var(--fui-mark-size) / 2 - 0.5px);
+    inset-inline-start: 0;
+    width: 100%;
+    height: 1px;
+  }
+  .fui-corner-mark[data-corner^="top"] {
+    top: calc(var(--fui-mark-size) / -2);
+  }
+  .fui-corner-mark[data-corner^="bottom"] {
+    bottom: calc(var(--fui-mark-size) / -2);
+  }
+  .fui-corner-mark[data-corner$="start"] {
+    inset-inline-start: calc(var(--fui-mark-size) / -2);
+  }
+  .fui-corner-mark[data-corner$="end"] {
+    inset-inline-end: calc(var(--fui-mark-size) / -2);
+  }
+
+  .fui-grid-guides {
+    position: absolute;
+    inset-block: 0;
+    inset-inline: var(--fui-page-padding);
+    z-index: 0;
+    display: grid;
+    grid-template-columns: repeat(var(--fui-guide-columns, 12), minmax(0, 1fr));
+    column-gap: var(--fui-guide-gap, var(--fui-space-6));
+    pointer-events: none;
+  }
+  .fui-grid-guides > span {
+    border-inline: 1px dashed var(--fui-guide);
+  }
+  @media (max-width: 767px) {
+    .fui-grid-guides {
+      display: none;
+    }
+  }
+  @media print {
+    .fui-grid-guides {
+      display: none;
+    }
+  }
+
+  .fui-card-caption {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--fui-space-1) var(--fui-space-4);
+    padding: var(--fui-space-2-5) var(--fui-space-5) var(--fui-space-3);
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    line-height: var(--fui-leading-label);
+    letter-spacing: var(--fui-tracking-label);
+  }
+
+  @media (forced-colors: active) {
+    .fui-corner-mark::before,
+    .fui-corner-mark::after {
+      background: CanvasText;
+    }
+    .fui-grid-guides {
+      display: none;
+    }
+    .fui-meter-tick {
+      fill: GrayText;
+    }
+    .fui-meter-tick-on {
+      fill: CanvasText;
+    }
+    .fui-meter-mark {
+      fill: Highlight;
+    }
+  }
+}
+

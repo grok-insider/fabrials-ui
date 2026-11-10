@@ -43,9 +43,10 @@ import {
 } from "../../packages/ui/src/clip-logic";
 import { canStartRecording, initialRecorderState, isTake, recorderReducer, soundLevel, type RecorderState, type RecorderTake } from "../../packages/ui/src/recorder-logic";
 import { VoiceInputButton, describeMicError } from "../../packages/ai-ui/src/index";
+import { uiStyles } from "./read-styles";
 
 const read = (path: string) => readFileSync(new URL(`../../packages/${path}`, import.meta.url), "utf8");
-const styles = read("ui/src/styles.css");
+const styles = uiStyles();
 const blockAt = styles.indexOf("/* 0.12: sound */");
 const closeOf = (text: string, from: number) => {
   let depth = 0;

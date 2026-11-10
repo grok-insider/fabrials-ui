@@ -12,9 +12,10 @@ import {
   panelOf,
   repeatsName,
 } from "../../packages/ui/src/description";
+import { uiStyles } from "./read-styles";
 
 const source = (file: string) => readFileSync(new URL(`../../packages/ui/src/${file}`, import.meta.url), "utf8");
-const styles = source("styles.css");
+const styles = uiStyles();
 const rule = (selector: string) => {
   const at = styles.indexOf(selector);
   assert.ok(at >= 0, `missing rule ${selector}`);

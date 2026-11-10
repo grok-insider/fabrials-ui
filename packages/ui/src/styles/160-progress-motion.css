@@ -1,0 +1,119 @@
+/* 0.11: Progress in motion. A value that changes eases the fill to it, and segments ink in order (base rules); work whose amount
+   is not known yet carries the working light across its track, and a ring turns the light round. Under reduced motion and in
+   forced colors the same state holds still: a dashed line, a dashed ring. */
+@layer components {
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes fui-progress-sweep {
+      from {
+        translate: -100% 0;
+      }
+      to {
+        translate: 240% 0;
+      }
+    }
+    @keyframes fui-progress-sweep-rtl {
+      from {
+        translate: 100% 0;
+      }
+      to {
+        translate: -240% 0;
+      }
+    }
+    @keyframes fui-progress-turn {
+      to {
+        --fui-light-angle: 360deg;
+      }
+    }
+    .fui-progress-indicator[data-indeterminate] {
+      position: absolute;
+      inset-block: 0;
+      inset-inline-start: 0;
+      width: 42%;
+      border-radius: inherit;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        var(--fui-progress-light-1) 38%,
+        var(--fui-progress-light-2) 68%,
+        var(--fui-progress-light-3) 92%,
+        transparent
+      );
+      animation: fui-progress-sweep 1.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+    }
+    .fui-progress-indicator[data-indeterminate]:dir(rtl) {
+      background: linear-gradient(
+        270deg,
+        transparent,
+        var(--fui-progress-light-1) 38%,
+        var(--fui-progress-light-2) 68%,
+        var(--fui-progress-light-3) 92%,
+        transparent
+      );
+      animation-name: fui-progress-sweep-rtl;
+    }
+    .fui-progress-ring[data-indeterminate] .fui-progress-ring-track {
+      stroke: var(--border);
+      stroke-dasharray: none;
+    }
+    @keyframes fui-progress-scan {
+      from {
+        --fui-scan-p: 0;
+      }
+      to {
+        --fui-scan-p: 1;
+      }
+    }
+    .fui-progress-scan {
+      animation: fui-progress-scan var(--fui-scan-duration) steps(var(--fui-scan-steps), jump-none) infinite;
+    }
+    .fui-progress-ring-light {
+      display: block;
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: conic-gradient(
+        from var(--fui-light-angle),
+        transparent 0% 46%,
+        var(--fui-progress-light-1) 64%,
+        var(--fui-progress-light-2) 78%,
+        var(--fui-progress-light-3) 90%,
+        transparent 100%
+      );
+      mask: radial-gradient(
+        farthest-side,
+        transparent calc(100% - var(--fui-progress-ring-stroke) - 0.5px),
+        var(--foreground) calc(100% - var(--fui-progress-ring-stroke)),
+        var(--foreground) calc(100% - 0.5px),
+        transparent
+      );
+      animation: fui-progress-turn 1.4s linear infinite;
+    }
+  }
+  @media (forced-colors: active) {
+    .fui-progress-indicator[data-indeterminate] {
+      forced-color-adjust: none;
+      position: static;
+      width: 100%;
+      border-radius: 0;
+      background: repeating-linear-gradient(90deg, Highlight 0 0.5rem, transparent 0.5rem 0.875rem);
+      animation: none;
+    }
+    .fui-progress-ring[data-indeterminate] .fui-progress-ring-track {
+      stroke: Highlight;
+      stroke-dasharray: 6 4;
+    }
+    .fui-progress-ring-light {
+      display: none;
+    }
+    .fui-progress-scan {
+      forced-color-adjust: none;
+    }
+    .fui-progress-scan > span {
+      background: GrayText;
+    }
+    .fui-progress-scan > span::after {
+      background: Highlight;
+    }
+  }
+}
+

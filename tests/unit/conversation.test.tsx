@@ -1,6 +1,5 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import type { ReactNode } from "react";
 import {
@@ -36,8 +35,9 @@ import {
   type ConversationMetrics,
   type LockState,
 } from "../../packages/ai-ui/src/conversation-logic";
+import { aiStyles } from "./read-styles";
 
-const styles = readFileSync(new URL("../../packages/ai-ui/src/styles.css", import.meta.url), "utf8");
+const styles = aiStyles();
 // A top-level rule of the block, at two spaces of indentation (a selector repeated inside a query is not this one).
 const rule = (selector: string) => {
   const at = styles.indexOf(`\n  ${selector}`);

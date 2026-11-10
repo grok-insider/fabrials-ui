@@ -1,6 +1,5 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import {
   Disclosure,
@@ -24,8 +23,9 @@ import {
   ToolbarSeparator,
 } from "../../packages/ui/src/index";
 import { keyShortcutsValue } from "../../packages/ui/src/icon-tooltip";
+import { uiStyles } from "./read-styles";
 
-const styles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
+const styles = uiStyles();
 
 test("icon button is named by aria-label, or by a hidden text node, never both", () => {
   const named = renderToStaticMarkup(<IconButton label="Rename" tooltip={false}><svg /></IconButton>);

@@ -1,0 +1,359 @@
+@layer components {
+  .fui-confirm-dialog-title {
+    overflow-wrap: anywhere;
+  }
+  .fui-confirm-dialog-body {
+    display: grid;
+    gap: var(--fui-space-3);
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .fui-truncated-text {
+    display: block;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .fui-positioner:has(> .fui-truncated-text-tooltip),
+  .fui-truncated-text-tooltip {
+    pointer-events: none;
+  }
+  .fui-truncated-text-tooltip {
+    overflow-wrap: anywhere;
+  }
+
+  /* 0.8: the section is the size container and an inner element is the grid, so the two columns follow the space the section
+     has (a sheet, a dialog, a page) instead of the viewport. inline-size: 100% because a container with inline containment
+     has no intrinsic width. */
+  .fui-settings-section {
+    container: fui-settings-section / inline-size;
+    inline-size: 100%;
+    min-inline-size: 0;
+    padding-top: var(--fui-space-6);
+    border-top: 1px solid var(--fui-separator);
+    color: var(--foreground);
+    font-family: var(--fui-font-sans);
+  }
+  .fui-settings-section-layout {
+    display: grid;
+    gap: var(--fui-space-4);
+  }
+  .fui-settings-section:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+  .fui-settings-section-intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--fui-space-1);
+    min-width: 0;
+  }
+  .fui-settings-section-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--fui-space-2);
+    min-width: 0;
+  }
+  .fui-settings-section-title {
+    margin: 0;
+    font-size: var(--fui-text-md);
+    font-weight: var(--fui-weight-semibold);
+    line-height: var(--fui-leading-md);
+    letter-spacing: var(--fui-tracking-tight);
+    overflow-wrap: anywhere;
+  }
+  .fui-settings-section-description {
+    margin: 0;
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-sm);
+    line-height: var(--fui-leading-sm);
+    text-wrap: pretty;
+  }
+  .fui-settings-section-body {
+    min-width: 0;
+  }
+  @container fui-settings-section (min-width: 36rem) {
+    .fui-settings-section:not([data-layout="stacked"]) > .fui-settings-section-layout {
+      grid-template-columns: minmax(0, 13rem) minmax(0, 1fr);
+      gap: var(--fui-space-8);
+    }
+  }
+
+  /* 0.11: a filter chip is its name and value, then a clear key of its own behind a soft divider. Only the key is
+     interactive; hovering it tints the key and draws the chip's edge, so it is plain what goes. */
+  .fui-filter-chip {
+    display: inline-flex;
+    align-items: stretch;
+    max-width: 100%;
+    min-width: 0;
+    min-height: 1.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--fui-radius-sm);
+    background: var(--card);
+    color: var(--foreground);
+    font-family: var(--fui-font-sans);
+    font-size: var(--fui-text-xs);
+    line-height: var(--fui-leading-xs);
+    box-shadow: var(--fui-shadow-xs);
+    transition: border-color var(--fui-duration) var(--fui-ease);
+  }
+  .fui-filter-chip[data-leaving] {
+    pointer-events: none;
+  }
+  .fui-filter-chip-text {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--fui-space-1);
+    min-width: 0;
+    padding-inline: var(--fui-space-2-5) var(--fui-space-2);
+  }
+  .fui-filter-chip-label {
+    flex: none;
+    color: var(--muted-foreground);
+  }
+  .fui-filter-chip-value {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: var(--fui-weight-medium);
+  }
+  .fui-filter-chip-remove {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: 1.75rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-inline-start: 1px solid var(--fui-separator);
+    border-start-end-radius: calc(var(--fui-radius-sm) - 1px);
+    border-end-end-radius: calc(var(--fui-radius-sm) - 1px);
+    background: transparent;
+    color: var(--muted-foreground);
+    font: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      background-color var(--fui-duration) var(--fui-ease),
+      color var(--fui-duration) var(--fui-ease);
+  }
+  .fui-filter-chip-remove svg {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .fui-filter-chip-remove:not(:disabled, [aria-disabled="true"]):hover {
+      background: var(--accent);
+      color: var(--foreground);
+    }
+    .fui-filter-chip:has(> .fui-filter-chip-remove:not(:disabled, [aria-disabled="true"]):hover) {
+      border-color: var(--fui-control-border);
+    }
+  }
+  .fui-filter-chip-remove:not(:disabled, [aria-disabled="true"]):active {
+    background: color-mix(in oklab, var(--foreground) 10%, var(--card));
+  }
+  /* A filter that cannot be cleared is still active: its words stay readable and only the key is quieted. */
+  .fui-filter-chip-remove:is(:disabled, [aria-disabled="true"]) {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .fui-suggestion-grid {
+    display: flex;
+    gap: var(--fui-space-2);
+    margin: 0;
+    padding: 0 0 var(--fui-space-1);
+    list-style: none;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+  }
+  .fui-suggestion-grid-item {
+    display: flex;
+    flex: none;
+    width: min(15rem, 70vw);
+    min-width: 0;
+    scroll-snap-align: start;
+  }
+  /* On a phone the row scrolls sideways and takes focus to be scrolled: its ring is drawn inside, where the row's own clip
+     cannot cut it off. It is a tab stop only while it overflows (see `useOverflowTabStop`). */
+  .fui-suggestion-grid:focus-visible {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: -2px;
+  }
+  @media (min-width: 768px) {
+    .fui-suggestion-grid {
+      display: grid;
+      grid-template-columns: repeat(var(--fui-suggestion-columns, 2), minmax(0, 1fr));
+      padding-bottom: 0;
+      overflow: visible;
+      scroll-snap-type: none;
+    }
+    .fui-suggestion-grid-item {
+      width: auto;
+    }
+  }
+  .fui-suggestion-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--fui-space-3);
+    width: 100%;
+    min-width: 0;
+    min-height: 2.75rem;
+    margin: 0;
+    padding: var(--fui-space-3) 0.875rem;
+    border: 1px solid var(--border);
+    border-radius: var(--fui-radius-md);
+    background: var(--card);
+    color: var(--foreground);
+    font: inherit;
+    font-family: var(--fui-font-sans);
+    text-align: start;
+    cursor: pointer;
+    transition:
+      background-color var(--fui-duration) var(--fui-ease),
+      border-color var(--fui-duration) var(--fui-ease);
+  }
+  .fui-suggestion-card:hover:not(:disabled) {
+    border-color: color-mix(in oklab, var(--foreground) 20%, transparent);
+    background: color-mix(in oklab, var(--muted) 60%, var(--card));
+  }
+  .fui-suggestion-card:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+  .fui-suggestion-card-icon {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 1rem;
+    height: 1rem;
+    margin-top: 0.125rem;
+    color: var(--muted-foreground);
+    transition: color var(--fui-duration) var(--fui-ease);
+  }
+  .fui-suggestion-card-icon svg {
+    width: 1rem;
+    height: 1rem;
+  }
+  .fui-suggestion-card:hover:not(:disabled) .fui-suggestion-card-icon {
+    color: var(--foreground);
+  }
+  .fui-suggestion-card-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--fui-space-0-5);
+    min-width: 0;
+  }
+  .fui-suggestion-card-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--fui-text-sm);
+    font-weight: var(--fui-weight-medium);
+    line-height: var(--fui-leading-sm);
+  }
+  .fui-suggestion-card-description {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+    line-height: 1.625;
+  }
+
+  .fui-shimmer-text {
+    position: relative;
+    display: inline-block;
+    color: var(--muted-foreground);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .fui-shimmer-text {
+      background-image:
+        linear-gradient(
+          90deg,
+          transparent calc(50% - var(--fui-shimmer-spread, 32px)),
+          var(--foreground),
+          transparent calc(50% + var(--fui-shimmer-spread, 32px))
+        ),
+        linear-gradient(var(--muted-foreground), var(--muted-foreground));
+      background-size: 250% 100%, auto;
+      background-repeat: no-repeat, padding-box;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: fui-shimmer-text var(--fui-shimmer-duration, 2s) linear infinite;
+    }
+  }
+  @media (forced-colors: active) {
+    .fui-shimmer-text {
+      background: none;
+      color: CanvasText;
+      animation: none;
+    }
+  }
+  @keyframes fui-shimmer-text {
+    from {
+      background-position: 100% center;
+    }
+    to {
+      background-position: 0% center;
+    }
+  }
+
+  .fui-file-thumb {
+    flex: none;
+    width: var(--fui-file-thumb-size, 2.5rem);
+    height: var(--fui-file-thumb-size, 2.5rem);
+    border: 1px solid var(--border);
+    border-radius: var(--fui-radius-md);
+    background: var(--muted);
+  }
+  .fui-file-thumb-image {
+    display: block;
+    object-fit: cover;
+  }
+  .fui-file-thumb-tile {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--fui-space-0-5);
+    background: color-mix(in oklab, var(--muted) 50%, var(--card));
+    color: var(--muted-foreground);
+  }
+  .fui-file-thumb-icon {
+    display: flex;
+  }
+  .fui-file-thumb-icon svg {
+    width: 1rem;
+    height: 1rem;
+  }
+  .fui-file-thumb-ext {
+    font-family: var(--fui-font-mono);
+    font-size: var(--fui-text-xs);
+    line-height: 1;
+  }
+
+  /* On touch and narrow screens the clear key reaches 44 px around its 28 px square; the chip keeps its size. */
+  @media (max-width: 767px), (pointer: coarse) {
+    .fui-filter-chip-remove::before {
+      content: "";
+      position: absolute;
+      inset: -0.5rem;
+    }
+  }
+}
+

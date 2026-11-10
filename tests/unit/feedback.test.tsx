@@ -1,6 +1,5 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import {
   Alert,
@@ -28,8 +27,9 @@ import {
 import { keyShortcutsValue } from "../../packages/ui/src/icon-tooltip";
 import * as ui from "../../packages/ui/src/index";
 import { isApplePlatform } from "../../packages/ui/src/use-modifier-key";
+import { uiStyles } from "./read-styles";
 
-const styles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
+const styles = uiStyles();
 const rule = (selector: string) => {
   const at = styles.indexOf(selector);
   assert.ok(at >= 0, `missing rule ${selector}`);

@@ -1,0 +1,185 @@
+@layer components {
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes fui-rise {
+      from {
+        opacity: 0;
+        translate: 0 0.25rem;
+        filter: blur(3px);
+      }
+    }
+    .fui-rise {
+      animation: fui-rise var(--fui-duration-slow) var(--fui-ease-out) both;
+      animation-delay: calc(min(var(--fui-stagger, 0), 8) * 45ms);
+    }
+    .fui-card[data-interactive] {
+      transition:
+        border-color var(--fui-duration) var(--fui-ease),
+        box-shadow var(--fui-duration) var(--fui-ease),
+        translate var(--fui-duration) var(--fui-ease-out);
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+    /* A card that is a link lifts a pixel toward the pointer. */
+    .fui-card[data-interactive]:hover {
+      translate: 0 -1px;
+    }
+  }
+
+  /* Light in words: a band of the working light crosses the muted ink. */
+  @media (prefers-reduced-motion: no-preference) {
+    .fui-shimmer-text[data-tone="light"] {
+      background-image:
+        linear-gradient(
+          90deg,
+          transparent calc(50% - var(--fui-shimmer-spread, 32px)),
+          var(--fui-light-1) calc(50% - var(--fui-shimmer-spread, 32px) / 3),
+          var(--fui-light-3) calc(50% + var(--fui-shimmer-spread, 32px) / 3),
+          transparent calc(50% + var(--fui-shimmer-spread, 32px))
+        ),
+        linear-gradient(var(--muted-foreground), var(--muted-foreground));
+    }
+  }
+
+  /* Letter by letter (0.11): the light steps one letter at a time with a trail of two, like a cursor reading the line. The
+     place of the light is one number for the whole text; still, it lights nothing. */
+  .fui-shimmer-text[data-variant="letters"] {
+    --fui-letter-head: var(--foreground);
+    --fui-letter-trail: var(--foreground);
+    --fui-shimmer-p: -1;
+    background-image: none;
+    -webkit-background-clip: border-box;
+    background-clip: border-box;
+    color: var(--muted-foreground);
+    animation: none;
+  }
+  .fui-shimmer-text[data-variant="letters"][data-tone="light"] {
+    --fui-letter-head: var(--fui-light-1);
+    --fui-letter-trail: var(--fui-light-3);
+  }
+  .fui-shimmer-text[data-variant="letters"] > [aria-hidden] > span {
+    --d: calc(var(--fui-shimmer-p) * (var(--fui-shimmer-count) + 2) - var(--i));
+    --on-0: clamp(0, (var(--d) + 0.5) * 1000, 1);
+    --on-1: clamp(0, (var(--d) - 0.5) * 1000, 1);
+    --on-2: clamp(0, (var(--d) - 1.5) * 1000, 1);
+    --on-3: clamp(0, (var(--d) - 2.5) * 1000, 1);
+    color: color-mix(
+      in oklab,
+      var(--fui-letter-head) calc((var(--on-0) - var(--on-1)) * 100%),
+      color-mix(
+        in oklab,
+        var(--fui-letter-trail) calc((var(--on-1) - var(--on-2)) * 70% + (var(--on-2) - var(--on-3)) * 35%),
+        var(--muted-foreground)
+      )
+    );
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes fui-shimmer-letters {
+      from {
+        --fui-shimmer-p: 0;
+      }
+      to {
+        --fui-shimmer-p: 1;
+      }
+    }
+    .fui-shimmer-text[data-variant="letters"] {
+      animation: fui-shimmer-letters var(--fui-shimmer-duration, 2s) steps(var(--fui-shimmer-steps), jump-none) infinite;
+    }
+  }
+  @media (forced-colors: active) {
+    .fui-shimmer-text[data-variant="letters"] > [aria-hidden] > span {
+      color: CanvasText;
+    }
+  }
+
+  /* A text that scrambles into place (0.11): the real text keeps its place and width, unseen, and the scramble is drawn over
+     it, clipped to it. In a shimmer the light waits until the text has settled. */
+  .fui-scramble-text {
+    position: relative;
+  }
+  :is(.fui-scramble-text, .fui-shimmer-text, [data-fui-scramble])[data-scrambling] {
+    -webkit-text-fill-color: transparent;
+  }
+  .fui-shimmer-text[data-scrambling] {
+    background-image: none;
+  }
+  .fui-scramble-text-frame {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    color: inherit;
+    -webkit-text-fill-color: currentColor;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .fui-shimmer-text > .fui-scramble-text-frame {
+    color: var(--muted-foreground);
+  }
+  .fui-shimmer-text[data-tone="light"] > .fui-scramble-text-frame {
+    color: var(--fui-light-1);
+  }
+
+  .fui-working-light,
+  .fui-working-light-bloom {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+  /* The bloom: the same band, blurred by its parent (a filter on the band itself would be cut back by its own mask). */
+  .fui-working-light-bloom {
+    filter: blur(7px);
+    opacity: 0.55;
+  }
+  .fui-working-light::before,
+  .fui-working-light-bloom::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    padding: 1.5px;
+    border-radius: inherit;
+    background: conic-gradient(
+      from var(--fui-light-angle),
+      transparent 0% 46%,
+      var(--fui-light-1) 64%,
+      var(--fui-light-2) 78%,
+      var(--fui-light-3) 90%,
+      transparent 100%
+    );
+    mask:
+      linear-gradient(var(--foreground) 0 0) content-box exclude,
+      linear-gradient(var(--foreground) 0 0);
+  }
+  .fui-working-light-bloom::before {
+    padding: 3px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes fui-light-turn {
+      to {
+        --fui-light-angle: 360deg;
+      }
+    }
+    .fui-working-light::before,
+    .fui-working-light-bloom::before {
+      animation: fui-light-turn 3.2s linear infinite;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fui-working-light::before {
+      background: color-mix(in oklab, var(--fui-light-1) 70%, transparent);
+    }
+    .fui-working-light-bloom {
+      display: none;
+    }
+  }
+  @media (forced-colors: active) {
+    .fui-working-light {
+      display: none;
+    }
+  }
+  /* A view that is loading is a skeleton: there is no work in it to light. */
+  [data-fui-loading] > .fui-loading-content .fui-working-light {
+    visibility: hidden !important;
+  }
+}
+

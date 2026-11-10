@@ -1,0 +1,636 @@
+@layer utilities {
+  /* Code in an answer is painted with the syntax inks of @fabrials/ui (--fui-syntax-*), the ones CodePanel uses, so a code
+     block reads the same in a chat as in the docs, in both themes. */
+  .fui-markdown {
+    min-width: 0;
+    max-width: 100%;
+    color: var(--foreground);
+    font-size: var(--fui-text-sm);
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+  }
+  .fui-markdown :where(p, ul, ol, blockquote, pre, table, figure, h1, h2, h3, h4, h5, h6, hr) {
+    margin-block: 0;
+  }
+  .fui-markdown > * + * {
+    margin-top: var(--fui-space-3);
+  }
+  .fui-markdown blockquote > * + * {
+    margin-top: var(--fui-space-2);
+  }
+  .fui-markdown :is(h1, h2, h3, h4, h5, h6) {
+    margin: var(--fui-space-6) 0 0;
+    color: var(--foreground);
+    font-weight: var(--fui-weight-semibold);
+    letter-spacing: -0.005em;
+    line-height: 1.35;
+    text-wrap: balance;
+  }
+  .fui-markdown > :first-child {
+    margin-top: 0;
+  }
+  .fui-markdown > :is(h1, h2, h3, h4, h5, h6) + * {
+    margin-top: var(--fui-space-2);
+  }
+  .fui-markdown h1 {
+    font-size: var(--fui-text-xl);
+  }
+  .fui-markdown h2 {
+    font-size: var(--fui-text-lg);
+  }
+  .fui-markdown h3 {
+    font-size: var(--fui-text-md);
+  }
+  .fui-markdown :is(h4, h5, h6) {
+    font-size: var(--fui-text-sm);
+  }
+  .fui-markdown :is(ul, ol) {
+    padding-inline-start: 1.375rem;
+    list-style-position: outside;
+    white-space: normal;
+  }
+  .fui-markdown ul {
+    list-style-type: disc;
+  }
+  .fui-markdown ol {
+    list-style-type: decimal;
+  }
+  .fui-markdown li {
+    padding-inline-start: var(--fui-space-1);
+  }
+  .fui-markdown li + li {
+    margin-top: var(--fui-space-1);
+  }
+  .fui-markdown li::marker {
+    color: var(--muted-foreground);
+    font-variant-numeric: tabular-nums;
+  }
+  .fui-markdown li > :is(ul, ol) {
+    margin-top: var(--fui-space-1);
+  }
+  .fui-markdown li > p {
+    margin: 0;
+  }
+  .fui-markdown li > p + p {
+    margin-top: var(--fui-space-2);
+  }
+  .fui-markdown :is(strong, b, [data-streamdown="strong"]) {
+    color: var(--foreground);
+    font-weight: var(--fui-weight-semibold);
+  }
+  .fui-markdown blockquote {
+    margin-inline: 0;
+    padding-block: var(--fui-space-0-5);
+    padding-inline: var(--fui-space-4) 0;
+    border-inline-start: 2px solid var(--border);
+    color: var(--muted-foreground);
+    font-style: normal;
+  }
+  .fui-markdown hr {
+    margin-block: var(--fui-space-6);
+    border: 0;
+    border-top: 1px solid var(--border);
+  }
+  .fui-markdown a:not(.fui-citation-chip) {
+    color: var(--brand-ink);
+    font-weight: var(--fui-weight-medium);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in oklab, currentColor 40%, transparent);
+    text-underline-offset: 3px;
+    overflow-wrap: anywhere;
+  }
+  .fui-markdown a:not(.fui-citation-chip):hover {
+    text-decoration-color: currentColor;
+  }
+  .fui-markdown :is(a, button):focus-visible {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: 2px;
+    border-radius: var(--fui-radius-xs);
+  }
+  /* Code reads left to right in any page: in a right-to-left answer a call keeps its brackets after its name. */
+  .fui-markdown :is([data-streamdown="inline-code"], :not(pre) > code) {
+    direction: ltr;
+    unicode-bidi: isolate;
+    padding: 0.125em 0.375em;
+    border-radius: var(--fui-radius-xs);
+    background: var(--muted);
+    color: var(--foreground);
+    font-family: var(--fui-font-mono);
+    font-size: 0.8125rem;
+    overflow-wrap: anywhere;
+  }
+  .fui-markdown img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--fui-radius-lg);
+  }
+  .fui-markdown [data-streamdown="mermaid-block"] {
+    max-width: 100%;
+    overflow-x: auto;
+    border-radius: var(--fui-radius-lg);
+  }
+  /* Code inside a link takes the link's ink. */
+  .fui-markdown a > :is(code, [data-streamdown="inline-code"]) {
+    color: inherit;
+  }
+  /* A key to press, as Kbd draws it. */
+  .fui-markdown kbd {
+    display: inline-block;
+    min-width: 1.25rem;
+    padding: 0.0625rem 0.3125rem;
+    border: 1px solid var(--border);
+    border-bottom-width: 2px;
+    border-radius: var(--fui-radius-xs);
+    background: var(--card);
+    color: var(--foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    font-weight: var(--fui-weight-medium);
+    line-height: 1.25;
+    text-align: center;
+    white-space: nowrap;
+  }
+  /* Marked text is a soft tint of the warning ink; struck text recedes. Never the marks of a code block's own lines. */
+  .fui-markdown mark:not(.fui-code-word) {
+    padding: 0 0.125em;
+    border-radius: var(--fui-radius-xs);
+    background: color-mix(in oklab, var(--warning) var(--fui-tint-edge), transparent);
+    color: inherit;
+  }
+  .fui-markdown :is(del, s):not(.fui-code-line) {
+    color: var(--muted-foreground);
+    text-decoration-color: color-mix(in oklab, currentColor 70%, transparent);
+  }
+  .fui-markdown :is(sup, sub) {
+    line-height: 0;
+  }
+  /* A task list (GFM): no bullet, the box sits where the bullet was and the text lines up with the other items. The boxes
+     are read-only, so they keep the browser's disabled look. A box needs a name: wrap the item's text and its box in a label. */
+  .fui-markdown li:is(.task-list-item, :has(> input[type="checkbox"]), :has(> label > input[type="checkbox"])) {
+    list-style: none;
+  }
+  .fui-markdown li > input[type="checkbox"],
+  .fui-markdown li > label > input[type="checkbox"] {
+    width: 0.875rem;
+    height: 0.875rem;
+    margin-block: 0;
+    margin-inline: -1.25rem 0.375rem;
+    vertical-align: -0.125rem;
+    accent-color: var(--brand);
+  }
+  /* Footnotes (GFM): a reference is a small raised number, the notes sit under a rule in smaller type. */
+  .fui-markdown a:is([data-footnote-ref], [data-footnote-backref]) {
+    text-decoration: none;
+  }
+  .fui-markdown a[data-footnote-ref] {
+    padding: 0 0.125rem;
+    font-size: 0.75em;
+    font-variant-numeric: tabular-nums;
+  }
+  .fui-markdown [data-footnotes] {
+    margin-top: var(--fui-space-6);
+    padding-top: var(--fui-space-3);
+    border-top: 1px solid var(--border);
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+  }
+  .fui-markdown [data-footnotes] > :is(h2, h3).sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .fui-markdown [data-footnotes] li + li {
+    margin-top: var(--fui-space-0-5);
+  }
+  /* A details block: a quiet plate whose summary is the line you press. */
+  .fui-markdown details {
+    padding: var(--fui-space-2) var(--fui-space-3);
+    border: 1px solid var(--border);
+    border-radius: var(--fui-radius-lg);
+    background: var(--card);
+  }
+  .fui-markdown summary {
+    margin: calc(-1 * var(--fui-space-2)) calc(-1 * var(--fui-space-3));
+    padding: var(--fui-space-2) var(--fui-space-3);
+    border-radius: inherit;
+    color: var(--foreground);
+    font-weight: var(--fui-weight-medium);
+    cursor: pointer;
+  }
+  .fui-markdown summary::marker {
+    color: var(--muted-foreground);
+  }
+  .fui-markdown details[open] > summary {
+    margin-bottom: var(--fui-space-2);
+    border-bottom: 1px solid var(--fui-separator);
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
+  }
+  .fui-markdown summary:focus-visible {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: -2px;
+  }
+  .fui-markdown figcaption {
+    margin-top: var(--fui-space-2);
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+  }
+
+  /* A fenced block a renderer leaves as a bare pre: the same well as a code block, without its bar. */
+  .fui-markdown > pre {
+    direction: ltr;
+    min-width: 0;
+    max-width: 100%;
+    margin-block: var(--fui-space-4);
+    padding: var(--fui-space-3) var(--fui-space-4);
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--fui-radius-plate);
+    background: var(--fui-code);
+    font-family: var(--fui-font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.7;
+    overflow-wrap: normal;
+  }
+
+  /* A code block is a plate with 12 px corners, its bar on the card. */
+  :is(.fui-code-block, .fui-markdown [data-streamdown="code-block"]) {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    min-width: 0;
+    max-width: 100%;
+    margin-block: var(--fui-space-4);
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--fui-radius-plate);
+    background: var(--card);
+    color: var(--foreground);
+    font-size: var(--fui-text-sm);
+    line-height: 1.5;
+  }
+  .fui-markdown > .fui-code-block:first-child,
+  .fui-markdown > [data-streamdown="code-block"]:first-child {
+    margin-top: 0;
+  }
+  :is(.fui-code-block-header, .fui-markdown [data-streamdown="code-block-header"]) {
+    display: flex;
+    align-items: center;
+    gap: var(--fui-space-2);
+    height: 2.5rem;
+    padding-block: 0;
+    padding-inline: var(--fui-space-4) var(--fui-space-1);
+    border-bottom: 1px solid var(--border);
+    background: var(--card);
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+  }
+  .fui-markdown [data-streamdown="code-block-header"] {
+    padding-inline-end: 7rem;
+  }
+  .fui-code-block-header > .fui-language-icon {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+  :is(.fui-code-block-language, .fui-markdown [data-streamdown="code-block-header"] > span) {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    font-family: var(--fui-font-mono);
+    text-overflow: ellipsis;
+    text-transform: lowercase;
+    white-space: nowrap;
+  }
+  /* With a file name, the header reads like a tab: the name in ink, the language beside it as a quiet tag. */
+  .fui-code-block-title {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: var(--fui-space-2);
+    min-width: 0;
+  }
+  .fui-code-block-filename {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--foreground);
+    font-family: var(--fui-font-mono);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .fui-code-block-header .fui-code-block-title > .fui-code-block-language {
+    flex: none;
+    padding: 0 var(--fui-space-1-5);
+    border-radius: var(--fui-radius-sm);
+    background: var(--muted);
+    font-size: var(--fui-text-label);
+    line-height: 1.25rem;
+  }
+  .fui-markdown [data-streamdown="code-block"] > div:has(> [data-streamdown="code-block-actions"]) {
+    position: static;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 2.5rem;
+    margin-top: -2.5rem;
+    padding-inline-end: var(--fui-space-1);
+    pointer-events: none;
+  }
+  :is(.fui-code-block-actions, .fui-markdown [data-streamdown="code-block-actions"]) {
+    display: flex;
+    align-items: center;
+    gap: var(--fui-space-0-5);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    backdrop-filter: none;
+    pointer-events: auto;
+  }
+  :is(
+      .fui-code-block-action,
+      .fui-markdown [data-streamdown="code-block-actions"] button,
+      .fui-markdown [data-streamdown="table-wrapper"] > :first-child button
+    ) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: 0;
+    border-radius: var(--fui-radius-md);
+    background: transparent;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    transition:
+      color var(--fui-duration) var(--fui-ease),
+      background-color var(--fui-duration) var(--fui-ease);
+  }
+  .fui-code-block-action svg {
+    width: 1rem;
+    height: 1rem;
+  }
+  .fui-code-block-action[data-copied] {
+    color: var(--success);
+  }
+  :is(
+      .fui-code-block-action,
+      .fui-markdown [data-streamdown="code-block-actions"] button,
+      .fui-markdown [data-streamdown="table-wrapper"] > :first-child button
+    ):hover {
+    background: var(--muted);
+    color: var(--foreground);
+  }
+  :is(.fui-code-block-body, .fui-markdown [data-streamdown="code-block-body"]) {
+    direction: ltr;
+    min-width: 0;
+    max-width: 100%;
+    margin: 0;
+    padding: var(--fui-space-3) var(--fui-space-4);
+    overflow-x: auto;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    font-size: 0.8125rem;
+    line-height: 1.7;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklch, var(--foreground) 20%, transparent) transparent;
+  }
+  .fui-code-block-body:focus-visible {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: -2px;
+  }
+  /* Lines drawn by CodeBlock sit in CodePanel's well (--fui-code), the background its inks are made for, and carry their own
+     inset, numbers and diff gutter (CodePanel's .fui-code-line rules), so a marked or changed line is tinted from edge to
+     edge. Lines a host highlights (Shiki, Streamdown) stay on the card, the background their themes are made for, with the
+     body's inset. */
+  .fui-code-block-body:has(> pre > code > .fui-code-line) {
+    padding-inline: 0;
+    background: var(--fui-code);
+  }
+  /* Wrapped, a long line folds under its own start, past the number and the diff mark. */
+  .fui-code-block[data-wrap] .fui-code-block-body pre {
+    width: auto;
+  }
+  .fui-code-block[data-wrap] .fui-code-line {
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+  }
+  .fui-code-block[data-wrap][data-line-numbers] .fui-code-line {
+    --fui-code-gutter: calc(1.75rem + var(--fui-space-4));
+    padding-inline-start: calc(var(--fui-space-4) + var(--fui-code-gutter));
+    text-indent: calc(-1 * var(--fui-code-gutter));
+  }
+  .fui-code-block[data-wrap][data-line-numbers] [data-diff-gutter] .fui-code-line {
+    --fui-code-gutter: calc(1.75rem + var(--fui-space-2) + 2ch);
+  }
+  :is(.fui-code-block-body, .fui-markdown [data-streamdown="code-block-body"]) pre {
+    width: max-content;
+    min-width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent !important;
+    font-family: var(--fui-font-mono);
+    font-size: inherit;
+    overflow-wrap: normal;
+  }
+  :is(.fui-code-block-body, .fui-markdown [data-streamdown="code-block-body"]) code {
+    padding: 0;
+    background: transparent;
+    font-family: inherit;
+    font-size: inherit;
+    counter-reset: fui-code-line;
+  }
+  :is(.fui-code-block-body, .fui-markdown [data-streamdown="code-block-body"]) code > span {
+    display: block;
+    min-height: 1lh;
+    white-space: pre;
+  }
+  .fui-markdown [data-streamdown="code-block-body"] code > span > span {
+    color: var(--sdm-c, inherit);
+  }
+  :is(.dark, [data-theme="dark"]) .fui-markdown [data-streamdown="code-block-body"] code > span > span {
+    color: var(--shiki-dark, var(--sdm-c, inherit));
+  }
+  @media (prefers-color-scheme: dark) {
+    [data-theme="system"] .fui-markdown [data-streamdown="code-block-body"] code > span > span {
+      color: var(--shiki-dark, var(--sdm-c, inherit));
+    }
+  }
+  .fui-code-block[data-line-numbers] code > span:not(.fui-code-line)::before {
+    content: counter(fui-code-line);
+    counter-increment: fui-code-line;
+    display: inline-block;
+    width: 1.75rem;
+    margin-inline-end: var(--fui-space-4);
+    color: color-mix(in oklab, var(--muted-foreground) 70%, transparent);
+    text-align: end;
+    user-select: none;
+  }
+  .fui-markdown [data-streamdown="code-block-body"] code > span::before {
+    width: 1.5rem;
+    margin-inline-end: var(--fui-space-4);
+    color: color-mix(in oklab, var(--muted-foreground) 60%, transparent);
+    font-size: 0.75rem;
+  }
+  :is(.fui-markdown, .fui-code-block) :is(.fui-token-keyword, .token.keyword, .hljs-keyword) {
+    color: var(--fui-syntax-keyword);
+  }
+  :is(.fui-markdown, .fui-code-block) :is(.fui-token-string, .token.string, .hljs-string) {
+    color: var(--fui-syntax-string);
+  }
+  :is(.fui-markdown, .fui-code-block) :is(.fui-token-number, .token.number, .hljs-number, .token.boolean, .hljs-literal) {
+    color: var(--fui-syntax-number);
+  }
+  :is(.fui-markdown, .fui-code-block) :is(.fui-token-function, .token.function, .hljs-title) {
+    color: var(--fui-syntax-function);
+  }
+  :is(.fui-markdown, .fui-code-block) :is(.fui-token-type, .token.class-name, .hljs-type, .hljs-built_in) {
+    color: var(--fui-syntax-type);
+  }
+  :is(.fui-markdown, .fui-code-block) :is(.fui-token-variable, .token.variable, .hljs-variable) {
+    color: var(--fui-syntax-variable);
+  }
+  :is(.fui-markdown, .fui-code-block) :is(.fui-token-tag, .token.tag, .hljs-tag, .hljs-name) {
+    color: var(--fui-syntax-tag);
+  }
+  :is(.fui-markdown, .fui-code-block) :is(.fui-token-attribute, .fui-token-property, .token.attr-name, .token.property, .hljs-attr, .hljs-property) {
+    color: var(--fui-syntax-function);
+  }
+  :is(.fui-markdown, .fui-code-block) :is(.fui-token-comment, .token.comment, .hljs-comment) {
+    color: var(--fui-syntax-comment);
+    font-style: italic;
+  }
+  :is(.fui-markdown, .fui-code-block) :is(.fui-token-punctuation, .token.punctuation, .token.operator) {
+    color: var(--fui-syntax-punctuation);
+  }
+  :is(.fui-markdown, .fui-code-block) :is(.fui-token-deleted, .token.deleted, .hljs-deletion) {
+    color: var(--fui-syntax-deleted);
+  }
+  :is(.fui-markdown, .fui-code-block) :is(.fui-token-inserted, .token.inserted, .hljs-addition) {
+    color: var(--fui-syntax-inserted);
+  }
+
+  .fui-markdown > table,
+  .fui-markdown .fui-table-scroll > table {
+    width: 100%;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+  }
+  .fui-markdown > table:not([data-streamdown]) {
+    display: block;
+    width: max-content;
+    max-width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--fui-radius-lg);
+    scrollbar-width: thin;
+  }
+  .fui-markdown .fui-table-scroll,
+  .fui-markdown [data-streamdown="table-wrapper"] > :last-child {
+    min-width: 0;
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--fui-radius-lg);
+    background: var(--card);
+    scrollbar-width: thin;
+  }
+  .fui-markdown .fui-table-scroll {
+    margin-top: var(--fui-space-4);
+  }
+  .fui-markdown [data-streamdown="table-wrapper"] {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--fui-space-1);
+    min-width: 0;
+    max-width: 100%;
+    margin-block: var(--fui-space-4);
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+  .fui-markdown [data-streamdown="table-wrapper"] > :first-child {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--fui-space-0-5);
+    order: 2;
+  }
+  .fui-markdown :is(table, [data-streamdown="table"]) {
+    width: 100%;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+  }
+  .fui-markdown :is(thead, [data-streamdown="table-header"]) {
+    background: color-mix(in oklab, var(--muted) 55%, var(--card));
+  }
+  .fui-markdown :is(th, [data-streamdown="table-header-cell"]) {
+    padding: var(--fui-space-2) var(--fui-space-3);
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+    font-weight: var(--fui-weight-semibold);
+    text-align: start;
+    white-space: nowrap;
+  }
+  .fui-markdown :is(td, [data-streamdown="table-cell"]) {
+    padding: var(--fui-space-2) var(--fui-space-3);
+    font-size: var(--fui-text-sm);
+    line-height: 1.5;
+    vertical-align: top;
+    overflow-wrap: normal;
+  }
+  .fui-markdown :is(tbody, [data-streamdown="table-body"]) > tr {
+    border-top: 1px solid var(--border);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .fui-markdown [data-streamdown="table-wrapper"] > :first-child {
+      position: absolute;
+      top: var(--fui-space-1);
+      inset-inline-end: var(--fui-space-1);
+      z-index: 1;
+      padding: var(--fui-space-0-5);
+      border: 1px solid var(--border);
+      border-radius: var(--fui-radius-md);
+      background: var(--card);
+      box-shadow: var(--fui-shadow-xs);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--fui-duration) var(--fui-ease);
+    }
+    .fui-markdown [data-streamdown="table-wrapper"] > :first-child button {
+      width: 1.75rem;
+      height: 1.75rem;
+    }
+    .fui-markdown [data-streamdown="table-wrapper"]:is(:hover, :focus-within) > :first-child {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+  @media (max-width: 767px), (pointer: coarse) {
+    :is(.fui-code-block-header, .fui-markdown [data-streamdown="code-block-header"]) {
+      height: 2.75rem;
+    }
+    .fui-markdown [data-streamdown="code-block"] > div:has(> [data-streamdown="code-block-actions"]) {
+      height: 2.75rem;
+      margin-top: -2.75rem;
+    }
+    :is(
+        .fui-code-block-action,
+        .fui-markdown [data-streamdown="code-block-actions"] button,
+        .fui-markdown [data-streamdown="table-wrapper"] > :first-child button
+      ) {
+      width: 2.75rem;
+      height: 2.75rem;
+    }
+  }
+
+}
+

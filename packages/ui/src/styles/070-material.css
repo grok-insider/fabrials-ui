@@ -1,0 +1,195 @@
+/* 0.10 material. The components were flat; depth now comes from a few shared recipes (tokens.css): layered elevation, a bevel
+   and a sheen on solid fills, sunken fields and wells, raised thumbs and indicators. Recipes adapted from Radix Themes
+   (https://github.com/radix-ui/themes, MIT, Copyright (c) 2023 WorkOS); the enter motion follows Base UI's popup examples
+   (MIT). Only these tokens may paint a gradient: a sheen inside a control, never a glow, never decoration. */
+@layer components {
+  /* Buttons: solid fills are keys (bevel and sheen), outline buttons are raised plates, ghost and link stay flat. */
+  .fui-button {
+    --fui-button-shadow: var(--fui-shadow-xs), var(--fui-bevel);
+    --fui-button-image: var(--fui-sheen);
+    background-image: var(--fui-button-image);
+  }
+  :is(.fui-button[data-variant="accent"], .fui-button-accent) {
+    --fui-button-shadow: var(--fui-shadow-xs), var(--fui-bevel);
+  }
+  :is(.fui-button[data-variant="outline"], .fui-button-outline),
+  :is(.fui-button[data-variant="destructive"], .fui-button-destructive) {
+    --fui-button-shadow: var(--fui-shadow-xs), var(--fui-highlight);
+    --fui-button-image: var(--fui-sheen-soft);
+  }
+  :is(.fui-button[data-variant="secondary"], .fui-button-secondary) {
+    --fui-button-shadow: var(--fui-highlight);
+    --fui-button-image: var(--fui-sheen-soft);
+  }
+  :is(.fui-button[data-variant="ghost"], .fui-button-ghost),
+  :is(.fui-button[data-variant="link"], .fui-button-link) {
+    --fui-button-image: none;
+  }
+  .fui-button[aria-pressed="true"] {
+    --fui-button-shadow: var(--fui-pressed);
+    --fui-button-image: none;
+  }
+  /* A pressed key: the bevel turns into an inner shadow and the key goes down. */
+  .fui-button:not(:disabled):not([data-disabled]):not([data-loading]):active {
+    transform: translateY(1px);
+    box-shadow: var(--fui-pressed);
+    background-image: none;
+  }
+  :is(.fui-button[data-variant="ghost"], .fui-button-ghost, .fui-button[data-variant="link"], .fui-button-link):not(:disabled):active {
+    box-shadow: none;
+  }
+
+  /* Fields are wells: a hairline edge and a soft inner shadow from the top. */
+  .fui-input,
+  .fui-input-group,
+  .fui-select-trigger:not(.fui-button) {
+    box-shadow: var(--fui-shadow-well);
+  }
+  .fui-input:focus-visible,
+  .fui-select-trigger[data-popup-open] {
+    box-shadow: var(--fui-shadow-well), var(--fui-focus-halo);
+  }
+  .fui-input:hover:not(:focus-visible, :disabled, [data-disabled]) {
+    border-color: color-mix(in oklab, var(--fui-control-border) 70%, var(--foreground));
+  }
+
+  /* Checks and radios: an unticked box is a small well; a ticked one is a key in Stormlight. */
+  .fui-checkbox,
+  .fui-radio {
+    box-shadow: var(--fui-shadow-well);
+    transition:
+      background-color var(--fui-duration) var(--fui-ease),
+      border-color var(--fui-duration) var(--fui-ease),
+      box-shadow var(--fui-duration) var(--fui-ease);
+  }
+  .fui-checkbox:is([data-checked], [data-indeterminate]),
+  .fui-radio[data-checked] {
+    background-image: var(--fui-sheen);
+    box-shadow: var(--fui-shadow-xs), var(--fui-bevel);
+  }
+
+  /* The switch: a sunken track, a raised thumb; the track fills with Stormlight when on. */
+  .fui-switch {
+    box-shadow: var(--fui-shadow-well);
+  }
+  .fui-switch[data-checked] {
+    background-image: var(--fui-sheen);
+    box-shadow: var(--fui-shadow-well), var(--fui-bevel);
+  }
+  .fui-switch-thumb,
+  .fui-switch[data-checked] .fui-switch-thumb {
+    background-image: var(--fui-sheen-soft);
+    box-shadow: var(--fui-shadow-xs), var(--fui-highlight);
+  }
+
+  /* Segmented choices sit in a well; the chosen segment is a raised plate. */
+  .fui-toggle-group,
+  .fui-tabs-list[data-variant="segmented"] {
+    box-shadow: var(--fui-shadow-well);
+  }
+  .fui-toggle-group[data-indicator]::before,
+  .fui-tabs-plate,
+  .fui-toggle[data-pressed],
+  .fui-tabs-list[data-variant="segmented"] .fui-tab[data-active] {
+    background-image: var(--fui-sheen-soft);
+    box-shadow: var(--fui-shadow-xs), var(--fui-highlight);
+  }
+
+  /* Plates rest just above the page: an edge, a soft shadow and the light along their top. */
+  .fui-card,
+  .fui-stat,
+  .fui-stat-group,
+  .fui-table-scroll,
+  .fui-code-panel {
+    box-shadow: var(--fui-shadow-xs), var(--fui-highlight);
+  }
+  .fui-stat-group > .fui-stat {
+    box-shadow: none;
+  }
+
+  /* Keys are keycaps. */
+  .fui-kbd {
+    background-image: var(--fui-sheen-soft);
+    box-shadow: var(--fui-highlight);
+  }
+
+  /* Overlays come from their trigger's side and settle on a quick-out curve; they leave faster than they came. */
+  .fui-menu,
+  .fui-popover,
+  .fui-tooltip {
+    transition-duration: var(--fui-duration-slow);
+    transition-timing-function: var(--fui-ease-out);
+    transition-property: opacity, transform, translate;
+  }
+  :is(.fui-menu, .fui-popover, .fui-tooltip)[data-ending-style] {
+    transition-duration: var(--fui-duration-fast);
+    transition-timing-function: var(--fui-ease-exit);
+  }
+  :is(.fui-menu, .fui-popover, .fui-tooltip)[data-side="bottom"]:is([data-starting-style], [data-ending-style]) {
+    translate: 0 -4px;
+  }
+  :is(.fui-menu, .fui-popover, .fui-tooltip)[data-side="top"]:is([data-starting-style], [data-ending-style]) {
+    translate: 0 4px;
+  }
+  :is(.fui-menu, .fui-popover, .fui-tooltip)[data-side="right"]:is([data-starting-style], [data-ending-style]),
+  :is(.fui-menu, .fui-popover, .fui-tooltip)[data-side="inline-end"]:is([data-starting-style], [data-ending-style]) {
+    translate: -4px 0;
+  }
+  :is(.fui-menu, .fui-popover, .fui-tooltip)[data-side="left"]:is([data-starting-style], [data-ending-style]),
+  :is(.fui-menu, .fui-popover, .fui-tooltip)[data-side="inline-start"]:is([data-starting-style], [data-ending-style]) {
+    translate: 4px 0;
+  }
+  .fui-dialog {
+    transition-timing-function: var(--fui-ease-out);
+  }
+  .fui-dialog[data-ending-style] {
+    transition-duration: var(--fui-duration);
+    transition-timing-function: var(--fui-ease-exit);
+  }
+  .fui-dialog[data-placement="center"]:is([data-starting-style], [data-ending-style]) {
+    transform: translate(-50%, -48%) scale(0.96);
+  }
+  .fui-menu-item,
+  .fui-item,
+  .fui-sidebar-menu-button {
+    transition: background-color var(--fui-duration-fast) var(--fui-ease), color var(--fui-duration-fast) var(--fui-ease);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    /* The thumb stretches while held, as a finger squashes it, and springs across. */
+    .fui-switch-thumb {
+      transition:
+        transform var(--fui-duration-slow) var(--fui-ease-out),
+        width var(--fui-duration) var(--fui-ease-out);
+    }
+    .fui-switch:active:not([data-disabled]) .fui-switch-thumb {
+      width: 1.25rem;
+    }
+    .fui-switch[data-checked]:active:not([data-disabled]) .fui-switch-thumb {
+      transform: translateX(0.75rem);
+    }
+    /* A tick pops in. */
+    @starting-style {
+      .fui-checkbox .fui-control-indicator,
+      .fui-radio .fui-radio-indicator {
+        scale: 0.6;
+      }
+    }
+    .fui-checkbox .fui-control-indicator,
+    .fui-radio .fui-radio-indicator {
+      transition: scale var(--fui-duration) var(--fui-ease-out);
+    }
+  }
+
+  @media (forced-colors: active) {
+    .fui-button,
+    .fui-checkbox,
+    .fui-radio,
+    .fui-switch,
+    .fui-kbd,
+    .fui-toggle[data-pressed] {
+      background-image: none;
+    }
+  }
+}
+

@@ -1,6 +1,5 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import { ZoomPan } from "../../packages/ui/src/index";
 import { clampZoom, fitZoom, sameZoom, wheelZooms, zoomByPinch, zoomByStep, zoomByWheel, zoomPercent, zoomRange } from "../../packages/ui/src/zoom-pan-logic";
@@ -17,9 +16,10 @@ import {
   toolPayload,
   type AsyncRenderState,
 } from "../../packages/ai-ui/src/index";
+import { uiStyles, aiStyles } from "./read-styles";
 
-const ui = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
-const ai = readFileSync(new URL("../../packages/ai-ui/src/styles.css", import.meta.url), "utf8");
+const ui = uiStyles();
+const ai = aiStyles();
 const rule = (sheet: string, selector: string) => {
   const at = sheet.indexOf(selector);
   assert.ok(at >= 0, `missing rule ${selector}`);

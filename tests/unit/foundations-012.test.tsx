@@ -30,9 +30,10 @@ import {
   type HotkeyEvent,
 } from "../../packages/ui/src/index";
 import { copyImage, copyText, downloadFile, ExportError, fileStem, serializeSvg, svgToPng } from "@fabrials/ui/export";
+import { uiStyles } from "./read-styles";
 
 const source = (file: string) => readFileSync(new URL(`../../packages/ui/src/${file}`, import.meta.url), "utf8");
-const styles = source("styles.css");
+const styles = uiStyles();
 
 // --- LocalTime -------------------------------------------------------------------------------------------------------
 

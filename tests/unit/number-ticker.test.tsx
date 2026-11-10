@@ -3,8 +3,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import { LabelsProvider, NumberTicker } from "../../packages/ui/src/index";
+import { uiStyles } from "./read-styles";
 
-const styles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
+const styles = uiStyles();
 const source = readFileSync(new URL("../../packages/ui/src/number-ticker.tsx", import.meta.url), "utf8");
 const manifest = JSON.parse(readFileSync(new URL("../../packages/ui/package.json", import.meta.url), "utf8"));
 

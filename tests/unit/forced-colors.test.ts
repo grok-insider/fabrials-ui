@@ -1,8 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { uiStyles } from "./read-styles";
 
-const styles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
+const styles = uiStyles();
 
 // The forced-colors pass of 0.9 is one block with four groups. These tests read that block; tests/visual/forced-colors.spec.ts
 // renders it in Chromium.

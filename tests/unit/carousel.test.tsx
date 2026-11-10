@@ -4,8 +4,9 @@ import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, DirectionProvider } from "../../packages/ui/src/index";
 import { carouselKeyMove, carouselNameProblem, carouselOffKey, carouselOwnsKey } from "../../packages/ui/src/carousel-logic";
+import { uiStyles } from "./read-styles";
 
-const styles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
+const styles = uiStyles();
 const source = readFileSync(new URL("../../packages/ui/src/carousel.tsx", import.meta.url), "utf8");
 const rule = (selector: string) => {
   const at = styles.indexOf(selector);

@@ -1,0 +1,323 @@
+@layer components {
+  /* 0.12: states and time (InlineConfirm, Countdown, StatePage, ErrorState, BackButton, ActionBar) */
+
+  /* ------------------------------------------------------ inline confirm */
+  /* A question asked in place: a tinted block, not a plate, so it can sit on a card. When it opens it is scrolled into view
+     with this much kept free under it: the sticky bar's measured height and the on-screen keyboard, when either is there. */
+  .fui-inline-confirm {
+    display: grid;
+    gap: var(--fui-space-3);
+    min-inline-size: 0;
+    padding: var(--fui-space-4);
+    border: 1px solid transparent;
+    border-radius: var(--fui-radius-plate);
+    background: var(--fui-surface-inset);
+    color: var(--foreground);
+    overflow-wrap: anywhere;
+    scroll-margin-block-start: var(--fui-space-2);
+    scroll-margin-block-end: calc(var(--fui-action-bar-size, 0px) + var(--fui-keyboard-inset, 0px) + var(--fui-space-2));
+  }
+  .fui-inline-confirm[data-destructive] {
+    border-color: color-mix(in oklab, var(--destructive) var(--fui-tint-edge), var(--card));
+    background: color-mix(in oklab, var(--destructive) var(--fui-tint-strength), var(--card));
+  }
+  .fui-inline-confirm-text {
+    display: grid;
+    gap: var(--fui-space-1);
+    min-inline-size: 0;
+  }
+  .fui-inline-confirm-title {
+    margin: 0;
+    font-size: var(--fui-text-sm);
+    font-weight: var(--fui-weight-semibold);
+    line-height: var(--fui-leading-sm);
+    text-wrap: balance;
+  }
+  .fui-inline-confirm[data-destructive] .fui-inline-confirm-title {
+    color: var(--fui-danger-ink);
+  }
+  .fui-inline-confirm-description {
+    max-inline-size: 44rem;
+    margin: 0;
+    color: var(--muted-foreground);
+    text-wrap: pretty;
+  }
+  .fui-inline-confirm-acknowledgement {
+    display: grid;
+    min-inline-size: 0;
+  }
+  .fui-inline-confirm-acknowledgement > .fui-native-choice {
+    align-items: flex-start;
+    padding-block: var(--fui-space-3);
+  }
+  .fui-inline-confirm-acknowledgement .fui-native-checkbox {
+    margin-block-start: 0.1875rem;
+  }
+  .fui-inline-confirm-error {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--fui-space-2);
+    margin: 0;
+    color: var(--fui-danger-ink);
+    font-size: 0.8125rem;
+    line-height: var(--fui-leading-sm);
+  }
+  .fui-inline-confirm-error > svg {
+    flex-shrink: 0;
+    inline-size: 1rem;
+    block-size: 1rem;
+    margin-block-start: 0.125rem;
+  }
+  .fui-inline-confirm-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--fui-space-2);
+    min-inline-size: 0;
+  }
+  /* On a phone the two answers share the row, so neither is a small target beside a large one. */
+  @media (max-width: 30rem) {
+    .fui-inline-confirm-actions > .fui-button {
+      flex: 1 1 8rem;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes fui-inline-confirm-in {
+      from {
+        opacity: 0;
+        translate: 0 4px;
+      }
+    }
+    .fui-inline-confirm {
+      animation: fui-inline-confirm-in var(--fui-duration-slow) var(--fui-ease-out) both;
+    }
+  }
+
+  /* ------------------------------------------------------------ countdown */
+  /* A reading in the label voice. The tone is a tint, an edge and an icon; nothing flashes. */
+  .fui-countdown {
+    --fui-countdown-tone: var(--foreground);
+    --fui-countdown-ink: var(--muted-foreground);
+    --fui-countdown-figure: var(--foreground);
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    max-inline-size: 100%;
+    min-block-size: 1.75rem;
+    padding-inline: var(--fui-space-2);
+    border: 1px solid transparent;
+    border-radius: var(--fui-radius-sm);
+    background: var(--fui-surface-inset);
+    color: var(--fui-countdown-ink);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    vertical-align: middle;
+    white-space: nowrap;
+    transition:
+      background-color var(--fui-duration-slow) var(--fui-ease),
+      border-color var(--fui-duration-slow) var(--fui-ease),
+      color var(--fui-duration-slow) var(--fui-ease);
+  }
+  .fui-countdown[data-tone="low"] {
+    --fui-countdown-tone: var(--warning);
+    --fui-countdown-ink: var(--fui-warning-ink);
+    --fui-countdown-figure: var(--fui-warning-ink);
+  }
+  .fui-countdown[data-tone="urgent"] {
+    --fui-countdown-tone: var(--destructive);
+    --fui-countdown-ink: var(--fui-danger-ink);
+    --fui-countdown-figure: var(--fui-danger-ink);
+  }
+  .fui-countdown:is([data-tone="low"], [data-tone="urgent"]) {
+    border-color: color-mix(in oklab, var(--fui-countdown-tone) var(--fui-tint-edge), var(--card));
+    background: color-mix(in oklab, var(--fui-countdown-tone) var(--fui-tint-strength), var(--card));
+  }
+  .fui-countdown-timer {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--fui-space-1-5);
+    min-inline-size: 0;
+  }
+  .fui-countdown-icon {
+    flex-shrink: 0;
+    inline-size: 0.875rem;
+    block-size: 0.875rem;
+  }
+  .fui-countdown-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .fui-countdown-clock {
+    color: var(--fui-countdown-figure);
+    font-size: var(--fui-text-sm);
+    font-weight: var(--fui-weight-medium);
+  }
+  .fui-countdown[data-size="sm"] {
+    min-block-size: 1.25rem;
+    padding-inline: var(--fui-space-1-5);
+  }
+  .fui-countdown[data-size="sm"] .fui-countdown-icon {
+    inline-size: 0.75rem;
+    block-size: 0.75rem;
+  }
+  .fui-countdown[data-size="sm"] .fui-countdown-clock {
+    font-size: var(--fui-text-label);
+  }
+
+  /* ----------------------------------------------------------- state page */
+  /* A whole page outside the shell. Rows: the brand, free space, the content, twice the free space: the content sits in
+     the upper third and, like every page, at the gutter. */
+  .fui-state-page {
+    --fui-state-page-size: 100dvh;
+    display: grid;
+    grid-template-rows: auto minmax(var(--fui-space-8), 1fr) auto minmax(var(--fui-space-8), 2fr);
+    box-sizing: border-box;
+    min-block-size: var(--fui-state-page-size);
+    min-inline-size: 0;
+    padding-block: env(safe-area-inset-top, 0px) env(safe-area-inset-bottom, 0px);
+    padding-inline: max(var(--fui-page-padding), env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--fui-font-sans);
+    font-size: var(--fui-text-sm);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  .fui-state-page-brand {
+    grid-row: 1;
+    display: flex;
+    align-items: center;
+    min-block-size: 4rem;
+    min-inline-size: 0;
+  }
+  .fui-state-page-body {
+    grid-row: 3;
+    display: grid;
+    justify-items: start;
+    gap: var(--fui-space-3);
+    max-inline-size: 36rem;
+    min-inline-size: 0;
+  }
+  .fui-state-page-code {
+    margin: 0;
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    font-variant-numeric: tabular-nums;
+    line-height: var(--fui-leading-sm);
+  }
+  .fui-state-page-title {
+    margin: 0;
+    font-family: var(--fui-font-display);
+    font-size: var(--fui-text-page);
+    font-weight: var(--fui-weight-semibold);
+    line-height: var(--fui-leading-page);
+    letter-spacing: var(--fui-tracking-tight);
+    overflow-wrap: anywhere;
+    text-wrap: balance;
+  }
+  .fui-state-page-description {
+    margin: 0;
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-md);
+    line-height: var(--fui-leading-md);
+    text-wrap: pretty;
+  }
+  .fui-state-page-actions {
+    margin-block-start: var(--fui-space-3);
+  }
+  .fui-state-page[data-align="center"] .fui-state-page-body {
+    justify-self: center;
+    justify-items: center;
+    text-align: center;
+  }
+  .fui-state-page[data-align="center"] .fui-state-page-actions {
+    justify-content: center;
+  }
+
+  /* ---------------------------------------------------------- error state */
+  .fui-error-state-reference {
+    display: flex;
+    align-items: center;
+    gap: var(--fui-space-1);
+    margin-block-start: var(--fui-space-2);
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    overflow-wrap: anywhere;
+  }
+  .fui-state-panel[data-align="center"] .fui-error-state-reference {
+    justify-content: center;
+  }
+
+  /* ---------------------------------------------------------- back button */
+  .fui-back-button-icon:dir(rtl) {
+    scale: -1 1;
+  }
+
+  /* ----------------------------------------------------------- action bar */
+  /* Sticky inside the nearest scroll container. A card around it clips with `overflow: clip`: `hidden` would make the card
+     that container and the bar could not stick to the page. */
+  .fui-action-bar {
+    container: fui-action-bar / inline-size;
+    position: sticky;
+    z-index: var(--fui-z-sticky);
+    inset-block-end: var(--fui-keyboard-inset, 0px);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--fui-space-2);
+    min-inline-size: 0;
+    padding-block: var(--fui-space-3) max(var(--fui-space-3), env(safe-area-inset-bottom, 0px));
+    padding-inline: max(var(--fui-space-4), env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
+    border-block-start: 1px solid var(--border);
+    background: var(--card);
+    color: var(--foreground);
+  }
+  .fui-action-bar-start,
+  .fui-action-bar-end {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--fui-space-2);
+    min-inline-size: 0;
+  }
+  .fui-action-bar-end {
+    margin-inline-start: auto;
+  }
+  @container fui-action-bar (max-width: 26rem) {
+    .fui-action-bar-end {
+      flex: 1 1 100%;
+    }
+    .fui-action-bar-end > .fui-button {
+      flex: 1 1 0;
+    }
+  }
+
+  @media (forced-colors: active) {
+    /* A tint is repainted Canvas: the block keeps an edge, and a destructive question a heavier one. */
+    .fui-inline-confirm {
+      border-color: GrayText;
+    }
+    .fui-inline-confirm[data-destructive] {
+      border: 2px solid CanvasText;
+    }
+    /* The tone keeps its icon; its edge says the rest: plain, dashed while time runs low, heavy when it is nearly up. */
+    .fui-countdown {
+      border-color: CanvasText;
+    }
+    .fui-countdown[data-tone="low"] {
+      border-style: dashed;
+    }
+    .fui-countdown[data-tone="urgent"] {
+      border-width: 2px;
+      padding-inline: calc(var(--fui-space-2) - 1px);
+    }
+    .fui-action-bar {
+      border-block-start-color: CanvasText;
+    }
+  }
+}
+

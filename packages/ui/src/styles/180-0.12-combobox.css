@@ -1,0 +1,143 @@
+@layer components {
+  /* 0.12: combobox. The flat parts: the field (an input group the list opens under), its keys, the empty line, and the
+     box of chips of a multiple one. The list and its rows are the menu's. */
+  .fui-combobox-input,
+  .fui-combobox-chips-input {
+    min-inline-size: 0;
+    text-overflow: ellipsis;
+  }
+  .fui-combobox-key {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: 1.75rem;
+    block-size: 1.75rem;
+    margin: 0;
+    margin-inline-end: var(--fui-space-1);
+    padding: 0;
+    border: 0;
+    border-radius: var(--fui-radius-sm);
+    background: transparent;
+    color: var(--muted-foreground);
+    font: inherit;
+    cursor: pointer;
+    transition:
+      background-color var(--fui-duration-fast) var(--fui-ease),
+      color var(--fui-duration-fast) var(--fui-ease);
+  }
+  .fui-combobox-key + .fui-combobox-key {
+    margin-inline-start: calc(var(--fui-space-1) * -1);
+  }
+  .fui-combobox-key svg {
+    inline-size: 1rem;
+    block-size: 1rem;
+  }
+  .fui-combobox-key:not(:disabled):active {
+    background: color-mix(in oklab, var(--foreground) 10%, var(--card));
+    color: var(--foreground);
+  }
+  .fui-combobox-key:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .fui-combobox-list {
+    outline: none;
+  }
+  .fui-combobox-list:empty {
+    display: none;
+  }
+  .fui-combobox-empty:not(:empty) {
+    padding: var(--fui-space-1-5) var(--fui-space-2);
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-sm);
+    line-height: var(--fui-leading-sm);
+  }
+  .fui-combobox-field > .fui-combobox-chips {
+    flex: 1;
+    min-inline-size: 0;
+    padding: var(--fui-space-1);
+    cursor: text;
+  }
+  .fui-input.fui-combobox-chips-input {
+    flex: 1 1 4rem;
+    inline-size: auto;
+    min-inline-size: 4rem;
+    min-block-size: 1.75rem;
+    padding-block: 0;
+    padding-inline: var(--fui-space-1-5);
+  }
+  .fui-combobox-field .fui-combobox-chip {
+    max-inline-size: 100%;
+    min-inline-size: 0;
+    outline: none;
+    cursor: default;
+    overflow-wrap: anywhere;
+  }
+  .fui-combobox-chip:has(> .fui-combobox-chip-remove) {
+    padding-inline-end: var(--fui-space-0-5);
+  }
+  .fui-combobox-chip:is([data-highlighted], :focus-visible) {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: 1px;
+  }
+  .fui-combobox-chip-remove {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: 1.125rem;
+    block-size: 1.125rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: var(--fui-radius-xs);
+    background: transparent;
+    color: var(--muted-foreground);
+    cursor: pointer;
+  }
+  .fui-combobox-chip-remove svg {
+    inline-size: 0.75rem;
+    block-size: 0.75rem;
+  }
+  @media (hover: hover) {
+    .fui-combobox-key:not(:disabled):hover {
+      background: var(--accent);
+      color: var(--foreground);
+    }
+    .fui-combobox-chip-remove:hover {
+      background: color-mix(in oklab, var(--foreground) 10%, transparent);
+      color: var(--foreground);
+    }
+  }
+  /* On touch each key reaches 44 px around its square; the field and the chip keep their size. */
+  @media (pointer: coarse) {
+    .fui-combobox-key::before {
+      content: "";
+      position: absolute;
+      inset: -0.5rem;
+    }
+    .fui-combobox-chip-remove::before {
+      content: "";
+      position: absolute;
+      inset: -0.8125rem;
+    }
+  }
+  @media (forced-colors: active) {
+    .fui-combobox-item[data-highlighted],
+    .fui-combobox-chip:is([data-highlighted], :focus-visible) {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+    .fui-combobox-field .fui-combobox-chip {
+      border: 1px solid CanvasText;
+    }
+    .fui-combobox-key:not(:disabled):is(:hover, :active),
+    .fui-combobox-chip-remove:is(:hover, :active) {
+      color: Highlight;
+    }
+  }
+}
+

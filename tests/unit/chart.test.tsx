@@ -1,8 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { uiStyles } from "./read-styles";
 
-const styles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
+const styles = uiStyles();
 
 // Recharts 3 paints the plot as svg[role=application][tabindex=0]. Its focus ring was removed outright (0.8), so a keyboard user
 // could not see where focus was; the rule must only remove it for focus that is not focus-visible.

@@ -1,10 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { uiStyles } from "./read-styles";
 
 // The pieces of @fabrials/ui whose rules were physical before 0.12. The browser spec (tests/visual/right-to-left.spec.ts)
 // reads the result in a right-to-left page; this holds the declarations, so a physical one does not come back.
-const styles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
+const styles = uiStyles();
 const rule = (selector: string) => {
   const at = styles.indexOf(selector);
   assert.ok(at >= 0, `missing rule ${selector}`);

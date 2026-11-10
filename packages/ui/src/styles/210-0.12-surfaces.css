@@ -1,0 +1,71 @@
+@layer components {
+  /* 0.12: surfaces */
+  /* size="touch": 44 px on every pointer and in every density, with the padding and the type of the default size. */
+  :is(.fui-button[data-size="touch"], .fui-button-size-touch),
+  :is(.fui-button[data-size="icon-touch"], .fui-button-size-icon-touch) {
+    min-block-size: 2.75rem;
+  }
+  :is(.fui-button[data-size="icon-touch"], .fui-button-size-icon-touch) {
+    aspect-ratio: 1;
+    min-inline-size: 2.75rem;
+    padding: 0;
+  }
+
+  /* The popover's close key. The popover becomes a column, where a key can stick: it holds the corner while the content
+     scrolls under it, on the popover's own surface. Its margins take it out of the flow (its height and the gap are given
+     back), so the content starts where it would without it; a header leaves it room. A sticky inset is measured from the
+     scroller's content edge, so the one that holds the key 6 px from the popover's edge is negative, like its margin. */
+  .fui-popover:has(> .fui-popover-close) {
+    --fui-popover-close-size: var(--fui-control-height-sm);
+    display: flex;
+    flex-direction: column;
+    scroll-padding-block-start: calc(var(--fui-popover-close-size) + var(--fui-space-2));
+  }
+  .fui-popover > .fui-popover-close {
+    --fui-button-bg: var(--fui-overlay-surface);
+    position: sticky;
+    inset-block-start: calc(-1 * var(--fui-space-1-5));
+    z-index: 1;
+    order: -1;
+    flex: none;
+    align-self: flex-end;
+    block-size: var(--fui-popover-close-size);
+    margin-block: calc(-1 * var(--fui-space-1-5)) calc(-1 * (var(--fui-popover-close-size) - var(--fui-space-1-5) + var(--fui-space-2)));
+    margin-inline-end: calc(-1 * var(--fui-space-1-5));
+    color: var(--muted-foreground);
+  }
+  .fui-popover:has(> .fui-popover-close) > .fui-popover-header {
+    padding-inline-end: calc(var(--fui-popover-close-size) - var(--fui-space-1-5) + var(--fui-space-2));
+  }
+
+  /* What a state panel holds under its description: chips, a short list. */
+  .fui-state-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--fui-space-2);
+    margin-block-start: var(--fui-space-3);
+  }
+  .fui-state-panel[data-align="center"] .fui-state-content {
+    justify-content: center;
+  }
+
+  /* On a phone the search takes the row; filters and actions follow under it. */
+  @media (max-width: 40rem) {
+    .fui-collection-toolbar > .fui-search {
+      flex-basis: 100%;
+      max-inline-size: none;
+    }
+  }
+
+  /* A sheet laid out with a DialogBody has no padding of its own: the safe areas are added around its bars. The docked edge
+     gives up only what the bars' own inset does not already cover. */
+  .fui-dialog:is([data-placement="start"], [data-placement="end"]):has(> .fui-dialog-body) {
+    padding-block: var(--fui-sheet-safe-block-start) var(--fui-sheet-safe-block-end);
+  }
+  .fui-dialog:is([data-placement="end"]:not([data-side="end"]), [data-side="end"]:dir(ltr), [data-side="start"]:dir(rtl)):has(> .fui-dialog-body) {
+    padding-right: max(0px, calc(env(safe-area-inset-right, 0px) - var(--fui-space-5)));
+  }
+  .fui-dialog:is([data-placement="start"]:not([data-side="start"]), [data-side="start"]:dir(ltr), [data-side="end"]:dir(rtl)):has(> .fui-dialog-body) {
+    padding-left: max(0px, calc(env(safe-area-inset-left, 0px) - var(--fui-space-5)));
+  }
+}

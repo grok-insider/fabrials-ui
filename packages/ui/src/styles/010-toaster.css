@@ -1,0 +1,205 @@
+/*
+ * Sonner injects unlayered styles, so these overrides stay outside the
+ * components layer. State tints use success, warning and danger ink — never
+ * the product gem. The close control stays inside the card so it cannot clip
+ * the leading edge, and height stays auto so a short measurement cannot crop
+ * the title or let the next notice show through.
+ */
+.fui-toaster[data-sonner-toaster] {
+  z-index: var(--fui-z-toast);
+  max-width: calc(100vw - 2rem);
+}
+/* 0.12: the stack keeps clear of the notch and the home indicator. Sonner places it with these offsets (its own rules, and
+   the narrow ones under 600 px); the larger of the offset and the inset wins, so nothing moves where the inset is 0. */
+.fui-toaster[data-sonner-toaster][data-y-position="top"] {
+  top: max(var(--offset-top), env(safe-area-inset-top, 0px));
+}
+.fui-toaster[data-sonner-toaster][data-y-position="bottom"] {
+  bottom: max(var(--offset-bottom), env(safe-area-inset-bottom, 0px));
+}
+.fui-toaster[data-sonner-toaster][data-x-position="left"] {
+  left: max(var(--offset-left), env(safe-area-inset-left, 0px));
+}
+.fui-toaster[data-sonner-toaster][data-x-position="right"] {
+  right: max(var(--offset-right), env(safe-area-inset-right, 0px));
+}
+@media (max-width: 600px) {
+  .fui-toaster[data-sonner-toaster][data-y-position="top"] {
+    top: max(var(--mobile-offset-top), env(safe-area-inset-top, 0px));
+  }
+  .fui-toaster[data-sonner-toaster][data-y-position="bottom"] {
+    bottom: max(var(--mobile-offset-bottom), env(safe-area-inset-bottom, 0px));
+  }
+  .fui-toaster[data-sonner-toaster][data-x-position="left"] {
+    left: var(--mobile-offset-left);
+  }
+  .fui-toaster[data-sonner-toaster][data-x-position="right"] {
+    right: var(--mobile-offset-right);
+  }
+}
+.fui-toaster[data-sonner-toaster][dir="ltr"],
+.fui-toaster[data-sonner-toaster][dir="rtl"] {
+  --toast-icon-margin-start: 0px;
+  --toast-icon-margin-end: 0px;
+  --toast-svg-margin-start: 0px;
+  --toast-svg-margin-end: 0px;
+  --toast-close-button-transform: none;
+}
+.fui-toaster[data-sonner-toaster] [data-sonner-toast] {
+  transition:
+    transform var(--fui-duration) var(--fui-ease),
+    opacity var(--fui-duration) var(--fui-ease),
+    height var(--fui-duration) var(--fui-ease),
+    box-shadow var(--fui-duration) var(--fui-ease);
+}
+.fui-toaster[data-sonner-toaster] [data-sonner-toast][data-y-position="bottom"]:not([data-mounted="true"]) {
+  --y: translateY(4px);
+}
+.fui-toaster[data-sonner-toaster] [data-sonner-toast][data-y-position="top"]:not([data-mounted="true"]) {
+  --y: translateY(-4px);
+}
+.fui-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"] {
+  align-items: center;
+  gap: var(--fui-space-2);
+  width: min(var(--width), calc(100vw - 2rem));
+  height: auto;
+  min-height: 2.75rem;
+  padding-block: 0.625rem;
+  padding-inline: var(--fui-space-3);
+  overflow: visible;
+  border-radius: var(--fui-radius-plate);
+  background: var(--fui-toast-surface, var(--fui-overlay-surface));
+  border-color: var(--fui-toast-border, var(--fui-overlay-border));
+  box-shadow: var(--fui-toast-shadow, var(--fui-overlay-shadow));
+  backdrop-filter: var(--fui-toast-filter, var(--fui-overlay-filter));
+  color: var(--foreground);
+  font-family: var(--fui-font-sans);
+  font-size: var(--fui-text-sm);
+  line-height: var(--fui-leading-sm);
+}
+.fui-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"][data-type="success"],
+.fui-toaster[data-sonner-toaster] [data-rich-colors="true"][data-sonner-toast][data-type="success"] {
+  background: var(--fui-toast-surface, var(--fui-overlay-surface));
+  color: var(--foreground);
+}
+.fui-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"][data-type="error"],
+.fui-toaster[data-sonner-toaster] [data-rich-colors="true"][data-sonner-toast][data-type="error"] {
+  background: var(--fui-toast-surface, var(--fui-overlay-surface));
+  color: var(--foreground);
+}
+.fui-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"][data-type="warning"],
+.fui-toaster[data-sonner-toaster] [data-rich-colors="true"][data-sonner-toast][data-type="warning"] {
+  background: var(--fui-toast-surface, var(--fui-overlay-surface));
+  color: var(--foreground);
+}
+.fui-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"][data-type="info"],
+.fui-toaster[data-sonner-toaster] [data-rich-colors="true"][data-sonner-toast][data-type="info"] {
+  background: var(--fui-toast-surface, var(--fui-overlay-surface));
+  color: var(--foreground);
+}
+.fui-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"] [data-icon] {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+}
+.fui-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"] [data-icon] svg {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+}
+.fui-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"] [data-content] {
+  flex: 1 1 auto;
+  gap: 0.125rem;
+  min-width: 0;
+}
+.fui-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"] [data-title] {
+  font-weight: var(--fui-weight-medium);
+  line-height: var(--fui-leading-sm);
+  color: var(--foreground);
+  overflow-wrap: anywhere;
+}
+.fui-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"] [data-description] {
+  color: var(--muted-foreground);
+  line-height: var(--fui-leading-sm);
+  overflow-wrap: anywhere;
+}
+.fui-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"] [data-close-button] {
+  position: static;
+  top: auto;
+  right: auto;
+  left: auto;
+  order: 1;
+  flex-shrink: 0;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-block: 0;
+  margin-inline: auto 0;
+  transform: none;
+  border: 0;
+  border-radius: var(--fui-radius-sm);
+  background: transparent;
+  color: var(--muted-foreground);
+  box-shadow: none;
+}
+.fui-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"] [data-close-button] svg {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+.fui-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"] [data-close-button]:hover {
+  background: var(--accent);
+  color: var(--foreground);
+}
+.fui-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"] [data-close-button]:focus-visible,
+.fui-toaster[data-sonner-toaster] [data-sonner-toast]:focus-visible {
+  outline: 2px solid var(--fui-focus);
+  outline-offset: 2px;
+  box-shadow: var(--fui-shadow-lg), var(--fui-highlight);
+}
+.fui-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"] [data-button] {
+  height: 2rem;
+  margin: 0;
+  padding: 0 var(--fui-space-3);
+  border-radius: var(--fui-radius-md);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-family: inherit;
+  font-size: var(--fui-text-xs);
+  font-weight: var(--fui-weight-medium);
+}
+/* `[data-sonner-theme]` is not decoration: Sonner injects its own sheet after this one, and its dark rule for the cancel button
+   (`[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast][data-styled=true] [data-cancel]`, a 30 % white fill) ties
+   this selector at five and wins by coming later. One more attribute outranks it in both themes. */
+.fui-toaster[data-sonner-toaster][data-sonner-theme] [data-sonner-toast][data-styled="true"] [data-cancel] {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--foreground);
+}
+@media (max-width: 600px) {
+  /* A compact pill sized to its message, centred, instead of a full-width card. */
+  .fui-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"] {
+    left: 0;
+    right: 0;
+    width: fit-content;
+    max-width: calc(100% - var(--mobile-offset-left) - var(--mobile-offset-right));
+    min-height: 2.5rem;
+    margin-inline: auto;
+    padding-block: 0.5rem;
+    padding-inline: var(--fui-space-3) var(--fui-space-4);
+    border-radius: var(--fui-radius-xl);
+  }
+  .fui-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"]:not(:has([data-description], [data-button])) {
+    border-radius: var(--fui-radius-full);
+  }
+}
+@media (max-width: 767px), (pointer: coarse) {
+  .fui-toaster[data-sonner-toaster] [data-sonner-toast][data-styled="true"] [data-close-button] {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fui-toaster[data-sonner-toaster] [data-sonner-toast] {
+    transition: none;
+  }
+}
+

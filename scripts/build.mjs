@@ -1,5 +1,5 @@
 import { build } from "vite";
-import { cp, mkdir, readdir, copyFile, readFile, rename, rm } from "node:fs/promises";
+import { cp, mkdir, readdir, copyFile, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
@@ -14,6 +14,20 @@ const clientDirective = /^(?:\s|\/\/[^\n]*\n|\/\*[\s\S]*?\*\/)*["']use client["'
 /** Whether a source text opens with the "use client" directive (comments may come before it). */
 export function isClientSource(code) {
   return clientDirective.test(code);
+}
+
+/**
+ * A package's stylesheet, as the concatenation of its parts in the order of
+ * `src/styles/order.json`. `src/styles.css` imports the same parts for a dev server;
+ * what ships is this one file, so a product imports one sheet.
+ */
+export async function stylesheet(directory) {
+  const parts = resolve(directory, "src/styles");
+  const order = JSON.parse(await readFile(resolve(parts, "order.json"), "utf8"));
+  const texts = await Promise.all(
+    order.map((file) => readFile(resolve(parts, file), "utf8")),
+  );
+  return texts.join("");
 }
 
 /** Bundles one package's modules into `outDir` (relative to the package), one file per source module. */
@@ -97,12 +111,16 @@ async function distribute(name) {
     { stdio: "inherit", cwd: root },
   );
   for (const file of await readdir(resolve(directory, "src"))) {
-    if (file.endsWith(".css"))
+    if (file.endsWith(".css") && file !== "styles.css")
       await copyFile(
         resolve(directory, "src", file),
         resolve(directory, staging, file),
       );
   }
+  await writeFile(
+    resolve(directory, staging, "styles.css"),
+    await stylesheet(directory),
+  );
   if (name === "ui") {
     await mkdir(resolve(directory, staging, "fonts"), { recursive: true });
     await cp(resolve(directory, "fonts"), resolve(directory, staging, "fonts"), {

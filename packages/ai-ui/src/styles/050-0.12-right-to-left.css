@@ -1,0 +1,112 @@
+@layer components {
+  /* 0.12: right to left, forced colors and print for the chat pieces */
+
+  /* What draws a direction turns with the page: a scan sweeps, lines are read and a page is written from the inline start,
+     and the arrow of a link that leaves the page points to the inline end. */
+  .fui-agent-mark:is([data-variant="scan"], [data-variant="lines"], [data-variant="type"]):dir(rtl),
+  .fui-search-step-open:dir(rtl) > svg {
+    scale: -1 1;
+  }
+  .fui-generation-page > span:dir(rtl) {
+    background: repeating-linear-gradient(270deg, currentColor 0 4px, transparent 4px 6px);
+  }
+  /* A host and a path are parts of an address: they read left to right in any page, the host before the path, and stay
+     beside what they belong to. */
+  :is(.fui-source-card .fui-source-meta, .fui-search-result-host, .fui-search-result-path):dir(rtl) {
+    direction: ltr;
+    text-align: end;
+  }
+  .fui-search-result-host:dir(rtl) {
+    order: 1;
+  }
+
+  /* Forced colors repaint every fill in Canvas and drop every shadow, so the chat pieces whose shape or state was a tint get
+     a form in system colours: an edge where there was a fill, a Highlight bar under what is pressed or active (never a fill
+     behind its label, never an outline, which is the focus ring's shape), a dashed edge for what failed. */
+  @media (forced-colors: active) {
+    .fui-citation-chip,
+    .fui-source-number {
+      outline: 1px solid LinkText;
+      outline-offset: -1px;
+    }
+    .fui-citation-chip[data-active]::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0;
+      inset-block-end: 0;
+      block-size: 2px;
+      background: Highlight;
+    }
+    .fui-source-card[data-active] {
+      position: relative;
+    }
+    .fui-source-card[data-active]::before {
+      content: "";
+      position: absolute;
+      inset-block: 0.25rem;
+      inset-inline-start: 0;
+      inline-size: 3px;
+      background: Highlight;
+    }
+    .fui-chat-message[data-role="user"] > .fui-chat-message-body {
+      outline: 1px solid CanvasText;
+      outline-offset: -1px;
+    }
+    .fui-composer:has(.fui-composer-input:focus-visible) {
+      outline: 2px solid Highlight;
+      outline-offset: 2px;
+    }
+    .fui-composer-pill[data-state="on"],
+    .fui-voice-button[data-status="recording"] {
+      position: relative;
+      border-color: Highlight;
+    }
+    .fui-composer-pill[data-state="on"]::after,
+    .fui-voice-button[data-status="recording"]::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0.25rem;
+      inset-block-end: 2px;
+      block-size: 3px;
+      background: Highlight;
+    }
+    .fui-voice-dot,
+    .fui-activity-dot,
+    .fui-activity-icon[data-live] .fui-activity-dot::after {
+      background: Highlight;
+    }
+    .fui-voice-button[data-status="error"],
+    .fui-attachment[data-status="error"] {
+      border-style: dashed;
+    }
+    .fui-attachment[data-variant="grid"] .fui-attachment-remove:not(:focus-visible) {
+      outline: 1px solid ButtonText;
+      outline-offset: -1px;
+    }
+    .fui-search-step-rail::before {
+      background: GrayText;
+    }
+    .fui-search-step[data-live] .fui-search-step-badge {
+      border-color: Highlight;
+      outline: 1px solid Highlight;
+    }
+  }
+
+  /* On paper a conversation is its words: no actions, no bubble, and a message stays on one page when it fits. */
+  @media print {
+    .fui-message-actions,
+    .fui-stream-caret {
+      display: none;
+    }
+    .fui-chat-message {
+      break-inside: avoid;
+    }
+    .fui-chat-message[data-role="user"] > .fui-chat-message-body {
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: none;
+    }
+  }
+}
+

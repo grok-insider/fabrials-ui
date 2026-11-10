@@ -1,12 +1,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Progress, ScrambleText, ShimmerText, Spinner, scrambleFrame } from "../../packages/ui/src/index";
 import { ChatMessage, GenerationFrame, SourceTally } from "../../packages/ai-ui/src/index";
+import { uiStyles as uiSheet, aiStyles as aiSheet } from "./read-styles";
 
-const uiStyles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
-const aiStyles = readFileSync(new URL("../../packages/ai-ui/src/styles.css", import.meta.url), "utf8");
+const uiStyles = uiSheet();
+const aiStyles = aiSheet();
 
 /** True when the first `animation: name` in `styles` sits inside a block for people who allow motion. */
 function movesOnlyWithMotion(styles: string, name: string) {

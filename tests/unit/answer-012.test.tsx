@@ -1,11 +1,11 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import { formatLocalTime, LabelsProvider } from "@fabrials/ui";
 import { CALLOUT_KINDS, EditableMessage, EditMessageAction, MarkdownCallout, MessageActions, MessageTimestamp } from "../../packages/ai-ui/src/index";
+import { aiStyles } from "./read-styles";
 
-const styles = readFileSync(new URL("../../packages/ai-ui/src/styles.css", import.meta.url), "utf8");
+const styles = aiStyles();
 
 // The block this package appends, bounded: the stylesheet is a union of everyone's blocks and others come after it.
 const MARKER = "/* 0.12: a callout in an answer, and a sent message edited in place */";

@@ -39,8 +39,9 @@ import {
   TabsList,
   TabsTrigger,
 } from "../../packages/ui/src/index";
+import { uiStyles } from "./read-styles";
 
-const styles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
+const styles = uiStyles();
 const tokens = readFileSync(new URL("../../packages/ui/src/tokens.css", import.meta.url), "utf8");
 
 /** The declarations of the first rule whose selector list contains `selector` exactly as written (up to its closing brace). */

@@ -1,0 +1,31 @@
+/* 0.11 "Instrument with life": arrivals, lifts and the working light.
+   - Arrivals: what streams in (a row, a step, a tile, a message) rises 4 px out of a slight blur. A list staggers its children
+     by giving each one --fui-stagger (its index); the delay stops growing after the eighth, so a long list never keeps anyone
+     waiting. Under reduced motion everything is simply there.
+   - The working light is the only light in the system. It shows while an agent works or something loads and at no other
+     time, it is painted from three gems (--fui-light-1, -2 and -3), and it is gone under reduced motion (a still edge in the
+     first gem says the same) and in forced colors. A surface carries it with <WorkingLight> as its last child; the surface
+     must be positioned (and must not clip its overflow, or the bloom is cut), and the light takes its corners. */
+/* Where the light of a letter-by-letter ShimmerText is, from 0 to 1 across the text; -1 lights nothing. */
+@property --fui-shimmer-p {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: -1;
+}
+/* Where the head of a scanning Progress is, from 0 to 1 across its strip. Registered so it can be animated in steps. */
+@property --fui-scan-p {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0.3;
+}
+/* How far the line spinner has filled: one cell per step. Registered so it can be animated in steps. */
+@property --fui-spinner-t {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+@property --fui-light-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}

@@ -1,10 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { renderToStaticMarkup } from "react-dom/server";
-import { readFileSync } from "node:fs";
 import { CodePanel, CodeTabs, File, Files, Folder, LanguageIcon, PackageInstall, RepoInfo, highlightCode, languageMark, packageCommand } from "../../packages/ui/src/index";
+import { uiStyles as uiSheet } from "./read-styles";
 
-const uiStyles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
+const uiStyles = uiSheet();
 
 const kinds = (code: string, language: string) =>
   highlightCode(code, language)

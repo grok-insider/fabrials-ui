@@ -1,0 +1,440 @@
+/* 0.10 inputs: search, password, number, slider, one-time code and the growing textarea. They reuse the field well
+   (--fui-shadow-well), the Stormlight focus halo and the label voice; nothing here moves unless a person acts. */
+@layer components {
+  .fui-search-input,
+  .fui-password-input-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+  }
+  .fui-password-input {
+    width: 100%;
+    min-width: 0;
+  }
+  .fui-search-input-icon {
+    position: absolute;
+    inset-inline-start: var(--fui-space-3);
+    display: inline-flex;
+    color: var(--muted-foreground);
+    pointer-events: none;
+  }
+  .fui-search-input-icon svg {
+    width: 1rem;
+    height: 1rem;
+  }
+  .fui-search-input .fui-search-input-control {
+    padding-inline: 2.25rem 2.5rem;
+  }
+  .fui-search-input-control::-webkit-search-cancel-button,
+  .fui-search-input-control::-webkit-search-decoration {
+    appearance: none;
+    display: none;
+  }
+  .fui-search-input-shortcut {
+    position: absolute;
+    inset-inline-end: var(--fui-space-2-5);
+    display: inline-flex;
+    pointer-events: none;
+  }
+  .fui-search-input-clear,
+  .fui-password-input-toggle {
+    position: absolute;
+    inset-inline-end: var(--fui-space-1);
+    color: var(--muted-foreground);
+  }
+  .fui-search-input-clear:hover,
+  .fui-password-input-toggle:hover {
+    color: var(--foreground);
+  }
+  .fui-password-input .fui-password-input-control {
+    padding-inline-end: 2.75rem;
+  }
+  .fui-password-input-control::-ms-reveal {
+    display: none;
+  }
+  .fui-password-input-caps {
+    display: flex;
+    align-items: center;
+    gap: var(--fui-space-1-5);
+    margin: var(--fui-space-1-5) 0 0;
+    color: var(--fui-warning-ink);
+    font-size: var(--fui-text-xs);
+  }
+  .fui-password-input-caps svg {
+    flex-shrink: 0;
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+  :is(.fui-search-input, .fui-password-input)[data-size="sm"] .fui-input {
+    min-height: var(--fui-control-height-sm);
+  }
+  :is(.fui-search-input, .fui-password-input)[data-size="sm"] :is(.fui-search-input-clear, .fui-password-input-toggle) {
+    min-height: calc(var(--fui-control-height-sm) - 0.5rem);
+  }
+
+  /* NumberField: the group is the well; the steppers are keys set into its end, split by a hairline. */
+  .fui-number-field {
+    min-width: 0;
+  }
+  .fui-number-field-group {
+    display: flex;
+    align-items: stretch;
+    min-height: var(--fui-control-height);
+    border: 1px solid var(--fui-control-border);
+    border-radius: var(--fui-radius-md);
+    background: var(--card);
+    box-shadow: var(--fui-shadow-well);
+    overflow: hidden;
+    transition:
+      border-color var(--fui-duration) var(--fui-ease),
+      box-shadow var(--fui-duration) var(--fui-ease);
+  }
+  .fui-number-field-group:hover:not(:focus-within) {
+    border-color: color-mix(in oklab, var(--fui-control-border) 70%, var(--foreground));
+  }
+  .fui-number-field-group:focus-within {
+    border-color: var(--fui-focus);
+    box-shadow: var(--fui-shadow-well), var(--fui-focus-halo);
+  }
+  .fui-number-field-group[data-invalid] {
+    border-color: var(--fui-danger-ink);
+  }
+  .fui-number-field-input {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 3ch;
+    padding: 0 var(--fui-space-3);
+    border: 0;
+    background: transparent;
+    color: var(--foreground);
+    font-family: var(--fui-font-mono);
+    font-size: var(--fui-text-sm);
+    font-variant-numeric: tabular-nums;
+    outline: none;
+  }
+  .fui-number-field-input::placeholder {
+    color: var(--muted-foreground);
+  }
+  .fui-number-field-unit {
+    display: flex;
+    align-items: center;
+    padding-inline-end: var(--fui-space-2-5);
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    letter-spacing: var(--fui-tracking-label);
+    white-space: nowrap;
+  }
+  .fui-number-field-step {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2.25rem;
+    padding: 0;
+    border: 0;
+    border-inline-start: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    transition: background-color var(--fui-duration-fast) var(--fui-ease), color var(--fui-duration-fast) var(--fui-ease);
+  }
+  .fui-number-field-step svg {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+  .fui-number-field-step:hover:not([data-disabled]) {
+    background: var(--accent);
+    color: var(--foreground);
+  }
+  .fui-number-field-step:active:not([data-disabled]) {
+    box-shadow: var(--fui-pressed);
+  }
+  .fui-number-field-step[data-disabled] {
+    color: color-mix(in oklab, var(--muted-foreground) 45%, transparent);
+    cursor: not-allowed;
+  }
+  .fui-number-field:is([data-disabled], [data-readonly]) .fui-number-field-group {
+    background: var(--muted);
+    box-shadow: none;
+  }
+  .fui-number-field[data-size="sm"] .fui-number-field-group {
+    min-height: var(--fui-control-height-sm);
+  }
+  @media (pointer: coarse) {
+    .fui-number-field-step {
+      width: 2.75rem;
+    }
+  }
+
+  /* Slider: a sunken track, a Stormlight fill and a raised fader cap with a centre line. */
+  .fui-slider {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--fui-space-3);
+    width: 100%;
+    min-width: 0;
+  }
+  .fui-slider[data-marks] {
+    padding-block-end: var(--fui-space-4);
+  }
+  .fui-slider-control {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 1.75rem;
+    padding-inline: 0.375rem;
+    touch-action: none;
+    cursor: pointer;
+  }
+  .fui-slider-track {
+    position: relative;
+    width: 100%;
+    height: 0.375rem;
+    border-radius: var(--fui-radius-xs);
+    background: var(--muted);
+    box-shadow: var(--fui-shadow-well), inset 0 0 0 1px color-mix(in oklab, var(--fui-control-border) 45%, transparent);
+  }
+  .fui-slider-indicator {
+    border-radius: inherit;
+    background-color: var(--brand);
+    background-image: var(--fui-sheen);
+  }
+  .fui-slider-thumb {
+    width: 0.75rem;
+    height: 1.25rem;
+    border: 1px solid var(--fui-control-border);
+    border-radius: var(--fui-radius-xs);
+    background-color: var(--card);
+    background-image: var(--fui-sheen-soft);
+    box-shadow: var(--fui-shadow-xs), var(--fui-highlight);
+    transition: box-shadow var(--fui-duration) var(--fui-ease), border-color var(--fui-duration) var(--fui-ease);
+  }
+  .fui-slider-thumb::before {
+    content: "";
+    position: absolute;
+    inset: -0.75rem -0.5rem;
+  }
+  .fui-slider-thumb::after {
+    content: "";
+    position: absolute;
+    inset-block: 0.3125rem;
+    left: calc(50% - 0.5px);
+    width: 1px;
+    background: var(--fui-control-border);
+  }
+  .fui-slider-thumb:hover,
+  .fui-slider-thumb[data-dragging] {
+    border-color: color-mix(in oklab, var(--fui-control-border) 55%, var(--foreground));
+  }
+  .fui-slider-thumb[data-dragging] {
+    box-shadow: var(--fui-shadow-sm), var(--fui-highlight);
+  }
+  .fui-slider-thumb:has(:focus-visible) {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: 2px;
+  }
+  /* A disabled slider dims its track, not its words: the value of a control that is off is still read, and 50 % of the muted
+     ink over a card is under the contrast a value has to keep (0.12). */
+  .fui-slider[data-disabled] .fui-slider-control {
+    opacity: 0.5;
+  }
+  .fui-slider[data-disabled] :is(.fui-slider-label, .fui-slider-value) {
+    color: var(--muted-foreground);
+  }
+  .fui-slider[data-disabled] .fui-slider-control {
+    cursor: not-allowed;
+  }
+  .fui-slider-marks {
+    position: absolute;
+    inset-inline: 0.375rem;
+    top: calc(50% + 0.5rem);
+    height: 0.375rem;
+    pointer-events: none;
+  }
+  .fui-slider-mark {
+    position: absolute;
+    inset-inline-start: var(--fui-slider-mark);
+    width: 1px;
+    height: 0.3125rem;
+    background: color-mix(in oklab, var(--muted-foreground) 70%, transparent);
+  }
+  .fui-slider-mark[data-labelled] {
+    height: 0.4375rem;
+    background: var(--muted-foreground);
+  }
+  /* A label is centred on its tick, except at the ends of the track, where it turns inward so it never leaves the slider.
+     Logical like Base UI's thumbs, so a right-to-left slider mirrors its ruler. */
+  .fui-slider-mark-label {
+    position: absolute;
+    top: 0.625rem;
+    inset-inline-start: 0;
+    translate: -50% 0;
+    color: var(--muted-foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    letter-spacing: var(--fui-tracking-label);
+    white-space: nowrap;
+  }
+  .fui-slider-mark-label:dir(rtl) {
+    translate: 50% 0;
+  }
+  .fui-slider-mark[data-edge="start"] .fui-slider-mark-label {
+    translate: 0 0;
+  }
+  .fui-slider-mark[data-edge="end"] .fui-slider-mark-label {
+    translate: -100% 0;
+  }
+  .fui-slider-mark[data-edge="end"] .fui-slider-mark-label:dir(rtl) {
+    translate: 100% 0;
+  }
+  .fui-slider-value {
+    min-width: 3ch;
+    color: var(--foreground);
+    font-family: var(--fui-font-label);
+    font-size: var(--fui-text-label);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: var(--fui-tracking-label);
+    text-align: end;
+    white-space: nowrap;
+  }
+  .fui-slider[data-orientation="vertical"] {
+    grid-template-columns: auto;
+    justify-items: center;
+    width: auto;
+  }
+  .fui-slider[data-orientation="vertical"] .fui-slider-control {
+    flex-direction: column;
+    min-height: 10rem;
+    min-width: 1.75rem;
+    padding: 0.375rem 0;
+  }
+  .fui-slider[data-orientation="vertical"] .fui-slider-track {
+    width: 0.375rem;
+    height: 100%;
+    min-height: 9rem;
+  }
+  .fui-slider[data-orientation="vertical"] .fui-slider-thumb {
+    width: 1.25rem;
+    height: 0.75rem;
+  }
+  .fui-slider[data-orientation="vertical"] .fui-slider-thumb::after {
+    inset-block: auto;
+    inset-inline: 0.3125rem;
+    top: calc(50% - 0.5px);
+    left: 0.3125rem;
+    width: auto;
+    height: 1px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .fui-slider:not([data-dragging]) :is(.fui-slider-thumb, .fui-slider-indicator) {
+      transition-property: left, right, bottom, top, width, height, box-shadow, border-color;
+      transition-duration: var(--fui-duration);
+      transition-timing-function: var(--fui-ease-out);
+    }
+  }
+
+  /* One-time code: slots are small wells; grouped slots share their hairlines. */
+  .fui-input-otp {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--fui-space-2);
+  }
+  .fui-input-otp-group {
+    display: flex;
+  }
+  .fui-input-otp-slot {
+    width: 2.5rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 1px solid var(--fui-control-border);
+    border-radius: var(--fui-radius-md);
+    background: var(--card);
+    box-shadow: var(--fui-shadow-well);
+    color: var(--foreground);
+    caret-color: var(--brand);
+    font-family: var(--fui-font-mono);
+    font-size: var(--fui-text-lg);
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+    transition:
+      border-color var(--fui-duration) var(--fui-ease),
+      box-shadow var(--fui-duration) var(--fui-ease);
+  }
+  .fui-input-otp-group > .fui-input-otp-slot {
+    border-radius: 0;
+  }
+  .fui-input-otp-group > .fui-input-otp-slot + .fui-input-otp-slot {
+    margin-inline-start: -1px;
+  }
+  .fui-input-otp-group > .fui-input-otp-slot:first-child {
+    border-start-start-radius: var(--fui-radius-md);
+    border-end-start-radius: var(--fui-radius-md);
+  }
+  .fui-input-otp-group > .fui-input-otp-slot:last-child {
+    border-start-end-radius: var(--fui-radius-md);
+    border-end-end-radius: var(--fui-radius-md);
+  }
+  .fui-input-otp-slot:focus-visible {
+    position: relative;
+    z-index: 1;
+    border-color: var(--fui-focus);
+    outline: 2px solid transparent;
+    box-shadow: var(--fui-shadow-well), var(--fui-focus-halo);
+  }
+  .fui-input-otp[data-invalid] .fui-input-otp-slot,
+  .fui-input-otp-slot[aria-invalid="true"] {
+    border-color: var(--fui-danger-ink);
+  }
+  .fui-input-otp[data-disabled] .fui-input-otp-slot {
+    background: var(--muted);
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+  .fui-input-otp-separator {
+    flex: none;
+    width: 0.625rem;
+    height: 1px;
+    background: var(--muted-foreground);
+  }
+
+  /* A textarea that grows with its text, then scrolls. */
+  .fui-textarea[data-autoresize] {
+    field-sizing: content;
+    resize: none;
+    min-height: calc(var(--fui-textarea-min-rows, 2) * 1lh + 2 * var(--fui-space-2) + 2px);
+    max-height: calc(var(--fui-textarea-max-rows, 12) * 1lh + 2 * var(--fui-space-2) + 2px);
+    overflow-y: auto;
+  }
+
+  @media (forced-colors: active) {
+    .fui-slider-track {
+      background: Canvas;
+      outline: 1px solid CanvasText;
+    }
+    .fui-slider-indicator {
+      background: Highlight;
+    }
+    .fui-slider-thumb {
+      border-color: ButtonText;
+      background: ButtonFace;
+    }
+    .fui-slider-mark {
+      background: CanvasText;
+    }
+    .fui-number-field-group {
+      border-color: ButtonText;
+    }
+    .fui-number-field-step {
+      color: ButtonText;
+      border-color: ButtonText;
+    }
+    .fui-input-otp-separator {
+      background: CanvasText;
+    }
+  }
+}
+

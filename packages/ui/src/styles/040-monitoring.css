@@ -1,0 +1,432 @@
+/* 0.6: monitoring pieces — dither canvas, activity strip, timeline, relative time, nav tabs */
+@layer components {
+  .fui-dither-canvas {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    display: block;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    image-rendering: pixelated;
+    opacity: 0;
+  }
+  .fui-dither-canvas[data-fixed] {
+    position: fixed;
+  }
+  .fui-dither-canvas[data-painted] {
+    opacity: 1;
+  }
+
+  /* 0.7: Highstorm brand pieces */
+  .fui-dither-scene {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    isolation: isolate;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .fui-dither-band {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    height: var(--fui-band-height, 4.5rem);
+    pointer-events: none;
+  }
+  .fui-dither-gem {
+    position: relative;
+    isolation: isolate;
+    display: inline-block;
+    flex-shrink: 0;
+    vertical-align: middle;
+  }
+
+  .fui-activity-strip {
+    display: grid;
+    gap: var(--fui-space-1-5);
+    margin: 0;
+    min-width: 0;
+    --fui-cell: var(--brand);
+    --fui-cell-height: 1.5rem;
+  }
+  .fui-activity-strip[data-size="sm"] {
+    --fui-cell-height: 1rem;
+  }
+  .fui-activity-strip[data-size="lg"] {
+    --fui-cell-height: 2rem;
+  }
+  .fui-activity-cells {
+    display: flex;
+    gap: 2px;
+    min-width: 0;
+    height: var(--fui-cell-height);
+  }
+  /* Many cells in a narrow strip shrink below the gap rather than overflow. */
+  .fui-activity-cell {
+    flex: 1 1 0;
+    min-width: 0;
+    border-radius: 2px;
+    background: color-mix(in oklab, var(--foreground) 7%, transparent);
+  }
+  .fui-activity-cell[data-tone="success"] {
+    --fui-cell: var(--success);
+  }
+  .fui-activity-cell[data-tone="warning"] {
+    --fui-cell: var(--warning);
+  }
+  .fui-activity-cell[data-tone="danger"] {
+    --fui-cell: var(--destructive);
+  }
+  .fui-activity-cell[data-level="1"] {
+    background: color-mix(in oklab, var(--fui-cell) 28%, transparent);
+  }
+  .fui-activity-cell[data-level="2"] {
+    background: color-mix(in oklab, var(--fui-cell) 50%, transparent);
+  }
+  .fui-activity-cell[data-level="3"] {
+    background: color-mix(in oklab, var(--fui-cell) 75%, transparent);
+  }
+  .fui-activity-cell[data-level="4"] {
+    background: var(--fui-cell);
+  }
+  .fui-activity-labels {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--fui-space-2);
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+  }
+
+  .fui-timeline {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .fui-timeline-item {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.75rem minmax(0, 1fr);
+    gap: var(--fui-space-3);
+    padding: var(--fui-space-2-5) var(--fui-space-2);
+    border-radius: var(--fui-radius-md);
+    --fui-timeline-color: var(--muted-foreground);
+  }
+  .fui-timeline-item[data-tone="info"] {
+    --fui-timeline-color: var(--fui-info-ink);
+  }
+  .fui-timeline-item[data-tone="success"] {
+    --fui-timeline-color: var(--fui-success-ink);
+  }
+  .fui-timeline-item[data-tone="warning"] {
+    --fui-timeline-color: var(--fui-warning-ink);
+  }
+  .fui-timeline-item[data-tone="danger"] {
+    --fui-timeline-color: var(--fui-danger-ink);
+  }
+  .fui-timeline-item:not(:last-child)::before {
+    content: "";
+    position: absolute;
+    top: calc(var(--fui-space-2-5) + 1.75rem + 2px);
+    bottom: calc(-1 * var(--fui-space-2-5) + 2px);
+    inset-inline-start: calc(var(--fui-space-2) + 0.875rem - 0.5px);
+    width: 1px;
+    background: var(--border);
+  }
+  .fui-timeline-marker {
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    overflow: hidden;
+    border-radius: var(--fui-radius-xs);
+    background: color-mix(in oklab, var(--fui-timeline-color) 14%, var(--card));
+    color: var(--fui-timeline-color);
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--fui-timeline-color) 30%, transparent);
+  }
+  .fui-timeline-marker > svg {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+  .fui-timeline-marker > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .fui-timeline-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: var(--fui-radius-full);
+    background: currentColor;
+  }
+  .fui-timeline-body {
+    display: grid;
+    gap: var(--fui-space-1);
+    min-width: 0;
+    padding-top: 0.25rem;
+  }
+  .fui-timeline-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--fui-space-1) var(--fui-space-2);
+    min-width: 0;
+    font-size: var(--fui-text-sm);
+  }
+  .fui-timeline-title {
+    min-width: 0;
+    font-weight: var(--fui-weight-medium);
+  }
+  .fui-timeline-time {
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+    white-space: nowrap;
+  }
+  .fui-timeline-actions {
+    display: inline-flex;
+    gap: var(--fui-space-1);
+    margin-inline-start: auto;
+  }
+  .fui-timeline-content {
+    min-width: 0;
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-sm);
+    overflow-wrap: anywhere;
+  }
+  .fui-timeline-item[data-fresh] {
+    background: color-mix(in oklab, var(--brand) 7%, transparent);
+  }
+
+  .fui-relative-time {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .fui-nav-tabs {
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .fui-nav-tabs > .fui-tabs-list {
+    flex-wrap: nowrap;
+    min-width: max-content;
+  }
+  .fui-nav-tab {
+    color: var(--muted-foreground);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .fui-nav-tab:focus-visible {
+    outline: 2px solid var(--fui-focus);
+    outline-offset: -2px;
+  }
+  .fui-nav-tab-count {
+    min-width: 1.25rem;
+    padding: 0 var(--fui-space-1-5);
+    border-radius: var(--fui-radius-xs);
+    background: var(--muted);
+    color: var(--muted-foreground);
+    font-size: var(--fui-text-xs);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.25rem;
+    text-align: center;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .fui-dither-canvas {
+      transition: opacity 600ms var(--fui-ease);
+    }
+    .fui-timeline-item[data-fresh] {
+      animation: fui-timeline-fresh 2.4s var(--fui-ease) both;
+    }
+    .fui-nav-tab:not([data-active]):hover {
+      color: var(--foreground);
+    }
+  }
+  @keyframes fui-timeline-fresh {
+    0% {
+      background: color-mix(in oklab, var(--brand) 18%, transparent);
+      transform: translateY(-4px);
+      opacity: 0;
+    }
+    15% {
+      opacity: 1;
+      transform: none;
+    }
+    100% {
+      background: transparent;
+    }
+  }
+
+  /* --------------------------------------------------- forced colors (0.9)
+     Windows high contrast repaints every background in Canvas and drops every box-shadow, so whatever these parts draw with a
+     fill or a hairline disappears: a switch's thumb, a meter, a badge's edge, a legend key. A colour that is a system colour in the
+     author value (Highlight, CanvasText) is kept, which is what every rule here uses. Four groups; the render of each is asserted
+     in tests/visual/forced-colors.spec.ts.
+     SVG fill and stroke are not repainted (the UA gives svg forced-color-adjust: preserve-parent-color), so a chart's series keep
+     their colours: only the HTML marks that label them needed a rule. Skeletons are out of scope; they have their own suite. */
+  @media (forced-colors: active) {
+    /* 1. Marks whose colour is the information: they keep it, with an edge that shows on any Canvas. */
+    .fui-chart-swatch,
+    .fui-badge-dot,
+    .fui-status-dot,
+    .fui-timeline-dot {
+      forced-color-adjust: none;
+      outline: 1px solid CanvasText;
+      outline-offset: -1px;
+    }
+    .fui-status-dot {
+      box-shadow: none;
+    }
+    /* The plot's text is SVG paint, which is not repainted either: it keeps the theme's muted ink, unreadable on a Canvas that is
+       not the theme's (a light page under a dark high-contrast palette). */
+    .fui-chart-frame .recharts-surface text {
+      fill: CanvasText;
+    }
+    .fui-timeline-dot {
+      /* The dot paints with currentColor, and the marker around it has its color forced; the dot's own is its tone. */
+      color: var(--fui-timeline-color);
+    }
+
+    /* 2. Fills that say a state or an amount: Highlight, on an edged track. */
+    .fui-meter-track,
+    .fui-progress-track:not([data-steps]):not(.fui-progress-ring),
+    .fui-progress-segment {
+      border: 1px solid CanvasText;
+    }
+    .fui-meter-indicator,
+    .fui-progress-indicator,
+    .fui-progress-segment::before {
+      background: Highlight;
+    }
+    /* A scrollbar's thumb says where the view is: CanvasText (its tint would be forced to nothing). */
+    .fui-scrollbar-thumb {
+      background: CanvasText;
+    }
+    /* A ring: the rest of the circle in GrayText, the part done in Highlight. */
+    .fui-progress-ring-track {
+      stroke: GrayText;
+    }
+    .fui-progress-ring-fill {
+      stroke: Highlight;
+    }
+    /* A row of a menu, a context menu or a select is marked by a tint that is gone: an outline in Highlight, as a row of the
+       combobox and of a command list. */
+    .fui-menu-item[data-highlighted] {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+    /* The thumb is a fill: CanvasText when off (a dot at the start), HighlightText on a Highlight track when on. */
+    .fui-switch-thumb {
+      background: CanvasText;
+    }
+    .fui-switch[data-checked] {
+      border-color: Highlight;
+      background: Highlight;
+    }
+    .fui-switch[data-checked] .fui-switch-thumb {
+      background: HighlightText;
+    }
+    .fui-checkbox[data-checked],
+    .fui-checkbox[data-indeterminate],
+    .fui-radio[data-checked] {
+      border-color: Highlight;
+    }
+    .fui-checkbox[data-checked],
+    .fui-checkbox[data-indeterminate] {
+      background: Highlight;
+      color: HighlightText;
+    }
+    .fui-radio-indicator {
+      background: Highlight;
+    }
+    /* The tabs' underline, and the bar of a vertical list (whose own rule has three classes of specificity). */
+    .fui-tabs-list .fui-tabs-indicator.fui-tabs-indicator {
+      background: Highlight;
+    }
+    .fui-tabs-list:not([data-variant="segmented"]):not(:has(.fui-tabs-indicator)) .fui-tab[data-active]::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0;
+      inset-block-end: 0;
+      block-size: 2px;
+      background: Highlight;
+    }
+    /* An activity cell is a step of Highlight over Canvas, with an edge so an empty one still shows. */
+    .fui-activity-cell {
+      forced-color-adjust: none;
+      border: 1px solid GrayText;
+      background: Canvas;
+    }
+    .fui-activity-cell[data-level]:not([data-level="0"]) {
+      border-color: CanvasText;
+    }
+    .fui-activity-cell[data-level="1"] {
+      background: color-mix(in srgb, Highlight 25%, Canvas);
+    }
+    .fui-activity-cell[data-level="2"] {
+      background: color-mix(in srgb, Highlight 45%, Canvas);
+    }
+    .fui-activity-cell[data-level="3"] {
+      background: color-mix(in srgb, Highlight 70%, Canvas);
+    }
+    .fui-activity-cell[data-level="4"] {
+      background: Highlight;
+    }
+
+    /* 3. Hairlines that were a box-shadow become an outline; pressed and active become a Highlight bar under the label, drawn
+       on a pseudo-element like the current item of a list. Not an outline: that is the focus ring's own shape, and a focused
+       pressed segment must still be told from an unpressed one. Not a Highlight fill behind the label either: Chromium paints
+       a Canvas backplate behind text over any author background unless the element opts out of forcing, so the label would be
+       HighlightText on a white box. */
+    .fui-badge,
+    .fui-avatar,
+    .fui-timeline-marker,
+    .fui-toggle-group,
+    .fui-tabs-list[data-variant="segmented"] {
+      outline: 1px solid CanvasText;
+      outline-offset: -1px;
+    }
+    /* A pressed or current tag (its tint is gone): a Highlight bar under its label, like a pressed segment. */
+    button.fui-badge[aria-pressed="true"],
+    a.fui-badge[aria-current]:not([aria-current="false"]) {
+      position: relative;
+    }
+    button.fui-badge[aria-pressed="true"]::after,
+    a.fui-badge[aria-current]:not([aria-current="false"])::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0.25rem;
+      inset-block-end: 1px;
+      block-size: 2px;
+      background: Highlight;
+    }
+    .fui-toggle[data-pressed],
+    .fui-tabs-list[data-variant="segmented"] .fui-tab[data-active],
+    .fui-tabs-list:not([data-variant="segmented"]):not(:has(.fui-tabs-indicator)) .fui-tab[data-active] {
+      position: relative;
+    }
+    .fui-toggle[data-pressed]::after,
+    .fui-tabs-list[data-variant="segmented"] .fui-tab[data-active]::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0.25rem;
+      inset-block-end: 2px;
+      block-size: 3px;
+      background: Highlight;
+    }
+
+    /* 4. Focus that was only a box-shadow (the control inside draws no ring of its own): the ring every other control gets in
+       forced colors, Highlight. */
+    .fui-input-group:has(.fui-input-group-control:focus-visible) {
+      outline: 2px solid Highlight;
+      outline-offset: 2px;
+    }
+    .fui-command-input-wrapper:focus-within {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+  }
+}
+

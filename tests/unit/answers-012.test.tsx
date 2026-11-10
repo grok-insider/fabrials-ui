@@ -1,6 +1,5 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import {
   AnnotationList,
@@ -29,8 +28,9 @@ import {
 } from "../../packages/ui/src/choice-keys";
 import { clampStep, lastStep, stepDelay, stepPlayerReducer, type StepPlayerAction, type StepPlayerState } from "../../packages/ui/src/step-player";
 import { graphemeBoundaries, placeRanges, wordTokens, type DiffPart } from "../../packages/ui/src/text-ranges";
+import { uiStyles } from "./read-styles";
 
-const styles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
+const styles = uiStyles();
 const BLOCK_MARK = "/* 0.12: answers and steps */";
 const blockAt = styles.lastIndexOf("@layer components {", styles.indexOf(BLOCK_MARK));
 const closeOf = (text: string, from: number) => {

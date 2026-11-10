@@ -1,6 +1,5 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import { ShimmerText, WorkingLight } from "../../packages/ui/src";
 import {
@@ -16,8 +15,9 @@ import {
   formatTokens,
   formatWorkTime,
 } from "../../packages/ai-ui/src/index";
+import { aiStyles as aiSheet } from "./read-styles";
 
-const aiStyles = readFileSync(new URL("../../packages/ai-ui/src/styles.css", import.meta.url), "utf8");
+const aiStyles = aiSheet();
 
 test("work time reads short: tenths under ten seconds, then seconds, minutes and hours", () => {
   assert.equal(formatWorkTime(0), "0.0s");

@@ -1,6 +1,5 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import {
   AttachmentsError,
@@ -21,9 +20,10 @@ import {
   type AttachmentState,
 } from "../../packages/ai-ui/src/index";
 import { DropOverlay, DropdownMenuItem, carriesFiles, draggedFilesRefused } from "../../packages/ui/src/index";
+import { uiStyles as uiSheet, aiStyles as aiSheet } from "./read-styles";
 
-const uiStyles = readFileSync(new URL("../../packages/ui/src/styles.css", import.meta.url), "utf8");
-const aiStyles = readFileSync(new URL("../../packages/ai-ui/src/styles.css", import.meta.url), "utf8");
+const uiStyles = uiSheet();
+const aiStyles = aiSheet();
 
 // One of the blocks 0.12 appends: its marker, then the declarations of a selector inside it, up to the closing brace.
 function block(css: string, marker: string) {
