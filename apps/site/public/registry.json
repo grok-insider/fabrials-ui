@@ -1116,6 +1116,31 @@
       ]
     },
     {
+      "name": "combobox",
+      "type": "registry:ui",
+      "title": "Combobox",
+      "description": "shadcn's combobox, backed by @fabrials/ui. A text field that filters a list of known values.",
+      "author": "Fabrials <admin@grokinsider.net>",
+      "dependencies": [
+        "@fabrials/ui@^0.11.0"
+      ],
+      "registryDependencies": [
+        "https://ui.fabrials.com/r/styles.json"
+      ],
+      "meta": {
+        "source": "shim",
+        "license": "MIT",
+        "category": "Shims",
+        "shadcn": "combobox"
+      },
+      "files": [
+        {
+          "path": "registry/shims/combobox.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "command",
       "type": "registry:ui",
       "title": "Command",

@@ -65,6 +65,7 @@ Namespace: add "registries": { "@fabrials": "https://ui.fabrials.com/r/{name}.js
 - carousel: npx shadcn@latest add https://ui.fabrials.com/r/carousel.json
 - checkbox: npx shadcn@latest add https://ui.fabrials.com/r/checkbox.json
 - collapsible: npx shadcn@latest add https://ui.fabrials.com/r/collapsible.json
+- combobox: npx shadcn@latest add https://ui.fabrials.com/r/combobox.json
 - command: npx shadcn@latest add https://ui.fabrials.com/r/command.json
 - context-menu: npx shadcn@latest add https://ui.fabrials.com/r/context-menu.json
 - dialog: npx shadcn@latest add https://ui.fabrials.com/r/dialog.json

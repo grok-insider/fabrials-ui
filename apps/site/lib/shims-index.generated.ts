@@ -125,6 +125,27 @@ export const shimIndex: { name: string; exports: string[] }[] = [
     ]
   },
   {
+    "name": "combobox",
+    "exports": [
+      "Combobox",
+      "ComboboxChip",
+      "ComboboxChips",
+      "ComboboxChipsInput",
+      "ComboboxCollection",
+      "ComboboxContent",
+      "ComboboxEmpty",
+      "ComboboxGroup",
+      "ComboboxInput",
+      "ComboboxItem",
+      "ComboboxLabel",
+      "ComboboxList",
+      "ComboboxSeparator",
+      "ComboboxTrigger",
+      "ComboboxValue",
+      "useComboboxAnchor"
+    ]
+  },
+  {
     "name": "command",
     "exports": [
       "Command",
