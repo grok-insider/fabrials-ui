@@ -1,17 +1,61 @@
 "use client";
-// Origin: Spectrum UI number ticker (beUI, Apache-2.0), copied 2026-09-22. Restyled with fui- classes in 0.4.
+// Origin: Spectrum UI number ticker (beUI, Apache-2.0), copied 2026-09-22. Restyled with fui- classes in 0.4. Since 0.12 the
+// columns roll on a CSS transition and there is no animation library behind it.
 
-import { animate, motion, useInView, useReducedMotion } from "motion/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type ComponentProps, type CSSProperties, type RefObject } from "react";
 import { useProvidedLocale } from "./labels";
 import { formatCount } from "./plural";
 import { classes } from "./shared";
 
-const EASE_OUT = [0.16, 1, 0.3, 1] as const;
 const DIGIT_HEIGHT_EM = 1.1;
 const DIGITS = Array.from({ length: 10 }, (_, n) => n);
+const REDUCED = "(prefers-reduced-motion: reduce)";
 
-export type NumberTickerProps = {
+/** One glyph per em, three decimals at most, so the stack lands exactly on its digit. */
+function travel(digit: number) {
+  return `translateY(-${Math.round(digit * DIGIT_HEIGHT_EM * 1000) / 1000}em)`;
+}
+
+function subscribe(onChange: () => void) {
+  const query = typeof matchMedia === "function" ? matchMedia(REDUCED) : null;
+  query?.addEventListener("change", onChange);
+  return () => query?.removeEventListener("change", onChange);
+}
+
+// Asked from the browser only: the server cannot know, and a guess would not match the first paint it sent.
+function useReducedMotion() {
+  return useSyncExternalStore(
+    subscribe,
+    () => typeof matchMedia === "function" && matchMedia(REDUCED).matches,
+    () => false,
+  );
+}
+
+/** Whether the element has come into view once, for a number that counts up when it is seen. */
+function useInViewOnce(ref: RefObject<HTMLElement | null>, enabled: boolean) {
+  const [seen, setSeen] = useState(false);
+  useEffect(() => {
+    const node = ref.current;
+    if (!enabled || seen) return;
+    if (typeof IntersectionObserver === "undefined" || !node) {
+      setSeen(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        setSeen(true);
+        observer.disconnect();
+      },
+      { threshold: 0.6 },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [enabled, ref, seen]);
+  return seen;
+}
+
+export type NumberTickerProps = Omit<ComponentProps<"span">, "children"> & {
   value: number;
   pad?: number;
   duration?: number;
@@ -20,7 +64,6 @@ export type NumberTickerProps = {
   prefix?: string;
   suffix?: string;
   blur?: boolean;
-  className?: string;
   digitClassName?: string;
   /**
    * The locale the number is grouped in ("12,480", "12.480"). Without one, here or from a `LabelsProvider`, the digits are
@@ -33,6 +76,12 @@ export type NumberTickerProps = {
   format?: (value: number) => string;
 };
 
+/**
+ * A number that rolls to its value like an odometer: each digit is a column of 0-9 that slides into place, the columns a
+ * little apart. It rolls once when it is first seen (or at once with `startOnView={false}`) and again whenever `value`
+ * changes, from wherever the digits are; the first paint shows the number at rest and reduced motion jumps with no roll.
+ * Assistive technology always reads the final number, and the digits keep their width as they turn.
+ */
 export function NumberTicker({
   value,
   pad,
@@ -46,16 +95,22 @@ export function NumberTicker({
   digitClassName,
   locale: ownLocale,
   format,
+  style,
+  ...props
 }: NumberTickerProps) {
   const provided = useProvidedLocale(typeof ownLocale === "boolean" ? undefined : ownLocale);
   const containerRef = useRef<HTMLSpanElement>(null);
-  const inView = useInView(containerRef, { once: true, amount: 0.6 });
-  const [armed, setArmed] = useState(!startOnView);
+  const inView = useInViewOnce(containerRef, startOnView);
+  const reduce = useReducedMotion();
+  const armed = !startOnView || inView;
   const [entered, setEntered] = useState(false);
+  // The columns are painted at rest first, one frame before they are asked to move, so the roll has somewhere to start.
+  const [live, setLive] = useState(false);
 
   useEffect(() => {
-    if (startOnView && inView) setArmed(true);
-  }, [startOnView, inView]);
+    const frame = requestAnimationFrame(() => setLive(true));
+    return () => cancelAnimationFrame(frame);
+  }, []);
 
   const text = useMemo(() => {
     if (format) return format(value);
@@ -77,7 +132,12 @@ export function NumberTicker({
   }, [armed, entered, duration, stagger, glyphs.length]);
 
   return (
-    <span ref={containerRef} className={classes("fui-ticker", className)}>
+    <span
+      ref={containerRef}
+      className={classes("fui-ticker", className)}
+      style={{ "--fui-ticker-duration": `${duration * 1000}ms`, ...style } as CSSProperties}
+      {...props}
+    >
       <span className="fui-sr-only">{readableText}</span>
       <span aria-hidden="true" className="fui-ticker-row">
         {prefix ? <span>{prefix}</span> : null}
@@ -92,11 +152,12 @@ export function NumberTicker({
           return (
             <Digit
               key={id}
-              digit={armed ? Number(char) : 0}
-              delay={entered ? 0 : index * stagger}
-              duration={duration}
               blur={blur}
+              blurDuration={Math.min(duration * 0.75, 0.32) * 1000}
               className={digitClassName}
+              delay={entered || reduce ? 0 : index * stagger}
+              digit={live && armed ? Number(char) : 0}
+              reduce={reduce}
             />
           );
         })}
@@ -109,32 +170,30 @@ export function NumberTicker({
 function Digit({
   digit,
   delay,
-  duration,
   blur,
+  blurDuration,
+  reduce,
   className,
 }: {
   digit: number;
   delay: number;
-  duration: number;
   blur: boolean;
+  blurDuration: number;
+  reduce: boolean;
   className?: string;
 }) {
-  const reduce = useReducedMotion();
   const columnRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    if (reduce || !blur || !columnRef.current || !Number.isFinite(digit)) return;
     const node = columnRef.current;
-    const controls = animate(
-      node,
-      { filter: ["blur(10px)", "blur(0px)"] },
-      { duration: Math.min(duration * 0.75, 0.32), delay, ease: EASE_OUT },
-    );
-    return () => {
-      controls.stop();
-      node.style.filter = "blur(0px)";
-    };
-  }, [blur, delay, digit, duration, reduce]);
+    if (reduce || !blur || !node || typeof node.animate !== "function") return;
+    const fade = node.animate([{ filter: "blur(10px)" }, { filter: "blur(0px)" }], {
+      duration: blurDuration,
+      delay: delay * 1000,
+      easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+    });
+    return () => fade.cancel();
+  }, [blur, blurDuration, delay, digit, reduce]);
 
   if (reduce) {
     return (
@@ -147,21 +206,15 @@ function Digit({
   return (
     <span
       className={classes("fui-ticker-digit", className)}
-      style={{ height: `${DIGIT_HEIGHT_EM}em`, width: "1ch" }}
+      style={{ height: `${DIGIT_HEIGHT_EM}em`, width: "1ch", "--fui-ticker-delay": `${delay * 1000}ms` } as CSSProperties}
     >
-      <motion.span
-        ref={columnRef}
-        initial={{ y: 0 }}
-        animate={{ y: `-${digit * DIGIT_HEIGHT_EM}em` }}
-        transition={reduce ? { duration: 0 } : { duration, delay, ease: EASE_OUT }}
-        className="fui-ticker-column"
-      >
+      <span className="fui-ticker-column" ref={columnRef} style={{ transform: digit === 0 ? "none" : travel(digit) }}>
         {DIGITS.map((n) => (
           <span key={n} className="fui-ticker-glyph">
             {n}
           </span>
         ))}
-      </motion.span>
+      </span>
     </span>
   );
 }

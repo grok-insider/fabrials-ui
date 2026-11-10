@@ -10,7 +10,7 @@ const root = resolve(import.meta.dirname, "../..");
 const packages = ["ui", "ai-ui"] as const;
 
 // Libraries whose modules are client modules themselves: a file that imports or re-exports one is a client module too.
-const CLIENT_LIBRARIES = /^(@base-ui\/react\/|cmdk$|embla-carousel-react$|motion\/react$|recharts$|sonner$|react-resizable-panels$)/;
+const CLIENT_LIBRARIES = /^(@base-ui\/react\/|cmdk$|embla-carousel-react$|recharts$|sonner$|react-resizable-panels$)/;
 
 // Directive-free on purpose although the scan finds a browser global.
 const PLAIN_BY_DESIGN: Record<string, string> = {

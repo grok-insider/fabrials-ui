@@ -1255,3 +1255,41 @@ Radiant can replace `components/chat/generated-media.tsx`.
   Only disabled sliders are affected.
 - **A `TabsList`** now carries `fui-tabs-list-segmented` beside `data-variant="segmented"`. The attributes still select the
   look; a host rule that keys on the class alone now matches.
+
+## NumberTicker without a dependency
+
+`NumberTicker` was the only piece of `@fabrials/ui` that used `motion`, so every product that installed the package installed `motion`, `framer-motion`, `motion-dom` and `motion-utils` (about 17 MB of `node_modules`) for one counter. The roll is now a CSS transition on the column of digits, the way `Readout` settles its characters: the package carries no animation library at all.
+
+### The API is the same
+
+| Prop | Same as before |
+| --- | --- |
+| `value`, `pad`, `duration`, `stagger`, `startOnView`, `prefix`, `suffix`, `blur`, `className`, `digitClassName`, `locale`, `format` | Unchanged in name, type, default and meaning. |
+| `...props`, `style` | New, and additive: `id`, `data-*`, `aria-*` and `ref` now reach the root span. `style` is merged after the ticker's own custom property, so a host can also override the length. |
+
+What a person sees is the same: a column of 0-9 per digit that turns into place, the columns 40 ms apart, a length of 0.9 s, once when six tenths of it have come into view (or at once with `startOnView={false}`), and again whenever `value` changes. The number read by assistive technology is the final one from the first frame; the turning digits are `aria-hidden`.
+
+### What changed inside
+
+- The column's position is an inline `transform: translateY()` and the sheet transitions it inside `@media (prefers-reduced-motion: no-preference)` with `--fui-ticker-duration` (the `duration` prop, from the root), `--fui-ease-out` — the same curve `motion` was given — and `--fui-ticker-delay` (the stagger, per digit). A change of value retargets the transition, so an interrupted roll carries on from where the digits are.
+- `useInView` became a small `IntersectionObserver` at the same threshold, and the first roll is started by one `requestAnimationFrame`: the columns are painted at rest and then asked to move, exactly as the `motion` version did, so the first paint is the same number of columns at rest.
+- Reduced motion is read with `useSyncExternalStore` and a server snapshot of `false`, so the markup the server sends always matches the first client paint; under reduced motion the columns are not built at all (as before) and the value is there at once.
+- `blur` fades each column from `blur(10px)` with `element.animate()` (the Web Animations API, part of the browser) for the same 320 ms, since a CSS transition cannot restart itself on a change. Nothing is left running when it ends.
+
+### What is no longer installed
+
+`motion` is gone from `packages/ui/package.json` and from the package's entry in `bun.lock`, and `tests/unit/boundaries.test.ts` no longer allows the import. The repository's lockfile still lists `motion`, because the docs site gets it from `fumadocs-ui`; the package does not.
+
+**A product that imported `motion` itself and relied on it being there through `@fabrials/ui` must add it to its own dependencies.** `@fabrials/ui` never documented that dependency, but npm hoisting made it reachable for some hosts.
+
+### What a product can delete
+
+Nothing in its own code: the props are the same. A product that added `motion` to its `package.json` only to keep the ticker's peer resolve can drop it.
+
+### What looks different
+
+Nothing at rest, and the roll is the same curve and the same length. Three things are visible in the markup if a product styles it:
+
+- The digit span carries `--fui-ticker-delay` and the root carries `--fui-ticker-duration`; `motion`'s generated inline styles are gone (`transform: none` at rest, as before).
+- With `blur`, the column no longer keeps an inline `filter: blur(0px)` after the fade; the animation ends and the property goes back to what the host sets.
+- The first paint of a number is still the value at rest (all columns at zero), which is what the server has always sent; nothing about that changed.
