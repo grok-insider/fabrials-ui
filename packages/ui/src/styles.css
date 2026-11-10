@@ -12991,8 +12991,9 @@
   }
 
   /* -------------------------------------------------------------- toggle */
-  /* The look of a key on its own: `default` sits on the page as a control, `outline` draws only its hairline. Pressed is the
-     same raised segment the key has inside a group (its own rule comes earlier, so it is said again here). */
+  /* The look of a key on its own: `default` sits on the page as a control, `outline` draws only its hairline. A group shows
+     the pressed key as a raised segment in its well; a key alone has no well to rise from, so pressed is the checked form
+     every control has: a Stormlight tint, its ink and an edge. */
   .fui-toggle-default {
     background: var(--muted);
     box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--foreground) 5%, transparent);
@@ -13003,11 +13004,9 @@
   }
   .fui-toggle-default[data-pressed],
   .fui-toggle-outline[data-pressed] {
-    background: var(--fui-segment);
-    color: var(--foreground);
-    box-shadow:
-      var(--fui-shadow-xs),
-      0 0 0 1px color-mix(in oklab, var(--foreground) 8%, transparent);
+    background: color-mix(in oklab, var(--brand) var(--fui-tint-strong), var(--card));
+    color: var(--brand-ink);
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--brand) var(--fui-tint-edge), transparent);
   }
   .fui-toggle-size-sm {
     min-block-size: calc(var(--fui-control-height-sm) - 6px);
