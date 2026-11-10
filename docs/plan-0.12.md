@@ -180,14 +180,15 @@ Merged means: on `feat/0.12`, with `bun run check` green on the merged branch an
 
 | Package | State |
 | --- | --- |
-| Phase 1 documents | merged, except 1.8 (the catalogue test) and the 0.12 pieces of `DESIGN.md` and the skill, which go with E3 |
+| Phase 1 documents | merged; the catalogue test of 1.8 is `tests/unit/docs-coverage.test.ts` |
 | A1, A2, A3, A4 | merged |
 | B1, B2, B3, B4 | merged |
-| C1, C2, C3 | merged |
-| C4 | in progress |
+| C1, C2, C3, C4 | merged |
 | D1, D2, D3 | merged (`GenerationFrame` went with D2) |
-| E1 | merged |
-| E2 | in progress |
-| E3 | in progress, in two parts: the new pieces of `@fabrials/ui` first, then the chat pieces and the rest |
-| 7.4 | in progress |
-| 7.1, 7.2, 7.3, 7.5 | not started: after the last package that adds styles |
+| E1, E2 | merged |
+| F1 (not in the first plan): the bugs E2's keyboard specs found | merged |
+| E3 | the pages of `@fabrials/ui`, the skill and `DESIGN.md` merged; the pages of `@fabrials/ai-ui` in progress |
+| 7.1, 7.2 | merged: 29 and 13 parts, the sheets ship minified beside a readable copy. The first part of `@fabrials/ui` stays one block of 6,500 lines (`docs/requests.md`) |
+| 7.3, 7.5 | merged, except `Attachments` on the house ring, the icons of `@fabrials/ai-ui` and `RelativeTime` on the shared clock (`docs/requests.md`) |
+| 7.4 | merged |
+| Version 0.12.0 and the final runs | not started |

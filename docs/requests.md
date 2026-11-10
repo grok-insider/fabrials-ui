@@ -6,7 +6,7 @@ Earlier rounds are closed and kept where they were written: Open Email's request
 
 ## Open
 
-State is `0.12 <package>` when the plan for 0.12 (`docs/plan-0.12.md`) covers it, `open` when nobody has decided, `owner` when it needs the owner's decision.
+State is `0.12 <package>` when 0.12 answers it (the package is the one in `docs/plan-0.12.md`, and `docs/migration-0.12.md` says how to adopt it), `open` when nobody has decided, `owner` when it needs the owner's decision.
 
 ### From Radiant (read at `adde470`, 2026-11-10)
 
@@ -62,6 +62,32 @@ Paths are under `src/` of `grok-insider/radiant`.
 | A tree view, a bottom drawer, a time picker, a menubar, more chart kinds | owner |
 | Remove deprecated names, one size and tone vocabulary, split the modules that hold several components | owner: a breaking release |
 | Move `recharts`, `embla-carousel-react`, `cmdk` and `react-resizable-panels` to optional peers or subpaths | owner: a breaking release |
+
+### Found while building 0.12 (2026-11-10)
+
+Seen by the packages of 0.12 and left alone, because the fix changes what a product sees today or needs a decision.
+
+| Request | Where | State |
+| --- | --- | --- |
+| `ConsumptionView` heads its first column with the raw group key (`daily`, `models`); `groupHeadings` exists since 0.12 and defaults to the key | `packages/ai-ui/src/consumption.tsx` | open: change the default in a breaking release |
+| `ProviderCard` drops the lines whose label starts with "Reset" when it has a reset inventory: a rule on an English word, which repeats a row once the data is translated | `packages/ai-ui/src/providers.tsx` | open |
+| `HostedMigration` prints `Status: {phase}` with the raw key while its session list prints the phase in words | `packages/ai-ui/src/hosted-migration.tsx` | open |
+| `Combobox`: with the list closed, Escape empties the field (in a multiple one, every chip); while the list is open the `<label for>` is hidden from assistive technology, so a field with no `aria-label` fails axe | Base UI's defaults, `packages/ui/src/combobox.tsx` | open |
+| `SelectValue` shows the raw value unless the root is given `items` | Base UI's API, `packages/ui/src/select.tsx`; said in the migration note | open: resolve the label from the item text |
+| `AlertDialogAction` is a plain button and the host closes the dialog; its comment does not say so | `packages/ui/src/dialog.tsx` | open: one sentence |
+| A `done` and a `correct` segment of `Progress` are both a solid fill: only the tone tells them apart | `packages/ui/src/progress.tsx` | open: a shape for `correct` |
+| The last tick of a chart's x axis loses about 2 px at 390 px in a 358 px frame | `packages/ui/src/chart.tsx` | open |
+| A `MediaGrid` tile whose picture fails before hydration is not reported to `onItemError` | `packages/ui/src/image.tsx` | open |
+| `LocalTime`'s hidden stand-in is written in English when no `locale` is passed, so a reader whose language changes the hour cycle sees the width change on hydration | `packages/ui/src/local-time.tsx` | open |
+| A `DropOverlay` over an area with no content has no height | `packages/ui/src/drop-overlay.tsx` | open: a minimum height or a sentence in its page |
+| The glyphs of `OnScreenKeyboard` are `--fui-text-md` in keys of 44 px: small for a script keyboard | `packages/ui/src/on-screen-keyboard.tsx` | open |
+| `Attachments` draws its own upload ring and file preview instead of `Progress variant="ring"` and `FileThumb`: the shapes differ (a ring that hugs a square tile, a 96 px preview) | `packages/ai-ui/src/attachments.tsx` | owner: it changes pixels |
+| `@fabrials/ai-ui` copies its icons from Lucide instead of importing `lucide-react` | `packages/ai-ui/src/chat-icons.tsx` | owner: a dependency of the package |
+| `RelativeTime` keeps its own timer: its period changes with the age of the date, and the shared ticker has one period per subscriber | `packages/ui/src/relative-time.tsx` | open |
+| The first part of the `@fabrials/ui` stylesheet is one `@layer components` block of 6,500 lines; cutting it per component changes the bytes of the sheet | `packages/ui/src/styles/000-base-and-components.css` | open: with the visual suite per component |
+| `references/components.md` of the skill is one table of 74 KB | `skills/fabrials-design-system/references/components.md` | open: split by area or generate it from the catalogue |
+| `Calendar`, `DatePicker`, `DateRangePicker` and `Spreadsheet` write in English unless a `locale` or a `LabelsProvider` says otherwise (0.11 used the runtime's locale, which made server and browser disagree) | `docs/migration-0.12.md` › Words and locale | owner: confirm or revert before the release |
+| The loading stand-in of `ImageViewer` carries a 6 px blur, the one blur outside a reveal | `packages/ui/src/styles/240-0.12-viewer-and-gallery.css` (`.fui-viewer-under`) | owner |
 
 ## What Radiant can adopt today
 
