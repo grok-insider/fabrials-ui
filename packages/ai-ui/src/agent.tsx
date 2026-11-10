@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useId, useRef, useState, type ComponentProps, type CSSProperties, type ReactNode } from "react";
-import { ShimmerText, WorkingLight, copyImage, formatCount, plural, useAnnounce, useLabels, useLocale, useScramble } from "@fabrials/ui";
+import { ShimmerText, WorkingLight, copyImage, formatCount, plural, prefersReducedMotion, useAnnounce, useLabels, useLocale, useScramble } from "@fabrials/ui";
 import { CopyIcon, DownloadIcon } from "./chat-icons";
 import { formatPercent, formatTokens } from "./format";
 
@@ -23,10 +23,6 @@ export function formatWorkTime(ms: number): string {
 
 function toTime(value: number | Date | undefined) {
   return value instanceof Date ? value.getTime() : value;
-}
-
-function prefersReducedMotion() {
-  return typeof window !== "undefined" && typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
 /**

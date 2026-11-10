@@ -10,7 +10,7 @@ import { classes as cn } from "./shared";
 import { Button } from "./controls"
 import { carouselKeyMove, carouselNameProblem, carouselOffKey, carouselOwnsKey } from "./carousel-logic"
 import { useDirection, type TextDirection } from "./direction"
-import { useMediaQuery } from "./use-media-query"
+import { useReducedMotion } from "./reduced-motion"
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
 
 type CarouselApi = UseEmblaCarouselType[1]
@@ -95,7 +95,7 @@ function Carousel({
   ...props
 }: React.ComponentProps<"div"> & CarouselProps) {
   const direction = useDirection()
-  const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)")
+  const reducedMotion = useReducedMotion()
   const [carouselRef, api] = useEmblaCarousel(
     {
       direction,

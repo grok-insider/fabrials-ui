@@ -1,13 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState, type ComponentPropsWithoutRef, type ElementType } from "react";
+import { prefersReducedMotion } from "./reduced-motion";
 import { classes } from "./shared";
 
 const FRAME = 32;
-
-function prefersReducedMotion() {
-  return typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
 
 /**
  * The text a scramble shows `progress` (0 to 1) of the way through: the characters before the settled point are the new

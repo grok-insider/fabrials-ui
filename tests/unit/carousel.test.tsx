@@ -127,7 +127,7 @@ test("keys are heard on the way up, never captured; Embla gets the direction and
   assert.match(source, /if \(event\.defaultPrevented && !carouselOffKey\(event\.target\)\) return/);
   assert.match(source, /const direction = useDirection\(\)/);
   assert.match(source, /direction,\s*\.\.\.opts,/);
-  assert.match(source, /useMediaQuery\("\(prefers-reduced-motion: reduce\)"\)/);
+  assert.match(source, /useReducedMotion\(\)/);
   assert.match(source, /\.\.\.\(reducedMotion \? \{ duration: 0 \} : null\)/);
   assert.match(source, /api\.scrollTo\(move === "first" \? 0 : api\.scrollSnapList\(\)\.length - 1\)/);
   assert.match(source, /aria-label=\{!named && index && count \? labels\.slide\(index, count\) : undefined\}/);

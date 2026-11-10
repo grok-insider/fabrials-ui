@@ -159,3 +159,4 @@ export {
   type FieldLabelProps,
   type FieldLabels,
 } from "./field-parts";
+export * from "./reduced-motion";

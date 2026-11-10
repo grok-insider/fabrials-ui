@@ -2,33 +2,17 @@
 // Origin: Spectrum UI number ticker (beUI, Apache-2.0), copied 2026-09-22. Restyled with fui- classes in 0.4. Since 0.12 the
 // columns roll on a CSS transition and there is no animation library behind it.
 
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type ComponentProps, type CSSProperties, type RefObject } from "react";
+import { useEffect, useMemo, useRef, useState, type ComponentProps, type CSSProperties, type RefObject } from "react";
 import { useProvidedLocale } from "./labels";
+import { useReducedMotion } from "./reduced-motion";
 import { formatCount } from "./plural";
 import { classes } from "./shared";
 
 const DIGIT_HEIGHT_EM = 1.1;
 const DIGITS = Array.from({ length: 10 }, (_, n) => n);
-const REDUCED = "(prefers-reduced-motion: reduce)";
-
 /** One glyph per em, three decimals at most, so the stack lands exactly on its digit. */
 function travel(digit: number) {
   return `translateY(-${Math.round(digit * DIGIT_HEIGHT_EM * 1000) / 1000}em)`;
-}
-
-function subscribe(onChange: () => void) {
-  const query = typeof matchMedia === "function" ? matchMedia(REDUCED) : null;
-  query?.addEventListener("change", onChange);
-  return () => query?.removeEventListener("change", onChange);
-}
-
-// Asked from the browser only: the server cannot know, and a guess would not match the first paint it sent.
-function useReducedMotion() {
-  return useSyncExternalStore(
-    subscribe,
-    () => typeof matchMedia === "function" && matchMedia(REDUCED).matches,
-    () => false,
-  );
 }
 
 /** Whether the element has come into view once, for a number that counts up when it is seen. */

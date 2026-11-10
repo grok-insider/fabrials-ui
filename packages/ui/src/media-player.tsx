@@ -20,6 +20,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuRadio
 import { IconButton } from "./icon-button";
 import { bufferedEnd, clamp, formatClock, keyAction, mayAnimate, playbackProblem, SPEEDS, spokenClock, stepSpeed, type PlayerAction } from "./media-logic";
 import { PixelSpinner } from "./pixel-spinner";
+import { prefersReducedMotion, REDUCED_MOTION_QUERY } from "./reduced-motion";
 import { classes } from "./shared";
 import { Slider } from "./slider";
 import { claimSound, releaseSound } from "./sound-bus";
@@ -80,7 +81,7 @@ const preference = { volume: 1, muted: false };
 
 const noSubscription = () => () => {};
 const pipSupported = () => typeof document !== "undefined" && "pictureInPictureEnabled" in document && !!document.pictureInPictureEnabled;
-const reducedMotion = () => typeof window !== "undefined" && !!window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const reducedMotion = prefersReducedMotion;
 
 type MediaState = {
   playing: boolean;
@@ -573,13 +574,13 @@ export function AnimatedImage({
   useEffect(() => {
     const node = host.current;
     if (!node) return;
-    const query = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+    const query = typeof window.matchMedia === "function" ? window.matchMedia(REDUCED_MOTION_QUERY) : undefined;
     const evaluate = () => {
       if (visible.current < 0.5) {
         userPaused.current = false;
         userPlayed.current = false;
       }
-      const may = mayAnimate({ visibleRatio: visible.current, tabHidden: document.hidden, reducedMotion: !!query?.matches && !userPlayed.current });
+      const may = mayAnimate({ visibleRatio: visible.current, tabHidden: document.hidden, reducedMotion: prefersReducedMotion() && !userPlayed.current });
       apply(may && !userPaused.current);
     };
     const seen =

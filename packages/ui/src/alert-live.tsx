@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import type { AlertLabels } from "./alert";
 import { Button } from "./controls";
 import { useLabels } from "./labels";
+import { prefersReducedMotion } from "./reduced-motion";
 
 const ALERT_LABELS: AlertLabels = {
   retry: "Try again",
@@ -72,7 +73,7 @@ export function AlertReveal() {
   useEffect(() => {
     const box = node.current?.closest<HTMLElement>('[data-slot="alert"]');
     if (!box) return;
-    const reduce = typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduce = prefersReducedMotion();
     box.scrollIntoView({ block: "nearest", behavior: reduce ? "auto" : "smooth" });
   }, []);
   return <span aria-hidden="true" hidden ref={node} />;

@@ -5,6 +5,7 @@ import { useRender } from "@base-ui/react/use-render";
 import { Tabs as BaseTabs } from "@base-ui/react/tabs";
 import { useLabels } from "./labels";
 import { classes, type StyledProps } from "./shared";
+import { prefersReducedMotion } from "./reduced-motion";
 import { useOverflowTabStop } from "./use-overflow";
 import { tabsListVariants, type BadgeSize, type BadgeTone, type BadgeVariant } from "./variants";
 
@@ -190,7 +191,7 @@ function useRevealSelectedTab(ref: RefObject<HTMLDivElement | null>, enabled: bo
       const box = list.getBoundingClientRect();
       const at = tab.getBoundingClientRect();
       if (at.left >= box.left + 8 && at.right <= box.right - 8) return;
-      const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+      const reduce = prefersReducedMotion();
       // Physical geometry, so the same delta is right in left-to-right and right-to-left lists.
       list.scrollBy({ left: at.left + at.width / 2 - (box.left + box.width / 2), behavior: reduce ? "auto" : "smooth" });
     };

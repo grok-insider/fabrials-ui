@@ -1,15 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState, type ComponentProps } from "react";
+import { prefersReducedMotion } from "./reduced-motion";
 import { classes } from "./shared";
 
 const GLYPHS = "0123456789:./-+#";
 const DURATION = 240;
 const FRAME = 30;
-
-function prefersReducedMotion() {
-  return typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
 
 /**
  * A reading in the label voice (Plex Mono 11 px): a sync time, a version, a peak, an identifier. When `value` changes the

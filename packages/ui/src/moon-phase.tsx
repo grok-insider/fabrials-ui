@@ -13,6 +13,7 @@ import {
   type MoonVariant,
   type MoonVariantId,
 } from "./moon-math";
+import { prefersReducedMotion, REDUCED_MOTION_QUERY } from "./reduced-motion";
 import { classes } from "./shared";
 
 const REVEAL_MS = 1200;
@@ -87,7 +88,7 @@ export function MoonPhase({
     };
 
     announce();
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const reduce = window.matchMedia(REDUCED_MOTION_QUERY);
     let raf = 0;
     let start: number | null = null;
     let cycle: number | null = null;
@@ -111,7 +112,7 @@ export function MoonPhase({
       cancelAnimationFrame(raf);
       start = null;
       cycle = null;
-      if (animate && !reduce.matches) raf = requestAnimationFrame(tick);
+      if (animate && !prefersReducedMotion()) raf = requestAnimationFrame(tick);
       else draw(phase, 1);
     };
 

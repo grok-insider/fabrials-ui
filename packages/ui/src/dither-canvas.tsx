@@ -21,6 +21,7 @@ import {
   type Rgb,
 } from "./dither";
 import { DITHER_BACKGROUND } from "./dither-presets";
+import { prefersReducedMotion } from "./reduced-motion";
 import { colorToRgba } from "./resolve-color";
 import { classes } from "./shared";
 import { documentTheme, subscribeDocumentTheme, themeOf } from "./theme";
@@ -332,7 +333,7 @@ export function DitherCanvas({
     }
 
     let frame = 0;
-    const animate = Boolean(field) && Boolean(reveal) && !canvas.dataset.revealed && !matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const animate = Boolean(field) && Boolean(reveal) && !canvas.dataset.revealed && !prefersReducedMotion();
     if (animate) {
       // One orchestrated moment, then the resting picture: no loop.
       canvas.dataset.revealed = "";

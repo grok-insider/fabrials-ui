@@ -21,7 +21,7 @@ import {
   type Ref,
   type RefCallback,
 } from "react";
-import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@fabrials/ui";
+import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, prefersReducedMotion } from "@fabrials/ui";
 import {
   CHECKPOINT_LABELS,
   END_THRESHOLD,
@@ -59,10 +59,6 @@ function join(...values: Array<string | false | null | undefined>) {
 function assignRef<T>(ref: Ref<T> | undefined, value: T | null) {
   if (typeof ref === "function") ref(value);
   else if (ref) (ref as { current: T | null }).current = value;
-}
-
-function motionAllowed() {
-  return typeof window !== "undefined" && typeof window.matchMedia === "function" && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
 /** Whether something between `target` and the conversation would take a scroll toward its start itself (a tall code block). */
@@ -182,7 +178,7 @@ function createEngine(initial: { anchor: ConversationAnchor; threshold: number }
   }
 
   function start(kind: Chase["kind"], target: Chase["target"], behavior: "smooth" | "instant") {
-    if (behavior === "smooth" && motionAllowed()) {
+    if (behavior === "smooth" && !prefersReducedMotion()) {
       chase = { kind, target, at: performance.now() };
       request();
       return true;
