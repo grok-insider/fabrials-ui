@@ -122,7 +122,7 @@
     margin-inline: auto;
   }
   .fui-conversation-jump.fui-button[data-align="end"] {
-    inset-inline-end: var(--fui-space-2);
+    inset-inline-end: calc(var(--fui-conversation-scrollbar, 0px) + var(--fui-space-2));
   }
   .fui-conversation-jump.fui-button[data-visible] {
     opacity: 1;

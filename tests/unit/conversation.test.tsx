@@ -471,7 +471,7 @@ test("the way back is hidden until it is needed, and it rises rather than jumps"
   assert.match(hidden, /opacity: 0;/);
   assert.match(rule(".fui-conversation-jump.fui-button[data-visible] {"), /visibility: visible;/);
   assert.match(rule(".fui-conversation-jump.fui-button[data-align=\"center\"] {"), /inset-inline: 0;\s*margin-inline: auto;/);
-  assert.match(rule(".fui-conversation-jump.fui-button[data-align=\"end\"] {"), /inset-inline-end: var\(--fui-space-2\);/);
+  assert.match(rule(".fui-conversation-jump.fui-button[data-align=\"end\"] {"), /inset-inline-end: calc\(var\(--fui-conversation-scrollbar, 0px\) \+ var\(--fui-space-2\)\);/);
   assert.match(rule(".fui-conversation-jump.fui-button {"), /inset-block-end: calc\(var\(--fui-conversation-footer-size\) \+ var\(--fui-space-3\)\);/);
   const motion = blockAt("@media (prefers-reduced-motion: no-preference) {\n    .fui-conversation-jump.fui-button {");
   assert.match(motion, /transition:/);
