@@ -1994,7 +1994,7 @@
       "name": "toggle",
       "type": "registry:ui",
       "title": "Toggle",
-      "description": "shadcn's toggle, backed by @fabrials/ui.",
+      "description": "shadcn's toggle, backed by @fabrials/ui. One key that stays on, on its own.",
       "author": "Fabrials <admin@grokinsider.net>",
       "dependencies": [
         "@fabrials/ui@^0.11.0"

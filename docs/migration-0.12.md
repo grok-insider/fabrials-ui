@@ -320,7 +320,7 @@ A confirmation that is not a dialog: the question is rendered where you put it a
 | `confirmLabel`, `pendingLabel`, `cancelLabel` | `cancelLabel` is "Cancel" by default |
 | `onConfirm({ acknowledged })`, `onCancel` | As above |
 | `destructive` | The danger tint, and the destructive button |
-| `pending`, `error`, `fallbackError` | For a host that owns the request: its state shown the same way as a promise's |
+| `pending`, `error`, `fallbackError` | For a host that owns the request: its state shown the same way as a promise's. `fallbackError` is what is shown when the failure says nothing itself, "Something went wrong" by default |
 | `acknowledgement` | `{ label, required = true, error = "Tick the box to continue", onCheckedChange }` |
 | `acknowledgementKey` | A new value empties the box (what is agreed to changed) |
 | `returnFocusRef` | Where focus goes on closing, when it is not the control that had it |
@@ -343,7 +343,7 @@ Radiant can delete its copies (`session/confirm-finish.tsx`, `session/skip-step.
 - `onDone` is called once per deadline, also when the deadline had already passed on mount.
 - Other props: `format` (`"auto"`, `"mm:ss"`, `"h:mm:ss"` or a function of the seconds), `hideLabel`, `size` (`"md"`, `"sm"`), `marks`, `now` (a fixed moment: the clock holds still, for a paused exam, a story or a test).
 
-`useCountdown(deadline, { offset, marks, tick, precision, thresholds, now })` returns `{ remainingMs, seconds, done, tone, crossed }`. All countdowns share one timer; it also reads the clock when the page is shown again, when the window takes focus and on `pageshow`. It renders once a second; `precision` (with `tick`) makes it finer. `crossed` is the mark passed most recently while the hook was watching (0 for the end).
+`useCountdown(deadline, { offset, marks, tick, precision, thresholds, now })` returns `{ remainingMs, seconds, done, tone, crossed }`. All countdowns share one timer; it also reads the clock when the page is shown again, when the window takes focus and on `pageshow`. It renders once a second; `precision` (with `tick`) makes it finer. `crossed` is `number | null`: the mark passed most recently while the hook was watching, `null` until one is passed, and `0` for the end.
 
 The arithmetic is exported from a module without `"use client"`, for a server or a test: `deadlineTime`, `clockOffset(serverNow, receivedAt)`, `remainingMs(deadline, offset, now)`, `wholeSeconds`, `crossedMark(previous, current, marks)`, `toneOf(seconds, thresholds)`, `formatCountdown(ms, locale, { format, round })`, `COUNTDOWN_MARKS`, `COUNTDOWN_THRESHOLDS`. The formatter is `formatCountdown`, not `formatClock`: that name is the media player's, which takes seconds and rounds down.
 
@@ -380,7 +380,7 @@ Radiant can delete `components/theme-provider.tsx` and `lib/theme-script.ts`. Tw
 
 ### `StatePage`, `ErrorState`, `BackButton`
 
-- `StatePage` is a whole page that is only a state, outside the app shell: not found, gone, a root error, offline. A `<main>` (`as="div"` where the host has one) at least the height of the viewport, clear of the safe areas, with `brand` (a link home) at the top start, then `code` (a short reading such as "404" in the label voice), `title` (`headingLevel`, 1 by default), `description`, `actions` and `children`. The content is anchored to the page gutter in the upper third, as the house layout rule asks; `align="center"` is there for a product that centres its states. `--fui-state-page-size` changes the minimum height.
+- `StatePage` is a whole page that is only a state, outside the app shell: not found, gone, a root error, offline. A `<main>` (`as="div"` where the host has one) at least the height of the viewport, clear of the safe areas, with `brand` (a link home) at the top start, then `code` (a short reading such as "404" in the label voice), `title` (`headingLevel`, 1 by default), `description`, `actions` and `children`. The content is anchored to the page gutter in the upper third, as the house layout rule asks; `align="center"` is there for a product that centres its states. `--fui-state-page-size` changes the minimum height, and it must be set on the `.fui-state-page` element itself (its own rule declares the default, so one set on an ancestor never reaches it).
 - `ErrorState` is a `StatePanel state="error"` for a route or a region that failed: `onRetry` shows "Try again" (`retrying` loads it), `homeHref` shows a link home (`homeLabel`), `actions` adds more, and `error` or `reference` shows "Reference abc123" with a copy key. Only `error.digest` is read; an error's message is never shown. Words come from `title`, `description` and `labels` (`title`, `description`, `retry`, `home`, `reference(id)`, `copyReference`, `copied`). The other `StatePanel` props (`headingLevel`, `size`, `variant`, `align`) pass through.
 - `BackButton` goes back in history and, when there is none (a page opened in a new tab), to `fallbackHref` ("/"): through `onNavigate(href)` when the host gives its router, else with a page load. With `render={<a href="…" />}` it is a link, the href is the fallback, and a modified click is left to the browser. Its arrow turns round in right to left. It takes `variant` ("outline" by default) and `size` like `Button`; its text is its children ("Go back").
 
@@ -522,6 +522,11 @@ The answers to a question as tiles. One answer is a Base UI radio group (the arr
 | `orientation`, `columns`, `size` | A stack (default), a row that wraps, at most `columns` columns as many as fit (an option is never narrower than 12rem), and `sm`, `default` or `lg` |
 | `result` | `correct` or `incorrect` on the group: it becomes read-only and the picked option is marked. Per option: `correct`, `incorrect` or `missed` |
 | `readOnly` | Focusable and readable, not changeable. On by itself once the group or one of its options has a `result` |
+| `multiple` | Absent: one answer, a radio group. `true`: a group of checkboxes, each its own tab stop, `value` as an array |
+| `disabled` | Every option off, still in the tab order and readable |
+| `required` | One answer must be picked before the form submits. A single-answer group only: a group of checkboxes has no such state |
+| `name` | Submits with the form: one value, or one entry per ticked option in a `multiple` group |
+| `locale` | The digits of the `numbers` markers (1, 2, 3 by default) |
 | `labels` | The words spoken after a marked option's name: `correct` ("Correct"), `incorrect` ("Your answer, incorrect"), `missed` ("Correct answer"), `ruledOut` ("Ruled out") |
 
 `ChoiceOption` takes `value` (required), `description` (a second line that describes the option and stays out of its name), `ruledOut` (stays where it was, struck through, `aria-disabled`, passed over by the arrows and without its key) and `result`.

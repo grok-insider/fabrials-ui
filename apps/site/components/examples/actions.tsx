@@ -156,6 +156,20 @@ export const buttonExamples: ExampleSet = {
         </Button>
       ),
     },
+    {
+      id: "touch",
+      title: "A target for a finger, and words while it waits",
+      description:
+        "`size=\"touch\"` is at least 44 px tall on every pointer and in every density, with the padding and the type of the default size, for a screen where every action is a learner's or a phone's. `loadingLabel` says what the button is doing while it works, in place of its children, and the width follows the text.",
+      code: `<Button size="touch">Check answer</Button>
+<Button loading loadingLabel="Saving">Save changes</Button>`,
+      render: () => (
+        <div style={row}>
+          <Button size="touch">Check answer</Button>
+          <Button loading loadingLabel="Saving">Save changes</Button>
+        </div>
+      ),
+    },
   ],
 };
 
@@ -220,6 +234,20 @@ export const iconButtonExamples: ExampleSet = {
               <RefreshCw aria-hidden />
             </IconButton>
           ))}
+        </div>
+      ),
+    },
+    {
+      id: "touch",
+      title: "44 px on every pointer",
+      description:
+        "`size=\"touch\"` is the 44 px square whatever the density and the pointer, for a toolbar a finger uses. An icon-only button keeps its name while it loads: the spinner takes the icon's place, so both fit.",
+      code: `<IconButton label="Refresh" size="touch"><RefreshCw aria-hidden /></IconButton>
+<IconButton label="Refreshing" loading size="touch"><RefreshCw aria-hidden /></IconButton>`,
+      render: () => (
+        <div style={row}>
+          <IconButton label="Refresh" size="touch" variant="outline"><RefreshCw aria-hidden /></IconButton>
+          <IconButton label="Refreshing" loading size="touch" variant="outline"><RefreshCw aria-hidden /></IconButton>
         </div>
       ),
     },

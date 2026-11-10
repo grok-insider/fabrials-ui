@@ -332,6 +332,33 @@ export const statusDotExamples: ExampleSet = {
   ],
 };
 
+function RetryAlert() {
+  const [tries, setTries] = useState(0);
+  return (
+    <Alert onRetry={() => setTries(tries + 1)} tone={tries === 0 ? "danger" : "info"}>
+      <OctagonX aria-hidden />
+      <AlertTitle>{tries === 0 ? "The key could not be read" : "Asked the relay again"}</AlertTitle>
+      <AlertDescription>{tries === 0 ? "It answered with a 502. Trying again usually works." : `That is ${tries} attempt${tries === 1 ? "" : "s"}.`}</AlertDescription>
+    </Alert>
+  );
+}
+
+function SuggestionChips() {
+  const [picked, setPicked] = useState("");
+  return (
+    <StatePanel description="Start from one of these, or write your own." state="empty" title="No searches yet">
+      <div style={row}>
+        {["Unread this week", "From the bank", "With attachments"].map((one) => (
+          <Button key={one} onClick={() => setPicked(one)} size="sm" variant="outline">
+            {one}
+          </Button>
+        ))}
+        {picked ? <span style={{ color: "var(--muted-foreground)" }}>Picked: {picked}</span> : null}
+      </div>
+    </StatePanel>
+  );
+}
+
 export const alertExamples: ExampleSet = {
   preview: () => (
     <div style={stack}>
@@ -416,6 +443,23 @@ export function StaleObservation() {
       ),
       align: "start",
     },
+    {
+      id: "retry",
+      title: "A notice that asks again",
+      description:
+        "`onRetry` draws Try again in the alert's action place; a promise keeps it busy until it settles and a second press is ignored. `tone` names the same five looks as `variant` (it wins when both are given), and `revealOnMount` scrolls an alert that arrived after the first paint into view, clear of a sticky header and an ActionBar.",
+      code: `<Alert tone="danger" onRetry={async () => { await reload(); }}>
+  <OctagonX aria-hidden />
+  <AlertTitle>The key could not be read</AlertTitle>
+  <AlertDescription>It answered with a 502. Trying again usually works.</AlertDescription>
+</Alert>`,
+      render: () => (
+        <div style={stack}>
+          <RetryAlert />
+        </div>
+      ),
+      align: "start",
+    },
   ],
 };
 
@@ -488,6 +532,21 @@ export const statePanelExamples: ExampleSet = {
           <StatePanel align="center" description="They may be out of date." state="stale" title="Showing the last folders" />
           <StatePanel size="sm" state="offline" title="You are offline" />
           <StatePanel state="loading" title="Loading folders" variant="inline" />
+        </div>
+      ),
+      align: "start",
+    },
+    {
+      id: "children",
+      title: "What to try, inside the state",
+      description:
+        "`children` is drawn under the description and before the actions: a wrapping row that centres with `align=\"center\"`. Use it for the suggestions of an empty state, so the next step is inside the panel that explains it.",
+      code: `<StatePanel state="empty" title="No searches yet" description="Start from one of these, or write your own.">
+  <div>{suggestions.map((one) => <Button key={one} size="sm" variant="outline">{one}</Button>)}</div>
+</StatePanel>`,
+      render: () => (
+        <div style={stack}>
+          <SuggestionChips />
         </div>
       ),
       align: "start",

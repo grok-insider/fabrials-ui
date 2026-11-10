@@ -7,9 +7,27 @@ import { activityExamples } from "./activity";
 import { attachmentsExamples, composerExamples } from "./composer";
 import { generationExamples } from "./generation-frame";
 import { contextMeterExamples, workingLightExamples } from "./context-meter";
-import { buttonExamples, iconButtonExamples, kbdExamples, toggleGroupExamples } from "./actions";
-import { alertExamples, badgeExamples, spinnerExamples, statePanelExamples, statusDotExamples, toasterExamples } from "./status";
-import { avatarExamples, cardExamples, meterExamples, statExamples, tableExamples } from "./data";
+import {
+  buttonExamples,
+  iconButtonExamples,
+  kbdExamples,
+  toggleGroupExamples,
+} from "./actions";
+import {
+  alertExamples,
+  badgeExamples,
+  spinnerExamples,
+  statePanelExamples,
+  statusDotExamples,
+  toasterExamples,
+} from "./status";
+import {
+  avatarExamples,
+  cardExamples,
+  meterExamples,
+  statExamples,
+  tableExamples,
+} from "./data";
 import { progressExamples } from "./progress";
 import { scrollAreaExamples } from "./scroll-area";
 import { avatarGroupExamples } from "./avatar-group";
@@ -18,12 +36,53 @@ import { sourceTallyExamples } from "./source-tally";
 import { chatMessageExamples } from "./chat-message";
 import { codeBlockExamples } from "./code-block";
 import { scrambleTextExamples, shimmerTextExamples } from "./text";
-import { checkboxExamples, fieldExamples, radioGroupExamples, selectExamples, sliderExamples, switchExamples } from "./forms";
-import { accordionExamples, dialogExamples, dropdownMenuExamples, itemExamples, tabsExamples, tooltipExamples } from "./structure";
+import {
+  checkboxExamples,
+  fieldExamples,
+  radioGroupExamples,
+  selectExamples,
+  sliderExamples,
+  switchExamples,
+} from "./forms";
+import {
+  accordionExamples,
+  dialogExamples,
+  dropdownMenuExamples,
+  itemExamples,
+  tabsExamples,
+  tooltipExamples,
+} from "./structure";
 import { localTimeExamples } from "./foundations";
 import { countdownExamples, inlineConfirmExamples } from "./states";
-import { choiceGroupExamples, revealCardExamples, stepControlsExamples } from "./answers";
+import {
+  choiceGroupExamples,
+  revealCardExamples,
+  stepControlsExamples,
+} from "./answers";
 import { clipButtonExamples, recorderPanelExamples } from "./sound";
+import {
+  comboboxExamples,
+  hoverCardExamples,
+  imageViewerExamples,
+  mediaGridExamples,
+  popoverExamples,
+} from "./overlays-012";
+import {
+  carouselExamples,
+  editableTextExamples,
+  fieldPartsExamples,
+  inputExamples,
+  onScreenKeyboardExamples,
+  textareaExamples,
+  toggleExamples,
+} from "./controls-012";
+import {
+  chartLegendExamples,
+  ditherCanvasExamples,
+  dropOverlayExamples,
+  zoomPanExamples,
+} from "./data-012";
+import { sidebarAccountExamples, sidebarExamples } from "./shell-012";
 
 /** Examples by catalogue slug. `lib/example-slugs.ts` lists the same keys for the server; a test keeps them equal. */
 export const exampleSets: Record<string, ExampleSet> = {
@@ -79,6 +138,24 @@ export const exampleSets: Record<string, ExampleSet> = {
   "step-controls": stepControlsExamples,
   "clip-button": clipButtonExamples,
   "recorder-panel": recorderPanelExamples,
+  popover: popoverExamples,
+  "hover-card": hoverCardExamples,
+  combobox: comboboxExamples,
+  "image-viewer": imageViewerExamples,
+  "media-grid": mediaGridExamples,
+  input: inputExamples,
+  textarea: textareaExamples,
+  "field-parts": fieldPartsExamples,
+  toggle: toggleExamples,
+  "editable-text": editableTextExamples,
+  "on-screen-keyboard": onScreenKeyboardExamples,
+  carousel: carouselExamples,
+  "chart-legend": chartLegendExamples,
+  "dither-canvas": ditherCanvasExamples,
+  "zoom-pan": zoomPanExamples,
+  "drop-overlay": dropOverlayExamples,
+  sidebar: sidebarExamples,
+  "sidebar-account": sidebarAccountExamples,
 };
 
 export type { Example, ExampleSet } from "./types";

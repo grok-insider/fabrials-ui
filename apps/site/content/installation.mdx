@@ -84,6 +84,45 @@ For example, after `init` and `add @fabrials/button @fabrials/mcp-dashboard`, a 
 
 Components import `@fabrials/ui` directly as well. Use the package in new code; use the shims where code expects shadcn's paths.
 
+## Styles, layers and fonts
+
+`init` imports three stylesheets, in this order:
+
+```css
+@import "@fabrials/ui/tokens.css";
+@import "@fabrials/ui/fonts.css";
+@import "@fabrials/ui/styles.css";
+```
+
+With Tailwind CSS 4, import `@fabrials/ui/layers.css` first. It is one line, `@layer theme, base, components, utilities;`, and it fixes the order of the cascade layers whatever order the bundler emits the other imports in. The Fabrials styles live in `components`: above Tailwind's preflight, below its utilities.
+
+```css
+@import "@fabrials/ui/layers.css";
+@import "tailwindcss";
+@import "@fabrials/ui/tokens.css";
+@import "@fabrials/ui/styles.css";
+```
+
+The fonts are IBM Plex, served as files. A script Plex does not have — Arabic, Hebrew, Chinese — takes a family of its own through `--fui-font-fallback`, a slot after the Plex faces in the sans, display, mono and label stacks. Set it on the root element, where the stacks are computed, and use the variable a `next/font` face already publishes on `<html>`:
+
+```css
+:root {
+  --fui-font-fallback: var(--font-plex-arabic);
+}
+```
+
+Unset, the slot holds the generic family that stood there, so the computed stacks are the ones of 0.11.
+
+## Safe areas on a phone
+
+With `viewport-fit=cover`, a page runs under the notch and the home indicator. Add the meta tag and the packages pad what they own:
+
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+```
+
+A `Sheet` pads its top and bottom and the side it is docked to, and its corner key moves down with it; a sticky `SiteHeader`, `AppHeader` and the `WorkspaceShell` header pad their top; the toaster keeps its stack inside the insets; a dialog's sticky footer pads its bottom; the image viewer pads all four sides. Every rule is a `max()` or an `env()` with a 0 fallback, so nothing moves where the inset is 0.
+
 ## Enable native WebMCP in Chrome
 
 <WebMCPSetup />
@@ -115,7 +154,18 @@ Your endpoint must accept the browser origin through CORS. The demo endpoint on 
 
 ## Next.js and Vite
 
-In Next.js, render interactive components under a client boundary. Helpers do not access `window`, `document` or storage during server rendering. The optional connector must remain in a Node server route.
+In Next.js, render interactive components under a client boundary. Helpers do not access `window`, `document` or storage during server rendering; the optional connector must remain in a Node server route.
+
+From 0.12 a module is a client module only when its source says `"use client"`, so a Server Component can call the pure ones and render the components that have no hook. These come from a module without the directive:
+
+- Formatting and counting: `formatBytes`, `formatRelativeTime`, `formatAbsoluteTime`, `fileTypeLabel`, `plural`, `formatCount`, `localeTag`, `countText`, `countLevel`, `countLimit`.
+- Dates: `toISODate`, `parseISODate`, `isSameDay`, `matchesDate`, `firstDayOfWeek`, `formatLocalTime`.
+- Words and direction: `dirOf`, `scriptDirection`, `isolate`, `interpolate`, `speakableText`, `speechChunks`, `fileStem`, `hostnameFromUrl`.
+- Keys and files: `matchHotkey`, `ariaKeyshortcuts`, `acceptsFile`, `sortFiles`, `carriesFiles`, `draggedFilesRefused`.
+- The class hooks: `buttonVariants`, `badgeVariants`, `tabsListVariants`, `toggleVariants`, `languageMark`.
+- `@fabrials/ui/export` (a whole subpath with no directive) and `themeInitScript`.
+
+`Card`, `Alert`, `Separator`, `Skeleton`, `StatGroup`, `StatusDot`, `DescriptionList`, `Timeline`, `ActivityStrip`, `Kbd`, `Spinner` and the other pieces with no directive of their own render on the server too, with no JavaScript of their own. Anything with a handler, a hook or a context — a dialog, a menu, a field, the chat pieces — comes from a client module, which is what it always was. A provider such as `LabelsProvider` or `ThemeProvider` is a client component, and a function cannot cross from the server: render it in a client module next to the other providers.
 
 In Vite, render the provider in your root React tree. Configure `@/*` in TypeScript and the Vite resolver, and ensure Tailwind scans the copied component files.
 

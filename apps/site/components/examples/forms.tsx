@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
   Slider,
+  SliderGroup,
   Switch,
   Textarea,
 } from "@fabrials/ui";
@@ -77,6 +78,20 @@ export const fieldExamples: ExampleSet = {
           <PasswordInput aria-label="App password" defaultValue="correct horse" />
           <NumberField aria-label="Batch size" defaultValue={500} max={5000} min={100} step={100} unit="rows" />
           <Textarea aria-label="Note" autoResize maxRows={6} minRows={2} placeholder="What should the operator know?" />
+        </div>
+      ),
+    },
+    {
+      id: "required",
+      title: "Required, optional, and the words for them",
+      description:
+        "`required` adds an asterisk and the word itself for a screen reader; `optional` writes the word in muted ink, and `required` wins when both are given. A `LabelsProvider` sets both words for every field (scope `field`).",
+      code: `<Field label="Street address" required>{(props) => <Input {...props} />}</Field>
+<Field label="Second line" optional>{(props) => <Input {...props} />}</Field>`,
+      render: () => (
+        <div style={form}>
+          <Field label="Street address" required>{(props) => <Input {...props} defaultValue="12 North Quay" />}</Field>
+          <Field label="Second line" optional>{(props) => <Input {...props} />}</Field>
         </div>
       ),
     },
@@ -216,6 +231,29 @@ export const sliderExamples: ExampleSet = {
       render: () => (
         <div style={{ width: "min(100%, 22rem)" }}>
           <Slider defaultValue={[20, 80]} showValue thumbLabels={["Minimum price", "Maximum price"]} />
+        </div>
+      ),
+    },
+    {
+      id: "row",
+      title: "A name, a track and a reading",
+      description:
+        "`label` makes the slider a row of name, track and value, and the name is the thumb's; `unit` is said and written after the value, including in `aria-valuetext`. `onValueCommitted` runs once when a drag ends or a key is released. `SliderGroup` lines several of them up column by column.",
+      code: `<Slider label="Rows per page" defaultValue={40} max={200} step={10} unit="rows" showValue />
+<Slider label="Badge width" defaultValue={72} max={120} unit="px" showValue />
+
+<SliderGroup>
+  <Slider label="Warning at" defaultValue={80} unit="%" showValue />
+  <Slider label="Danger at" defaultValue={95} unit="%" showValue />
+</SliderGroup>`,
+      render: () => (
+        <div style={form}>
+          <Slider defaultValue={40} label="Rows per page" max={200} showValue step={10} unit="rows" />
+          <Slider defaultValue={72} label="Badge width" max={120} showValue unit="px" />
+          <SliderGroup>
+            <Slider defaultValue={80} label="Warning at" showValue unit="%" />
+            <Slider defaultValue={95} label="Danger at" showValue unit="%" />
+          </SliderGroup>
         </div>
       ),
     },

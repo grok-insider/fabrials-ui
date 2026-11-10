@@ -271,10 +271,20 @@ export default async function Docs({
               <ol className="docs-steps">
                 <li className="docs-step">
                   <p>
-                    Import the control from <code>{uiItem.package}</code>, after{" "}
-                    <Link href="/docs/installation">setting the app up</Link>.
+                    {uiItem.exports.length > 0 ? (
+                      <>
+                        Import the control from <code>{uiItem.package}</code>, after{" "}
+                        <Link href="/docs/installation">setting the app up</Link>.
+                      </>
+                    ) : (
+                      <>
+                        Nothing to import: these are CSS custom properties, already declared for every theme in{" "}
+                        <code>{uiItem.package}</code>, so the page is ready once{" "}
+                        <Link href="/docs/installation">the app is set up</Link>.
+                      </>
+                    )}
                   </p>
-                  <CodeBlock code={usage} label="TypeScript" />
+                  <CodeBlock code={usage} label={uiItem.exports.length > 0 ? "TypeScript" : "CSS"} />
                 </li>
                 {shimNames.has(slug) && (
                   <li className="docs-step">

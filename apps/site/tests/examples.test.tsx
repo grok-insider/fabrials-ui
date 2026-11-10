@@ -15,6 +15,28 @@ globalThis.ResizeObserver ??= class {
   disconnect() {}
 } as unknown as typeof ResizeObserver;
 
+// ...no IntersectionObserver, which it uses to know which slides are in view...
+globalThis.IntersectionObserver ??= class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+  takeRecords() {
+    return [];
+  }
+} as unknown as typeof IntersectionObserver;
+
+// ...and no matchMedia, which it asks for its options.
+globalThis.matchMedia ??= ((query: string) => ({
+  matches: false,
+  media: query,
+  onchange: null,
+  addListener() {},
+  removeListener() {},
+  addEventListener() {},
+  removeEventListener() {},
+  dispatchEvent: () => false,
+})) as unknown as typeof matchMedia;
+
 it("the server's list of pages with examples is the examples' own", () => {
   expect([...exampleSlugs].sort()).toEqual(Object.keys(exampleSets).sort());
 });
