@@ -446,7 +446,9 @@ test("a key types at the caret and the field keeps the focus and the value", asy
   await expect(input).toBeFocused();
   await expect(input).toHaveValue("qw");
 
-  // The caret is where it was: ArrowLeft in the field, then a key goes in the middle.
+  // The caret is where it was: ArrowLeft in the field, then a key goes in the middle. The keyboard puts the caret back on
+  // the frame after it writes (the controlled value lands on React's commit), so the arrow waits for that frame.
+  await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
   await page.keyboard.press("ArrowLeft");
   await key(keyboard, "e").click();
   await expect(input).toHaveValue("qew");

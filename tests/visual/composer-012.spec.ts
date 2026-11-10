@@ -263,7 +263,10 @@ test("the pill that picks opens with the keyboard, moves with the arrows, tells 
   const list = page.getByRole("listbox");
   await expect(list).toBeVisible();
   await expect(page.getByRole("option", { name: /^High/ })).toBeVisible();
+  // The list opens on the current value; the arrow waits for that, or it would start from the top.
+  await expect(page.locator('[role="option"][data-highlighted]')).toContainText("Low");
   await page.keyboard.press("ArrowDown");
+  await expect(page.locator('[role="option"][data-highlighted]')).toContainText("Medium");
   await page.keyboard.press("Enter");
   await expect(pill).toHaveAttribute("aria-label", "Reasoning effort: Medium");
   await expect(pill).toHaveAttribute("data-state", "on");

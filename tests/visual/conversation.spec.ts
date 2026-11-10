@@ -281,7 +281,8 @@ test("the rail follows the reading, brings a message to the top, and is one tab 
   await page.keyboard.press("ArrowDown");
   await expect(list.nth(2)).toBeFocused();
   // The preview repeats the message beside its marker; it is a tooltip of the library, which names it through the button.
-  await expect(page.locator(".fui-conversation-preview")).toContainText("Message 3 of 6");
+  // The preview of the marker the focus left may still be closing: the one asked for is the one with these words.
+  await expect(page.locator(".fui-conversation-preview").filter({ hasText: "Message 3 of 6" })).toBeVisible();
   await page.keyboard.press("ArrowUp");
   await expect(list.nth(1)).toBeFocused();
   // The space above the rail is reserved: no marker sits over the words.

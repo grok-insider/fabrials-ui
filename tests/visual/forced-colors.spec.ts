@@ -319,17 +319,23 @@ for (const scheme of ["light", "dark"] as const) {
       await page.getByRole("button", { name: "View" }).click();
       const menu = page.getByRole("menu", { name: "View" });
       await expect(menu).toBeVisible();
+      const highlighted = page.locator(".fui-menu-item[data-highlighted]");
       await menu.press("ArrowDown");
+      await expect(highlighted).toBeVisible();
       expect(await style(page, ".fui-menu-item[data-highlighted]", ["outlineStyle", "outlineWidth", "outlineColor", "outlineOffset"])).toEqual(ring);
       await page.keyboard.press("Escape");
-      // The context menu is the same row.
+      await expect(page.getByRole("menu")).toHaveCount(0);
+      // The context menu is the same row. It opens a frame after the press, so the arrow waits for it.
       const box = (await page.getByText("Invoice 2025-0412").boundingBox())!;
       await page.mouse.click(box.x + 24, box.y + 12, { button: "right" });
+      await expect(page.getByRole("menu")).toBeVisible();
       await page.keyboard.press("ArrowDown");
+      await expect(highlighted).toBeVisible();
       expect(await style(page, ".fui-menu-item[data-highlighted]", ["outlineColor"])).toEqual({ outlineColor: system.Highlight });
       await page.keyboard.press("Escape");
       // A select's rows are the same row too.
       await open(page, "tests-parts--select-parts", scheme);
+      await expect(page.locator(".fui-select-list .fui-menu-item[data-highlighted]")).toBeVisible();
       expect(await style(page, ".fui-select-list .fui-menu-item[data-highlighted]", ["outlineColor", "outlineOffset"])).toEqual({
         outlineColor: system.Highlight,
         outlineOffset: "-2px",
@@ -337,6 +343,7 @@ for (const scheme of ["light", "dark"] as const) {
       // And a command list's own active row.
       await open(page, "tests-parts--commands", scheme);
       await page.keyboard.press("ArrowDown");
+      await expect(page.locator(".fui-command-item:is([data-selected='true'], [data-active], [aria-selected='true'])").first()).toBeVisible();
       expect(await style(page, ".fui-command-item:is([data-selected='true'], [data-active], [aria-selected='true'])", ["outlineColor", "outlineOffset"])).toEqual({
         outlineColor: system.Highlight,
         outlineOffset: "-2px",
