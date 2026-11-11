@@ -192,4 +192,5 @@ Merged means: on `feat/0.12`, with `bun run check` green on the merged branch an
 | 7.3, 7.5 | merged, except `Attachments` on the house ring, the icons of `@fabrials/ai-ui` and `RelativeTime` on the shared clock (`docs/requests.md`) |
 | 7.4 | merged |
 | Version 0.12.0 | done on `feat/0.12`; not pushed, not tagged, not published |
-| Final runs (2026-11-10) | `bun run check` 811 and 149 tests; the visual suite 1243 of 1243 against the parts and against the minified sheets; the skeleton suite 2485 passed, 26 skipped on purpose, in three engines; gitleaks clean. Not verified: a screen reader, real Safari and Firefox, a phone, a microphone, any product on 0.12 |
+| After the owner's review (2026-11-10) | merged: English as the one default language for everything that formats, with `timeZone` for the accounts family and a guard test (`tests/unit/default-locale.test.tsx`); the rail and the jump key of a conversation clear of the scrollbar; `docs/research-generative-ui.md` |
+| Final runs | see the commit that closes the release: `bun run check`, the visual suite against the parts and against the minified sheets, the skeleton suite in three engines, gitleaks. Not verified: a screen reader, real Safari and Firefox, a phone, a microphone, any product on 0.12 |
