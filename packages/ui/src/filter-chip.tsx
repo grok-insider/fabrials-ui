@@ -129,7 +129,7 @@ function FilterChipButton({ label, value, clearLabel, labels: ownLabels, classNa
     node.dataset.leaving = "";
     const exit = node.animate([{ opacity: 1, scale: "1" }, { opacity: 0, scale: "0.9" }], {
       duration,
-      easing: "cubic-bezier(0.3, 0, 1, 1)",
+      easing: "cubic-bezier(0.16, 1, 0.3, 1)",
       fill: "forwards",
     });
     const finish = () => {

@@ -261,6 +261,8 @@ test("groups carry their heading, and a long list scrolls inside its popup to th
   await expect(groups).toHaveCount(2);
   await expect(page.getByRole("group", { name: "Platform" }).getByRole("option")).toHaveText(["Infrastructure", "Security"]);
   await page.keyboard.press("Escape");
+  // The first list fades out for 100 ms (also under reduced motion): the next one is looked for once it is gone.
+  await expect(page.locator(".fui-combobox-content")).toHaveCount(0);
   const input = field(page, "Room");
   await input.focus();
   await page.keyboard.press("ArrowDown");

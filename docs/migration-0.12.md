@@ -1,6 +1,6 @@
 # Migrating to 0.12
 
-0.12 is additive: nothing is removed and nothing is renamed. A product on 0.11 can take it without changing a line, except a product that relied on the browser's language for dates and numbers, which sets `LabelsProvider locale` once (see [Words and locale](#words-and-locale)). This note says what is new, what a product can now delete, and the few places where something looks or behaves differently. Each section below was written with the change it describes; the plan they follow is `docs/plan-0.12.md`.
+0.12 is additive: nothing is removed and nothing is renamed. A product on 0.11 can take it without changing a line, except a product that relied on the browser's language for dates and numbers, which sets `LabelsProvider locale` once (see [Words and locale](#words-and-locale)). One default changed on purpose: `NumberTicker` no longer counts up from zero when it is first seen, and the lengths of a few movements did ([What moves and when](#what-moves-and-when)). This note says what is new, what a product can now delete, and the few places where something looks or behaves differently. Each section below was written with the change it describes; the plan they follow is `docs/plan-0.12.md`.
 
 
 ## The chat pieces: right to left, forced colors, print
@@ -1280,10 +1280,11 @@ Radiant can replace `components/chat/generated-media.tsx`.
 
 | Prop | Same as before |
 | --- | --- |
-| `value`, `pad`, `duration`, `stagger`, `startOnView`, `prefix`, `suffix`, `blur`, `className`, `digitClassName`, `locale`, `format` | Unchanged in name, type, default and meaning. |
+| `value`, `pad`, `prefix`, `suffix`, `blur`, `className`, `digitClassName`, `locale`, `format` | Unchanged in name, type, default and meaning. |
+| `duration`, `stagger`, `startOnView` | The same names and types. Their defaults and when they apply changed with `rollIn`: see [What moves and when](#what-moves-and-when). |
 | `...props`, `style` | New, and additive: `id`, `data-*`, `aria-*` and `ref` now reach the root span. `style` is merged after the ticker's own custom property, so a host can also override the length. |
 
-What a person sees is the same: a column of 0-9 per digit that turns into place, the columns 40 ms apart, a length of 0.9 s, once when six tenths of it have come into view (or at once with `startOnView={false}`), and again whenever `value` changes. The number read by assistive technology is the final one from the first frame; the turning digits are `aria-hidden`.
+The roll is the same thing to look at: a column of 0-9 per digit that turns into place whenever `value` changes. What changed afterwards, in the same release, is when it rolls and for how long: the number is there at first paint and no longer counts up to itself unless asked (`rollIn`), and a roll takes 240 ms ([What moves and when](#what-moves-and-when)). The number read by assistive technology is the final one from the first frame; the turning digits are `aria-hidden`.
 
 ### What changed inside
 
@@ -1308,7 +1309,7 @@ Nothing at rest, and the roll is the same curve and the same length. Three thing
 
 - The digit span carries `--fui-ticker-delay` and the root carries `--fui-ticker-duration`; `motion`'s generated inline styles are gone (`transform: none` at rest, as before).
 - With `blur`, the column no longer keeps an inline `filter: blur(0px)` after the fade; the animation ends and the property goes back to what the host sets.
-- The first paint of a number is still the value at rest (all columns at zero), which is what the server has always sent; nothing about that changed.
+- The first paint of a number is the number: each column is on its digit (`transform: translateY(-4.4em)` for a 4). With `rollIn` it is all columns at zero, as before.
 
 ## Callouts, an edited message and a stamp in the reader's zone
 
@@ -1554,6 +1555,61 @@ Nothing a product imports changes. `@fabrials/ui/styles.css` and `@fabrials/ai-u
 - It does rewrite spellings that mean the same: `0.5rem` → `.5rem`, `transparent` → `#0000`, `oklch(1 0 0 / 12%)` → `oklch(100% 0 0/.12)`, `translateX(1rem)` → `translate(1rem)`, and a width query to range form (`(max-width: 47.99rem)` → `(width<=47.99rem)`, `(min-width: 40rem)` → `(width>=40rem)`). All of it is inside the browser baseline `DESIGN.md` states: Chrome 120, Safari 16.4, Firefox 128.
 - The notices a licence requires beside adapted code are written `/*! … */` in the parts (the Radix Themes recipes, in `070-material.css`) and the build puts them back at the top of the minified sheet.
 - The whole visual suite runs against the minified sheets as well as against the parts (`FUI_STYLES=dist`), with no reference changed: the two render the same.
+
+## What moves and when
+
+An audit of every transition and animation of the two packages, against how often a person sees each one. The rule it applied: what is done a hundred times a day, or with a key, does not move; what is opened tens of times a day is quick; a finger is followed exactly; and nothing moves on the first paint. None of it changes an API except `NumberTicker`.
+
+### What looks or behaves differently
+
+| Piece | Before | Now |
+| --- | --- | --- |
+| Menus, selects, comboboxes, popovers | Arrive in 240 ms | 150 ms (`--fui-duration`). They still leave in 100 ms. |
+| Tooltips | 240 ms, every one | 100 ms, and the next tooltip of a row is there at once: Base UI marks it `data-instant` and the sheet now reads it. |
+| A menu opened or closed with a key | 240 ms | At once (`data-instant`). The same for a menu of a menubar after its neighbour. |
+| The highlighted row of a menu | Faded in 100 ms, so a held arrow key left a trail | Moves with the key. Rows a pointer browses (`Item`, the sidebar's rows) keep their fade. |
+| `CommandDialog` | Travelled 4 px and grew from 98 % in 240 ms | Fades in and out in 100 ms, and its veil with it. It does not travel or grow. |
+| The veil of a dialog | Left in 240 ms, 90 ms after its panel | Leaves with its panel, in 150 ms. |
+| Folding the sidebar (Ctrl/Cmd+B, the trigger, the rail) | Its width was animated for 240 ms, resizing the page beside it on every frame | The page is resized once. The group labels fade in 100 ms. The phone sheet still slides. |
+| `.fui-rise` with `--fui-stagger` | 45 ms apart: the eighth item started 360 ms in, there but not yet visible | 30 ms apart (`--fui-stagger-step`): 240 ms for the eighth. |
+| The plate of `ToggleGroup`, `ThemeSwitcher` and segmented `Tabs` | Trailing edge 70 ms behind: 310 ms in all | 40 ms behind: 280 ms. |
+| The underline of `Tabs` | Slid in 240 ms | 100 ms. |
+| A key of `OnScreenKeyboard` | Faded in 150 ms when pressed | Answers in the frame it is pressed. |
+| A `Checkbox` or `Radio` that is checked when the page loads | Its tick popped in and was drawn on every load (the rule was an `@starting-style`, which also runs on the first paint) | At rest. The tick pops and is drawn when it is checked: the rule reads Base UI's `data-starting-style`. |
+| A toast dragged with a finger | Followed 150 ms behind (the sheet's `transition` outranked Sonner's `transition: none` while swiping) | Follows the finger. |
+| What leaves (`--fui-ease-exit`: menus, popovers, tooltips, dialogs, a filter chip) | An accelerating curve, `cubic-bezier(0.3, 0, 1, 1)`: it held still for its first frames | The quick-out curve of what arrives, in less time: it starts leaving in the frame it is asked to. |
+| Under reduced motion: a menu, a popover, a tooltip, a dialog, a sheet and the veil | Cut in and out (every length is 0) | Fade, 150 ms in and 100 out, in place: nothing travels, grows or slides, and a sheet fades where it used to slide. Everything else still changes at once. New tokens `--fui-duration-fade` and `--fui-duration-fade-exit`; the rules are a part of their own, `300-reduced-motion.css`. Toasts are as before: Sonner turns their transitions off itself. |
+| `ImageViewer`: a picture flicked down | Closed at 0.6 px/ms (from 24 px), which a short flick does not reach | Closes at 0.3 px/ms (`FLICK_SPEED`). Dragged past 96 px it closes as before. Not yet tried on a phone. |
+| A scrolling `TabsList` | Scrolled smoothly to the selected tab, also on mount and for every press of a held arrow key | Goes straight there on mount and when the last move was under 400 ms ago; smoothly otherwise. |
+
+### `NumberTicker`
+
+| Prop | Before | Now |
+| --- | --- | --- |
+| `rollIn` | — | New, `false`. `true` counts the number up from zero the first time it is shown. |
+| `startOnView` | `true`: counted up when six tenths were in view; `false`: on mount | Only with `rollIn`. |
+| `duration` | `0.9` | Unset: the roll takes `--fui-duration-slow` (240 ms). A value still sets it. |
+| `stagger` | `0.04` | `0.02`, and only for the count-up. |
+
+A number that is there at first render now shows at once, on the server and in the browser, and rolls when it changes. It used to count up from zero every time it came into view, which is a figure animating on the first paint of a screen: what `DESIGN.md` rules out. **To keep the old behaviour** for the one figure that is a page's moment: `<NumberTicker rollIn duration={0.9} stagger={0.04} value={…} />`. `blur` softens a column that turns, and no longer runs on the first paint.
+
+### Nothing to do
+
+A product that vendored or installs 0.12 gets all of the above with the sheet. Host rules that restated the old lengths (`.fui-menu { transition-duration: … }`) still win and can be deleted.
+
+## The worst a source can send
+
+Found by rendering each piece with data nobody chose: an address of eighty letters, a key, a commit id, a total of twelve figures, a count of four. The rules are in a part of their own, `290-worst-case.css`; none changes a piece whose content fits.
+
+- **`Stat` in a `StatGroup`.** A figure of ten characters or more, given as a string or a number, is set as large as its cell allows (down to 1.25rem) instead of breaking in the middle: `12,345,678.90` used to read `12,345,67` / `8.90`. `Stat` writes `data-fit` and `--fui-figure-ch` on the figure, and the cell becomes a size container (only that cell, and only in a group). A figure passed as an element, and a `Stat` outside a group, are as before.
+- **`DescriptionList` (`layout="grid"`).** The term's column is `fit-content(40%)` with a floor of 8rem: a long term wraps inside two fifths of the list. It used to grow with the term, which left an address 10 letters wide and, with an identifier, the details one letter per line. Lists whose terms fit look the same.
+- **`AvatarGroupCount`.** `+1,280` grows into a pill; it was cut by its circle.
+- **A menu entry, a breadcrumb, a `TimelineItem` title, a `CardCaption` reading, a `Stat` label and hint** break anywhere when a word alone would overflow, instead of leaving their menu, their plate or the page. A menu's shortcut stays whole.
+- **`SidebarAccount`.** The name and the address carry a `title` in the row, where they are cut, and wrap in the menu, where they can be read whole.
+- **`avatarInitials("Christopher Montgomery III")`** is `CM`, not `CI`: `Jr`, `Sr`, `II`, `III`, `IV`, `PhD`, `MD` and `Esq` after a family name are skipped (never the first word, and never when nothing else is left).
+- **`NumberField` and `EditableText`** are 16 px on a phone, like `Input` since 0.7: iOS zooms into a smaller field and does not zoom back.
+
+Not changed, and why: a `Table` cell does not break anywhere (a table that scrolled would squeeze every column instead); a `Badge` in a `CardAction` or beside a `SectionHeader` title is not cut unless the host passes `truncate`.
 
 ## Loading: a platform checkbox in a line of words
 

@@ -9,6 +9,8 @@ import { formatCount } from "./plural";
 import { classes } from "./shared";
 
 const DIGIT_HEIGHT_EM = 1.1;
+/** `--fui-duration-slow`, for the lengths worked out here when no `duration` is given. */
+const DEFAULT_SECONDS = 0.24;
 const DIGITS = Array.from({ length: 10 }, (_, n) => n);
 /** One glyph per em, three decimals at most, so the stack lands exactly on its digit. */
 function travel(digit: number) {
@@ -42,8 +44,16 @@ function useInViewOnce(ref: RefObject<HTMLElement | null>, enabled: boolean) {
 export type NumberTickerProps = Omit<ComponentProps<"span">, "children"> & {
   value: number;
   pad?: number;
+  /** The length of the roll in seconds. Without it, `--fui-duration-slow` (240 ms). */
   duration?: number;
+  /** With `rollIn`: how far apart the columns start, in seconds. */
   stagger?: number;
+  /**
+   * Count up from zero the first time it is shown. Off by default (since 0.12): a figure that is there at first render
+   * shows at once, and rolls only when it changes. For the one figure of a page that is its moment, not for a dashboard.
+   */
+  rollIn?: boolean;
+  /** With `rollIn`: wait until six tenths of it are in view (the default), or count up as soon as it is mounted. */
   startOnView?: boolean;
   prefix?: string;
   suffix?: string;
@@ -61,16 +71,17 @@ export type NumberTickerProps = Omit<ComponentProps<"span">, "children"> & {
 };
 
 /**
- * A number that rolls to its value like an odometer: each digit is a column of 0-9 that slides into place, the columns a
- * little apart. It rolls once when it is first seen (or at once with `startOnView={false}`) and again whenever `value`
- * changes, from wherever the digits are; the first paint shows the number at rest and reduced motion jumps with no roll.
- * Assistive technology always reads the final number, and the digits keep their width as they turn.
+ * A number that rolls to a new value like an odometer: each digit is a column of 0-9 that slides into place. The first
+ * paint shows the number itself, at rest; it rolls whenever `value` changes, from wherever the digits are, in 240 ms.
+ * `rollIn` also counts it up from zero the first time it is seen, the columns a little apart. Reduced motion jumps with
+ * no roll. Assistive technology always reads the final number, and the digits keep their width as they turn.
  */
 export function NumberTicker({
   value,
   pad,
-  duration = 0.9,
-  stagger = 0.04,
+  duration,
+  stagger = 0.02,
+  rollIn = false,
   startOnView = true,
   prefix,
   suffix,
@@ -84,17 +95,20 @@ export function NumberTicker({
 }: NumberTickerProps) {
   const provided = useProvidedLocale(typeof ownLocale === "boolean" ? undefined : ownLocale);
   const containerRef = useRef<HTMLSpanElement>(null);
-  const inView = useInViewOnce(containerRef, startOnView);
+  const inView = useInViewOnce(containerRef, rollIn && startOnView);
   const reduce = useReducedMotion();
-  const armed = !startOnView || inView;
-  const [entered, setEntered] = useState(false);
-  // The columns are painted at rest first, one frame before they are asked to move, so the roll has somewhere to start.
-  const [live, setLive] = useState(false);
+  const armed = !rollIn || !startOnView || inView;
+  const seconds = duration ?? DEFAULT_SECONDS;
+  const [entered, setEntered] = useState(!rollIn);
+  // Counting up: the columns are painted at zero first, one frame before they are asked to move, so the roll has
+  // somewhere to start. Otherwise they are painted on their digits and stay there until the value changes.
+  const [live, setLive] = useState(!rollIn);
 
   useEffect(() => {
+    if (live) return;
     const frame = requestAnimationFrame(() => setLive(true));
     return () => cancelAnimationFrame(frame);
-  }, []);
+  }, [live]);
 
   const text = useMemo(() => {
     if (format) return format(value);
@@ -110,7 +124,7 @@ export function NumberTicker({
 
   useEffect(() => {
     if (!armed || entered) return;
-    const total = (duration + glyphs.length * stagger) * 1000;
+    const total = (seconds + glyphs.length * stagger) * 1000;
     const timer = window.setTimeout(() => setEntered(true), total);
     return () => window.clearTimeout(timer);
   }, [armed, entered, duration, stagger, glyphs.length]);
@@ -119,7 +133,7 @@ export function NumberTicker({
     <span
       ref={containerRef}
       className={classes("fui-ticker", className)}
-      style={{ "--fui-ticker-duration": `${duration * 1000}ms`, ...style } as CSSProperties}
+      style={duration === undefined ? style : ({ "--fui-ticker-duration": `${duration * 1000}ms`, ...style } as CSSProperties)}
       {...props}
     >
       <span className="fui-sr-only">{readableText}</span>
@@ -137,7 +151,7 @@ export function NumberTicker({
             <Digit
               key={id}
               blur={blur}
-              blurDuration={Math.min(duration * 0.75, 0.32) * 1000}
+              blurDuration={Math.min(seconds * 0.75, 0.32) * 1000}
               className={digitClassName}
               delay={entered || reduce ? 0 : index * stagger}
               digit={live && armed ? Number(char) : 0}
@@ -167,9 +181,13 @@ function Digit({
   className?: string;
 }) {
   const columnRef = useRef<HTMLSpanElement>(null);
+  // The digit this column was last asked for: the blur is for a column that turns, not for one that is first painted.
+  const shown = useRef(digit);
 
   useEffect(() => {
     const node = columnRef.current;
+    if (shown.current === digit) return;
+    shown.current = digit;
     if (reduce || !blur || !node || typeof node.animate !== "function") return;
     const fade = node.animate([{ filter: "blur(10px)" }, { filter: "blur(0px)" }], {
       duration: blurDuration,

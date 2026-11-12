@@ -25,10 +25,16 @@ function firstGrapheme(word: string): string {
  * English by default (pass it for Turkish or Lithuanian names, whose letters grow differently); `fallback` when there is
  * nothing to show.
  */
+/** What may follow a family name without being one. */
+const SUFFIX = /^(?:jr|sr|ii|iii|iv|phd|md|esq)\.?,?$/iu;
+
 export function avatarInitials(value: string, fallback = "?", locale?: string): string {
   const text = value.trim();
   if (!text) return fallback;
-  const words = /\s/u.test(text) ? text.split(/\s+/u) : [text.split("@")[0] || text];
+  const all = /\s/u.test(text) ? text.split(/\s+/u) : [text.split("@")[0] || text];
+  // "Christopher Montgomery III" is C M, not C I: what follows the family name is not a name. Kept when nothing else is left.
+  const named = all.filter((word, index) => index === 0 || !SUFFIX.test(word));
+  const words = named.length > 1 || all.length === 1 ? named : all;
   const letters =
     words.length > 1
       ? [firstGrapheme(words[0]), firstGrapheme(words[words.length - 1])]

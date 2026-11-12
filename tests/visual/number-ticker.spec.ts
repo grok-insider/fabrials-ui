@@ -108,7 +108,8 @@ test.describe("the roll", () => {
     await open(page);
     await expect.poll(() => read(page, "#ticker-live")).toBe("48,210");
     await page.getByRole("button", { name: "Set 12,840" }).click();
-    await page.waitForTimeout(250);
+    // A third of the way through a roll of 240 ms.
+    await page.waitForTimeout(80);
     const before = await read(page, "#ticker-live");
     expect(before).not.toBe("12,840");
     await page.getByRole("button", { name: "Set 48,210" }).click();
@@ -127,7 +128,7 @@ test.describe("the roll", () => {
     await expect.poll(() => read(page, "#ticker-live"), { timeout: 5000 }).toBe("960");
   });
 
-  test("a number that is below the fold counts up when it is seen, not before", async ({ page }) => {
+  test("asked to count up, a number that is below the fold does it when it is seen, not before", async ({ page }) => {
     await page.goto(`/iframe.html?id=tests-number-ticker--on-view&viewMode=story`);
     await expect(page.locator("#ticker-on-view")).toBeAttached();
     await page.evaluate(() => document.fonts.ready);
@@ -139,16 +140,16 @@ test.describe("the roll", () => {
     expect(columns).toBe(5);
   });
 
-  test("the roll happens once on first paint and then holds still", async ({ page }) => {
+  test("a number that is there at first paint is at rest: it does not count up to itself", async ({ page }) => {
     await open(page);
-    const first = await read(page, "#ticker-plain");
-    expect(first).not.toBe("12480");
-    await expect.poll(() => read(page, "#ticker-plain"), { timeout: 5000 }).toBe("12480");
+    // Read as soon as the story is there: already the number, with nothing on its way.
+    expect(await read(page, "#ticker-plain")).toBe("12480");
     const running = () =>
       page.evaluate(() => [...document.querySelectorAll("#ticker-plain .fui-ticker-column")].reduce((total, node) => total + node.getAnimations().length, 0));
-    await expect.poll(running, { timeout: 5000 }).toBe(0);
+    expect(await running()).toBe(0);
     await page.waitForTimeout(400);
     expect(await read(page, "#ticker-plain")).toBe("12480");
+    expect(await running()).toBe(0);
   });
 });
 

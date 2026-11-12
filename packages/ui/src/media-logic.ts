@@ -261,8 +261,11 @@ export function playbackProblem(
 export const AXIS_SLOP = 10;
 /** A fitted picture dragged down this far closes the viewer when it is let go. */
 export const CLOSE_DISTANCE = 96;
-/** A flick down this fast (pixels per millisecond) closes it from a shorter drag, of at least `FLICK_DISTANCE`. */
-export const FLICK_SPEED = 0.6;
+/**
+ * A flick down this fast (pixels per millisecond) closes it from a shorter drag, of at least `FLICK_DISTANCE`. It was
+ * 0.6, which a short, natural flick does not reach; lower than this, letting go of almost any drag would close.
+ */
+export const FLICK_SPEED = 0.3;
 export const FLICK_DISTANCE = 24;
 /** Two taps this close in time (milliseconds) and place (pixels) are a double tap. */
 export const DOUBLE_TAP_TIME = 300;

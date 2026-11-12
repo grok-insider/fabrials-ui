@@ -36,16 +36,16 @@ const examples: ExampleSet = {
       id: "when-it-rolls",
       title: "When it rolls",
       description:
-        "By default it counts up once, when six tenths of it have come into view, and then only when the value changes. `startOnView={false}` rolls it as soon as it appears, `duration` is the length in seconds and `stagger` sets the columns apart.",
+        "A figure that is there when the page is shows at once, and rolls only when its value changes. `rollIn` counts it up from zero the first time six tenths of it come into view (or at once with `startOnView={false}`): for the one figure that is a page's moment, not for a dashboard. `duration` is the length in seconds and `stagger` sets the columns of a count-up apart.",
       code: `<NumberTicker value={12840} />
-<NumberTicker value={12840} startOnView={false} duration={1.4} stagger={0.08} />`,
+<NumberTicker value={12840} rollIn duration={0.9} stagger={0.04} />`,
       render: () => (
         <div style={row}>
           <p style={figure}>
             <NumberTicker locale="en" value={48_210} />
           </p>
           <p style={figure}>
-            <NumberTicker duration={1.4} locale="en" startOnView={false} stagger={0.08} value={12840} />
+            <NumberTicker duration={0.9} locale="en" rollIn stagger={0.04} value={12840} />
           </p>
         </div>
       ),
@@ -83,11 +83,11 @@ const examples: ExampleSet = {
     {
       id: "blur",
       title: "A blur as it lands",
-      description: "`blur` softens each column as it slides and brings it into focus, for a figure that arrives rather than changes.",
-      code: `<NumberTicker blur value={12840} startOnView={false} />`,
+      description: "`blur` softens each column as it turns and brings it into focus. With `rollIn` it is how a figure arrives.",
+      code: `<NumberTicker blur rollIn value={12840} startOnView={false} />`,
       render: () => (
         <p style={figure}>
-          <NumberTicker blur locale="en" startOnView={false} value={12840} />
+          <NumberTicker blur locale="en" rollIn startOnView={false} value={12840} />
         </p>
       ),
     },

@@ -261,9 +261,7 @@
     font: inherit;
     font-size: var(--fui-text-sm);
     cursor: pointer;
-    transition:
-      background-color var(--fui-duration) var(--fui-ease),
-      transform var(--fui-duration-fast) var(--fui-ease);
+    /* No transition: a key answers in the frame it is pressed. */
   }
   .fui-keyboard-key:focus-visible {
     outline: 2px solid var(--fui-focus);

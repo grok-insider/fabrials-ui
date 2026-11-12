@@ -1,0 +1,26 @@
+/* Reduced motion is less motion, not none. What comes over the page (a menu, a popover, a tooltip, a dialog, a sheet and
+   the veil behind it) still fades, so it does not cut in and out; nothing travels, grows or slides. The three lengths of
+   the system are 0 here, so everything else changes at once, as before: only these read --fui-duration-fade. */
+@layer components {
+  @media (prefers-reduced-motion: reduce) {
+    :root :is(.fui-menu, .fui-popover, .fui-tooltip, .fui-dialog, .fui-backdrop) {
+      transition: opacity var(--fui-duration-fade) var(--fui-ease-out);
+    }
+    /* Arriving, it is placed in the frame it is still transparent. Leaving, it stays where it is while it fades and is
+       put away when the fade ends (step-end), so a sheet does not vanish in the frame it is asked to close. */
+    :root :is(.fui-menu, .fui-popover, .fui-tooltip, .fui-dialog, .fui-backdrop)[data-ending-style] {
+      transition:
+        opacity var(--fui-duration-fade-exit) var(--fui-ease-out),
+        transform var(--fui-duration-fade-exit) step-end,
+        translate var(--fui-duration-fade-exit) step-end,
+        scale var(--fui-duration-fade-exit) step-end;
+    }
+    /* A sheet slides and does not fade when motion is allowed; here the fade is all it has. */
+    :root .fui-dialog:is([data-starting-style], [data-ending-style]) {
+      opacity: 0;
+    }
+    :root :is(.fui-menu, .fui-popover, .fui-tooltip)[data-instant] {
+      transition-duration: 0ms;
+    }
+  }
+}

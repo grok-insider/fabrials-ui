@@ -9,7 +9,8 @@
     }
     .fui-rise {
       animation: fui-rise var(--fui-duration-slow) var(--fui-ease-out) both;
-      animation-delay: calc(min(var(--fui-stagger, 0), 8) * 45ms);
+      /* 30 ms apart up to the eighth: the last of a list starts 240 ms in, inside the 300 ms a group may take. */
+      animation-delay: calc(min(var(--fui-stagger, 0), 8) * var(--fui-stagger-step));
     }
     .fui-card[data-interactive] {
       transition:

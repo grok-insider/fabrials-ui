@@ -217,11 +217,11 @@
     }
     .fui-toggle-group[data-indicator="ready"][data-direction="right"]::before,
     .fui-tabs-plate[data-activation-direction="right"] {
-      transition-delay: 70ms, 0ms, 0ms, 0ms, 0ms;
+      transition-delay: 40ms, 0ms, 0ms, 0ms, 0ms;
     }
     .fui-toggle-group[data-indicator="ready"][data-direction="left"]::before,
     .fui-tabs-plate[data-activation-direction="left"] {
-      transition-delay: 0ms, 70ms, 0ms, 0ms, 0ms;
+      transition-delay: 0ms, 40ms, 0ms, 0ms, 0ms;
     }
     .fui-toggle-group[data-indicator] > .fui-toggle,
     .fui-tabs-list[data-variant="segmented"]:has(> .fui-tabs-plate) > .fui-tab {
@@ -244,8 +244,14 @@
       stroke-dashoffset: 0;
       transition: stroke-dashoffset var(--fui-duration) var(--fui-ease);
     }
+    /* Drawn when it is checked, not when the page is: Base UI marks the tick that has just been mounted by a change
+       (data-starting-style) and not the one that was there at first render. @starting-style would draw every box that
+       loads checked. A MultiSelect's box has no such mark; its ticks are drawn as its list opens. */
+    .fui-checkbox .fui-control-indicator[data-starting-style] svg path {
+      stroke-dashoffset: 24;
+    }
     @starting-style {
-      .fui-checkbox .fui-control-indicator svg path {
+      .fui-multi-select-box .fui-control-indicator svg path {
         stroke-dashoffset: 24;
       }
     }

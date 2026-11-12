@@ -1089,11 +1089,12 @@ export const uiCatalog: UiCatalogItem[] = [
     "number-ticker",
     "Number ticker",
     "Metrics",
-    "A total that counts to the current value.",
+    "A total that rolls to its new value when it changes.",
     ["NumberTicker"],
     [
       ["value", "number", "The number to show."],
       ["prefix / suffix", "string", "Unit or currency around the digits."],
+      ["rollIn", "boolean", "Count up from zero the first time it is shown. Off: a number that is there at first render shows at once."],
       ["locale", "Intl.LocalesArgument | boolean", "The grouping and the digits: this prop, else a LabelsProvider's, else plain digits. true is the deprecated request for the device's locale, which a server cannot know."],
     ],
     "Reduced motion jumps to the final value. A screen-reader string carries the same number. Blur is off. The roll is a CSS transition on the column of digits, so the package installs no animation library at all: a product that added motion only for the ticker can drop it. Without a locale the digits stay plain (12480), which is the same on the server and in the browser and what 0.11 printed.",

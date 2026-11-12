@@ -86,8 +86,16 @@
   --fui-duration-fast: 100ms;
   --fui-duration: 150ms;
   --fui-duration-slow: 240ms;
+  /* The beat between the items of a list that arrive one after another (`.fui-rise` with `--fui-stagger`). */
+  --fui-stagger-step: 30ms;
   --fui-ease: cubic-bezier(0.2, 0, 0, 1);
-  --fui-ease-exit: cubic-bezier(0.3, 0, 1, 1);
+  /* What leaves starts leaving in the frame it is asked to: the same quick-out curve as what arrives (--fui-ease-out),
+     in less time. It used to be an accelerating curve, which held the thing still for its first frames. */
+  --fui-ease-exit: cubic-bezier(0.16, 1, 0.3, 1);
+  /* The fade of what comes over the page. Not set to 0 under reduced motion, where it is the only movement left
+     (300-reduced-motion.css). */
+  --fui-duration-fade: 150ms;
+  --fui-duration-fade-exit: 100ms;
   /* A small overshoot for things a hand moves: a thumb, a tick, a tile landing. */
   --fui-ease-spring: cubic-bezier(0.34, 1.36, 0.64, 1);
 

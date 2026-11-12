@@ -52,6 +52,11 @@
     height var(--fui-duration) var(--fui-ease),
     box-shadow var(--fui-duration) var(--fui-ease);
 }
+/* A toast held by a finger follows it exactly: its transform has no transition until it is let go. (Sonner says so
+   itself, with fewer attributes than the rule above, which would win and leave the toast 150 ms behind the hand.) */
+.fui-toaster[data-sonner-toaster] [data-sonner-toast][data-swiping="true"] {
+  transition-property: opacity, height, box-shadow;
+}
 .fui-toaster[data-sonner-toaster] [data-sonner-toast][data-y-position="bottom"]:not([data-mounted="true"]) {
   --y: translateY(4px);
 }

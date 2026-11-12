@@ -119,10 +119,10 @@ export const Pieces: Story = { render: () => <Bench /> };
 // A number that is below the fold at first paint: it counts up when it is seen, and not before. The behaviour test scrolls to it.
 export const OnView: Story = {
   render: () => (
-    <Page description="A figure that is off screen at first paint and starts its one roll when six tenths of it have come into view." title="Counting up when it is seen">
+    <Page description="A figure asked to count up (`rollIn`) that is off screen at first paint: it starts its one roll when six tenths of it have come into view." title="Counting up when it is seen">
       <div aria-hidden="true" style={{ blockSize: "140vh" }} />
       <p id="ticker-on-view" style={{ ...figure, fontSize: "2.5rem" }}>
-        <NumberTicker locale="en" value={48_210} />
+        <NumberTicker locale="en" rollIn value={48_210} />
       </p>
     </Page>
   ),

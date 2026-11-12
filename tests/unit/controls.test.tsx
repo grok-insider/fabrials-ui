@@ -171,8 +171,8 @@ test("segmented plates are placed by their four edges and slide leading edge fir
   assert.match(styles, /\.fui-toggle-group\[data-indicator\]::before \{\s*top: var\(--fui-toggle-y\);\s*left: var\(--fui-toggle-x\);\s*right: var\(--fui-toggle-r\);/);
   assert.match(styles, /\.fui-tabs-plate \{\s*top: var\(--active-tab-top\);\s*left: var\(--active-tab-left\);\s*right: var\(--active-tab-right\);/);
   const motion = styles.slice(styles.indexOf("@media (prefers-reduced-motion: no-preference) {", styles.indexOf("/* Data and images arriving")));
-  assert.match(motion, /\[data-direction="right"\]::before,\s*\.fui-tabs-plate\[data-activation-direction="right"\] \{\s*transition-delay: 70ms, 0ms/);
-  assert.match(motion, /\[data-direction="left"\]::before,\s*\.fui-tabs-plate\[data-activation-direction="left"\] \{\s*transition-delay: 0ms, 70ms/);
+  assert.match(motion, /\[data-direction="right"\]::before,\s*\.fui-tabs-plate\[data-activation-direction="right"\] \{\s*transition-delay: 40ms, 0ms/);
+  assert.match(motion, /\[data-direction="left"\]::before,\s*\.fui-tabs-plate\[data-activation-direction="left"\] \{\s*transition-delay: 0ms, 40ms/);
   const segmented = renderToStaticMarkup(
     <ToggleGroup aria-label="Range" defaultValue={["7d"]}>
       <ToggleGroupItem value="7d">7 days</ToggleGroupItem>

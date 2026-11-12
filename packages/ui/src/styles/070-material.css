@@ -113,17 +113,26 @@
     box-shadow: var(--fui-highlight);
   }
 
-  /* Overlays come from their trigger's side and settle on a quick-out curve; they leave faster than they came. */
+  /* Overlays come from their trigger's side and settle on a quick-out curve; they leave faster than they came.
+     A menu is opened tens of times a day: 150 ms. A tooltip is passed over more often still: 100 ms. */
   .fui-menu,
   .fui-popover,
   .fui-tooltip {
-    transition-duration: var(--fui-duration-slow);
+    transition-duration: var(--fui-duration);
     transition-timing-function: var(--fui-ease-out);
     transition-property: opacity, transform, translate;
+  }
+  .fui-tooltip {
+    transition-duration: var(--fui-duration-fast);
   }
   :is(.fui-menu, .fui-popover, .fui-tooltip)[data-ending-style] {
     transition-duration: var(--fui-duration-fast);
     transition-timing-function: var(--fui-ease-exit);
+  }
+  /* Base UI says when one of these should not animate: the tooltip after the first one of a toolbar, a menu opened or
+     closed with a key, a menu of a menubar after its neighbour. Those are there, or gone, at once. */
+  :is(.fui-menu, .fui-popover, .fui-tooltip)[data-instant] {
+    transition-duration: 0ms;
   }
   :is(.fui-menu, .fui-popover, .fui-tooltip)[data-side="bottom"]:is([data-starting-style], [data-ending-style]) {
     translate: 0 -4px;
@@ -149,7 +158,7 @@
   .fui-dialog[data-placement="center"]:is([data-starting-style], [data-ending-style]) {
     transform: translate(-50%, -48%) scale(0.96);
   }
-  .fui-menu-item,
+  /* A menu's highlighted row is where the arrow keys are: it moves with them, with no fade to trail behind a held key. */
   .fui-item,
   .fui-sidebar-menu-button {
     transition: background-color var(--fui-duration-fast) var(--fui-ease), color var(--fui-duration-fast) var(--fui-ease);
@@ -168,10 +177,13 @@
     .fui-switch[data-checked]:active:not([data-disabled]) .fui-switch-thumb {
       transform: translateX(0.75rem);
     }
-    /* A tick pops in. */
+    /* A tick pops in when it is checked. One that is there at first render is there at rest (see the drawn check). */
+    .fui-checkbox .fui-control-indicator[data-starting-style],
+    .fui-radio .fui-radio-indicator[data-starting-style] {
+      scale: 0.6;
+    }
     @starting-style {
-      .fui-checkbox .fui-control-indicator,
-      .fui-radio .fui-radio-indicator {
+      .fui-multi-select-box .fui-control-indicator {
         scale: 0.6;
       }
     }

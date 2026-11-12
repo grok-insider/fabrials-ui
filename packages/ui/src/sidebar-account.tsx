@@ -108,11 +108,11 @@ export function SidebarAccount({
         <AvatarFallback>{avatarInitials(name?.trim() || email || "")}</AvatarFallback>
       </Avatar>
       <span className="fui-sidebar-account-text">
-        <span className="fui-sidebar-account-name" dir="auto">
+        <span className="fui-sidebar-account-name" dir="auto" title={displayName}>
           {displayName}
         </span>
         {email && email.trim() !== displayName ? (
-          <span className="fui-sidebar-account-email" dir="auto">
+          <span className="fui-sidebar-account-email" dir="auto" title={email}>
             {email}
           </span>
         ) : null}

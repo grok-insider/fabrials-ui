@@ -29,6 +29,20 @@ export type StatProps = Omit<ComponentProps<"div">, "children"> & {
   loading?: boolean;
 };
 
+/** From this many characters on, a figure no longer fits the narrowest cell of a group at its full size. */
+const LONG_FIGURE = 10;
+
+/**
+ * For a figure given as text or a number and long enough to need it: its length, so that inside a `StatGroup` the
+ * styles can set it as large as its cell allows instead of breaking the number in two. A figure that is an element is
+ * left as it is: its length is not known here.
+ */
+function figureFit(value: ReactNode): { "data-fit"?: ""; style?: CSSProperties } {
+  if (typeof value !== "string" && typeof value !== "number") return {};
+  const length = Array.from(String(value)).length;
+  return length < LONG_FIGURE ? {} : { "data-fit": "", style: { "--fui-figure-ch": length } as CSSProperties };
+}
+
 export function Stat({
   label,
   value,
@@ -59,7 +73,7 @@ export function Stat({
       {loading ? (
         <span aria-hidden className="fui-skeleton fui-stat-skeleton" />
       ) : (
-        <p className="fui-stat-value">
+        <p className="fui-stat-value" {...figureFit(value)}>
           {value}
           {unit ? <span className="fui-stat-unit">{unit}</span> : null}
         </p>

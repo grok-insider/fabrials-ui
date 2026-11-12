@@ -254,7 +254,7 @@ test("the account row is one named button with the picture, the name and the sec
   assert.match(html, /ada@harbour\.test/);
   assert.match(html, /fui-sidebar-account-chevron/);
   // The name takes its own direction and the row is not the current page.
-  assert.match(html, /class="fui-sidebar-account-name" dir="auto"/);
+  assert.match(html, /class="fui-sidebar-account-name" dir="auto" title=/);
   assert.doesNotMatch(html, /data-active/);
   // Closed: no menu in the markup.
   assert.doesNotMatch(html, /fui-menu/);
@@ -274,7 +274,10 @@ test("the account row without a name says it is an account, and takes the curren
   );
   assert.match(active, /data-active="true"/);
   // With no second line to add, the email is not repeated under the name.
-  assert.equal((active.match(/beacon@harbour\.test/g) ?? []).length, 1);
+  assert.equal((active.match(/>beacon@harbour\.test</g) ?? []).length, 1);
+  // The row cuts a long address: its title has it whole.
+  assert.match(active, /class="fui-sidebar-account-email" dir="auto" title="beacon@harbour\.test"/);
+  assert.match(active, /class="fui-sidebar-account-name" dir="auto" title="Beacon Operations"/);
 });
 
 test("the labels of the account row are the host's", () => {

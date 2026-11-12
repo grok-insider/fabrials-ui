@@ -1602,6 +1602,10 @@
   .fui-backdrop:is([data-starting-style], [data-ending-style]) {
     opacity: 0;
   }
+  /* The veil leaves with its panel (150 ms), not 90 ms after it. */
+  .fui-backdrop[data-ending-style] {
+    transition-duration: var(--fui-duration);
+  }
   .fui-dialog {
     position: fixed;
     /* one class, as it always was: an override with one class keeps working. --fui-sheet-z is the documented way to move a sheet. */
@@ -2754,9 +2758,10 @@
     width: var(--active-tab-width);
     translate: var(--active-tab-left) 0;
     background: var(--brand);
+    /* A line 2 px high: at 240 ms the eye is on the new tab before it is. */
     transition:
-      translate var(--fui-duration-slow) var(--fui-ease),
-      width var(--fui-duration-slow) var(--fui-ease);
+      translate var(--fui-duration-fast) var(--fui-ease),
+      width var(--fui-duration-fast) var(--fui-ease);
   }
   .fui-tabs-list[data-variant="segmented"],
   .fui-toggle-group {
@@ -4676,7 +4681,7 @@
     position: relative;
     width: var(--sidebar-width);
     background: transparent;
-    transition: width var(--fui-duration-slow) var(--fui-ease);
+    /* No transition: folding the sidebar (Ctrl/Cmd+B) resizes the whole page beside it, once, not on every frame of 240 ms. */
   }
   .fui-sidebar[data-collapsible="offcanvas"] .fui-sidebar-gap {
     width: 0;
@@ -4695,10 +4700,6 @@
     display: flex;
     width: var(--sidebar-width);
     height: 100svh;
-    transition:
-      left var(--fui-duration-slow) var(--fui-ease),
-      right var(--fui-duration-slow) var(--fui-ease),
-      width var(--fui-duration-slow) var(--fui-ease);
   }
   /* "left" and "right" are physical sides: the same edge, with its border on the inner side, in every writing direction.
      "start" and "end" (0.12) are the logical ones. */
@@ -4826,9 +4827,7 @@
     font-family: var(--fui-font-label);
     font-size: var(--fui-text-label);
     letter-spacing: var(--fui-tracking-label);
-    transition:
-      margin var(--fui-duration-slow) var(--fui-ease),
-      opacity var(--fui-duration-slow) var(--fui-ease);
+    transition: opacity var(--fui-duration-fast) var(--fui-ease);
   }
   .fui-sidebar-group-label svg {
     width: 1rem;
@@ -5378,11 +5377,18 @@
     top: var(--fui-command-top);
     transform: translateX(-50%);
   }
+  /* The command palette is opened by a key, a hundred times a day: it does not travel or grow. It and its veil fade in
+     100 ms, and that is all. */
   .fui-dialog.fui-command-dialog[data-placement="center"]:is(
       [data-starting-style],
       [data-ending-style]
     ) {
-    transform: translate(-50%, -4px) scale(0.98);
+    transform: translateX(-50%);
+  }
+  .fui-dialog.fui-command-dialog,
+  .fui-dialog.fui-command-dialog[data-ending-style],
+  .fui-backdrop:has(~ .fui-command-dialog) {
+    transition-duration: var(--fui-duration-fast);
   }
   .fui-command-dialog .fui-command {
     border-radius: 0;

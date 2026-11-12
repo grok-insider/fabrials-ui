@@ -135,11 +135,11 @@ test("segmented plates: a toggle group's plate moves its leading edge first and 
     );
   await group.getByRole("button", { name: "30 days" }).click();
   await expect(group).toHaveAttribute("data-direction", "right");
-  // Moving right, the right edge leaves at once and the left edge 70 ms later.
-  await expect.poll(transitions).toEqual(expect.arrayContaining(["left 70", "right 0"]));
+  // Moving right, the right edge leaves at once and the left edge 40 ms later.
+  await expect.poll(transitions).toEqual(expect.arrayContaining(["left 40", "right 0"]));
   await group.getByRole("button", { name: "24 h" }).click();
   await expect(group).toHaveAttribute("data-direction", "left");
-  await expect.poll(transitions).toEqual(expect.arrayContaining(["left 0", "right 70"]));
+  await expect.poll(transitions).toEqual(expect.arrayContaining(["left 0", "right 40"]));
   await cdp.send("Animation.setPlaybackRate", { playbackRate: 1 });
 
   const tabs = page.getByRole("tablist", { name: "Mailbox" });

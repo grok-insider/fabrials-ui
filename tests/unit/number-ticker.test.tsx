@@ -20,25 +20,38 @@ const still = block.replace(media, "");
 
 const html = (element: React.ReactElement) => renderToStaticMarkup(element);
 const GLYPHS = Array.from({ length: 10 }, (_, n) => `<span class="fui-ticker-glyph">${n}</span>`).join("");
-const digit = (delay: number) =>
-  `<span class="fui-ticker-digit" style="height:1.1em;width:1ch;--fui-ticker-delay:${delay}ms"><span class="fui-ticker-column" style="transform:none">${GLYPHS}</span></span>`;
+const digit = (delay: number, transform = "none") =>
+  `<span class="fui-ticker-digit" style="height:1.1em;width:1ch;--fui-ticker-delay:${delay}ms"><span class="fui-ticker-column" style="transform:${transform}">${GLYPHS}</span></span>`;
 const row = (inner: string) => `<span aria-hidden="true" class="fui-ticker-row">${inner}</span>`;
 const read = (element: React.ReactElement) => html(element).match(/<span class="fui-sr-only">([^<]*)</)?.[1];
 
-test("the first paint is the value's number of columns at rest, and the number itself is what is read", () => {
+test("the first paint is the number itself, each column on its digit, and the number is what is read", () => {
+  // No length of its own: the roll takes the token's 240 ms, and nothing under reduced motion.
   assert.equal(
     html(<NumberTicker value={7} />),
-    `<span class="fui-ticker" style="--fui-ticker-duration:900ms"><span class="fui-sr-only">7</span>${row(digit(0))}</span>`,
+    `<span class="fui-ticker"><span class="fui-sr-only">7</span>${row(digit(0, "translateY(-7.7em)"))}</span>`,
   );
-  // Every column is a stack of 0-9 at rest: the paint never guesses a position the browser would then jump from.
-  assert.doesNotMatch(html(<NumberTicker value={12480} locale="en" />), /translateY/);
+  // A figure that is there at first render shows at once: the columns are on 1, 2, 4, 8 and 0, with no delay to count up by.
+  const shown = html(<NumberTicker value={12480} locale="en" />);
+  assert.deepEqual(shown.match(/transform:[^"]+/g), ["transform:translateY(-1.1em)", "transform:translateY(-2.2em)", "transform:translateY(-4.4em)", "transform:translateY(-8.8em)", "transform:none"]);
+  assert.deepEqual([...new Set(shown.match(/--fui-ticker-delay:\d+ms/g))], ["--fui-ticker-delay:0ms"]);
   // The words around it are read, and the columns are not.
   assert.equal(read(<NumberTicker prefix="$" value={42} suffix=" kg" />), "$42 kg");
   assert.match(html(<NumberTicker prefix="$" value={42} suffix=" kg" />), /<span>\$<\/span>/);
 });
 
+test("asked to count up, the first paint is a row of zeros, each column a little after the one before", () => {
+  // Every column is a stack of 0-9 at rest: the paint never guesses a position the browser would then jump from.
+  assert.equal(
+    html(<NumberTicker rollIn value={73} />),
+    `<span class="fui-ticker"><span class="fui-sr-only">73</span>${row(digit(0) + digit(20))}</span>`,
+  );
+  assert.doesNotMatch(html(<NumberTicker rollIn startOnView={false} value={12480} locale="en" />), /translateY/);
+  assert.equal(read(<NumberTicker rollIn value={73} />), "73", "what is read is the number, never the zeros");
+});
+
 test("the length, the stagger and the width ride on custom properties, and groups stay plain characters", () => {
-  const one = html(<NumberTicker duration={1.4} locale="en" stagger={0.1} startOnView={false} value={48_210} />);
+  const one = html(<NumberTicker duration={1.4} locale="en" rollIn stagger={0.1} startOnView={false} value={48_210} />);
   assert.match(one, /^<span class="fui-ticker" style="--fui-ticker-duration:1400ms">/);
   assert.match(one, /--fui-ticker-delay:0ms/);
   assert.match(one, /--fui-ticker-delay:100ms/);
@@ -66,8 +79,9 @@ test("it takes the props of the span it is, and its class names merge", () => {
   const merged = html(
     <NumberTicker className="big" data-slot="total" digitClassName="x" id="total" style={{ color: "red" }} value={5} />,
   );
-  assert.match(merged, /^<span class="fui-ticker big" style="--fui-ticker-duration:900ms;color:red" data-slot="total" id="total">/);
+  assert.match(merged, /^<span class="fui-ticker big" style="color:red" data-slot="total" id="total">/);
   assert.match(merged, /<span class="fui-ticker-digit x" style="height:1.1em;width:1ch;--fui-ticker-delay:0ms">/);
+  assert.match(html(<NumberTicker duration={0.5} style={{ color: "red" }} value={5} />), /style="--fui-ticker-duration:500ms;color:red"/);
 });
 
 test("the roll is one transition of the column, written only for people who allow motion, with the house ease and the tokens", () => {

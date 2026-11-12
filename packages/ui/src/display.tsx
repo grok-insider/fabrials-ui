@@ -182,23 +182,31 @@ export function TableCaption(props: ComponentProps<"caption">) {
   return <caption {...props} />;
 }
 
+/** A selection this soon after the last one (milliseconds) is a key held down or a quick run of presses. */
+const REVEAL_REST = 400;
+
 /** Keeps the selected tab of a scrolling list in view: when it is (partly) out of the list's box, the list scrolls its OWN box until the tab is centred. Never scrolls the page or a dialog, works in RTL, and only acts when the selection changes (or on mount), so it never fights a manual scroll. */
 function useRevealSelectedTab(ref: RefObject<HTMLDivElement | null>, enabled: boolean) {
   useEffect(() => {
     const list = ref.current;
     if (!enabled || !list) return;
-    const reveal = () => {
+    // When the list last moved for a selection. The first placement is not a movement, and an arrow key held down asks
+    // for a new one every few milliseconds: both go straight there, so smooth scrolls never queue behind the keyboard.
+    let last = Number.NEGATIVE_INFINITY;
+    const reveal = (first = false) => {
       const tab = list.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]');
       if (!tab) return;
       const box = list.getBoundingClientRect();
       const at = tab.getBoundingClientRect();
       if (at.left >= box.left + 8 && at.right <= box.right - 8) return;
-      const reduce = prefersReducedMotion();
+      const now = performance.now();
+      const instant = first || now - last < REVEAL_REST || prefersReducedMotion();
+      last = now;
       // Physical geometry, so the same delta is right in left-to-right and right-to-left lists.
-      list.scrollBy({ left: at.left + at.width / 2 - (box.left + box.width / 2), behavior: reduce ? "auto" : "smooth" });
+      list.scrollBy({ left: at.left + at.width / 2 - (box.left + box.width / 2), behavior: instant ? "auto" : "smooth" });
     };
-    const frame = requestAnimationFrame(reveal);
-    const observer = new MutationObserver(reveal);
+    const frame = requestAnimationFrame(() => reveal(true));
+    const observer = new MutationObserver(() => reveal());
     observer.observe(list, { attributes: true, attributeFilter: ["aria-selected"], subtree: true });
     return () => {
       cancelAnimationFrame(frame);

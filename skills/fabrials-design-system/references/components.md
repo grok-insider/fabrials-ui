@@ -248,7 +248,7 @@ Triggers take `render` to become a Fabrials button: `<DialogTrigger render={<But
 | `ActivityStrip`, `activityLevel` | Intensity cells (posts per day or hour) |
 | `Timeline`, `TimelineItem` | An event feed, newest first; `fresh` highlights a new item once |
 | `RelativeTime`, `formatRelativeTime`, `formatAbsoluteTime` | "3 minutes ago" with the exact date in a `time` element; `absoluteFormat` (options or a per-date function), `now` (fixed number stops the timer) and `timeZone` make it deterministic and hydration-exact |
-| `NumberTicker` | A total that counts up once; jumps under reduced motion. The roll is a CSS transition on the column of digits, so the package installs no animation library. `locale` takes a tag or the provider's (`locale={true}` still means the device's and is deprecated); `...props` and `style` reach the root |
+| `NumberTicker` | A total that is there at first paint and rolls, in 240 ms, when it changes (`rollIn` counts it up once from zero, for a page's one moment); jumps under reduced motion. The roll is a CSS transition on the column of digits, so the package installs no animation library. `locale` takes a tag or the provider's (`locale={true}` still means the device's and is deprecated); `...props` and `style` reach the root |
 
 Chart colours come from `--chart-1` to `--chart-6`; the first series reads as Stormlight.
 

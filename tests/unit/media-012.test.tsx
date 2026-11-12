@@ -78,7 +78,11 @@ test("a drag down moves the picture, fades the backdrop and shrinks it, and clos
   assert.equal(closesOnRelease(150, 0), true);
   assert.equal(closesOnRelease(30, 0.9), true);
   assert.equal(closesOnRelease(23, 2), false);
-  assert.equal(closesOnRelease(30, 0.5), false);
+  // A short, natural flick closes (it did not at 0.6); a finger that is barely moving does not.
+  assert.equal(closesOnRelease(30, 0.5), true);
+  assert.equal(closesOnRelease(30, 0.3), true);
+  assert.equal(closesOnRelease(30, 0.29), false);
+  assert.equal(closesOnRelease(90, 0.11), false);
   assert.equal(closesOnRelease(-200, 1), false);
   assert.equal(closesOnRelease(Number.NaN, 1), false);
 });

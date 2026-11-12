@@ -1,0 +1,91 @@
+/* What data nobody chose does to a component: an address of eighty letters with no space, a key, a commit id, a total of
+   twelve figures, a count of four. Each rule here mends one break seen in a render; none changes a component whose
+   content fits. */
+@layer components {
+  /* Words with no place to break break anywhere rather than run out of their plate, their menu or the page. */
+  .fui-card-caption > * {
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+  }
+  .fui-stat-label,
+  .fui-stat-meta,
+  .fui-breadcrumb-link,
+  .fui-breadcrumb-page,
+  .fui-timeline-title {
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+  }
+  .fui-menu-item,
+  .fui-menu-label {
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+  }
+  /* The entry's words give way; its shortcut stays whole beside them. */
+  .fui-menu-shortcut {
+    flex: none;
+    overflow-wrap: normal;
+    white-space: nowrap;
+  }
+
+  /* A long term takes two fifths of the list at most and wraps there; the details keep the rest. Before, the term's
+     column grew with the term, and a term from data left its details a column one letter wide. */
+  .fui-description-list:not([data-layout]),
+  .fui-description-list[data-layout="grid"] {
+    grid-template-columns: fit-content(40%) minmax(0, 1fr);
+  }
+  :is(.fui-description-list:not([data-layout]), .fui-description-list[data-layout="grid"]) .fui-description-term {
+    /* The 8rem a term always had, less the half of the gap between the columns that an item's own gap takes from its cell. */
+    min-inline-size: calc(8rem - var(--fui-space-3));
+    overflow-wrap: anywhere;
+  }
+
+  /* "+1,280" is wider than a face: the count grows into a pill instead of being cut by its circle. */
+  .fui-avatar.fui-avatar-group-count {
+    inline-size: auto;
+    min-inline-size: 2rem;
+    padding-inline: 0.3em;
+  }
+  .fui-avatar.fui-avatar-group-count[data-size="xs"] {
+    min-inline-size: 1.25rem;
+  }
+  .fui-avatar.fui-avatar-group-count[data-size="sm"] {
+    min-inline-size: 1.5rem;
+  }
+  .fui-avatar.fui-avatar-group-count[data-size="lg"] {
+    min-inline-size: 2.5rem;
+  }
+  .fui-avatar.fui-avatar-group-count[data-size="xl"] {
+    min-inline-size: 3.5rem;
+  }
+
+  /* A total of ten figures or more, in a group: the figure is set as large as its cell allows, down to 1.25rem, instead
+     of breaking in the middle of the number. Stat counts the figure's characters (--fui-figure-ch); a tabular digit of
+     the display face is a little over half an em wide. Only inside a group, whose cells have a width of their own: a
+     size container takes its width from outside, and a Stat laid out by a host may take its width from its figure. */
+  .fui-stat-group > .fui-stat:has(> .fui-stat-value[data-fit]) {
+    container: fui-stat / inline-size;
+  }
+  @container fui-stat (min-width: 0) {
+    .fui-stat-value[data-fit] {
+      font-size: clamp(1.25rem, calc(100cqi / (var(--fui-figure-ch) * 0.56)), var(--fui-text-figure));
+    }
+  }
+
+  /* The account's menu is where its address can be read whole: it wraps there. In the row it is cut, and says so in
+     its title. */
+  .fui-sidebar-account-identity-name,
+  .fui-sidebar-account-identity-email {
+    overflow: visible;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  /* iOS zooms the page into a field set under 16 px and does not zoom back. `.fui-input` is 1rem on a phone since 0.7;
+     these two came later and were not. */
+  @media (max-width: 767px), (pointer: coarse) {
+    .fui-number-field-input,
+    .fui-editable-text-field {
+      font-size: 1rem;
+    }
+  }
+}

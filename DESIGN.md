@@ -134,23 +134,36 @@ Three pieces use it, and every product uses them in these places:
 
 ## Motion
 
-Motion answers what a person did, what the data did or what an agent is doing, like an instrument responding to its controls: opening, expanding, choosing, confirming, a value arriving, work in progress. Durations are 100, 150 and 240 ms (`--fui-duration-fast`, `--fui-duration`, `--fui-duration-slow`) on a quick-out ease (`--fui-ease-out`); things a hand moves (a thumb, a tile landing) may overshoot a little on `--fui-ease-spring`. All of it drops to 0 under reduced motion, where every state still shows at once.
+Motion answers what a person did, what the data did or what an agent is doing, like an instrument responding to its controls: opening, expanding, choosing, confirming, a value arriving, work in progress. Durations are 100, 150 and 240 ms (`--fui-duration-fast`, `--fui-duration`, `--fui-duration-slow`). The curves, each with a job: `--fui-ease` for a state changing in place (a tint, a border, a fill), `--fui-ease-out` for what arrives, `--fui-ease-exit` for what leaves (the same quick-out curve in less time, so a thing starts leaving in the frame it is asked to), and `--fui-ease-spring`, a small overshoot, for what a hand moves (a tile landing, a picture let go).
+
+Reduced motion is less motion, not none. The three lengths are 0 there and every state shows at once, with one thing kept: what comes over the page (a menu, a popover, a tooltip, a dialog, a sheet and the veil behind it) still fades, 150 ms in and 100 out (`--fui-duration-fade`, `--fui-duration-fade-exit`), and nothing travels, grows or slides.
+
+How often a thing is seen decides whether it moves at all:
+
+| How often | What it gets | Examples |
+| --- | --- | --- |
+| A hundred times a day, or by a key | Nothing | A menu opened with Enter, the row the arrow keys are on, a key of the on-screen keyboard, folding the sidebar with Ctrl+B, the second tooltip of a toolbar |
+| Tens of times a day | 100 to 150 ms | A tooltip (100), a menu, a select or a popover under the pointer (150), the command palette (a fade of 100 ms, with no travel) |
+| Now and then | 240 ms | A dialog, a sheet, an accordion |
+| Once | May take longer | The one orchestrated moment of a page |
+
+A group that arrives together is done inside 300 ms, the last of its items included. What a finger holds follows it exactly, with no transition until it is let go.
 
 The vocabulary ("instrument with life", since 0.11; the rows 0.12 adds are at the end), each tied to one cause:
 
 | Cause | Motion | Where |
 | --- | --- | --- |
-| A choice in a single-choice group | The plate slides to the new item, its leading edge first, and settles; a chosen theme's icon turns into place | `ToggleGroup`, `ThemeSwitcher`, segmented `Tabs`; the `Tabs` underline slides |
+| A choice in a single-choice group | The plate slides to the new item, its leading edge first and the trailing one 40 ms behind, and settles; a chosen theme's icon turns into place | `ToggleGroup`, `ThemeSwitcher`, segmented `Tabs`; the `Tabs` underline slides in 100 ms |
 | A filter cleared | The chip fades and shrinks a little before it goes; focus moves to the next chip | `FilterChip` |
 | Something is live | The dot ripples outward while it lasts, and stops with it | `StatusDot pulse`, `Badge dot pulse` |
 | A press | The key goes down 1 px while held | `Button` |
-| A check | The tick is drawn | `Checkbox` |
+| A check | The tick is drawn, when it is checked: a box that loads checked is at rest | `Checkbox` |
 | A level changes | The ruler inks its ticks in order and its mark travels | `Meter variant="ruler"`, `Stat meter` |
 | A task advances | The fill eases to the new amount; segments ink in order; a ring closes | `Progress` (`steps`, `variant="ring"`) |
 | Work whose total is not known yet | The working light crosses the track, or turns round the ring; a dashed line or ring holds still under reduced motion | `Progress` without a value |
-| A number changes | The digits roll like an odometer | `NumberTicker` |
+| A number changes | The digits roll like an odometer, in 240 ms. A number that is there at first render does not count up to itself (`rollIn` is the exception, for a page's one moment) | `NumberTicker` |
 | A reading changes | The characters cycle for 240 ms and settle left to right | `Readout` |
-| Something arrives after the view is shown | It rises 4 px out of a slight blur; a list staggers its items by 45 ms, up to the eighth | `.fui-rise` with `--fui-stagger`; an agent's steps, search results, attachment tiles |
+| Something arrives after the view is shown | It rises 4 px out of a slight blur; a list staggers its items by 30 ms (`--fui-stagger-step`), up to the eighth, so the last one starts 240 ms in | `.fui-rise` with `--fui-stagger`; an agent's steps, search results, attachment tiles |
 | Media or data arrives after the view is shown | It appears through a 2 px dither in four steps | `FileThumb`; any host element with `data-fui-reveal="in"` |
 | Busy | A ring of square cells lights in turn; dots, bars, a grid or a line of cells where a ring would not fit | `Spinner` (`variant`), `Button loading`, `StatePanel` loading, loading toasts |
 | An agent works | The working light turns along the edge of what it works on, a band of light crosses its label, its indicator ripples, and the time it has taken counts up | `WorkingLight`, `ShimmerText tone="light"`, the agent pieces of `@fabrials/ai-ui` |
@@ -160,14 +173,14 @@ The vocabulary ("instrument with life", since 0.11; the rows 0.12 adds are at th
 | A search runs | A head of the working light hops across a strip of cells; each source found rises in as a tile and the count settles | `Progress variant="scan"`, `SourceTally` |
 | An answer arrives | A block caret of the working light ends the text; it blinks only while the stream waits | `ChatMessage streaming` |
 | A picture or a page is made | Light ripples through the dots, cells grow finer behind a band moving down, or a band scans down; a page's rows are written from the top, the row being written in the light | `GenerationFrame` (`effect`, `kind`) |
-| Opening and closing | Overlays fade, scale and slide 4 px from their trigger's side and leave faster (100 ms); dialogs grow from 96 %; an accordion's body rises out of a slight blur as its panel grows | Menus, popovers, tooltips, dialogs, sheets, accordions |
+| Opening and closing | Overlays fade, scale and slide 4 px from their trigger's side (menus and popovers in 150 ms, tooltips in 100) and leave faster (100 ms); one opened by a key, and the tooltip after the first of a row, are there at once (`data-instant`); dialogs grow from 96 % and their veil leaves with them; the command palette only fades; an accordion's body rises out of a slight blur as its panel grows | Menus, popovers, tooltips, dialogs, sheets, accordions |
 | A pointer over a card that is a link | The card lifts 1 px and its shadow deepens | `Card` with `interactive` |
-| Holding a switch | The thumb stretches while held and springs across | `Switch` |
-| A tick | The check or dot pops in from 60 % | `Checkbox`, `Radio` |
+| Holding a switch | The thumb stretches while held and slides across | `Switch` |
+| A tick | The check or dot pops in from 60 % when it is chosen, not when the page loads | `Checkbox`, `Radio` |
 | An answer arrives in a chat | The log follows it: one placement in view per frame, never a smooth scroll per token, and it lets go the moment the reader scrolls or selects; under reduced motion every placement of ours is instant | `Conversation`, `ConversationContent` |
 | The reader is away from the last message | The way back fades in and rises 4 px in 150 ms, with the count of what arrived; it leaves faster than it came | `ConversationScrollButton` |
 | An answer is revealed | The revealed side rises 4 px out of a slight blur; a follow-up chip that arrives later does the same | `RevealCard`, `SuggestionChips` |
-| A finger drags a picture down | The picture and the stage follow the finger, and on letting go it springs back into place or closes; a mouse drag does nothing | `ImageViewer` `dragToClose`, `data-settling` on `--fui-ease-spring` |
+| A finger drags a picture down | The picture and the stage follow the finger, and on letting go it springs back into place or closes (past 96 px, or flicked at 0.3 px/ms from 24 px); a mouse drag does nothing | `ImageViewer` `dragToClose`, `data-settling` on `--fui-ease-spring` |
 | A voice is recorded | The level bar follows it at 100 ms, linear, so it reads as a level and not as a jitter | `RecorderPanel` level meter |
 | A notice appears after the first paint | It brings itself into view smoothly, keeping a sticky header and an `ActionBar` clear; instantly under reduced motion | `Alert revealOnMount` |
 

@@ -27,5 +27,7 @@
   "250-0.12-zoom-pan.css",
   "260-0.12-drop-overlay.css",
   "270-0.12-shell.css",
-  "280-0.12-controls.css"
+  "280-0.12-controls.css",
+  "290-worst-case.css",
+  "300-reduced-motion.css"
 ]

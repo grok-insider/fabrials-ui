@@ -109,7 +109,8 @@ Scale tokens: `--fui-text-label` 11, `xs` 12, `sm` 14, `md` 16, `lg` 18, `xl` 20
 
 ## Motion
 
-- Durations `--fui-duration-fast` 100 ms, `--fui-duration` 150 ms, `--fui-duration-slow` 240 ms; eases `--fui-ease`, `--fui-ease-out`, and `--fui-ease-spring` for what a hand moves. All become 0 under `prefers-reduced-motion: reduce`.
+- Durations `--fui-duration-fast` 100 ms, `--fui-duration` 150 ms, `--fui-duration-slow` 240 ms; eases `--fui-ease` (a state changing in place), `--fui-ease-out` (arriving), `--fui-ease-exit` (leaving) and `--fui-ease-spring` for what a hand moves. All become 0 under `prefers-reduced-motion: reduce`, where the only thing kept is the fade of what comes over the page (`--fui-duration-fade`, in `300-reduced-motion.css`): no travel, no scale.
+- How often it is seen decides: nothing for what is done with a key or a hundred times a day (Base UI's `data-instant` is honoured), 100 to 150 ms for tooltips, menus and popovers, 240 ms for dialogs and sheets. A group that arrives together is done inside 300 ms (`.fui-rise` steps by `--fui-stagger-step`, 30 ms). What a finger holds has no transition.
 - Motion answers what a person did, what the data did or what an agent is doing: opening, expanding, choosing (a sliding segment), pressing (1 px down), checking (a drawn tick), a level or number or reading changing (a sweeping ruler, rolling digits, a settling `Readout`), media arriving after the view (`data-fui-reveal`), things arriving after the view (`.fui-rise`, staggered with `--fui-stagger`), a card that is a link lifting 1 px under the pointer.
 - No enter animations on the first paint of a screen people repeat all day; no scroll-triggered reveals.
 - One orchestrated moment per page at most: `DitherScene` `reveal` (on by default) or a large `DitherGem` `reveal`. Painted once; never again on that page.
