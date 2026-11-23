@@ -312,6 +312,11 @@ export default async function Docs({
           </Section>
           <Section id="api" title="API reference">
             <Table aria-label={`${item.title} API`} className="docs-props">
+              <colgroup>
+                <col className="docs-props-col-name" />
+                <col className="docs-props-col-type" />
+                <col className="docs-props-col-desc" />
+              </colgroup>
               <TableHeader>
                 <TableRow>
                   <TableHead>Prop / export</TableHead>
@@ -320,15 +325,17 @@ export default async function Docs({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {item.props.map(([name, type, description]) => (
-                  <TableRow key={name}>
-                    <TableCell>
-                      <code>{name}</code>
+                {item.props.map(([name, type, description], index) => (
+                  <TableRow key={`${name}-${index}`}>
+                    <TableCell data-label="Prop / export" className="docs-prop-cell-name">
+                      <code className="docs-prop-name">{name}</code>
                     </TableCell>
-                    <TableCell>
-                      <code className="docs-type">{type}</code>
+                    <TableCell data-label="Type" className="docs-prop-cell-type">
+                      {type ? <code className="docs-type">{type}</code> : <span className="docs-type-empty">—</span>}
                     </TableCell>
-                    <TableCell>{description}</TableCell>
+                    <TableCell data-label="Description" className="docs-prop-cell-desc">
+                      {description}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

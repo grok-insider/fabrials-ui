@@ -1,24 +1,73 @@
-import {
-  TravelExample,
-  SupportExample,
-  OnboardingExample,
-} from "@/components/workflow-examples";
-import { PlaygroundSandbox } from "@/components/playground-sandbox";
 import Link from "next/link";
-import { PlaygroundGallery } from "@/components/playground-gallery";
+import { Badge, PageHeader, SectionHeader } from "@fabrials/ui";
 import { CoffeeDemo } from "@/components/coffee-demo";
-import { ExplorerDemo, BookingDemo } from "@/components/demos";
+import { BookingDemo, ExplorerDemo } from "@/components/demos";
+import { PlaygroundGallery } from "@/components/playground-gallery";
+import { PlaygroundSandbox } from "@/components/playground-sandbox";
+import { AgentWorkbenchDemo, InstrumentLabDemo } from "@/components/playground/showcase-demos";
+import { OnboardingExample, SupportExample, TravelExample } from "@/components/workflow-examples";
 import { MCPDashboard } from "@/registry/components/mcp-dashboard";
-import { Card, CardContent, PageHeader, SectionHeader } from "@fabrials/ui";
-export const metadata = { title: "Playground" };
+import uiPackage from "../../../../packages/ui/package.json";
+
+export const metadata = {
+  title: "Playground",
+  description:
+    "Interactive 0.12 workbenches for live AI agent telemetry, Stormlight dithering, Radiant glyphs and shared WebMCP flows.",
+};
+
 export default function Playground() {
   return (
-    <main id="main-content" className="w-full px-(--fui-page-padding) py-12">
-      <PageHeader
-        title="Playground"
-        description="Choose a scenario. Edit tool arguments and execute them against the live interface, then try a manual correction. Inspect every result and reset to experiment again."
-      />
+    <main id="main-content" className="playground-main">
+      <div className="playground-head">
+        <PageHeader
+          eyebrow={`Interactive lab · @fabrials/ui ${uiPackage.version}`}
+          title="Playground"
+          description="Explore live @fabrials/ai-ui agent runs, interactive Bayer dither & polestone controls, first-load skeletons, and shared WebMCP workflows. Every sandbox runs locally with synthetic data."
+          actions={<Badge tone="info" dot>9 interactive scenarios</Badge>}
+        />
+      </div>
+
       <PlaygroundGallery>
+        <section id="agent-workbench" className="scroll-mt-28">
+          <SectionHeader
+            title="Agent & AI runtime workbench"
+            description="Step through live operational workflows with AgentThinking, TaskList, ToolCall inspectors, ContextMeter thresholds, streaming ChatMessage carets and GenerationFrame effects."
+          />
+          <ComponentLinks
+            slugs={[
+              ["agent-thinking", "AgentThinking"],
+              ["task-list", "TaskList"],
+              ["tool-call", "ToolCall"],
+              ["context-meter", "ContextMeter"],
+              ["generation-frame", "GenerationFrame"],
+              ["working-light", "WorkingLight"],
+            ]}
+          />
+          <PlaygroundSandbox>
+            <AgentWorkbenchDemo />
+          </PlaygroundSandbox>
+        </section>
+
+        <section id="instrument-lab" className="scroll-mt-28">
+          <SectionHeader
+            title="Stormlight, Polestones & Dither lab"
+            description="Switch across all ten Knights Radiant orders and polestone ramps, tune 8×8 Bayer dot resolution, test compact density, and toggle zero-layout-shift Loading skeletons live."
+          />
+          <ComponentLinks
+            slugs={[
+              ["dither-canvas", "DitherCanvas"],
+              ["radiant-glyph", "RadiantGlyph"],
+              ["loading", "Loading"],
+              ["stat-group", "StatGroup"],
+              ["progress", "Progress"],
+              ["readout", "Readout"],
+            ]}
+          />
+          <PlaygroundSandbox>
+            <InstrumentLabDemo />
+          </PlaygroundSandbox>
+        </section>
+
         <section id="comparison" className="scroll-mt-28">
           <SectionHeader
             title="From a recommendation to a selection"
@@ -35,6 +84,7 @@ export default function Playground() {
             <CoffeeDemo playground />
           </PlaygroundSandbox>
         </section>
+
         <section id="explorer" className="scroll-mt-28">
           <SectionHeader
             title="A project explorer"
@@ -46,14 +96,11 @@ export default function Playground() {
               ["webmcp-provider", "WebMCP provider"],
             ]}
           />
-          <Card>
-            <CardContent>
-              <PlaygroundSandbox>
-                <ExplorerDemo playground />
-              </PlaygroundSandbox>
-            </CardContent>
-          </Card>
+          <PlaygroundSandbox>
+            <ExplorerDemo playground />
+          </PlaygroundSandbox>
         </section>
+
         <section id="reservation" className="scroll-mt-28">
           <SectionHeader
             title="A reservation flow"
@@ -65,14 +112,11 @@ export default function Playground() {
               ["date-range", "Date range"],
             ]}
           />
-          <Card>
-            <CardContent>
-              <PlaygroundSandbox>
-                <BookingDemo playground />
-              </PlaygroundSandbox>
-            </CardContent>
-          </Card>
+          <PlaygroundSandbox>
+            <BookingDemo playground />
+          </PlaygroundSandbox>
         </section>
+
         <section id="console" className="scroll-mt-28">
           <SectionHeader
             title="A real MCP connection"
@@ -85,15 +129,12 @@ export default function Playground() {
               ["tool-catalog", "Tool catalog"],
             ]}
           />
-          <Card>
-            <CardContent>
-              <PlaygroundSandbox>
-                <MCPDashboard defaultEndpoint="/api/demo/mcp" />
-              </PlaygroundSandbox>
-            </CardContent>
-          </Card>
+          <PlaygroundSandbox>
+            <MCPDashboard defaultEndpoint="/api/demo/mcp" />
+          </PlaygroundSandbox>
         </section>
-        <section id="travel" className="scroll-mt-24">
+
+        <section id="travel" className="scroll-mt-28">
           <SectionHeader
             title="Plan a quieter weekend"
             description="Compare stays with your budget and preferences. An agent can highlight matches and build the same shortlist."
@@ -104,15 +145,12 @@ export default function Playground() {
               ["webmcp-provider", "WebMCP provider"],
             ]}
           />
-          <Card>
-            <CardContent>
-              <PlaygroundSandbox>
-                <TravelExample playground />
-              </PlaygroundSandbox>
-            </CardContent>
-          </Card>
+          <PlaygroundSandbox>
+            <TravelExample playground />
+          </PlaygroundSandbox>
         </section>
-        <section id="support" className="scroll-mt-24">
+
+        <section id="support" className="scroll-mt-28">
           <SectionHeader
             title="Triage a support queue"
             description="Filter the inbox, inspect a ticket and review its resolution before applying the change."
@@ -123,15 +161,12 @@ export default function Playground() {
               ["webmcp-provider", "WebMCP provider"],
             ]}
           />
-          <Card>
-            <CardContent>
-              <PlaygroundSandbox>
-                <SupportExample playground />
-              </PlaygroundSandbox>
-            </CardContent>
-          </Card>
+          <PlaygroundSandbox>
+            <SupportExample playground />
+          </PlaygroundSandbox>
         </section>
-        <section id="onboarding" className="scroll-mt-24">
+
+        <section id="onboarding" className="scroll-mt-28">
           <SectionHeader
             title="Set up a workspace"
             description="A validated multi-step flow that an agent can prepare and a person can finish."
@@ -142,29 +177,21 @@ export default function Playground() {
               ["webmcp-provider", "WebMCP provider"],
             ]}
           />
-          <Card>
-            <CardContent>
-              <PlaygroundSandbox>
-                <OnboardingExample playground />
-              </PlaygroundSandbox>
-            </CardContent>
-          </Card>
+          <PlaygroundSandbox>
+            <OnboardingExample playground />
+          </PlaygroundSandbox>
         </section>
       </PlaygroundGallery>
     </main>
   );
 }
 
-function ComponentLinks({ slugs }: { slugs: string[][] }) {
+function ComponentLinks({ slugs }: { slugs: readonly [string, string][] }) {
   return (
-    <div className="mb-6 flex flex-wrap items-center gap-2 text-xs">
-      <span className="mr-1 text-muted-foreground">Built with</span>
+    <div className="playground-chips">
+      <span className="playground-chips-label">Built with</span>
       {slugs.map(([slug, title]) => (
-        <Link
-          key={slug}
-          href={`/docs/${slug}`}
-          className="rounded-md border px-2.5 py-1.5 text-foreground hover:bg-accent"
-        >
+        <Link key={slug} href={`/docs/${slug}`} className="playground-chip-link">
           {title}
         </Link>
       ))}

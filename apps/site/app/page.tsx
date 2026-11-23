@@ -122,105 +122,113 @@ export default function Home() {
       </section>
 
       <section className="landing-section" aria-labelledby="architecture-title">
-        <div className="landing-section-head">
-          <div className="landing-section-title-group">
-            <p className="landing-label-voice">System architecture · Owned source or npm packages</p>
-            <h2 id="architecture-title" className="landing-section-title">
-              One coherent kit from form controls to live agent runs.
-            </h2>
-            <p className="landing-section-lead">
-              Install individual blocks through the shadcn CLI or depend directly on the packages. Every surface shares
-              the same OKLCH tokens, keyboard semantics and motion grammar.
-            </p>
+        <div className="landing-section-inner">
+          <div className="landing-section-head">
+            <div className="landing-section-title-group">
+              <p className="landing-label-voice">System architecture · Owned source or npm packages</p>
+              <h2 id="architecture-title" className="landing-section-title">
+                One coherent kit from form controls to live agent runs.
+              </h2>
+              <p className="landing-section-lead">
+                Install individual blocks through the shadcn CLI or depend directly on the packages. Every surface shares
+                the same OKLCH tokens, keyboard semantics and motion grammar.
+              </p>
+            </div>
+            <Link href="/docs/design" className={buttonVariants({ variant: "outline", size: "sm" })}>
+              Read design principles
+            </Link>
           </div>
-          <Link href="/docs/design" className={buttonVariants({ variant: "outline", size: "sm" })}>
-            Read design principles
-          </Link>
-        </div>
 
-        <ul className="landing-pillars">
-          {pillars.map((pillar) => (
-            <li key={pillar.title} className="landing-pillar">
-              <span className="landing-pillar-count">{pillar.count}</span>
-              <div className="landing-pillar-name">
-                <h3>{pillar.title}</h3>
-                <code>{pillar.pkg}</code>
-              </div>
-              <div className="landing-pillar-desc">
-                <p>{pillar.text}</p>
-                <div className="landing-pillar-tags">
-                  {pillar.tags.map((tag) => (
-                    <Badge key={tag} size="sm">
-                      {tag}
-                    </Badge>
-                  ))}
+          <ul className="landing-pillars">
+            {pillars.map((pillar) => (
+              <li key={pillar.title} className="landing-pillar">
+                <span className="landing-pillar-count">{pillar.count}</span>
+                <div className="landing-pillar-name">
+                  <h3>{pillar.title}</h3>
+                  <code>{pillar.pkg}</code>
                 </div>
-              </div>
-              <Link href={pillar.href} className="landing-pillar-link">
-                {pillar.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
+                <div className="landing-pillar-desc">
+                  <p>{pillar.text}</p>
+                  <div className="landing-pillar-tags">
+                    {pillar.tags.map((tag) => (
+                      <Badge key={tag} size="sm">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                <Link href={pillar.href} className="landing-pillar-link">
+                  {pillar.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
 
       <section id="orders" className="landing-section scroll-mt-20" aria-labelledby="orders-title">
-        <div className="landing-section-head">
-          <div className="landing-section-title-group">
-            <p className="landing-label-voice">Brand identity · The Ten Polestones &amp; Knights Radiant glyphs</p>
-            <h2 id="orders-title" className="landing-section-title">
-              Ten canonical orders, one disciplined mark system.
-            </h2>
-            <p className="landing-section-lead">
-              Every Fabrials product signs its mark with a polestone while keeping Stormlight as the sole interaction
-              colour. Select an order to inspect its bilaterally symmetrical glyph at icon and plate scale.
-            </p>
+        <div className="landing-section-inner">
+          <div className="landing-section-head">
+            <div className="landing-section-title-group">
+              <p className="landing-label-voice">Brand identity · The Ten Polestones &amp; Knights Radiant glyphs</p>
+              <h2 id="orders-title" className="landing-section-title">
+                Ten canonical orders, one disciplined mark system.
+              </h2>
+              <p className="landing-section-lead">
+                Every Fabrials product signs its mark with a polestone while keeping Stormlight as the sole interaction
+                colour. Select an order to inspect its bilaterally symmetrical glyph at icon and plate scale.
+              </p>
+            </div>
+            <Link href="/docs/radiant-glyph" className={buttonVariants({ variant: "outline", size: "sm" })}>
+              RadiantGlyph docs
+            </Link>
           </div>
-          <Link href="/docs/radiant-glyph" className={buttonVariants({ variant: "outline", size: "sm" })}>
-            RadiantGlyph docs
-          </Link>
+          <OrdersShowcase />
         </div>
-        <OrdersShowcase />
       </section>
 
       <section id="try-it" className="landing-section scroll-mt-20" aria-labelledby="try-title">
-        <div className="landing-section-head">
-          <div className="landing-section-title-group">
-            <p className="landing-label-voice">Shared WebMCP reference · Human + agent interface</p>
-            <h2 id="try-title" className="landing-section-title">
-              Watch an agent use the interface you use.
-            </h2>
-            <p className="landing-section-lead">
-              Follow the narrated walkthrough or switch to Try it yourself: the page registers live WebMCP tools for
-              your browser&apos;s agent, and you can invoke every tool directly. People keep the final approval.
-            </p>
+        <div className="landing-section-inner">
+          <div className="landing-section-head">
+            <div className="landing-section-title-group">
+              <p className="landing-label-voice">Shared WebMCP reference · Human + agent interface</p>
+              <h2 id="try-title" className="landing-section-title">
+                Watch an agent use the interface you use.
+              </h2>
+              <p className="landing-section-lead">
+                Follow the narrated walkthrough or switch to Try it yourself: the page registers live WebMCP tools for
+                your browser&apos;s agent, and you can invoke every tool directly. People keep the final approval.
+              </p>
+            </div>
+            <Link href="/docs/comparison" className={buttonVariants({ variant: "outline", size: "sm" })}>
+              Build this interaction
+            </Link>
           </div>
-          <Link href="/docs/comparison" className={buttonVariants({ variant: "outline", size: "sm" })}>
-            Build this interaction
-          </Link>
+          <HomeDemo />
         </div>
-        <HomeDemo />
       </section>
 
       <section className="landing-section" aria-labelledby="start-title">
-        <div className="landing-close">
-          <div className="grid gap-2">
-            <p className="landing-label-voice">Ready for production</p>
-            <h2 id="start-title" className="landing-section-title">
-              Start with the registry or explore every component live.
-            </h2>
-            <p className="m-0 text-sm leading-relaxed text-muted-foreground">
-              Every component ships with accessible keyboard paths, light and dark themes, right-to-left support and
-              first-load skeleton states.
-            </p>
-          </div>
-          <div className="landing-close-actions">
-            <Link href="/docs/installation" className={buttonVariants({ size: "lg" })}>
-              Installation guide
-            </Link>
-            <Link href="/components" className={buttonVariants({ variant: "outline", size: "lg" })}>
-              Component catalogue
-            </Link>
+        <div className="landing-section-inner">
+          <div className="landing-close">
+            <div className="grid gap-2">
+              <p className="landing-label-voice">Ready for production</p>
+              <h2 id="start-title" className="landing-section-title">
+                Start with the registry or explore every component live.
+              </h2>
+              <p className="m-0 text-sm leading-relaxed text-muted-foreground">
+                Every component ships with accessible keyboard paths, light and dark themes, right-to-left support and
+                first-load skeleton states.
+              </p>
+            </div>
+            <div className="landing-close-actions">
+              <Link href="/docs/installation" className={buttonVariants({ size: "lg" })}>
+                Installation guide
+              </Link>
+              <Link href="/components" className={buttonVariants({ variant: "outline", size: "lg" })}>
+                Component catalogue
+              </Link>
+            </div>
           </div>
         </div>
       </section>

@@ -524,13 +524,59 @@ h3.docs-heading {
 .docs .fui-repo-info.docs-repo {
   max-width: 28rem;
 }
-.docs .docs-props th:first-child,
-.docs .docs-props td:first-child {
-  white-space: nowrap;
+.docs .docs-props {
+  table-layout: fixed;
+  width: 100%;
+}
+.docs .docs-props-col-name {
+  width: 23%;
+}
+.docs .docs-props-col-type {
+  width: 27%;
+}
+.docs .docs-props-col-desc {
+  width: 50%;
 }
 .docs .docs-props td {
   vertical-align: top;
+  padding-block: 0.875rem;
+  color: color-mix(in oklab, var(--foreground) 84%, var(--muted-foreground));
+  line-height: 1.6;
+  overflow-wrap: break-word;
+}
+.docs .docs-props code.docs-prop-name {
+  display: inline-block;
+  max-width: 100%;
+  padding: 0.125rem 0.4375rem;
+  border: 1px solid var(--fui-separator);
+  border-radius: var(--fui-radius-xs);
+  background: var(--fui-surface-inset);
+  color: var(--foreground);
+  font-family: var(--fui-font-mono);
+  font-size: 0.8125rem;
+  font-weight: var(--fui-weight-medium);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.docs .docs-props code.docs-type {
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   color: var(--muted-foreground);
+  font-family: var(--fui-font-mono);
+  font-size: 0.78125rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.docs .docs-type-empty {
+  color: var(--muted-foreground);
+  opacity: 0.55;
+  font-family: var(--fui-font-mono);
+  font-size: 0.78125rem;
 }
 
 /* Component index */
@@ -958,6 +1004,36 @@ h3.docs-heading {
   .docs-pager a[data-direction="next"] {
     grid-column: 1;
   }
+  .docs .docs-props {
+    table-layout: auto;
+  }
+  .docs .docs-props colgroup,
+  .docs .docs-props thead {
+    display: none;
+  }
+  .docs .docs-props tbody,
+  .docs .docs-props tr,
+  .docs .docs-props td {
+    display: block;
+    width: 100%;
+  }
+  .docs .docs-props tbody tr {
+    padding: 0.875rem var(--fui-space-4);
+    border-bottom: 1px solid var(--fui-separator);
+  }
+  .docs .docs-props tbody tr:last-child {
+    border-bottom: 0;
+  }
+  .docs .docs-props tbody td {
+    padding: 0;
+    border-bottom: 0;
+  }
+  .docs .docs-props tbody td.docs-prop-cell-type {
+    margin-top: var(--fui-space-1-5);
+  }
+  .docs .docs-props tbody td.docs-prop-cell-desc {
+    margin-top: var(--fui-space-2);
+  }
 }
 
 .docs-section > p a,
@@ -969,14 +1045,6 @@ h3.docs-heading {
 .docs-section > p a:hover,
 .docs-step p a:hover {
   text-decoration-color: currentColor;
-}
-/* Types wrap at spaces, never inside a word. */
-.docs .docs-props .docs-type {
-  overflow-wrap: normal;
-  word-break: normal;
-}
-.docs .docs-props td:nth-child(2) {
-  min-width: 8rem;
 }
 
 /* Examples: one plate per way of using a component, the live demo over the code that makes it. */

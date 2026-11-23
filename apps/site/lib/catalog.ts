@@ -205,11 +205,12 @@ export const catalog: CatalogItem[] = [
     ["ConfirmationDialog"],
     [
       ["open", "boolean", "Controlled visibility."],
-      ["onOpenChange", "(open) => void", "Visibility updates."],
+      ["onOpenChange", "(open: boolean) => void", "Visibility updates."],
+      ["title", "string", "Concrete action heading shown in the dialog."],
       [
-        "title / description",
+        "description",
         "string",
-        "Describe the concrete action and its consequences.",
+        "Explains the consequences of confirming this action.",
       ],
       ["onConfirm", "() => Promise<unknown>", "Runs only after confirmation."],
     ],
@@ -334,14 +335,15 @@ export const catalog: CatalogItem[] = [
     ["registry/components/resource-explorer.tsx"],
     ["ResourceExplorer", "PromptCatalog"],
     [
+      ["resources", "Resource[]", "Discovered static resources."],
       [
-        "resources / templates",
-        "Resource[] / ResourceTemplateType[]",
-        "Discovered resources and URI templates.",
+        "templates",
+        "ResourceTemplateType[]",
+        "Discovered parameterized URI templates.",
       ],
       [
         "onRead",
-        "(uri) => Promise<unknown>",
+        "(uri: string) => Promise<unknown>",
         "Read a selected or fully expanded URI.",
       ],
       ["prompts", "Prompt[]", "Discovered prompt definitions."],
