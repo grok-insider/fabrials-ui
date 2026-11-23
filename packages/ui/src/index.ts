@@ -41,6 +41,7 @@ export * from "./kbd";
 export * from "./number-ticker";
 export * from "./chart";
 export * from "./brand";
+export * from "./radiant-glyph";
 export * from "./data";
 export * from "./snippet";
 export * from "./avatar";

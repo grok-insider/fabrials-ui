@@ -1,0 +1,55 @@
+/* Product-grade component polish: navigation active indicator, interactive edge contrast and table/badge crispness. */
+@layer components {
+  /* Site navigation: crisp active indicator and hover affordance so headers read as finished product chrome. */
+  .fui-site-nav :is(a, button):not(.fui-button):not(.fui-nav-menu-trigger):not(.fui-nav-menu-link) {
+    position: relative;
+  }
+  .fui-site-nav [aria-current="page"] {
+    background: var(--fui-surface-hover);
+    color: var(--foreground);
+  }
+  .fui-site-nav [aria-current="page"]::after {
+    content: "";
+    position: absolute;
+    inset-inline: var(--fui-space-2-5);
+    inset-block-end: 0;
+    block-size: var(--fui-bar);
+    border-radius: var(--fui-radius-full);
+    background: var(--brand-ink);
+  }
+
+  /* Interactive buttons and plates: stronger edge definition under fine pointers without adding glow. */
+  @media (hover: hover) and (pointer: fine) {
+    .fui-site-nav :is(a, button):not(.fui-button):not(.fui-nav-menu-trigger):not(.fui-nav-menu-link):hover {
+      background: var(--fui-surface-hover);
+      color: var(--foreground);
+    }
+    :is(.fui-button[data-variant="outline"], .fui-button-outline):not(:disabled):not([data-disabled]):hover {
+      border-color: color-mix(in oklab, var(--foreground) 26%, transparent);
+    }
+    .fui-card[data-interactive]:hover {
+      border-color: color-mix(in oklab, var(--foreground) 22%, var(--border));
+      box-shadow: var(--fui-shadow-sm), var(--fui-highlight);
+    }
+  }
+
+  /* Tables: clearer inset header edge so tabular data separates cleanly from the plate. */
+  .fui-table thead th {
+    border-block-end: 1px solid var(--border);
+  }
+
+  /* Neutral badges keep a crisp inner edge on dark plates. */
+  .fui-badge:not([data-tone]):not([data-variant="solid"]):not([data-variant="outline"]),
+  .fui-badge[data-tone="neutral"]:not([data-variant="solid"]):not([data-variant="outline"]) {
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--border) 85%, transparent);
+  }
+
+  @media (forced-colors: active) {
+    .fui-radiant-glyph[data-colored] {
+      color: CanvasText;
+    }
+    .fui-site-nav [aria-current="page"]::after {
+      background: Highlight;
+    }
+  }
+}

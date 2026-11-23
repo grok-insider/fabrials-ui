@@ -21,13 +21,16 @@ export const STORM_RAMP: ThemeRamp = {
 /** Gem colours as hex, for ramps (the CSS tokens are oklch). */
 export const GEM_HEX = {
   stormlight: "#3f8fd9",
-  heliodor: "#d6a13b",
   sapphire: "#3b5bc4",
-  ruby: "#c73b45",
-  emerald: "#23896a",
-  zircon: "#36a3b5",
   smokestone: "#76705f",
+  ruby: "#c73b45",
+  diamond: "#a7b8c9",
+  emerald: "#23896a",
+  garnet: "#96303d",
+  zircon: "#36a3b5",
   amethyst: "#8b55c6",
+  topaz: "#c98532",
+  heliodor: "#d6a13b",
 } as const;
 
 export type GemHexName = keyof typeof GEM_HEX;

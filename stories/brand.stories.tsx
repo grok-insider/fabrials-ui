@@ -3,6 +3,8 @@ import {
   FabrialsGem,
   PageHeader,
   ProductLockup,
+  RADIANT_ORDERS,
+  RadiantGlyph,
   SectionHeader,
   type GemName,
 } from "@fabrials/ui";
@@ -195,5 +197,39 @@ function LockupsDemo() {
   );
 }
 
+function RadiantOrdersDemo() {
+  return (
+    <main className="catalogue">
+      <PageHeader
+        title="Ten Orders of the Knights Radiant"
+        description="Canonical bilaterally symmetrical order glyphs paired with the ten polestones, crisp from 16 px icons to plate scale."
+      />
+      <section aria-label="Radiant order glyphs" className="catalogue-lockups">
+        {RADIANT_ORDERS.map((item) => (
+          <div key={item.order} className="catalogue-lockup">
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+              <RadiantGlyph order={item.order} size={40} colored title={`${item.name} glyph`} />
+              <div>
+                <strong>
+                  {String(item.number).padStart(2, "0")} {item.plural}
+                </strong>
+                <div className="catalogue-table-meta">
+                  {item.gem} · {item.surges.join(" / ")}
+                </div>
+              </div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              {[16, 20, 28].map((size) => (
+                <RadiantGlyph key={size} order={item.order} size={size} />
+              ))}
+            </div>
+          </div>
+        ))}
+      </section>
+    </main>
+  );
+}
+
 export const Tokens: Story = { render: () => <TokensDemo /> };
 export const Lockups: Story = { render: () => <LockupsDemo /> };
+export const RadiantOrders: Story = { render: () => <RadiantOrdersDemo /> };

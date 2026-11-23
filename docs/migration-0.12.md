@@ -1614,3 +1614,9 @@ Not changed, and why: a `Table` cell does not break anywhere (a table that scrol
 ## Loading: a platform checkbox in a line of words
 
 Found by the skeleton suite on the new page of `RoutingPolicyForm`, in Firefox only. A `NativeCheckbox` or `NativeRadio` set inline in a line of text (not in its own `label` prop, which is a flex row) made that line 1 px taller while `Loading` was on: Firefox puts the baseline of a platform checkbox 1 px above its lower edge, and at the edge once the skeleton turns it into a plain box. The skeleton now keeps the platform's baseline there (`vertical-align: -1px`, under `@supports (-moz-appearance: none)`, with no specificity, so an alignment of your own stands). Nothing changes in Chromium or WebKit, nor outside `Loading`.
+
+## Ten Orders of the Knights Radiant and polestone tokens
+
+- **`RadiantGlyph`, `RADIANT_ORDERS`, `RADIANT_ORDER_MAP`**: server-safe, bilaterally symmetrical vector glyphs (`viewBox="0 0 64 64"`) for all ten canonical Orders (`windrunner`, `skybreaker`, `dustbringer`, `edgedancer`, `truthwatcher`, `lightweaver`, `elsecaller`, `willshaper`, `stoneward`, `bondsmith`), paired with their polestones, Surges and Heralds. Inherits `currentColor` by default; `colored` paints the glyph in its polestone token (`--gem`).
+- **Complete ten polestones**: `GemName`, `GEM_HEX` and `tokens.css` add `diamond`, `garnet` and `topaz` alongside `sapphire`, `smokestone`, `ruby`, `emerald`, `zircon`, `amethyst`, `heliodor` and `stormlight`.
+- **Surface, border and navigation polish**: refined light and dark surface/border separation in `tokens.css`, clearer Stormlight active-page indicator in `SiteHeader`, crisper outline button and interactive card hover edges, and elevated `ChatComposer` and user bubble contrast in `@fabrials/ai-ui`.

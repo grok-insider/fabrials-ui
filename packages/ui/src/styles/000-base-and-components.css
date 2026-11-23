@@ -3664,6 +3664,15 @@
     stroke-linejoin: round;
     vector-effect: non-scaling-stroke;
   }
+  .fui-radiant-glyph {
+    display: inline-block;
+    flex-shrink: 0;
+    vertical-align: middle;
+    shape-rendering: geometricPrecision;
+  }
+  .fui-radiant-glyph[data-colored] {
+    color: var(--gem);
+  }
   .fui-lockup {
     display: inline-flex;
     align-items: center;

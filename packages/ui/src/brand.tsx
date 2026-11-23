@@ -4,13 +4,16 @@ import { classes } from "./shared";
 
 export type GemName =
   | "stormlight"
-  | "heliodor"
   | "sapphire"
-  | "ruby"
-  | "emerald"
-  | "zircon"
   | "smokestone"
-  | "amethyst";
+  | "ruby"
+  | "diamond"
+  | "emerald"
+  | "garnet"
+  | "zircon"
+  | "amethyst"
+  | "topaz"
+  | "heliodor";
 
 /** The faceted gem at the heart of every Fabrials mark. Colored by `--gem`. */
 export function FabrialsGem({

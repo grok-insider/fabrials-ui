@@ -45,22 +45,25 @@ Deep Stormwall: cold slate taken almost to black in the dark theme and almost to
 - **Crem** `#5a5247`, a warm stone, exists only inside the storm's dither ramp.
 - Contrast is checked on the real surfaces: body and control text meet WCAG AA in both themes.
 
-### Gems
+### Gems and the Ten Orders
 
-Each product signs its mark with a gem, set as `data-gem` on the document root and drawn by `DitherGem` or `FabrialsGem`. The gem colours the mark and nothing else: never a status, a button or a link.
+Each product signs its mark with a gem, set as `data-gem` on the document root and drawn by `DitherGem`, `FabrialsGem` or `RadiantGlyph`. The gem colours the mark and nothing else: never a status, a button or a link. All ten canonical polestones from the Ten Essences plus `stormlight` are defined in `tokens.css` (`--gem-*`) and `GEM_HEX`, and `RadiantGlyph` (`RADIANT_ORDERS`) provides the ten bilaterally symmetrical Knights Radiant order glyphs in a 64×64 vector grid crisp from 16 px icons up to plate scale.
 
-| Gem | Signs |
-| --- | --- |
-| Stormlight | The Fabrials house mark, Radiant, admin.fabrials.com |
-| Heliodor | fabrials.com, Usage AI |
-| Sapphire | Syl |
-| Ruby | Spanreed (spanreeds are ruby fabrials) |
-| Emerald | X Tracker |
-| Zircon | Fabrials UI, Urithiru |
-| Smokestone | News, guides |
-| Amethyst | ai.fabrials.com |
+| Gem | Order | Signs |
+| --- | --- | --- |
+| Stormlight | — | The Fabrials house mark, Radiant, admin.fabrials.com |
+| Sapphire | Windrunners | Syl |
+| Smokestone | Skybreakers | News, guides |
+| Ruby | Dustbringers | Spanreed (spanreeds are ruby fabrials) |
+| Diamond | Edgedancers | Wyndle |
+| Emerald | Truthwatchers | X Tracker |
+| Garnet | Lightweavers | Lightweave |
+| Zircon | Elsecallers | Fabrials UI, Urithiru |
+| Amethyst | Willshapers | ai.fabrials.com |
+| Topaz | Stonewards | Foundation / system tooling |
+| Heliodor | Bondsmiths | fabrials.com, Usage AI |
 
-A product the table does not name borrows a gem until the owner gives it one, and says so in its own `DESIGN.md`: today Open Email and Wyndle borrow emerald and Palanaeum borrows smokestone. Two products with the same gem never share a screen.
+Two products with the same gem never share a screen.
 
 ## Typography
 
@@ -225,7 +228,7 @@ The catalogue lives in Storybook (`bun run storybook`, port 6041) and at ui.fabr
 - **Answers and steps:** ChoiceGroup with ChoiceOption, ChoiceFeedback, RevealCard with RatingBar, StepControls, MarkedText with AnnotationList and TextDiff, ClipButton with `useClipPlayer` and SpeedToggle, RecorderPanel with `useRecorder`, `useSpeech`.
 - **Docs pieces:** CodePanel, CodeTabs, PackageInstall, Files/Folder/File and RepoInfo. Syntax uses the muted `--fui-syntax-*` inks, never Stormlight.
 - **Media:** Image, AspectRatio, MediaGrid (a gallery of up to eight), ImageViewer (with `ImageViewerProvider` and `ZoomableImage`), VideoPlayer, AudioPlayer, AnimatedImage (a GIF or a silent loop that moves only on screen and can always be paused); Avatar sizes `xs` to `xl` with initials on a tint of one of the five data hues, AvatarGroup with a count and faces cut out of the surface under them, AvatarBadge.
-- **Brand and chrome:** CornerMarks, GridGuides, CardCaption, DitherScene, DitherBand, DitherGem, DitherCanvas (a field, a scene you paint or a picture), ProductLockup, FabrialsGem, Avatar, Snippet, CopyButton, SiteHeader, AuthLayout, MoonPhase, Starfield.
+- **Brand and chrome:** CornerMarks, GridGuides, CardCaption, DitherScene, DitherBand, DitherGem, DitherCanvas (a field, a scene you paint or a picture), ProductLockup, FabrialsGem, RadiantGlyph (with `RADIANT_ORDERS` and `RADIANT_ORDER_MAP` for the ten Knights Radiant orders), Avatar, Snippet, CopyButton, SiteHeader (with an active-page Stormlight indicator), AuthLayout, MoonPhase, Starfield.
 - **Patterns:** WorkspaceShell, AppHeader, Sidebar (menu rows work without a shell; `SidebarAccount` and the inset's header for a phone), SidePanel (a docked detail pane, a sheet on a phone), NavSwitcher, ResizablePanelGroup, PageHeader, SectionHeader, CollectionToolbar, BulkActions, StatePanel, StatePage with ErrorState and BackButton (a page that is only a state), ActionBar (the bar of a step), InlineConfirm (a question in place, for "End the session early?"), Countdown, SettingsSection, FilterChip, FileThumb, SuggestionCard, TruncatedText, EditableText (a title renamed in place), DropOverlay, ShimmerText (`tone="light"` for an agent at work), WorkingLight.
 - **Loading:** `Loading` with `placeholderText`, `placeholderList` and `useLoading` (see Loading states).
 - **Foundations:** `LocalTime`, `useHydrated`, `useHotkeys`, `useElementSize`, `useMediaQuery`, `ErrorBoundary`, `Announcer` with `useAnnounce`, `LabelsProvider` with `useLabels`, `useLocale` and `plural`, `ThemeProvider` with `useTheme` and `themeInitScript`, `ForeignText`, `useResolvedTokens`, and the `@fabrials/ui/export` helpers. The pure ones run on the server.
