@@ -86,7 +86,7 @@
   overflow: auto;
   padding: 1.25rem;
   background: var(--muted);
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: var(--fui-radius-lg);
   font-size: 0.75rem;
   line-height: 1.75;

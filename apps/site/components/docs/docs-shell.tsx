@@ -2,10 +2,23 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { useSearchContext } from "fumadocs-ui/contexts/search";
-import { ArrowLeft, ArrowRight, ArrowUp, BookOpen, Bot, Check, ChevronDown, ChevronsUpDown, PanelLeft, Search, TextAlignStart } from "lucide-react";
 import {
+  ArrowLeft,
+  ArrowRight,
+  ArrowUp,
+  BookOpen,
+  Bot,
+  Check,
+  ChevronDown,
+  ChevronsUpDown,
+  PanelLeft,
+  Search,
+  TextAlignStart,
+} from "lucide-react";
+import {
+  Badge,
   Button,
   Collapsible,
   CollapsibleContent,
@@ -22,9 +35,26 @@ import {
   Kbd,
   RepoInfo,
 } from "@fabrials/ui";
-import { docsNeighbours, docsRoots, rootFor, type DocsRoot } from "@/lib/docs-nav";
+import { ComponentSpecimen } from "@/components/component-specimen";
+import { docsNeighbours, docsRoots, rootFor, type DocsNavPage, type DocsRoot } from "@/lib/docs-nav";
 import { DocsTocList, useActiveHeadings, type DocsTocItem } from "@/components/docs/docs-toc";
 import "./docs.css";
+
+interface HoveredPreview {
+  slug: string;
+  title: string;
+  description?: string;
+  group: string;
+  top: number;
+  left: number;
+}
+
+function slugForPreview(page: DocsNavPage, section: "Guides" | "Components" | "Agents"): string | null {
+  if (section === "Guides") return null;
+  if (!page.href.startsWith("/docs/")) return null;
+  const slug = page.href.slice("/docs/".length);
+  return slug.length > 0 ? slug : null;
+}
 
 function RootMark({ root }: { root: DocsRoot }) {
   if (root.kind === "fabrials") return <DitherGem gem="zircon" size={18} />;
@@ -40,7 +70,10 @@ function RootMark({ root }: { root: DocsRoot }) {
 function RootToggle({ current }: { current: DocsRoot }) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="docs-root-trigger" aria-label={`Documentation: ${current.title}. Switch library`}>
+      <DropdownMenuTrigger
+        className="docs-root-trigger"
+        aria-label={`Documentation: ${current.title}. Switch library`}
+      >
         <RootMark root={current} />
         <span className="docs-root-text">
           <span className="docs-root-title">{current.title}</span>
@@ -64,9 +97,25 @@ function RootToggle({ current }: { current: DocsRoot }) {
   );
 }
 
-function DocsNav({ path, root }: { path: string; root: DocsRoot }) {
+function DocsNav({
+  path,
+  root,
+  onPreviewEnter,
+  onPreviewLeave,
+  onPreviewDismiss,
+}: {
+  path: string;
+  root: DocsRoot;
+  onPreviewEnter?: (el: HTMLElement, page: DocsNavPage, group: string, slug: string) => void;
+  onPreviewLeave?: () => void;
+  onPreviewDismiss?: () => void;
+}) {
   return (
-    <nav aria-label={`${root.title} documentation`} className="docs-nav">
+    <nav
+      aria-label={`${root.title} documentation`}
+      className="docs-nav"
+      onPointerLeave={onPreviewDismiss}
+    >
       {root.groups.map((group) => (
         <Collapsible key={group.name} defaultOpen className="docs-nav-group">
           <CollapsibleTrigger className="docs-nav-heading">
@@ -75,13 +124,32 @@ function DocsNav({ path, root }: { path: string; root: DocsRoot }) {
           </CollapsibleTrigger>
           <CollapsibleContent>
             <ul>
-              {group.pages.map((page) => (
-                <li key={page.href}>
-                  <Link href={page.href} aria-current={page.href === path ? "page" : undefined}>
-                    {page.title}
-                  </Link>
-                </li>
-              ))}
+              {group.pages.map((page) => {
+                const previewSlug = onPreviewEnter ? slugForPreview(page, group.section) : null;
+                return (
+                  <li key={page.href}>
+                    <Link
+                      href={page.href}
+                      aria-current={page.href === path ? "page" : undefined}
+                      onPointerEnter={
+                        previewSlug && onPreviewEnter
+                          ? (event) => onPreviewEnter(event.currentTarget, page, group.name, previewSlug)
+                          : onPreviewLeave
+                      }
+                      onPointerLeave={previewSlug ? onPreviewLeave : undefined}
+                      onFocus={
+                        previewSlug && onPreviewEnter
+                          ? (event) => onPreviewEnter(event.currentTarget, page, group.name, previewSlug)
+                          : onPreviewDismiss
+                      }
+                      onBlur={previewSlug ? onPreviewLeave : undefined}
+                      onClick={onPreviewDismiss}
+                    >
+                      {page.title}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </CollapsibleContent>
         </Collapsible>
@@ -136,16 +204,111 @@ function useRepoStats(repository: string) {
 
 /**
  * The part of the docs that stays put between pages: the phone bar, the
- * sidebar with the library switcher, and the phone navigation sheet. Pages
- * render DocsShell inside it.
+ * sidebar with the library switcher, the floating x.ai-style live hover
+ * preview, and the phone navigation sheet. Pages render DocsShell inside it.
  */
 export function DocsFrame({ children }: { children: ReactNode }) {
   const path = usePathname();
   const [navOpen, setNavOpen] = useState(false);
+  const [hovered, setHovered] = useState<HoveredPreview | null>(null);
+  const hoveredRef = useRef<HoveredPreview | null>(null);
+  const openTimerRef = useRef<number | null>(null);
+  const closeTimerRef = useRef<number | null>(null);
   const root = rootFor(path);
   const repo = useRepoStats(root.repository);
   const sidebar = useRef<HTMLElement>(null);
-  useEffect(() => setNavOpen(false), [path]);
+
+  hoveredRef.current = hovered;
+
+  const clearTimers = useCallback(() => {
+    if (openTimerRef.current !== null) {
+      window.clearTimeout(openTimerRef.current);
+      openTimerRef.current = null;
+    }
+    if (closeTimerRef.current !== null) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  }, []);
+
+  const dismissPreview = useCallback(() => {
+    clearTimers();
+    setHovered(null);
+  }, [clearTimers]);
+
+  const scheduleLeave = useCallback(() => {
+    if (openTimerRef.current !== null) {
+      window.clearTimeout(openTimerRef.current);
+      openTimerRef.current = null;
+    }
+    if (closeTimerRef.current !== null) window.clearTimeout(closeTimerRef.current);
+    closeTimerRef.current = window.setTimeout(() => {
+      setHovered(null);
+      closeTimerRef.current = null;
+    }, 110);
+  }, []);
+
+  const handlePreviewEnter = useCallback(
+    (el: HTMLElement, page: DocsNavPage, group: string, slug: string) => {
+      if (typeof window === "undefined" || window.innerWidth < 1024) return;
+      if (closeTimerRef.current !== null) {
+        window.clearTimeout(closeTimerRef.current);
+        closeTimerRef.current = null;
+      }
+
+      const itemRect = el.getBoundingClientRect();
+      const sidebarRect = sidebar.current?.getBoundingClientRect();
+      const estimatedHeight = 256;
+      const top = Math.min(
+        Math.max(68, itemRect.top - 44),
+        Math.max(68, window.innerHeight - estimatedHeight - 16),
+      );
+      const left = Math.round((sidebarRect?.right ?? 280) + 12);
+
+      const next: HoveredPreview = {
+        slug,
+        title: page.title,
+        description: page.description,
+        group,
+        top: Math.round(top),
+        left,
+      };
+
+      // Instant switch when already open (zero flicker); intentional ~80 ms delay on initial open.
+      if (hoveredRef.current) {
+        if (openTimerRef.current !== null) {
+          window.clearTimeout(openTimerRef.current);
+          openTimerRef.current = null;
+        }
+        setHovered(next);
+        return;
+      }
+
+      if (openTimerRef.current !== null) window.clearTimeout(openTimerRef.current);
+      openTimerRef.current = window.setTimeout(() => {
+        setHovered(next);
+        openTimerRef.current = null;
+      }, 80);
+    },
+    [],
+  );
+
+  useEffect(() => {
+    setNavOpen(false);
+    dismissPreview();
+  }, [path, dismissPreview]);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") dismissPreview();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      clearTimers();
+    };
+  }, [dismissPreview, clearTimers]);
+
   // Keep the current page's link in view inside the sidebar, without moving the page itself.
   useEffect(() => {
     const box = sidebar.current;
@@ -176,15 +339,40 @@ export function DocsFrame({ children }: { children: ReactNode }) {
       </div>
       <div className="docs-body">
         <div className="docs-sidebar-column">
-          <aside ref={sidebar} className="docs-sidebar" aria-label="Documentation sidebar">
+          <aside ref={sidebar} className="docs-sidebar" aria-label="Documentation sidebar" onScroll={dismissPreview}>
             <SearchTrigger />
             <RootToggle current={root} />
-            <DocsNav path={path} root={root} />
+            <DocsNav
+              path={path}
+              root={root}
+              onPreviewEnter={handlePreviewEnter}
+              onPreviewLeave={scheduleLeave}
+              onPreviewDismiss={dismissPreview}
+            />
             {repoInfo}
           </aside>
         </div>
         {children}
       </div>
+
+      {hovered && (
+        <div
+          className="docs-hover-preview"
+          style={{ top: hovered.top, left: hovered.left }}
+          aria-hidden="true"
+          data-testid="docs-hover-preview"
+        >
+          <div className="docs-hover-preview-head">
+            <span className="docs-hover-preview-title">{hovered.title}</span>
+            <Badge size="sm">{hovered.group}</Badge>
+          </div>
+          {hovered.description && <p className="docs-hover-preview-desc">{hovered.description}</p>}
+          <div className="docs-hover-preview-stage" inert>
+            <ComponentSpecimen slug={hovered.slug} category={hovered.group} title={hovered.title} />
+          </div>
+        </div>
+      )}
+
       <Dialog open={navOpen} onOpenChange={setNavOpen}>
         <DialogContent placement="start" className="docs-sheet" closeLabel="Close navigation">
           <DialogTitle className="docs-sheet-title">Documentation</DialogTitle>

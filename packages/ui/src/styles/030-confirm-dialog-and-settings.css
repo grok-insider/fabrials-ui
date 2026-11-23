@@ -84,22 +84,21 @@
   }
 
   /* 0.11: a filter chip is its name and value, then a clear key of its own behind a soft divider. Only the key is
-     interactive; hovering it tints the key and draws the chip's edge, so it is plain what goes. */
+     interactive; hovering it shifts the key's tonal fill, so it is plain what goes. */
   .fui-filter-chip {
     display: inline-flex;
     align-items: stretch;
     max-width: 100%;
     min-width: 0;
     min-height: 1.75rem;
-    border: 1px solid var(--border);
+    border: 0;
     border-radius: var(--fui-radius-sm);
-    background: var(--card);
+    background: var(--muted);
     color: var(--foreground);
     font-family: var(--fui-font-sans);
     font-size: var(--fui-text-xs);
     line-height: var(--fui-leading-xs);
-    box-shadow: var(--fui-shadow-xs);
-    transition: border-color var(--fui-duration) var(--fui-ease);
+    transition: background-color var(--fui-duration) var(--fui-ease);
   }
   .fui-filter-chip[data-leaving] {
     pointer-events: none;
@@ -152,9 +151,6 @@
     .fui-filter-chip-remove:not(:disabled, [aria-disabled="true"]):hover {
       background: var(--accent);
       color: var(--foreground);
-    }
-    .fui-filter-chip:has(> .fui-filter-chip-remove:not(:disabled, [aria-disabled="true"]):hover) {
-      border-color: var(--fui-control-border);
     }
   }
   .fui-filter-chip-remove:not(:disabled, [aria-disabled="true"]):active {
@@ -211,7 +207,7 @@
     min-height: 2.75rem;
     margin: 0;
     padding: var(--fui-space-3) 0.875rem;
-    border: 1px solid var(--border);
+    border: 0;
     border-radius: var(--fui-radius-md);
     background: var(--card);
     color: var(--foreground);
@@ -219,13 +215,10 @@
     font-family: var(--fui-font-sans);
     text-align: start;
     cursor: pointer;
-    transition:
-      background-color var(--fui-duration) var(--fui-ease),
-      border-color var(--fui-duration) var(--fui-ease);
+    transition: background-color var(--fui-duration) var(--fui-ease);
   }
   .fui-suggestion-card:hover:not(:disabled) {
-    border-color: color-mix(in oklab, var(--foreground) 20%, transparent);
-    background: color-mix(in oklab, var(--muted) 60%, var(--card));
+    background: var(--accent);
   }
   .fui-suggestion-card:disabled {
     cursor: not-allowed;
@@ -317,7 +310,7 @@
     flex: none;
     width: var(--fui-file-thumb-size, 2.5rem);
     height: var(--fui-file-thumb-size, 2.5rem);
-    border: 1px solid var(--border);
+    border: 0;
     border-radius: var(--fui-radius-md);
     background: var(--muted);
   }

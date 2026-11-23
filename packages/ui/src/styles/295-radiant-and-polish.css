@@ -1,4 +1,4 @@
-/* Product-grade component polish: navigation active indicator, interactive edge contrast and table/badge crispness. */
+/* Product-grade component polish: navigation active indicator, borderless tonal lift and high-contrast edges. */
 @layer components {
   /* Site navigation: crisp active indicator and hover affordance so headers read as finished product chrome. */
   .fui-site-nav :is(a, button):not(.fui-button):not(.fui-nav-menu-trigger):not(.fui-nav-menu-link) {
@@ -18,7 +18,7 @@
     background: var(--brand-ink);
   }
 
-  /* Interactive buttons and plates: stronger edge definition under fine pointers without adding glow. */
+  /* Interactive buttons and borderless tonal plates: smooth tonal shift on hover instead of heavy perimeter boxes. */
   @media (hover: hover) and (pointer: fine) {
     .fui-site-nav :is(a, button):not(.fui-button):not(.fui-nav-menu-trigger):not(.fui-nav-menu-link):hover {
       background: var(--fui-surface-hover);
@@ -28,28 +28,37 @@
       border-color: color-mix(in oklab, var(--foreground) 26%, transparent);
     }
     .fui-card[data-interactive]:hover {
-      border-color: color-mix(in oklab, var(--foreground) 22%, var(--border));
-      box-shadow: var(--fui-shadow-sm), var(--fui-highlight);
+      background: color-mix(in oklab, var(--accent) 72%, var(--card));
     }
   }
 
-  /* Tables: clearer inset header edge so tabular data separates cleanly from the plate. */
+  /* Tables: whisper-quiet single-axis rule under inset header band. */
   .fui-table thead th {
-    border-block-end: 1px solid var(--border);
+    border-block-end: 1px solid var(--fui-separator);
   }
 
-  /* Neutral badges keep a crisp inner edge on dark plates. */
-  .fui-badge:not([data-tone]):not([data-variant="solid"]):not([data-variant="outline"]),
-  .fui-badge[data-tone="neutral"]:not([data-variant="solid"]):not([data-variant="outline"]) {
-    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--border) 85%, transparent);
-  }
-
+  /* Forced-colors: borderless tonal containers recover a crisp 1px CanvasText boundary in Windows high contrast. */
   @media (forced-colors: active) {
     .fui-radiant-glyph[data-colored] {
       color: CanvasText;
     }
     .fui-site-nav [aria-current="page"]::after {
       background: Highlight;
+    }
+    .fui-card,
+    .fui-stat,
+    .fui-stat-group,
+    .fui-table-scroll,
+    .fui-code-panel,
+    .fui-state-panel:not([data-variant="inline"]),
+    .fui-alert,
+    .fui-bulk-actions:not([data-empty]),
+    .fui-files,
+    .fui-repo-info,
+    .fui-snippet,
+    .fui-filter-chip,
+    .fui-suggestion-card {
+      border: 1px solid CanvasText;
     }
   }
 }

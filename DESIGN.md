@@ -6,7 +6,7 @@ Fabrials UI 0.12 "Instrument with life" (the look that began with 0.11) is the s
 
 1. **One interaction light.** Stormlight blue marks what you can act on and where you are: focus, links, checked controls, the active navigation item, the first data series. Nothing else is blue, apart from the working light while something works (principle 2).
 2. **Light is dithered, or it is work.** Fabrials are gems that hold stormlight. On screen, brand light is an ordered dither on canvas. The one other light is the working light: while an agent works or something loads, a band of light turns along an edge or crosses a label, and it goes out when the work ends. Nothing else glows.
-3. **Calm surfaces, grouped by space.** Screens read like good instruments: slate surfaces, plates with soft corners, text at working sizes. Things that belong together share one plate; space and a tint separate them before a line does, and the lines that remain are soft. One plate with soft dividers beats cards inside cards, and a state is a tint, not a box.
+3. **Borderless surfaces, grouped by space.** Screens breathe directly on the canvas like calibrated instruments (following the restraint of x.ai and opencode.ai): slate surfaces, borderless tonal plates with soft corners, text at working sizes. Separate structure with **space first**, **subtle tonal surface shifts second** (`--card` vs `--background`), and **whisper-quiet single-axis hairlines (`--fui-separator`) third** (e.g. between table rows or section splits). Never wrap divs, cards, stat strips, tables, code panels, banners, filter bars or state panels in 4-sided `border: 1px solid` boxes or resting drop-shadow frames; reserve enclosed 1 px edges strictly for floating overlays (`Dialog`, `Popover`, `DropdownMenu`, `Command`, `Tooltip`), explicit `outline` buttons, active focus rings (`--fui-focus`) and `forced-colors: active`. One tonal plate with soft dividers beats boxes inside boxes, and a state is a tint, not a bordered box.
 4. **Say what happened.** A stale value is not a fresh one; a configured connection is not a reachable one. Errors say what went wrong and what to do; empty states invite the next action.
 5. **Accessible by default.** Every control has a name, a visible focus and a keyboard path. Colour always travels with text or a symbol.
 6. **Small pieces, owned by the host.** Shared components present; products own routing, requests, authentication and storage. Compose small components instead of adding a universal one with dozens of flags.
@@ -19,12 +19,12 @@ Deep Stormwall: cold slate taken almost to black in the dark theme and almost to
 
 | Role | Token | Light | Dark |
 | --- | --- | --- | --- |
-| Page | `--background` | `#f6f7f8` | Deep Stormwall `#08090b` |
-| Surface (plates, panels) | `--card` | `#ffffff` | `#0e1014` |
-| Overlay (menus, dialogs) | `--popover` | `#ffffff` | `#14171c` |
-| Sunken (code, wells) | `--muted`, `--fui-code` | `#eef0f2`, `#f0f2f4` | `#15181e`, `#0b0d10` |
-| Hover | `--accent` | `#e9ecef` | `#191d24` |
-| Hairline | `--border` | `#e0e3e7` | `#1d2128` |
+| Page | `--background` | `#f4f5f7` | Deep Stormwall `#08090b` |
+| Surface (borderless plates, panels) | `--card` | `#ffffff` | `#101218` |
+| Overlay (menus, dialogs) | `--popover` | `#ffffff` | `#161922` |
+| Sunken (code, wells) | `--muted`, `--fui-code` | `#eceef1`, `#eff1f4` | `#161922`, `#0d0f14` |
+| Hover | `--accent` | `#e7eaee` | `#1c202a` |
+| Hairline (single-axis dividers, overlays) | `--border` | `#e3e6ea` | `#20242d` |
 | Control boundary | `--fui-control-border` | `#858d98` | `#5e6672` |
 | Thumb of an off switch | `--fui-switch-thumb` | the surface | ink at 66 % on the sunken track, so the state reads at about 6:1 |
 | Soft divider (rows inside one plate) | `--fui-separator` | the hairline at 62 % on the surface | the same |
@@ -84,9 +84,9 @@ Numbers use tabular figures. Headings wrap with `text-wrap: balance`. Copy is se
 - Spacing follows a 4 px grid (`--fui-space-*`).
 - Controls are 40 px (`--fui-control-height`); small 32, extra small 28, large 44. `data-density="compact"` tightens controls to 32 px and collection rows, as a composition choice, not a stored preference. Narrow screens and coarse pointers keep 44 px targets.
 - **Soft corners, one scale.** 4 px for keys, kbd and small marks; 6 px for tags, chips and small controls; 8 px for controls (buttons, fields, selects, segments); 10 px for menus, popovers and the command palette; 12 px for plates (cards, stats, stat groups, tables, code panels and code blocks, alerts, state panels, toasts); 16 px for dialogs and sheets (`--fui-radius-xs` to `--fui-radius-2xl`, `--fui-radius-plate`). Dots, avatars, switches and meter tracks are round. Nothing rounder than 16 px except those.
-- **Plates.** A plate is the surface, a hairline edge, 12 px corners and a soft resting elevation (`--fui-shadow-xs` and the top highlight). What belongs together shares one plate: a `StatGroup` is one plate whose figures are divided by soft lines that stop short of its edges; a table's head is an inset band inside its plate; a card's footer and caption sit on the plate with no line above them.
-- **Tags.** Badges are soft tags: 6 px corners, a tint of their tone and the tone's ink, a round dot. The outline variant is the only one with an edge; solid is for the rare tag that must shout. Three sizes (18, 20 and 24 px); an icon is a 12 px glyph in the tag's ink before the word; a number on its own is a count, centred in a tag at least as wide as it is tall. A tag that is a link or a button deepens its tint under the pointer, and a pressed one keeps that tint with an edge in its colour.
-- Separate with space first, a tint second and a soft line third. Do not box every label and control, and never put a plate inside a plate.
+- **Borderless plates.** A plate is a calm tonal surface (`--card` over `--background`) with 12 px corners and **no 4-sided perimeter border or resting drop shadow**. What belongs together shares one tonal plate: a `StatGroup` is one borderless plate whose figures are divided by whisper-quiet single-axis lines (`--fui-separator`) that stop short of its edges; a table's head is an inset band inside its borderless plate with quiet row dividers; a card's footer and caption sit on the plate with no box around them; interactive cards answer hover with a smooth tonal surface lift (`--accent`) rather than a glowing or thickened border. Under `forced-colors: active`, structural plates recover a 1 px `CanvasText` edge so boundaries remain legible.
+- **Tags.** Badges are soft borderless tags: 6 px corners, a tint of their tone and the tone's ink, a round dot, and no inner box outline on neutral or tinted variants. The `outline` variant is the only one with an edge; `solid` is for the rare tag that must shout. Three sizes (18, 20 and 24 px); an icon is a 12 px glyph in the tag's ink before the word; a number on its own is a count, centred in a tag at least as wide as it is tall. A tag that is a link or a button deepens its tint under the pointer, and a pressed one keeps that tint with an edge in its colour.
+- Separate with space first, subtle tonal contrast second, and a whisper-quiet single-axis hairline third. Never wrap divs, cards, stat strips, tables, code panels, banners, filter bars or state panels in 4-sided borders, and never put a plate inside a plate.
 
 ## Material
 
@@ -94,7 +94,7 @@ Components are not flat: they read as physical parts of an instrument. Depth com
 
 | Recipe | Token | On |
 | --- | --- | --- |
-| Elevation | `--fui-shadow-xs` (controls and plates), `-sm` (a raised plate, a card under the pointer), `-md` (menus, popovers, toasts), `-lg` (dialogs, sheets) | Layered: a contact shadow, a short drop and a long soft one, darker in the dark theme |
+| Elevation | `--fui-shadow-xs` (raised controls and active segments), `-sm` (compact floating pills), `-md` (menus, popovers, toasts), `-lg` (dialogs, sheets) | Layered: a contact shadow, a short drop and a long soft one, darker in the dark theme. Structural plates (`Card`, `Stat`, `StatGroup`, `Table`, `CodePanel`) stay borderless and unshadowed at rest |
 | Key | `--fui-bevel` and `--fui-sheen` | Solid fills: primary and accent buttons, ticked checks and radios, a switch that is on. A light top edge, a dark bottom edge, a 10 to 16 % tonal sheen |
 | Raised plate | `--fui-shadow-xs` and `--fui-highlight`, `--fui-sheen-soft` | Outline and destructive buttons, the chosen segment, a switch thumb, keycaps, the current row of a sidebar or a vertical tab rail (on `--fui-sidebar-active`) |
 | Well | `--fui-shadow-well` | Fields, selects, unticked checks, a switch track, a segmented group: a soft inner shadow from the top |
@@ -208,6 +208,7 @@ A loading view is the finished view painted as its own skeleton. Wrap the real c
 ## Layout and composition
 
 - **Full-canvas layout (never clamp the page shell).** Every page fills **100 % of the available viewport width** with disciplined edge gutters (`clamp(1.25rem, 2.5vw, 3rem)` for public sites, landings and playgrounds; `--fui-page-padding` in compact app workspaces). **Never** wrap page shells, headers, footers, landings, playgrounds, documentation frames or dashboards in narrow centred containers (`max-width: 1200px / 1440px / 1520px` with `margin-inline: auto`) that leave empty side wings of dead void on `2560×1440` and ultrawide monitors.
+- **Borderless by default (open-canvas surfaces).** Never wrap divs, cards, stat strips, tables, code panels, banners, filter bars or state panels in 4-sided `border: 1px solid` boxes or resting drop-shadow frames. Separate structure with **space first**, **subtle tonal surface shifts second** (`--card` vs `--background`), and **whisper-quiet single-axis hairlines (`--fui-separator`) third** (e.g. between table rows, sidebar seam or section splits). Reserve enclosed 1 px edges strictly for floating overlays (`Dialog`, `Popover`, `DropdownMenu`, `Command`, `Tooltip`), explicit `outline` buttons, active focus rings (`--fui-focus`) and `forced-colors: active`.
 - **Constrain prose measure, never the page container.** Apply a reading cap (`max-inline-size: 65ch` to `72ch`) only to individual long-form prose paragraphs, lists and descriptions — or to intentionally small modal/auth cards — never by shrinking the page shell or floating a narrow island in the middle of the screen.
 - **Scale proportionally on wide screens (`>= 1600px` / `2560px`).** Let multi-column grids, hero showcases, interactive consoles, component catalogues, API reference tables, playgrounds and order showcases expand across the full viewport canvas.
 - **Product screens** read as an instrument panel: a `PageHeader` with a mono eyebrow (the period or source), then the totals as one `StatGroup` with rulers, the main chart and the main table as plates, captions on figures. No corner marks or guides on product screens. They use `WorkspaceShell` with navigation and header slots when they need a shell; hosts own routing, active state, authentication, theme storage and native window chrome. Mail keeps its resizable panes; desktop keeps native window behaviour.

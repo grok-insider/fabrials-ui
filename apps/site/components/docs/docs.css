@@ -24,7 +24,7 @@
   display: flex;
   justify-content: flex-start;
   min-width: 0;
-  border-right: 1px solid var(--border);
+  border-right: 1px solid var(--fui-separator);
   background: var(--sidebar);
 }
 .docs-sidebar,
@@ -62,13 +62,14 @@
   gap: var(--fui-space-2-5);
   width: 100%;
   padding: var(--fui-space-1-5) var(--fui-space-2);
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: var(--fui-radius-md);
   background: var(--card);
   color: var(--foreground);
   font: inherit;
   text-align: left;
   cursor: pointer;
+  transition: background-color var(--fui-duration-fast) var(--fui-ease);
 }
 .docs-root-trigger:hover,
 .docs-root-trigger[data-popup-open] {
@@ -80,7 +81,7 @@
   place-items: center;
   width: 1.75rem;
   height: 1.75rem;
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: var(--fui-radius-sm);
   background: var(--background);
   color: var(--muted-foreground);
@@ -190,7 +191,7 @@
   gap: 1px;
   margin: var(--fui-space-1) 0 var(--fui-space-2) var(--fui-space-3);
   padding: 0 0 0 var(--fui-space-2);
-  border-left: 1px solid var(--border);
+  border-left: 1px solid var(--fui-separator);
   list-style: none;
 }
 .docs-nav li a {
@@ -358,7 +359,8 @@ h3.docs-heading {
 }
 .docs-prose blockquote {
   padding: var(--fui-space-3) var(--fui-space-4);
-  border: 1px solid var(--border);
+  border: 0;
+  border-inline-start: 2px solid var(--fui-separator);
   border-radius: var(--fui-radius-md);
   background: var(--muted);
   color: var(--foreground);
@@ -413,9 +415,9 @@ h3.docs-heading {
   scrollbar-color: var(--border) transparent;
   min-height: 15rem;
   padding: var(--fui-space-8) var(--fui-space-6);
-  border: 1px solid var(--border);
-  border-radius: var(--fui-radius-lg);
-  background: var(--background);
+  border: 0;
+  border-radius: var(--fui-radius-plate);
+  background: var(--card);
 }
 /* The preview may sit inside Loading's display: contents wrappers. A preview that sets its own width (data-width, from
    components/demo-frame) keeps it. Not in a cascade layer: this file can reach the page before Tailwind's layer order. */
@@ -467,9 +469,9 @@ h3.docs-heading {
   place-items: center;
   width: 1.75rem;
   height: 1.75rem;
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: 999px;
-  background: var(--card);
+  background: var(--muted);
   color: var(--foreground);
   font-size: var(--fui-text-xs);
   font-weight: 600;
@@ -482,7 +484,7 @@ h3.docs-heading {
   top: 2.25rem;
   bottom: calc(-1 * var(--fui-space-6) + 0.5rem);
   width: 1px;
-  background: var(--border);
+  background: var(--fui-separator);
 }
 .docs-step > p {
   padding-top: 0.2rem;
@@ -502,9 +504,9 @@ h3.docs-heading {
   display: grid;
   gap: var(--fui-space-4);
   padding: var(--fui-space-5);
-  border: 1px solid var(--border);
-  border-left: 2px solid var(--brand-ink, var(--primary));
-  border-radius: var(--fui-radius-md);
+  border: 0;
+  border-inline-start: 2px solid var(--brand-ink, var(--primary));
+  border-radius: var(--fui-radius-plate);
   background: var(--card);
 }
 .webmcp-setup-lead {
@@ -549,7 +551,7 @@ h3.docs-heading {
   display: inline-block;
   max-width: 100%;
   padding: 0.125rem 0.4375rem;
-  border: 1px solid var(--fui-separator);
+  border: 0;
   border-radius: var(--fui-radius-xs);
   background: var(--fui-surface-inset);
   color: var(--foreground);
@@ -580,7 +582,11 @@ h3.docs-heading {
   font-size: 0.78125rem;
 }
 
-/* Component index */
+/* Component visual gallery (borderless tonal tiles + category chips) */
+.docs-gallery-controls {
+  display: grid;
+  gap: var(--fui-space-4);
+}
 .docs-index-toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -592,51 +598,178 @@ h3.docs-heading {
   position: relative;
   width: min(100%, 24rem);
 }
-.docs-index-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
-  margin: 0;
-  padding: 0;
-  border: 1px solid var(--border);
-  border-radius: var(--fui-radius-lg);
-  list-style: none;
-  overflow: hidden;
-}
-.docs-index-grid li {
-  display: flex;
-  margin: 0 -1px -1px 0;
-  border-right: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-}
-.docs-index-grid a {
-  display: grid;
-  align-content: start;
-  gap: var(--fui-space-1);
-  width: 100%;
-  padding: var(--fui-space-4);
-  text-decoration: none;
-}
-.docs-index-grid a:hover {
-  background: var(--accent);
-}
-.docs-index-grid a:focus-visible {
-  outline-offset: -2px;
-}
-.docs-index-title {
+.docs-category-bar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--fui-space-2);
-  color: var(--foreground);
-  font-weight: 500;
+  gap: var(--fui-space-1-5);
 }
-.docs-index-count {
+.docs-category-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--fui-space-1-5);
+  min-height: 2rem;
+  padding: 0 var(--fui-space-3);
+  border: 0;
+  border-radius: var(--fui-radius-sm);
+  background: var(--card);
+  color: var(--muted-foreground);
+  font-family: var(--fui-font-sans);
+  font-size: var(--fui-text-xs);
+  font-weight: var(--fui-weight-medium);
+  cursor: pointer;
+  transition:
+    background-color var(--fui-duration-fast) var(--fui-ease),
+    color var(--fui-duration-fast) var(--fui-ease);
+}
+@media (hover: hover) and (pointer: fine) {
+  .docs-category-chip:hover {
+    background: var(--accent);
+    color: var(--foreground);
+  }
+}
+.docs-category-chip[aria-pressed="true"] {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+.docs-category-count {
+  font-family: var(--fui-font-label);
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.72;
+}
+.docs-gallery-section-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--fui-space-2-5);
+}
+.docs-gallery-section-count {
+  color: var(--muted-foreground);
+  font-family: var(--fui-font-label);
+  font-size: var(--fui-text-label);
+  font-variant-numeric: tabular-nums;
+}
+.docs-gallery-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--fui-space-4);
   margin: 0;
+  padding: 0;
+  list-style: none;
 }
-.docs-index-description {
+@media (min-width: 640px) {
+  .docs-gallery-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1120px) {
+  .docs-gallery-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1536px) {
+  .docs-gallery-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (min-width: 2048px) {
+  .docs-gallery-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+.docs-gallery-item {
+  display: flex;
+  min-width: 0;
+}
+.docs-gallery-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  padding: var(--fui-space-3);
+  border: 0;
+  border-radius: var(--fui-radius-plate);
+  background: var(--card);
+  transition: background-color var(--fui-duration) var(--fui-ease);
+}
+@media (hover: hover) and (pointer: fine) {
+  .docs-gallery-tile:hover {
+    background: color-mix(in oklab, var(--accent) 76%, var(--card));
+  }
+}
+.docs-gallery-tile:has(.docs-gallery-link:focus-visible) {
+  outline: 2px solid var(--fui-focus);
+  outline-offset: 2px;
+}
+.docs-gallery-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 8.5rem;
+  padding: var(--fui-space-3);
+  overflow: hidden;
+  border-radius: var(--fui-radius-md);
+  background: var(--background);
+  pointer-events: none;
+  user-select: none;
+}
+.docs-specimen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+.docs-gallery-meta {
+  display: grid;
+  align-content: start;
+  gap: var(--fui-space-1);
+  padding: var(--fui-space-3) var(--fui-space-1) var(--fui-space-1);
+  min-width: 0;
+}
+.docs-gallery-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fui-space-2);
+  min-width: 0;
+}
+.docs-gallery-link {
+  color: var(--foreground);
+  font-size: var(--fui-text-sm);
+  font-weight: var(--fui-weight-semibold);
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.docs-gallery-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--fui-radius-plate);
+}
+.docs-gallery-link:focus-visible {
+  outline: none;
+}
+.docs-gallery-badge {
+  flex: none;
+}
+.docs-gallery-description {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   color: var(--muted-foreground);
   font-size: var(--fui-text-xs);
   line-height: 1.5;
+}
+.docs-index-count {
+  margin: 0;
 }
 .docs-index-footer {
   margin: var(--fui-space-4) 0 0;
@@ -648,6 +781,81 @@ h3.docs-heading {
   text-underline-offset: 4px;
 }
 
+/* x.ai-style floating live hover preview beside the sidebar */
+.docs-hover-preview {
+  position: fixed;
+  z-index: var(--fui-z-popover, 60);
+  width: 21rem;
+  display: grid;
+  gap: var(--fui-space-2-5);
+  padding: var(--fui-space-4);
+  border: 1px solid var(--fui-overlay-border);
+  border-radius: var(--fui-radius-plate);
+  background: var(--fui-overlay-surface);
+  box-shadow: var(--fui-overlay-shadow);
+  pointer-events: none;
+  animation: docs-hover-preview-in var(--fui-duration-fast) var(--fui-ease-out);
+}
+@keyframes docs-hover-preview-in {
+  from {
+    opacity: 0;
+    translate: -4px 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .docs-hover-preview {
+    animation: none;
+  }
+}
+.docs-hover-preview-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fui-space-2);
+  min-width: 0;
+}
+.docs-hover-preview-title {
+  color: var(--foreground);
+  font-size: var(--fui-text-sm);
+  font-weight: var(--fui-weight-semibold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.docs-hover-preview-desc {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  color: var(--muted-foreground);
+  font-size: var(--fui-text-xs);
+  line-height: 1.5;
+}
+.docs-hover-preview-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 9rem;
+  padding: var(--fui-space-4);
+  overflow: hidden;
+  border-radius: var(--fui-radius-md);
+  background: var(--background);
+  pointer-events: none;
+}
+@media (max-width: 1023px) {
+  .docs-hover-preview {
+    display: none;
+  }
+}
+@media (forced-colors: active) {
+  .docs-gallery-tile,
+  .docs-category-chip {
+    border: 1px solid CanvasText;
+  }
+}
+
 /* Pager */
 .docs-pager {
   display: grid;
@@ -655,15 +863,17 @@ h3.docs-heading {
   gap: var(--fui-space-3);
   margin-top: var(--fui-space-8);
   padding-top: var(--fui-space-6);
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--fui-separator);
 }
 .docs-pager a {
   display: grid;
   gap: var(--fui-space-1);
   padding: var(--fui-space-3) var(--fui-space-4);
-  border: 1px solid var(--border);
-  border-radius: var(--fui-radius-md);
+  border: 0;
+  border-radius: var(--fui-radius-plate);
+  background: var(--card);
   text-decoration: none;
+  transition: background-color var(--fui-duration-fast) var(--fui-ease);
 }
 .docs-pager a:hover {
   background: var(--accent);
@@ -774,8 +984,9 @@ h3.docs-heading {
 .docs-toc-inline {
   display: none;
   margin-bottom: var(--fui-space-6);
-  border: 1px solid var(--border);
-  border-radius: var(--fui-radius-md);
+  border: 0;
+  border-radius: var(--fui-radius-plate);
+  background: var(--card);
 }
 .docs-toc-inline-trigger {
   display: flex;
@@ -1072,10 +1283,9 @@ h3.docs-heading.docs-example-title {
   min-width: 0;
   margin-top: var(--fui-space-2);
   overflow: hidden;
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: var(--fui-radius-plate);
   background: var(--card);
-  box-shadow: var(--fui-shadow-xs), var(--fui-highlight);
 }
 .docs-example-stage {
   display: flex;
@@ -1087,7 +1297,7 @@ h3.docs-heading.docs-example-title {
   min-height: 9rem;
   padding: var(--fui-space-8) var(--fui-space-6);
   overflow-x: auto;
-  background: var(--background);
+  background: var(--fui-surface-inset);
 }
 .docs-example-stage[data-align="start"] {
   align-items: flex-start;
@@ -1095,7 +1305,7 @@ h3.docs-heading.docs-example-title {
 }
 .docs-example-plate > .fui-code-panel {
   border: 0;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--fui-separator);
   border-radius: 0;
   box-shadow: none;
 }

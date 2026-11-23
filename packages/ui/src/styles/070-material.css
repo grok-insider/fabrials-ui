@@ -95,14 +95,7 @@
     box-shadow: var(--fui-shadow-xs), var(--fui-highlight);
   }
 
-  /* Plates rest just above the page: an edge, a soft shadow and the light along their top. */
-  .fui-card,
-  .fui-stat,
-  .fui-stat-group,
-  .fui-table-scroll,
-  .fui-code-panel {
-    box-shadow: var(--fui-shadow-xs), var(--fui-highlight);
-  }
+  /* Structural plates stay borderless and unshadowed at rest: tonal surface contrast separates them from the canvas. */
   .fui-stat-group > .fui-stat {
     box-shadow: none;
   }

@@ -195,7 +195,7 @@
   align-items: center;
   min-height: 1.5rem;
   padding: 0 var(--fui-space-2-5);
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: var(--fui-radius-sm);
   background: var(--card);
   color: var(--foreground);
@@ -203,14 +203,12 @@
   font-size: 0.75rem;
   text-decoration: none;
   transition:
-    border-color var(--fui-duration-fast) var(--fui-ease),
     background-color var(--fui-duration-fast) var(--fui-ease),
     color var(--fui-duration-fast) var(--fui-ease);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .playground-chip-link:hover {
-    border-color: var(--brand-ink);
     background: color-mix(in oklab, var(--brand) var(--fui-tint-strength), var(--card));
     color: var(--brand-ink);
   }
@@ -219,10 +217,9 @@
 .playground-plate {
   min-width: 0;
   overflow: hidden;
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: var(--fui-radius-plate);
   background: var(--card);
-  box-shadow: var(--fui-shadow-xs), var(--fui-highlight);
 }
 
 .playground-sandbox-bar {
@@ -344,7 +341,7 @@
   display: grid;
   gap: var(--fui-space-4);
   padding: var(--fui-space-4);
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: var(--fui-radius-lg);
   background: var(--background);
   min-width: 0;
@@ -364,7 +361,7 @@
   display: grid;
   gap: var(--fui-space-3);
   padding: var(--fui-space-3-5, 0.875rem) var(--fui-space-4);
-  border: 1px solid var(--fui-separator);
+  border: 0;
   border-radius: var(--fui-radius-md);
   background: var(--fui-surface-inset);
   min-width: 0;
@@ -377,7 +374,7 @@
   justify-content: space-between;
   gap: var(--fui-space-3);
   padding: var(--fui-space-3) var(--fui-space-4);
-  border: 1px solid color-mix(in oklab, var(--brand) var(--fui-tint-edge), transparent);
+  border: 0;
   border-radius: var(--fui-radius-md);
   background: color-mix(in oklab, var(--brand) var(--fui-tint-strength), var(--card));
   font-size: var(--fui-text-sm);
@@ -427,7 +424,7 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: var(--fui-radius-lg);
   background: var(--background);
   overflow: hidden;
@@ -494,31 +491,30 @@
   gap: var(--fui-space-1-5);
   height: 1.75rem;
   padding-inline: var(--fui-space-2-5);
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: var(--fui-radius-sm);
-  background: var(--card);
+  background: var(--muted);
   color: var(--muted-foreground);
   font-family: var(--fui-font-mono);
   font-size: 0.71875rem;
   font-variant-numeric: tabular-nums;
   cursor: pointer;
   transition:
-    border-color var(--fui-duration-fast) var(--fui-ease),
     background-color var(--fui-duration-fast) var(--fui-ease),
     color var(--fui-duration-fast) var(--fui-ease);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .pg-preset-btn:hover {
-    border-color: var(--fui-control-border);
+    background: var(--accent);
     color: var(--foreground);
   }
 }
 
 .pg-preset-btn[aria-pressed="true"] {
-  border-color: var(--brand-ink);
   background: color-mix(in oklab, var(--brand) var(--fui-tint-strength), var(--card));
   color: var(--brand-ink);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--brand-ink) 45%, transparent);
 }
 
 .pg-dither-stage {
@@ -526,7 +522,7 @@
   isolation: isolate;
   overflow: hidden;
   min-height: 15.5rem;
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: var(--fui-radius-lg);
   background: var(--background);
   --fui-dither-bg: var(--background);
@@ -545,10 +541,9 @@
   align-items: center;
   gap: var(--fui-space-3);
   padding: var(--fui-space-3) var(--fui-space-4);
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: var(--fui-radius-lg);
   background: color-mix(in oklab, var(--card) 92%, transparent);
-  box-shadow: var(--fui-shadow-xs);
 }
 
 .pg-polestone-grid {
@@ -562,22 +557,20 @@
   align-items: center;
   gap: var(--fui-space-2);
   padding: var(--fui-space-2) var(--fui-space-2-5);
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: var(--fui-radius-md);
-  background: var(--card);
+  background: var(--muted);
   color: var(--foreground);
   font-size: var(--fui-text-xs);
   font-weight: var(--fui-weight-medium);
   text-align: start;
   cursor: pointer;
-  transition:
-    border-color var(--fui-duration-fast) var(--fui-ease),
-    background-color var(--fui-duration-fast) var(--fui-ease);
+  transition: background-color var(--fui-duration-fast) var(--fui-ease);
 }
 
 .pg-polestone-btn[aria-pressed="true"] {
-  border-color: var(--brand-ink);
   background: color-mix(in oklab, var(--brand) var(--fui-tint-strength), var(--card));
+  box-shadow: inset 0 0 0 1.5px var(--brand-ink);
 }
 
 .pg-polestone-btn span {

@@ -14,8 +14,7 @@
     }
     .fui-card[data-interactive] {
       transition:
-        border-color var(--fui-duration) var(--fui-ease),
-        box-shadow var(--fui-duration) var(--fui-ease),
+        background-color var(--fui-duration) var(--fui-ease),
         translate var(--fui-duration) var(--fui-ease-out);
     }
   }

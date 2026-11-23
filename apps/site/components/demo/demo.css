@@ -2,8 +2,8 @@
    column split by a hairline; the narrated tour adds a transport row. */
 .demo {
   overflow: clip;
-  border: 1px solid var(--border);
-  border-radius: var(--fui-radius-lg);
+  border: 0;
+  border-radius: var(--fui-radius-plate);
   background: var(--card);
   --fui-dither-bg: var(--card);
 }
@@ -14,7 +14,7 @@
   gap: var(--fui-space-2) var(--fui-space-4);
   min-height: 3rem;
   padding: var(--fui-space-2) var(--fui-space-4);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--fui-separator);
 }
 .demo-bar-note {
   margin: 0;
@@ -37,7 +37,7 @@
   display: grid;
   align-content: start;
   min-width: 0;
-  border-left: 1px solid var(--border);
+  border-left: 1px solid var(--fui-separator);
   background: var(--background);
 }
 .demo-side-head {
@@ -47,7 +47,7 @@
   gap: var(--fui-space-2);
   min-height: 2.75rem;
   padding: var(--fui-space-1) var(--fui-space-2) var(--fui-space-1) var(--fui-space-4);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--fui-separator);
 }
 .demo-side-head > div {
   display: flex;
@@ -251,7 +251,7 @@
   align-items: flex-start;
   gap: var(--fui-space-2);
   padding: var(--fui-space-3);
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: var(--fui-radius-md);
   background: var(--card);
 }

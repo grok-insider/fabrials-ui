@@ -55,14 +55,15 @@ test("the card caption is a slot in the label voice", () => {
   assert.match(styles, /\.fui-card-caption \{[^}]*font-family: var\(--fui-font-label\)/);
 });
 
-test("plates have 12 px corners and rest on the plate elevation, which only the material block paints", () => {
-  for (const selector of [".fui-card", ".fui-stat", ".fui-stat-group", ".fui-table-scroll"]) {
+test("plates have 12 px corners and stay borderless and unshadowed at rest", () => {
+  for (const selector of [".fui-card", ".fui-stat", ".fui-stat-group", ".fui-table-scroll", ".fui-code-panel"]) {
     const block = styles.match(new RegExp(`\\n  ${selector.replace(".", "\\.")} \\{([^}]*)\\}`))?.[1] ?? "";
     assert.match(block, /border-radius: var\(--fui-radius-plate\)/, selector);
+    assert.match(block, /border: 0;/, selector);
     assert.doesNotMatch(block, /box-shadow/, selector);
   }
-  const material = styles.slice(styles.indexOf("/*! 0.10 material."));
-  assert.match(material, /\.fui-card,\n  \.fui-stat,\n  \.fui-stat-group,\n  \.fui-table-scroll,\n  \.fui-code-panel \{\n    box-shadow: var\(--fui-shadow-xs\), var\(--fui-highlight\);/);
+  const material = styles.slice(styles.indexOf("/*! 0.10 material."), styles.indexOf('/* 0.11 "Instrument with life"'));
+  assert.doesNotMatch(material, /\.fui-card,\s*\.fui-stat,\s*\.fui-stat-group,\s*\.fui-table-scroll,\s*\.fui-code-panel/);
   assert.match(tokens, /--fui-radius-plate: 0\.75rem;/);
   assert.match(tokens, /--fui-font-label: var\(--fui-font-mono\);/);
 });

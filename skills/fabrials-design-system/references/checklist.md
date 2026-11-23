@@ -5,6 +5,7 @@ Run this before saying UI work is done. Report each item as checked, not applica
 ## 1. Rules
 
 - [ ] Full-canvas layout: page shells, headers, footers, landings, playgrounds, docs and dashboards fill 100 % of the viewport width with disciplined edge gutters (`clamp(1.25rem, 2.5vw, 3rem)` or `--fui-page-padding`), no narrow `1200–1520px` centred wrappers, prose measure capped at `65ch`–`72ch` only on text blocks.
+- [ ] Borderless by default: structural containers (cards, stat strips, tables, code panels, banners, filter bars, state panels) separate by space, subtle tonal contrast (`--card` vs `--background`) and whisper-quiet single-axis hairlines (`--fui-separator`) — no 4-sided `border: 1px solid` boxes or resting card drop shadows; enclosed 1 px edges only on floating overlays, `outline` buttons, focus rings and `forced-colors: active`.
 - [ ] The screen follows its recipe in `layout.md` (landing, index, docs, workspace, settings, sign-in, states).
 - [ ] Components come from `@fabrials/ui` / `@fabrials/ai-ui` (or registry shims and blocks); no re-implemented control, no edited `vendor/` copy.
 - [ ] The anti-slop checks in `style-rules.md` pass; run the `rg` scan on the changed files and review every hit.

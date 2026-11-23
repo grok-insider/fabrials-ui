@@ -5,6 +5,7 @@ Page anatomy for the surfaces Fabrials builds. Each recipe names the components,
 ## The frame every page shares
 
 - **Full-canvas width, disciplined gutters.** Every page shell, header, footer, landing, playground, documentation frame and dashboard fills **100 % of the available viewport width** with disciplined edge gutters: `clamp(1.25rem, 2.5vw, 3rem)` for public sites, landings and playgrounds, or `--fui-page-padding` (`24 px`, `16 px` below `768 px`) in compact app workspaces. Headers, sections and footers share the same gutter so their edges line up across the full canvas.
+- **Borderless by default.** Never wrap divs, cards, stat strips, tables, code panels, banners, filter bars or state panels in 4-sided borders (`border: 1px solid`) or resting drop-shadow boxes. Separate structure with **space first**, **subtle tonal surface shifts second** (`--card` vs `--background`), and **whisper-quiet single-axis hairlines (`--fui-separator`) third** (e.g. between table rows, sidebar seam or section splits). Reserve enclosed 1 px edges strictly for floating overlays (`Dialog`, `Popover`, `DropdownMenu`, `Command`, `Tooltip`), explicit `outline` buttons, active focus rings (`--fui-focus`) and `forced-colors: active`.
 - **Never clamp or centre the page shell.** Never wrap a page container, header, hero, section, playground or dashboard in a narrow centred box (`max-width: 1200px / 1440px / 1520px`, `max-w-7xl`, `mx-auto`, `margin-inline: auto`, `justify-content: center` or `text-center` on a page column). Empty 500 px side wings on `2560×1440` and ultrawide screens are a defect.
 - **Constrain prose measure, not the container.** Limit line length **only** on individual long-form prose blocks (`max-inline-size: 65ch` to `72ch`) or intentionally small modal/auth cards. `--fui-content` (`80rem`) is an optional cap for a single form stack (such as settings), never a centred page wrapper.
 - **Wide screens (`>= 1600px` / `2560px`) expand proportionally.** Let multi-column grids, hero showcases, interactive consoles, component catalogues, API reference tables, playgrounds and order showcases use the full viewport width while prose paragraphs stay at `65ch`–`72ch`.
@@ -113,7 +114,7 @@ import { DitherGem } from "@fabrials/ui";
 
 - The link names its destination ("Install Spanreed", "Read the Syl docs"), without an arrow.
 - Numbers in a leading column only when they are real counts (the site home shows component counts); numbered markers only for real sequences.
-- A catalogue of dozens of peer entries with search and filters (ui.fabrials.com `/components`) may use one bordered panel split into cells by hairlines (`.docs-index-grid` in `apps/site/components/docs/docs.css`): no per-item card, shadow or icon tile.
+- A catalogue of dozens of peer entries with search and filters (ui.fabrials.com `/components`) uses borderless tonal gallery tiles (`--card` over `--background`, generous gap, smooth tonal brighten on hover, zero perimeter borders) with live miniature component specimens.
 - `SuggestionGrid` is for empty-state prompts in a chat or workspace, not for listing products.
 
 ## Brand panel on a public page
