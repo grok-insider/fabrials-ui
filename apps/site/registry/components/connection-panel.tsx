@@ -1,9 +1,19 @@
 "use client";
 import { useId, useState } from "react";
 import { Plug, Unplug } from "lucide-react";
-import { Badge, Button, Input, Label, NativeSelect } from "@fabrials/ui";
+import {
+  Alert,
+  AlertDescription,
+  Badge,
+  Button,
+  Input,
+  Label,
+  NativeSelect,
+  StatusDot,
+} from "@fabrials/ui";
 import { BrowserOAuthProvider } from "@/registry/mcp/oauth";
 import type { ConnectionOptions } from "@/registry/mcp/client";
+
 export function ConnectionPanel({
   status,
   error,
@@ -28,9 +38,17 @@ export function ConnectionPanel({
   const [localError, setLocalError] = useState("");
   const connected = status === "connected";
   const busy = status === "connecting";
+  const dotTone = connected
+    ? "success"
+    : busy
+      ? "info"
+      : status === "error" || Boolean(error || localError)
+        ? "danger"
+        : "neutral";
+
   return (
     <form
-      className="space-y-4"
+      className="grid gap-4 rounded-[var(--fui-radius-lg)] border bg-background p-4"
       onSubmit={async (e) => {
         e.preventDefault();
         setLocalError("");
@@ -54,26 +72,44 @@ export function ConnectionPanel({
         }
       }}
     >
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-sm font-medium">Server connection</h3>
-        <Badge variant="outline" role="status">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--fui-separator)] pb-3">
+        <div className="flex items-center gap-2">
+          <StatusDot tone={dotTone} pulse={busy || connected} label={status} hideLabel />
+          <h3 className="m-0 text-sm font-medium text-foreground">
+            Server connection
+          </h3>
+        </div>
+        <Badge
+          tone={
+            connected
+              ? "success"
+              : busy
+                ? "info"
+                : status === "error"
+                  ? "danger"
+                  : "neutral"
+          }
+          size="sm"
+          role="status"
+        >
           {status}
           {protocol && ` · ${protocol}`}
         </Badge>
       </div>
-      <div className="space-y-1.5">
-        <Label htmlFor={`${id}-url`}>MCP endpoint</Label>
-        <Input
-          id={`${id}-url`}
-          value={endpoint}
-          onChange={(e) => setEndpoint(e.target.value)}
-          placeholder="https://your-server.com/mcp"
-          required
-          disabled={connected || busy}
-        />
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1.5">
+
+      <div className="grid gap-3 md:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,1fr)]">
+        <div className="grid gap-1.5">
+          <Label htmlFor={`${id}-url`}>MCP endpoint</Label>
+          <Input
+            id={`${id}-url`}
+            value={endpoint}
+            onChange={(e) => setEndpoint(e.target.value)}
+            placeholder="https://your-server.com/mcp"
+            required
+            disabled={connected || busy}
+          />
+        </div>
+        <div className="grid gap-1.5">
           <Label htmlFor={`${id}-auth`}>Authentication</Label>
           <NativeSelect
             id={`${id}-auth`}
@@ -89,7 +125,7 @@ export function ConnectionPanel({
             <option value="oauth">OAuth / PKCE</option>
           </NativeSelect>
         </div>
-        <div className="space-y-1.5">
+        <div className="grid gap-1.5">
           <Label htmlFor={`${id}-version`}>Protocol</Label>
           <NativeSelect
             id={`${id}-version`}
@@ -103,8 +139,9 @@ export function ConnectionPanel({
           </NativeSelect>
         </div>
       </div>
+
       {auth === "bearer" && !connected && (
-        <div className="space-y-1.5">
+        <div className="grid max-w-md gap-1.5">
           <Label htmlFor={`${id}-token`}>Token · memory only</Label>
           <Input
             id={`${id}-token`}
@@ -116,8 +153,9 @@ export function ConnectionPanel({
           />
         </div>
       )}
+
       {auth === "oauth" && !connected && (
-        <div className="space-y-1.5">
+        <div className="grid max-w-md gap-1.5">
           <Label htmlFor={`${id}-client`}>Client ID (optional)</Label>
           <Input
             id={`${id}-client`}
@@ -127,44 +165,49 @@ export function ConnectionPanel({
           />
         </div>
       )}
+
       {(error || localError) && (
-        <p role="alert" className="text-sm text-destructive">
-          {localError || error}
-        </p>
+        <Alert variant="destructive" role="alert">
+          <AlertDescription>{localError || error}</AlertDescription>
+        </Alert>
       )}
-      <div className="flex gap-2">
-        {connected ? (
-          <Button
-            variant="outline"
-            type="button"
-            onClick={() => {
-              setToken("");
-              void onDisconnect();
-            }}
-          >
-            <Unplug />
-            Disconnect
-          </Button>
-        ) : (
-          <Button type="submit" disabled={busy}>
-            <Plug />
-            {busy ? "Connecting…" : "Connect server"}
-          </Button>
-        )}
-        {busy && (
-          <Button
-            variant="outline"
-            type="button"
-            onClick={() => void onDisconnect()}
-          >
-            Cancel
-          </Button>
-        )}
+
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--fui-separator)] pt-3">
+        <div className="flex items-center gap-2">
+          {connected ? (
+            <Button
+              variant="outline"
+              size="sm"
+              type="button"
+              onClick={() => {
+                setToken("");
+                void onDisconnect();
+              }}
+            >
+              <Unplug />
+              Disconnect
+            </Button>
+          ) : (
+            <Button type="submit" size="sm" variant="accent" disabled={busy}>
+              <Plug />
+              {busy ? "Connecting…" : "Connect server"}
+            </Button>
+          )}
+          {busy && (
+            <Button
+              variant="outline"
+              size="sm"
+              type="button"
+              onClick={() => void onDisconnect()}
+            >
+              Cancel
+            </Button>
+          )}
+        </div>
+        <p className="m-0 font-mono text-[11px] text-muted-foreground">
+          Direct connections stay in your browser · CORS required for remote servers
+        </p>
       </div>
-      <p className="text-xs leading-relaxed text-muted-foreground">
-        Direct connections stay in your browser. The endpoint must allow CORS.
-        Use the optional server connector for private credentials.
-      </p>
     </form>
   );
 }

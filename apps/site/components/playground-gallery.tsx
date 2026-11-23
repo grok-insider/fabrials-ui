@@ -12,8 +12,8 @@ const scenarioGroups: readonly ScenarioGroup[] = [
   {
     label: "0.12 Instrument & AI",
     items: [
-      ["agent-workbench", "Agent & AI runtime", "Working light, tasks, tool calls & streaming"],
-      ["instrument-lab", "Stormlight & Dither lab", "Polestones, Bayer canvas, rulers & skeletons"],
+      ["agent-workbench", "Agent & AI runtime", "Working light, tasks & tool calls"],
+      ["instrument-lab", "Stormlight & Dither lab", "Polestones, Bayer canvas & rulers"],
     ],
   },
   {
@@ -75,7 +75,10 @@ export function PlaygroundGallery({ children }: { children: ReactNode }) {
       <nav aria-label="Playground scenarios" className="playground-rail">
         {scenarioGroups.map((group) => (
           <div key={group.label} className="playground-rail-group">
-            <p className="playground-rail-label">{group.label}</p>
+            <p className="playground-rail-label">
+              <span>{group.label}</span>
+              <span className="playground-rail-count">{group.items.length}</span>
+            </p>
             <ul className="playground-rail-list">
               {group.items.map(([id, title, description]) => {
                 const num = scenarioNumbers.get(id) ?? "00";

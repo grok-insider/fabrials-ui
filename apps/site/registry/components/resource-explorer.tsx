@@ -5,10 +5,11 @@ import type {
   ResourceTemplateType,
   Prompt,
 } from "@modelcontextprotocol/client";
-import { Button } from "@fabrials/ui";
+import { Badge, Button } from "@fabrials/ui";
 import { ArgumentsForm } from "@/registry/components/arguments-form";
 import { ResultView } from "@/registry/components/result-view";
 import { errorMessage } from "@/registry/mcp/types";
+
 export function ResourceExplorer({
   resources,
   templates = [],
@@ -21,6 +22,7 @@ export function ResourceExplorer({
   const [result, setResult] = useState<unknown>();
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
+
   async function read(uri: string) {
     setError("");
     setPending(true);
@@ -32,41 +34,57 @@ export function ResourceExplorer({
       setPending(false);
     }
   }
+
   return (
-    <section className="space-y-4">
-      <h3 className="text-sm font-medium">Resources</h3>
+    <section className="grid gap-4">
+      <div className="flex items-center justify-between gap-2">
+        <h3 className="m-0 text-sm font-medium text-foreground">Resources</h3>
+        <Badge size="sm" tone="neutral">
+          {resources.length}
+        </Badge>
+      </div>
       {!resources.length && (
-        <p className="text-sm text-muted-foreground">
+        <p className="m-0 rounded-[var(--fui-radius-md)] border border-[var(--fui-separator)] bg-[var(--fui-surface-inset)] px-4 py-5 text-sm text-muted-foreground">
           No resources advertised.
         </p>
       )}
-      {resources.map((resource) => (
-        <div
-          key={resource.uri}
-          className="flex items-center justify-between gap-3 rounded-lg border p-3"
-        >
-          <div className="min-w-0">
-            <p className="text-sm font-medium">
-              {resource.title ?? resource.name}
-            </p>
-            <p className="break-all font-mono text-[10px] text-muted-foreground">
-              {resource.uri}
-            </p>
-          </div>
-          <Button
-            size="xs"
-            variant="outline"
-            disabled={pending}
-            onClick={() => void read(resource.uri)}
-          >
-            Read
-          </Button>
+      {resources.length > 0 && (
+        <div className="grid divide-y divide-[var(--fui-separator)] overflow-hidden rounded-[var(--fui-radius-lg)] border bg-background">
+          {resources.map((resource) => (
+            <div
+              key={resource.uri}
+              className="flex flex-wrap items-center justify-between gap-3 px-4 py-3"
+            >
+              <div className="min-w-0">
+                <p className="m-0 text-sm font-medium text-foreground">
+                  {resource.title ?? resource.name}
+                </p>
+                <p className="m-0 mt-0.5 break-all font-mono text-[11px] text-muted-foreground">
+                  {resource.uri}
+                </p>
+              </div>
+              <Button
+                size="xs"
+                variant="outline"
+                disabled={pending}
+                onClick={() => void read(resource.uri)}
+              >
+                Read
+              </Button>
+            </div>
+          ))}
         </div>
-      ))}
+      )}
       {templates.map((template) => (
-        <details key={template.uriTemplate} className="rounded-lg border p-3">
-          <summary className="cursor-pointer text-sm">
-            {template.name} · template
+        <details
+          key={template.uriTemplate}
+          className="rounded-[var(--fui-radius-lg)] border bg-background p-4"
+        >
+          <summary className="cursor-pointer text-sm font-medium text-foreground">
+            {template.name}{" "}
+            <span className="font-mono text-[11px] font-normal text-muted-foreground">
+              · template
+            </span>
           </summary>
           <p className="my-3 break-all font-mono text-xs text-muted-foreground">
             {template.uriTemplate}
@@ -89,7 +107,7 @@ export function ResourceExplorer({
         </details>
       ))}
       {error && (
-        <p role="alert" className="text-sm text-destructive">
+        <p role="alert" className="m-0 text-sm text-[var(--fui-danger-ink)]">
           {error}
         </p>
       )}
@@ -97,6 +115,7 @@ export function ResourceExplorer({
     </section>
   );
 }
+
 export function PromptCatalog({
   prompts,
   onGet,
@@ -106,41 +125,52 @@ export function PromptCatalog({
 }) {
   const [result, setResult] = useState<unknown>();
   return (
-    <section className="space-y-4">
-      <h3 className="text-sm font-medium">Prompts</h3>
+    <section className="grid gap-4">
+      <div className="flex items-center justify-between gap-2">
+        <h3 className="m-0 text-sm font-medium text-foreground">Prompts</h3>
+        <Badge size="sm" tone="neutral">
+          {prompts.length}
+        </Badge>
+      </div>
       {!prompts.length && (
-        <p className="text-sm text-muted-foreground">No prompts advertised.</p>
+        <p className="m-0 rounded-[var(--fui-radius-md)] border border-[var(--fui-separator)] bg-[var(--fui-surface-inset)] px-4 py-5 text-sm text-muted-foreground">
+          No prompts advertised.
+        </p>
       )}
-      {prompts.map((prompt) => (
-        <details key={prompt.name} className="rounded-lg border p-4">
-          <summary className="cursor-pointer text-sm font-medium">
-            {prompt.title ?? prompt.name}
-          </summary>
-          <p className="my-3 text-xs text-muted-foreground">
-            {prompt.description}
-          </p>
-          <ArgumentsForm
-            schema={{
-              type: "object",
-              properties: Object.fromEntries(
-                (prompt.arguments ?? []).map((arg) => [
-                  arg.name,
-                  { type: "string", description: arg.description },
-                ]),
-              ),
-              required: (prompt.arguments ?? [])
-                .filter((a) => a.required)
-                .map((a) => a.name),
-            }}
-            submitLabel="Get prompt"
-            onSubmit={async (args) =>
-              setResult(
-                await onGet(prompt.name, args as Record<string, string>),
-              )
-            }
-          />
-        </details>
-      ))}
+      {prompts.length > 0 && (
+        <div className="grid divide-y divide-[var(--fui-separator)] overflow-hidden rounded-[var(--fui-radius-lg)] border bg-background">
+          {prompts.map((prompt) => (
+            <details key={prompt.name} className="p-4">
+              <summary className="cursor-pointer text-sm font-medium text-foreground">
+                {prompt.title ?? prompt.name}
+              </summary>
+              <p className="my-3 text-xs leading-relaxed text-muted-foreground">
+                {prompt.description}
+              </p>
+              <ArgumentsForm
+                schema={{
+                  type: "object",
+                  properties: Object.fromEntries(
+                    (prompt.arguments ?? []).map((arg) => [
+                      arg.name,
+                      { type: "string", description: arg.description },
+                    ]),
+                  ),
+                  required: (prompt.arguments ?? [])
+                    .filter((a) => a.required)
+                    .map((a) => a.name),
+                }}
+                submitLabel="Get prompt"
+                onSubmit={async (args) =>
+                  setResult(
+                    await onGet(prompt.name, args as Record<string, string>),
+                  )
+                }
+              />
+            </details>
+          ))}
+        </div>
+      )}
       {result !== undefined && <ResultView result={result} />}
     </section>
   );

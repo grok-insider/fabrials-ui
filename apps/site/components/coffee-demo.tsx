@@ -8,14 +8,17 @@ import {
   ShoppingBag,
   Plus,
   Minus,
+  Sparkles,
 } from "lucide-react";
 import {
   Alert,
   AlertDescription,
+  Badge,
   Button,
   Input,
   Label,
   NativeSelect,
+  StatusDot,
 } from "@fabrials/ui";
 import {
   WebMCPProvider,
@@ -34,12 +37,20 @@ import {
   coffeeTotal,
   type CoffeeId,
 } from "@/lib/coffee-demo";
+
 const money = (n: number) =>
   new Intl.NumberFormat("en", {
     style: "currency",
     currency: "EUR",
     maximumFractionDigits: 0,
   }).format(n);
+
+const PRESETS = [
+  { label: "32 cm · 58 mm", width: 32, fitting: "58 mm" },
+  { label: "40 cm · 54 mm", width: 40, fitting: "54 mm" },
+  { label: "28 cm · 58 mm", width: 28, fitting: "58 mm" },
+] as const;
+
 export function CoffeeDemo({ playground = false }: { playground?: boolean }) {
   return (
     <WebMCPProvider>
@@ -48,6 +59,7 @@ export function CoffeeDemo({ playground = false }: { playground?: boolean }) {
     </WebMCPProvider>
   );
 }
+
 export function useCoffeeStore() {
   const mcp = useWebMCP();
   const [width, setWidth] = useState(32);
@@ -73,6 +85,7 @@ export function useCoffeeStore() {
   const match = compared ? coffeeMatch(compared.width, compared.fitting) : undefined;
   const total = coffeeTotal(cart.id, cart.filter);
   const active = coffeeProducts.find((p) => p.id === cart.id);
+
   async function run(
     name: string,
     args: Record<string, unknown>,
@@ -88,6 +101,7 @@ export function useCoffeeStore() {
       setBusy(false);
     }
   }
+
   useWebMCPTool({
     name: "compare_coffee_machines",
     title: "Compare coffee machines",
@@ -111,6 +125,7 @@ export function useCoffeeStore() {
       return { products: compareCoffee(maxWidth, fit), cartChanged: false };
     },
   });
+
   useWebMCPTool({
     name: "set_coffee_cart",
     title: "Choose a machine",
@@ -134,6 +149,7 @@ export function useCoffeeStore() {
       };
     },
   });
+
   useWebMCPTool(
     {
       name: "set_coffee_filter",
@@ -160,6 +176,7 @@ export function useCoffeeStore() {
     },
     Boolean(cart.id),
   );
+
   useWebMCPTool(
     {
       name: "review_coffee_cart",
@@ -179,6 +196,7 @@ export function useCoffeeStore() {
     },
     Boolean(cart.id),
   );
+
   function reset() {
     updateCart({ id: null, filter: false });
     setCompared(null);
@@ -188,6 +206,7 @@ export function useCoffeeStore() {
     setError("");
     mcp.clearHistory();
   }
+
   return {
     mcp,
     width,
@@ -209,7 +228,9 @@ export function useCoffeeStore() {
     reset,
   };
 }
+
 export type CoffeeStore = ReturnType<typeof useCoffeeStore>;
+
 export function CoffeeComparison({
   store,
   action,
@@ -227,14 +248,16 @@ export function CoffeeComparison({
         compared ? (
           match ? (
             <>
-              <strong>{match.name} fits your setup.</strong> It is the only one of {coffeeProducts.length} that meets all
-              three requirements: {match.reasons.join(", ")}.
+              <strong>{match.name} fits your setup.</strong> It is the only one of{" "}
+              {coffeeProducts.length} that meets all three requirements:{" "}
+              {match.reasons.join(", ")}.
             </>
           ) : (
             <>
               No machine meets all three requirements.
-              {close.length > 0 && ` ${close.join(" and ")} miss${close.length === 1 ? "es" : ""} one.`} Adjust your
-              requirements or compare the trade-offs below.
+              {close.length > 0 &&
+                ` ${close.join(" and ")} miss${close.length === 1 ? "es" : ""} one.`}{" "}
+              Adjust your requirements or compare the trade-offs below.
             </>
           )
         ) : undefined
@@ -243,7 +266,7 @@ export function CoffeeComparison({
         action?.(p) ?? (
           <Button
             size="sm"
-            variant={cart.id === p.id ? "secondary" : "outline"}
+            variant={cart.id === p.id ? "accent" : "outline"}
             disabled={busy}
             onClick={() =>
               void run("set_coffee_cart", {
@@ -267,6 +290,7 @@ export function CoffeeComparison({
     />
   );
 }
+
 function CoffeeWorkbench() {
   const store = useCoffeeStore();
   const {
@@ -275,6 +299,7 @@ function CoffeeWorkbench() {
     setWidth,
     fitting,
     setFitting,
+    compared,
     cart,
     saved,
     error,
@@ -283,23 +308,51 @@ function CoffeeWorkbench() {
     active,
     run,
   } = store;
+
   return (
-    <div className="overflow-hidden rounded-[var(--fui-radius-lg)] border bg-card">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b px-5 py-4 sm:px-7">
-        <div>
-          <p className="text-sm font-medium">The morning ritual</p>
-          <p className="text-xs text-muted-foreground">
-            Interactive store · fictional products
-          </p>
+    <div className="grid gap-5">
+      <div className="pg-toolbar">
+        <div className="pg-toolbar-group">
+          <div>
+            <p className="m-0 text-sm font-medium text-foreground">
+              The morning ritual
+            </p>
+            <p className="m-0 mt-0.5 font-mono text-[11px] text-muted-foreground">
+              {coffeeProducts.length} scale-drawn machines ·{" "}
+              {mcp.support === "native"
+                ? `${mcp.tools.length} browser tools`
+                : `${mcp.tools.length} shared WebMCP tools`}
+            </p>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-muted-foreground">
-            {mcp.support === "native"
-              ? `${mcp.tools.length} browser tools`
-              : "Manual + simulation"}
-          </span>
+
+        <div className="pg-toolbar-group">
+          <div className="pg-preset-row" role="group" aria-label="Counter presets">
+            {PRESETS.map((preset) => {
+              const isSelected =
+                compared?.width === preset.width &&
+                compared?.fitting === preset.fitting;
+              return (
+                <button
+                  key={preset.label}
+                  type="button"
+                  className="pg-preset-btn"
+                  aria-pressed={isSelected}
+                  disabled={busy}
+                  onClick={() =>
+                    void run("compare_coffee_machines", {
+                      maxWidth: preset.width,
+                      fitting: preset.fitting,
+                    })
+                  }
+                >
+                  {preset.label}
+                </button>
+              );
+            })}
+          </div>
           <Button
-            variant="ghost"
+            variant="outline"
             size="icon-sm"
             aria-label="Reset coffee demo"
             onClick={store.reset}
@@ -308,26 +361,24 @@ function CoffeeWorkbench() {
           </Button>
         </div>
       </div>
-      <div className="grid lg:grid-cols-[1fr_320px]">
-        <div className="min-w-0 p-5 sm:p-7">
-          <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="mb-2 text-sm text-muted-foreground">
-                Make room for better mornings
-              </p>
-              <h3 className="text-2xl font-medium tracking-tight sm:text-3xl">
-                A good fit. In every way.
-              </h3>
-            </div>
-            <span className="rounded-md border px-3 py-1 text-xs text-muted-foreground">
-              {coffeeProducts.length} machines to compare
+
+      <div className="pg-split">
+        <div className="pg-well content-start">
+          <div className="pg-well-head">
+            <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-muted-foreground">
+              <Braces className="size-3.5" aria-hidden />
+              Requirements &amp; guided agent call
             </span>
+            <Badge tone={compared ? "info" : "neutral"} size="sm">
+              {compared
+                ? `Evaluated · ${compared.width} cm · ${compared.fitting}`
+                : "Two flat whites · independent steam"}
+            </Badge>
           </div>
-          <div className="mb-6 flex flex-wrap items-end gap-3 rounded-xl bg-muted/60 p-4">
-            <div>
-              <Label htmlFor="coffee-width" className="mb-2 block">
-                Counter width (cm)
-              </Label>
+
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="grid gap-1.5">
+              <Label htmlFor="coffee-width">Counter width (cm)</Label>
               <Input
                 id="coffee-width"
                 type="number"
@@ -335,18 +386,16 @@ function CoffeeWorkbench() {
                 max={100}
                 value={width}
                 onChange={(e) => setWidth(Number(e.target.value))}
-                className="w-28"
+                className="w-28 tabular-nums"
               />
             </div>
-            <div>
-              <Label htmlFor="coffee-fitting" className="mb-2 block">
-                Your accessories
-              </Label>
+            <div className="grid gap-1.5">
+              <Label htmlFor="coffee-fitting">Your accessories</Label>
               <NativeSelect
                 id="coffee-fitting"
                 value={fitting}
                 onChange={(e) => setFitting(e.target.value)}
-                className="w-auto"
+                className="w-auto min-w-28"
               >
                 {coffeeFittings.map((fit) => (
                   <option key={fit}>{fit}</option>
@@ -366,108 +415,144 @@ function CoffeeWorkbench() {
               Compare
             </Button>
           </div>
-          <CoffeeComparison store={store} />
+
+          <div className="pg-inset">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="font-mono text-[11px] text-muted-foreground">
+                Simulated agent prompt
+              </span>
+              <Badge size="sm" tone="info">
+                Simulation
+              </Badge>
+            </div>
+            <p className="m-0 text-sm font-medium leading-6 text-foreground">
+              “Two flat whites. A 32 cm counter. Keep my 58 mm accessories.”
+            </p>
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+              <span className="font-mono text-[11px] text-muted-foreground">
+                Calls <code className="text-foreground">compare_coffee_machines</code> on the same store
+              </span>
+              <Button
+                variant="accent"
+                size="sm"
+                disabled={busy}
+                onClick={() =>
+                  void run(
+                    "compare_coffee_machines",
+                    { maxWidth: 32, fitting: "58 mm" },
+                    "simulator",
+                  )
+                }
+              >
+                <Sparkles />
+                Find the right fit
+              </Button>
+            </div>
+          </div>
         </div>
+
         <aside
-          className="flex flex-col border-t bg-muted/30 p-5 sm:p-7 lg:border-t-0 lg:border-l"
+          className="pg-well content-start"
           aria-label="Coffee demo assistant and cart"
         >
-          <div className="mb-4 flex items-center justify-between">
-            <span className="flex items-center gap-2 text-xs font-medium">
-              <Braces className="size-4" /> Try a tool
+          <div className="pg-well-head">
+            <span className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground">
+              <ShoppingBag className="size-4 text-muted-foreground" aria-hidden />
+              Your selection
             </span>
-            <span className="rounded-md border px-2 py-1 text-[10px] text-muted-foreground">
-              Simulation
-            </span>
+            <Badge size="sm" tone={active ? "info" : "neutral"}>
+              {active ? (cart.filter ? "2 items" : "1 item") : "Empty"}
+            </Badge>
           </div>
-          <p className="text-lg leading-7 tracking-tight">
-            “Two flat whites. A 32 cm counter. Keep my 58 mm accessories.”
-          </p>
-          <p className="mt-3 text-xs leading-5 text-muted-foreground">
-            This guided call uses the same tools as a browser agent. No AI
-            connection required.
-          </p>
-          <Button
-            className="mt-5 w-full"
-            disabled={busy}
-            onClick={() =>
-              void run(
-                "compare_coffee_machines",
-                { maxWidth: 32, fitting: "58 mm" },
-                "simulator",
-              )
-            }
-          >
-            Find the right fit
-          </Button>
-          <div className="my-6 border-t" />
-          <div className="flex items-center justify-between text-sm font-medium">
-            <span>Your selection</span>
-            <ShoppingBag className="size-4" />
-          </div>
+
           {active ? (
-            <div className="mt-4 space-y-4">
-              <div className="flex justify-between gap-2 text-sm">
-                <span>{active.name}</span>
-                <span>{money(active.price)}</span>
-              </div>
+            <div className="grid gap-3.5">
+              <dl className="pg-kv">
+                <div className="pg-kv-row">
+                  <dt>Machine</dt>
+                  <dd>{active.name}</dd>
+                </div>
+                <div className="pg-kv-row">
+                  <dt>Price</dt>
+                  <dd>{money(active.price)}</dd>
+                </div>
+              </dl>
+
               <Button
-                variant="outline"
-                className="w-full justify-between py-3 text-left"
+                variant={cart.filter ? "secondary" : "outline"}
+                className="h-auto w-full justify-between py-2.5 text-left"
                 onClick={() =>
                   void run("set_coffee_filter", { included: !cart.filter })
                 }
                 aria-pressed={cart.filter}
               >
-                <span>
-                  {cart.filter ? "Filter added" : "Add compatible filter"}
-                  <span className="mt-1 block text-xs font-normal text-muted-foreground">
+                <span className="grid gap-0.5">
+                  <span className="text-xs font-medium">
+                    {cart.filter ? "Filter added" : "Add compatible filter"}
+                  </span>
+                  <span className="font-mono text-[11px] font-normal text-muted-foreground">
                     Universal · €24
                   </span>
                 </span>
-                {cart.filter ? <Minus /> : <Plus />}
+                {cart.filter ? <Minus className="size-3.5" /> : <Plus className="size-3.5" />}
               </Button>
-              <div className="flex justify-between border-t pt-4 text-sm font-medium">
+
+              <div className="flex items-baseline justify-between border-t border-[var(--fui-separator)] pt-3 text-sm font-semibold tabular-nums text-foreground">
                 <span>Total</span>
                 <span>{money(total)}</span>
               </div>
+
               <Button
-                variant="outline"
                 className="w-full"
+                size="sm"
                 onClick={() => void run("review_coffee_cart", {})}
               >
                 Review selection
               </Button>
-              <p className="text-[11px] leading-5 text-muted-foreground">
-                Demo only. No payment or order is created.
+
+              <p className="m-0 font-mono text-[11px] leading-4 text-muted-foreground">
+                Demo only · no payment or order is created.
               </p>
             </div>
           ) : (
-            <div className="my-5 rounded-xl border border-dashed p-5 text-sm leading-6 text-muted-foreground">
-              Choose a machine from the comparison. Your selection appears here.
+            <div className="pg-inset text-xs leading-5 text-muted-foreground">
+              Choose a machine from the comparison below to inspect pricing, accessories and human review.
             </div>
           )}
+
           {saved && (
-            <Alert variant="success" className="mt-4">
+            <Alert variant="success">
               <AlertDescription>Selection saved for this demo.</AlertDescription>
             </Alert>
           )}
-          <div className="mt-auto pt-6">
+
+          <div className="border-t border-[var(--fui-separator)] pt-3">
             <details className="text-xs">
-              <summary className="cursor-pointer py-2 text-muted-foreground">
+              <summary className="cursor-pointer font-mono text-[11px] text-muted-foreground hover:text-foreground">
                 Activity · {mcp.executions.length} actions
               </summary>
               <ol
-                className="mt-2 max-h-48 space-y-3 overflow-y-auto"
+                className="mt-2.5 grid max-h-40 gap-2 overflow-y-auto p-0 list-none"
                 aria-label="Coffee tool activity"
               >
                 {mcp.executions.slice(0, 5).map((e) => (
                   <li
                     key={e.id}
-                    className="break-words rounded-lg border bg-background p-3"
+                    className="grid gap-1 rounded-[var(--fui-radius-sm)] border border-[var(--fui-separator)] bg-card px-2.5 py-2"
                   >
-                    <div className="mb-1 flex justify-between text-xs text-muted-foreground">
-                      <span>
+                    <div className="flex items-center justify-between gap-2 font-mono text-[10px] text-muted-foreground">
+                      <span className="inline-flex items-center gap-1.5">
+                        <StatusDot
+                          tone={
+                            e.status === "success"
+                              ? "success"
+                              : e.status === "error"
+                                ? "danger"
+                                : "info"
+                          }
+                          label={e.status}
+                          hideLabel
+                        />
                         {e.source === "agent"
                           ? "Browser agent"
                           : e.source === "simulator"
@@ -476,23 +561,30 @@ function CoffeeWorkbench() {
                       </span>
                       <span>{e.status}</span>
                     </div>
-                    <code>{e.name}</code>
+                    <code className="truncate font-mono text-[11px] text-foreground">
+                      {e.name}
+                    </code>
                   </li>
                 ))}
               </ol>
             </details>
           </div>
+
           {(error || mcp.error) && (
-            <p role="alert" className="mt-3 text-xs text-destructive">
+            <p role="alert" className="m-0 text-xs text-[var(--fui-danger-ink)]">
               {error || mcp.error}
             </p>
           )}
         </aside>
       </div>
+
+      <CoffeeComparison store={store} />
+
       <CoffeeReviewDialog store={store} />
     </div>
   );
 }
+
 export function CoffeeReviewDialog({ store }: { store: CoffeeStore }) {
   const { review, setReview, setSaved, active, cart, total } = store;
   return (
@@ -504,12 +596,14 @@ export function CoffeeReviewDialog({ store }: { store: CoffeeStore }) {
       confirmLabel="Save demo selection"
       onConfirm={() => setSaved(true)}
     >
-      <div className="flex justify-between rounded-xl bg-muted p-4 text-sm">
-        <span>
+      <div className="flex items-baseline justify-between rounded-[var(--fui-radius-md)] border border-[var(--fui-separator)] bg-[var(--fui-surface-inset)] px-4 py-3 text-sm">
+        <span className="text-foreground">
           {active?.name}
           {cart.filter ? " + water filter" : ""}
         </span>
-        <strong>{money(total)}</strong>
+        <strong className="font-mono tabular-nums text-foreground">
+          {money(total)}
+        </strong>
       </div>
     </ConfirmationDialog>
   );

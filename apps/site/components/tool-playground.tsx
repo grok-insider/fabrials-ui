@@ -1,6 +1,7 @@
 "use client";
 import { useId, useState } from "react";
-import { Badge, Label, NativeSelect } from "@fabrials/ui";
+import { Terminal } from "lucide-react";
+import { Badge, Label, NativeSelect, StatusDot } from "@fabrials/ui";
 import { useWebMCP } from "@/registry/webmcp/provider";
 import { ArgumentsForm } from "@/registry/components/arguments-form";
 import { ExecutionLog } from "@/registry/components/execution-log";
@@ -17,15 +18,31 @@ export function ToolPlayground() {
         <div>
           <h3>Take the agent&apos;s seat</h3>
           <p>
-            Edit a tool&apos;s inputs, execute it against the live interface above, then make a manual correction.
+            Invoke any registered WebMCP tool directly against the live interface above, then make a manual edit.
           </p>
         </div>
-        <Badge tone="info" size="sm">
-          Local WebMCP runner
-        </Badge>
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge tone="neutral" size="sm">
+            {mcp.tools.length} {mcp.tools.length === 1 ? "tool" : "tools"}
+          </Badge>
+          <Badge tone={mcp.support === "native" ? "success" : "info"} dot size="sm">
+            {mcp.support === "native" ? "Native WebMCP" : "Local WebMCP runner"}
+          </Badge>
+        </div>
       </div>
-      <div className="grid min-w-0 gap-8 lg:grid-cols-2">
-        <div className="min-w-0 space-y-4">
+
+      <div className="pg-split-even">
+        <div className="pg-well">
+          <div className="pg-well-head">
+            <span className="inline-flex items-center gap-2 font-mono text-[11px] text-muted-foreground">
+              <Terminal className="size-3.5" aria-hidden />
+              Tool invocation
+            </span>
+            {tool && (
+              <code className="font-mono text-[11px] text-foreground">{tool.name}</code>
+            )}
+          </div>
+
           <div className="grid gap-1.5">
             <Label htmlFor={id}>Available tool</Label>
             <NativeSelect
@@ -41,9 +58,10 @@ export function ToolPlayground() {
               ))}
             </NativeSelect>
           </div>
+
           {tool && (
             <>
-              <p className="text-sm leading-6 text-muted-foreground">{tool.description}</p>
+              <p className="m-0 text-xs leading-relaxed text-muted-foreground">{tool.description}</p>
               <ArgumentsForm
                 key={tool.name}
                 schema={tool.inputSchema}
@@ -52,12 +70,21 @@ export function ToolPlayground() {
               />
             </>
           )}
-          <p className="font-mono text-xs leading-5 text-muted-foreground">
-            Runs the same handler as native WebMCP. No connected AI is required.
-          </p>
+
+          <div className="pg-status-strip">
+            <StatusDot
+              tone="info"
+              label="Runs the same handler as native WebMCP · no connected AI required"
+            />
+          </div>
         </div>
-        <div className="min-w-0 max-h-[480px] overflow-auto">
-          <ExecutionLog executions={mcp.executions} onClear={mcp.clearHistory} onCancel={mcp.cancel} />
+
+        <div className="pg-well max-h-[30rem] overflow-auto">
+          <ExecutionLog
+            executions={mcp.executions}
+            onClear={mcp.clearHistory}
+            onCancel={mcp.cancel}
+          />
         </div>
       </div>
     </section>

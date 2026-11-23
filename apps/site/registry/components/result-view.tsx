@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Button } from "@fabrials/ui";
 import { cn } from "@/lib/utils";
+
 export function safeUrl(value: unknown): string | undefined {
   if (typeof value !== "string") return;
   try {
@@ -11,26 +12,28 @@ export function safeUrl(value: unknown): string | undefined {
     return;
   }
 }
+
 function Json({ value }: { value: unknown }) {
   return (
-    <pre className="max-h-96 overflow-auto whitespace-pre-wrap break-words rounded-lg bg-muted/70 p-4 font-mono text-xs leading-relaxed">
+    <pre className="m-0 max-h-96 overflow-auto whitespace-pre-wrap break-words rounded-[var(--fui-radius-md)] border border-[var(--fui-separator)] bg-[var(--fui-code)] p-3.5 font-mono text-xs leading-relaxed">
       {JSON.stringify(value, null, 2) ?? String(value)}
     </pre>
   );
 }
+
 function Content({ value }: { value: unknown }) {
   if (!value || typeof value !== "object") return <Json value={value} />;
   const block = value as Record<string, unknown>;
   if (block.type === "text" && typeof block.text === "string")
     return (
-      <p className="whitespace-pre-wrap break-words text-sm leading-relaxed">
+      <p className="m-0 whitespace-pre-wrap break-words text-sm leading-relaxed text-foreground">
         {block.text}
       </p>
     );
   if (block.type === "resource_link" && safeUrl(block.uri))
     return (
       <a
-        className="text-sm underline underline-offset-4"
+        className="text-sm text-[var(--brand-ink)] underline underline-offset-4"
         href={safeUrl(block.uri)}
         target="_blank"
         rel="noopener noreferrer"
@@ -45,7 +48,7 @@ function Content({ value }: { value: unknown }) {
   ) {
     const resource = block.resource as Record<string, unknown>;
     return typeof resource.text === "string" ? (
-      <pre className="max-h-80 overflow-auto whitespace-pre-wrap text-xs">
+      <pre className="m-0 max-h-80 overflow-auto whitespace-pre-wrap rounded-[var(--fui-radius-md)] border border-[var(--fui-separator)] bg-[var(--fui-code)] p-3.5 font-mono text-xs">
         {resource.text}
       </pre>
     ) : (
@@ -68,7 +71,7 @@ function Content({ value }: { value: unknown }) {
           <img
             src={src}
             alt="Tool result"
-            className="max-h-80 max-w-full rounded-md object-contain"
+            className="max-h-80 max-w-full rounded-[var(--fui-radius-md)] object-contain"
           />
         </picture>
       );
@@ -80,6 +83,7 @@ function Content({ value }: { value: unknown }) {
   }
   return <Json value={value} />;
 }
+
 export function ResultView({
   result,
   className,
@@ -97,10 +101,11 @@ export function ResultView({
     : Array.isArray(object?.contents)
       ? object.contents
       : null;
+
   return (
-    <div className={cn("space-y-3", className)}>
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-medium text-muted-foreground">
+    <div className={cn("grid gap-2.5", className)}>
+      <div className="flex items-center justify-between gap-2">
+        <span className="font-mono text-[11px] text-muted-foreground">
           Result
         </span>
         <Button

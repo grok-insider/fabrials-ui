@@ -1,12 +1,15 @@
 "use client";
 import { useId, useRef, useState, type ReactNode } from "react";
-import { Button } from "@fabrials/ui";
+import { Check } from "lucide-react";
+import { Alert, AlertDescription, Button } from "@fabrials/ui";
 import { errorMessage } from "@/registry/mcp/types";
+
 export interface WizardStep {
   title: string;
   content: ReactNode;
   validate?: () => string | null | Promise<string | null>;
 }
+
 export function Wizard({
   steps,
   step,
@@ -22,49 +25,86 @@ export function Wizard({
   const region = useRef<HTMLDivElement>(null);
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
-  const current = steps[Math.max(0, Math.min(step, steps.length - 1))];
+  const clamped = Math.max(0, Math.min(step, steps.length - 1));
+  const current = steps[clamped];
   if (!current) return null;
+
   return (
-    <section className="space-y-6">
-      <ol className="flex flex-wrap gap-5" aria-label="Progress">
-        {steps.map((item, i) => (
-          <li
-            key={i}
-            aria-current={i === step ? "step" : undefined}
-            className={`flex items-center gap-2 text-xs ${i === step ? "text-foreground" : "text-muted-foreground"}`}
-          >
-            <span
-              className={`flex size-6 items-center justify-center rounded-full border tabular-nums ${i === step ? "border-transparent bg-[var(--brand)] text-[var(--brand-foreground)]" : ""}`}
+    <section className="grid gap-5">
+      <ol
+        className="m-0 flex flex-wrap items-center gap-2 border-b border-[var(--fui-separator)] pb-4 list-none p-0"
+        aria-label="Progress"
+      >
+        {steps.map((item, i) => {
+          const isCurrent = i === clamped;
+          const isDone = i < clamped;
+          return (
+            <li
+              key={i}
+              aria-current={isCurrent ? "step" : undefined}
+              className={`flex items-center gap-2 text-xs ${
+                isCurrent
+                  ? "font-medium text-foreground"
+                  : isDone
+                    ? "text-foreground"
+                    : "text-muted-foreground"
+              }`}
             >
-              {i + 1}
-            </span>
-            {item.title}
-          </li>
-        ))}
+              <span
+                className={`flex size-6 items-center justify-center rounded-full border font-mono text-[11px] tabular-nums transition-colors ${
+                  isCurrent
+                    ? "border-transparent bg-[var(--brand)] text-[var(--brand-foreground)]"
+                    : isDone
+                      ? "border-[color-mix(in_oklab,var(--fui-success-ink)_35%,transparent)] bg-[color-mix(in_oklab,var(--success)_var(--fui-tint-strength),var(--card))] text-[var(--fui-success-ink)]"
+                      : "border-border bg-[var(--fui-surface-inset)] text-muted-foreground"
+                }`}
+              >
+                {isDone ? <Check className="size-3.5" aria-hidden /> : i + 1}
+              </span>
+              <span>{item.title}</span>
+              {i < steps.length - 1 && (
+                <span
+                  aria-hidden="true"
+                  className={`mx-1 h-px w-5 sm:w-8 ${
+                    isDone ? "bg-[var(--brand-ink)]" : "bg-[var(--fui-separator)]"
+                  }`}
+                />
+              )}
+            </li>
+          );
+        })}
       </ol>
+
       <div
         ref={region}
         tabIndex={-1}
         aria-labelledby={id}
-        className="space-y-4 outline-none"
+        className="grid gap-4 outline-none"
       >
-        <h3 id={id} className="font-medium">
-          {current.title}
-        </h3>
+        <div className="flex items-baseline justify-between gap-3">
+          <h3 id={id} className="m-0 text-base font-medium tracking-tight text-foreground">
+            {current.title}
+          </h3>
+          <span className="font-mono text-[11px] tabular-nums text-muted-foreground">
+            Step {clamped + 1} of {steps.length}
+          </span>
+        </div>
         {current.content}
       </div>
+
       {error && (
-        <p role="alert" className="text-sm text-destructive">
-          {error}
-        </p>
+        <Alert variant="destructive" role="alert">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
       )}
-      <div className="flex justify-between">
+
+      <div className="flex items-center justify-between gap-3 border-t border-[var(--fui-separator)] pt-4">
         <Button
           variant="outline"
-          disabled={step === 0 || pending}
+          disabled={clamped === 0 || pending}
           onClick={() => {
             setError("");
-            onStepChange(step - 1);
+            onStepChange(clamped - 1);
           }}
         >
           Back
@@ -80,8 +120,8 @@ export function Wizard({
                 setError(invalid);
                 return;
               }
-              if (step < steps.length - 1) {
-                onStepChange(step + 1);
+              if (clamped < steps.length - 1) {
+                onStepChange(clamped + 1);
                 region.current?.focus();
               } else await onComplete();
             } catch (e) {
@@ -93,7 +133,7 @@ export function Wizard({
         >
           {pending
             ? "Working…"
-            : step === steps.length - 1
+            : clamped === steps.length - 1
               ? "Complete"
               : "Continue"}
         </Button>
