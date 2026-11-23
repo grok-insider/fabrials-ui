@@ -4,6 +4,7 @@ Run this before saying UI work is done. Report each item as checked, not applica
 
 ## 1. Rules
 
+- [ ] Full-canvas layout: page shells, headers, footers, landings, playgrounds, docs and dashboards fill 100 % of the viewport width with disciplined edge gutters (`clamp(1.25rem, 2.5vw, 3rem)` or `--fui-page-padding`), no narrow `1200–1520px` centred wrappers, prose measure capped at `65ch`–`72ch` only on text blocks.
 - [ ] The screen follows its recipe in `layout.md` (landing, index, docs, workspace, settings, sign-in, states).
 - [ ] Components come from `@fabrials/ui` / `@fabrials/ai-ui` (or registry shims and blocks); no re-implemented control, no edited `vendor/` copy.
 - [ ] The anti-slop checks in `style-rules.md` pass; run the `rg` scan on the changed files and review every hit.
@@ -65,7 +66,7 @@ Check each changed screen:
 - [ ] Light and dark, both designed (not one inverted into the other).
 - [ ] 390 x 844: one column, 16 px gutter, 44 px targets, menus in sheets, nothing clipped.
 - [ ] 768 and 1440 px: layout switches where `layout.md` says.
-- [ ] 2560 x 1315 at DPR 1 (the owner's screen): content still starts at the left gutter; no centred island, no stretched card rows, prose keeps its measure.
+- [ ] 2560 x 1440 / 2560 x 1315 at DPR 1 (the owner's screen): full-canvas edge-to-edge rhythm with disciplined gutters and zero empty horizontal side wings; grids, heroes, tables, playgrounds and showcases expand proportionally while prose keeps its `65ch`–`72ch` measure.
 - [ ] No horizontal page scroll at any size (`scrollWidth <= innerWidth`); wide tables scroll inside their labelled region.
 - [ ] Dither: text on the calm side or a solid surface; the canvas fades into the surface behind it in both themes; at most one `DitherBand`.
 - [ ] 200 % text size: nothing overlaps or clips.

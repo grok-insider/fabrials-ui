@@ -62,12 +62,9 @@ export function SiteHeader() {
     </>
   );
 
-  const isContained = path === "/" || path.startsWith("/playground");
-
   return (
     <FuiSiteHeader
       data-site-header
-      className={isContained ? "site-header-contained" : undefined}
       brand={
         <div className="flex items-center gap-2.5">
           <Link href="/" className="text-foreground no-underline">

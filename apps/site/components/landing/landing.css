@@ -1,14 +1,14 @@
-/* Landing & playground composition: full-bleed atmospheric bands with centered 1520px content rhythm. */
+/* Full-canvas landing & shell composition: 100% viewport width with disciplined edge gutters. */
 :root {
-  --site-max-width: 95rem;
-  --landing-gutter: clamp(1.25rem, 3vw, 3rem);
+  --site-gutter: clamp(1.25rem, 2.5vw, 3rem);
+  --landing-gutter: var(--site-gutter);
 }
 
-.site-header-contained .fui-site-header-inner {
+.fui-site-header[data-site-header] .fui-site-header-inner {
   width: 100%;
-  max-width: var(--site-max-width);
-  margin-inline: auto;
-  padding-inline: var(--landing-gutter);
+  max-width: none;
+  margin-inline: 0;
+  padding-inline: var(--site-gutter);
 }
 
 .landing-main {
@@ -20,15 +20,13 @@
   position: relative;
   isolation: isolate;
   width: 100%;
-  padding-inline: var(--landing-gutter);
+  padding-inline: var(--site-gutter);
   padding-block: clamp(3rem, 5.2vw, 4.75rem) clamp(3.25rem, 5.8vw, 5.25rem);
   overflow: clip;
 }
 
 .landing-hero .fui-grid-guides {
-  inset-inline: var(--landing-gutter);
-  max-width: var(--site-max-width);
-  margin-inline: auto;
+  inset-inline: var(--site-gutter);
 }
 
 .landing-hero-storm.fui-dither-scene {
@@ -40,12 +38,10 @@
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: minmax(0, 1.02fr) minmax(0, 1.12fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
   align-items: start;
-  gap: var(--fui-space-8) clamp(2rem, 4.5vw, 4.5rem);
+  gap: var(--fui-space-8) clamp(2rem, 3.5vw, 4.5rem);
   width: 100%;
-  max-width: var(--site-max-width);
-  margin-inline: auto;
 }
 
 .landing-hero-copy {
@@ -54,7 +50,6 @@
   gap: var(--fui-space-5);
   min-width: 0;
   width: 100%;
-  max-width: 42rem;
 }
 
 .landing-hero-copy > * {
@@ -82,10 +77,11 @@
 
 .landing-hero-title {
   margin: 0;
+  max-inline-size: 16ch;
   font-family: var(--fui-font-display);
-  font-size: clamp(2.125rem, 5.2vw, 4.625rem);
+  font-size: clamp(2.25rem, 4.8vw, 5.25rem);
   font-weight: var(--fui-weight-semibold);
-  line-height: 0.96;
+  line-height: 0.95;
   letter-spacing: -0.02em;
   text-wrap: balance;
   color: var(--foreground);
@@ -93,7 +89,7 @@
 
 .landing-hero-lead {
   margin: 0;
-  max-width: 50ch;
+  max-inline-size: 62ch;
   color: var(--muted-foreground);
   font-size: 1.0625rem;
   line-height: 1.65;
@@ -102,7 +98,7 @@
 .landing-hero-install {
   min-width: 0;
   width: 100%;
-  max-width: min(34rem, 100%);
+  max-width: min(44rem, 100%);
 }
 
 .landing-hero-actions {
@@ -282,14 +278,12 @@
 .landing-section {
   width: 100%;
   border-block-start: 1px solid var(--border);
-  padding-inline: var(--landing-gutter);
+  padding-inline: var(--site-gutter);
   padding-block: clamp(3rem, 5.2vw, 4.5rem);
 }
 
 .landing-section-inner {
   width: 100%;
-  max-width: var(--site-max-width);
-  margin-inline: auto;
 }
 
 .landing-section-head {
@@ -304,7 +298,7 @@
 .landing-section-title-group {
   display: grid;
   gap: var(--fui-space-2);
-  max-width: 44rem;
+  min-width: 0;
 }
 
 .landing-label-voice {
@@ -319,7 +313,7 @@
 .landing-section-title {
   margin: 0;
   font-family: var(--fui-font-display);
-  font-size: clamp(1.75rem, 2.8vw, 2.25rem);
+  font-size: clamp(1.75rem, 2.8vw, 2.375rem);
   font-weight: var(--fui-weight-semibold);
   line-height: 1.08;
   letter-spacing: -0.015em;
@@ -329,6 +323,7 @@
 
 .landing-section-lead {
   margin: 0;
+  max-inline-size: 68ch;
   color: var(--muted-foreground);
   font-size: var(--fui-text-md);
   line-height: 1.6;
@@ -344,7 +339,7 @@
 
 .landing-pillar {
   display: grid;
-  grid-template-columns: 4.5rem minmax(11rem, 1.3fr) minmax(0, 2.5fr) auto;
+  grid-template-columns: 4.5rem minmax(13rem, 1.2fr) minmax(0, 2.8fr) auto;
   align-items: baseline;
   gap: var(--fui-space-3) var(--fui-space-6);
   padding-block: var(--fui-space-5);
@@ -388,6 +383,7 @@
 
 .landing-pillar-desc p {
   margin: 0;
+  max-inline-size: 68ch;
   color: var(--muted-foreground);
   font-size: var(--fui-text-sm);
   line-height: 1.6;
@@ -582,7 +578,7 @@
 /* ----------------------------------------------------------- closing band */
 .landing-close {
   display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.5fr) auto;
   align-items: center;
   gap: var(--fui-space-6);
   padding: var(--fui-space-6);
@@ -590,6 +586,10 @@
   border-radius: var(--fui-radius-plate);
   background: var(--card);
   box-shadow: var(--fui-shadow-xs), var(--fui-highlight);
+}
+
+.landing-close p {
+  max-inline-size: 68ch;
 }
 
 .landing-close-actions {
@@ -609,14 +609,12 @@
   display: grid;
   gap: var(--fui-space-8);
   width: 100%;
-  max-width: var(--site-max-width);
-  margin-inline: auto;
-  padding: var(--fui-space-10) var(--landing-gutter) var(--fui-space-8);
+  padding: var(--fui-space-10) var(--site-gutter) var(--fui-space-8);
 }
 
 .site-footer-columns {
   display: grid;
-  grid-template-columns: minmax(0, 1.6fr) repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1.8fr) repeat(2, minmax(0, 1fr));
   gap: var(--fui-space-8);
 }
 
@@ -624,11 +622,11 @@
   display: grid;
   align-content: start;
   gap: var(--fui-space-3);
-  max-width: 34ch;
 }
 
 .site-footer-brand p {
   margin: 0;
+  max-inline-size: 48ch;
   color: var(--muted-foreground);
   font-size: var(--fui-text-sm);
   line-height: 1.6;
@@ -690,6 +688,12 @@
 }
 
 /* -------------------------------------------------------------- responsive */
+@media (min-width: 1800px) {
+  .orders-layout {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.15fr);
+  }
+}
+
 @media (max-width: 1080px) {
   .landing-hero-grid {
     grid-template-columns: minmax(0, 1fr);

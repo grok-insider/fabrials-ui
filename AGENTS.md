@@ -42,7 +42,7 @@ A piece is done when all of this is true. Recent complete examples to copy from:
 
 - Read `DESIGN.md`, then use the `fabrials-design-system` skill: its `references/` hold the layout recipes, which component to use, the style rules as checks and the QA checklist. `DESIGN.md` wins over the skill; report a conflict instead of working around it.
 - The rules agents break most:
-  - Nothing is centred on the page; content anchors to `--fui-page-padding` and wide screens keep the free space on the right.
+  - Full-canvas layout: pages fill 100 % of the viewport width with disciplined edge gutters (`clamp(1.25rem, 2.5vw, 3rem)` or `--fui-page-padding`). Never clamp page shells, headers, landings, playgrounds, docs or dashboards to narrow centred containers (`1200–1520px`); constrain measure (`65–72ch`) only on long-form prose blocks or intentionally small modal/auth cards, and let grids, tables and showcases expand proportionally across `2560×1440` and ultrawide screens.
   - Lists of products or features are index rows, not grids of identical cards; never a plate inside a plate.
   - Stormlight is the only interaction colour; primary buttons are ink; a gem signs its product's mark and nothing else. Tokens only.
   - Radii 4/6/8/10/12/16 px, states as tints, sentence case, no uppercase eyebrows, no `→` on buttons or links, no gradient or glow except the working light while something works.

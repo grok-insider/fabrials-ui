@@ -23,7 +23,7 @@
 }
 .demo-body {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 22rem;
+  grid-template-columns: minmax(0, 1fr) clamp(22rem, 26vw, 34rem);
   min-width: 0;
 }
 .demo-stage {

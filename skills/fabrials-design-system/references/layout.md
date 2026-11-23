@@ -4,9 +4,10 @@ Page anatomy for the surfaces Fabrials builds. Each recipe names the components,
 
 ## The frame every page shares
 
-- **Gutter.** Page content starts at `--fui-page-padding`: 24 px, and 16 px below 768 px (`tokens.css`). Headers, sections and footers use the same gutter, so their left edges line up.
-- **No centred page column.** Never `mx-auto`, `margin-inline: auto`, `justify-content: center` or `text-center` on a page container, hero or section. A reading limit is a `max-width` on the text block (`max-w-[38rem]`, `max-width: 68ch`), anchored left.
-- **Wide screens get room, not an island.** At 1440 and 2560 px, tables, rows and panels grow; prose keeps its measure and the rest of the row stays free on the right or goes to a panel. Do not wrap the page in an 80rem centred box. `--fui-content` (80rem) is a cap for a text block or a form, never a centred container.
+- **Full-canvas width, disciplined gutters.** Every page shell, header, footer, landing, playground, documentation frame and dashboard fills **100 % of the available viewport width** with disciplined edge gutters: `clamp(1.25rem, 2.5vw, 3rem)` for public sites, landings and playgrounds, or `--fui-page-padding` (`24 px`, `16 px` below `768 px`) in compact app workspaces. Headers, sections and footers share the same gutter so their edges line up across the full canvas.
+- **Never clamp or centre the page shell.** Never wrap a page container, header, hero, section, playground or dashboard in a narrow centred box (`max-width: 1200px / 1440px / 1520px`, `max-w-7xl`, `mx-auto`, `margin-inline: auto`, `justify-content: center` or `text-center` on a page column). Empty 500 px side wings on `2560×1440` and ultrawide screens are a defect.
+- **Constrain prose measure, not the container.** Limit line length **only** on individual long-form prose blocks (`max-inline-size: 65ch` to `72ch`) or intentionally small modal/auth cards. `--fui-content` (`80rem`) is an optional cap for a single form stack (such as settings), never a centred page wrapper.
+- **Wide screens (`>= 1600px` / `2560px`) expand proportionally.** Let multi-column grids, hero showcases, interactive consoles, component catalogues, API reference tables, playgrounds and order showcases use the full viewport width while prose paragraphs stay at `65ch`–`72ch`.
 - **Sections** are separated by a hairline and vertical space (`border-t py-14` on the site home), not by boxes.
 - **Headings.** Hero: display face 44 to 96 px, `leading-[0.94]`. Page title: `PageHeader` (display, 32 px, with a mono `eyebrow` for the period or source). Marketing section title: display 28 to 30 px (`font-display text-[1.875rem] leading-tight font-semibold`). Subsections: 16 px semibold (`SectionHeader`).
 - **Instrument details (0.11).** Figures end in a `CardCaption`; labels and readings use the label voice (`font-label text-[11px]`, `--fui-text-label`). `CornerMarks` and `GridGuides` belong to brand moments only (a landing hero, a sign-in figure). See `DESIGN.md` › "Instrument details".
@@ -87,7 +88,7 @@ import { Button, Card, CardCaption, CornerMarks, DitherScene, GridGuides, Snippe
 - `GridGuides` is the section's first child; the section must be positioned. It follows `--fui-page-padding` and hides under 768 px.
 - The scene inside the plate is absolute: its box needs `position: relative; isolation: isolate`. `variant="hero"` across the whole section (the front entering from the right, `left: 40%`) is still allowed where a plate does not fit; text stays on the calm side.
 - The scene's `reveal` (1200 ms by default, skipped under reduced motion) is the page's one orchestrated moment. Nothing else on the page animates on load.
-- On phones the plate moves below the text, full width. On very wide screens it stops at 46rem, anchored to its column.
+- On phones the plate moves below the text, full width. On wide screens (`>= 1600px` / `2560px`) the hero split and specimen plate expand proportionally across the full canvas while the lead paragraph keeps its reading measure (`<= 68ch`).
 - A command can replace the button (`PackageInstall` or `Snippet`), as on ui.fabrials.com.
 - References: `stories/instrument.stories.tsx` › Landing with `stories/instrument.css`; the 0.7 composition in `stories/highstorm.stories.tsx`.
 
@@ -135,14 +136,14 @@ At most one band per view. Set `--fui-dither-bg` to the surface the canvas sits 
 
 The ui.fabrials.com docs are the reference (`apps/site/components/docs/docs-shell.tsx`, `docs-toc.tsx`, `docs.css`, `apps/site/lib/docs-nav.ts`). They are site code, not package exports: adapt them, keep the structure.
 
-- **Frame.** `SiteHeader` on top; below it a three-column grid: `minmax(17.5rem, 1fr) minmax(0, 56rem) minmax(16rem, 1fr)`. The frame (`DocsFrame`) stays mounted between pages so the sidebar keeps its scroll and open groups.
-- **Sidebar panel.** Its `--sidebar` background and right hairline run to the window's left edge; the navigation sits against the article. Contents, top to bottom: search button (`Search` + `Kbd` Ctrl K), the library switcher, collapsible groups, a `RepoInfo` link.
+- **Frame.** `SiteHeader` spans 100 % on top; below it a full-canvas three-column grid: `var(--docs-sidebar) minmax(0, 1fr) var(--docs-toc)` (`17.5rem` / `1fr` / `15.5rem`, widening to `19rem` / `1fr` / `17.5rem` from `1800 px`). The sidebar anchors to the left viewport edge, the page index anchors to the right viewport edge, and the main column fills the full remaining canvas with zero dead side wings. The frame (`DocsFrame`) stays mounted between pages so the sidebar keeps its scroll and open groups.
+- **Sidebar panel.** Its `--sidebar` background and right hairline sit flush at the window's left edge. Contents, top to bottom: search button (`Search` + `Kbd` Ctrl K), the library switcher, collapsible groups, a `RepoInfo` link.
 - **Library switcher.** A `DropdownMenu` whose trigger shows the root's mark (`DitherGem` for Fabrials UI, a lucide icon or initials for others), title and one-line description, with a check on the current root. Roots: guides, Fabrials UI, WebMCP & MCP, all libraries, each library.
 - **Navigation groups.** `Collapsible` per group; pages hang off a 1 px hairline rail; the current page has `aria-current="page"`, an `--accent` background and a 2 px Stormlight bar on the rail.
-- **Article.** `PageHeader` with `eyebrow` as sentence-case context (a breadcrumb such as "Components / Controls"), title, description and the page's actions; then content in a single column where prose stops at 80ch and code, tables and previews take the full column; then a previous/next pager.
-- **Page index.** "On this page" as a thread: an SVG line that steps in for subsections with a short diagonal; the stretch covering the sections on screen is Stormlight and ends in a dot; a "Back to top" link. Below 1280 px it becomes an inline collapsible above the content.
+- **Article.** `PageHeader` with `eyebrow` as sentence-case context (a breadcrumb such as "Components / Controls"), title, description and the page's actions; then content filling the full main column where prose paragraphs and lists keep a `68ch`–`72ch` measure while code panels, API tables, live previews and component index grids take the full column width; then a previous/next pager.
+- **Page index.** "On this page" as a thread anchored to the right edge: an SVG line that steps in for subsections with a short diagonal; the stretch covering the sections on screen is Stormlight and ends in a dot; a "Back to top" link. Below 1280 px it becomes an inline collapsible above the content.
 - **Phones.** Below 1024 px the sidebar becomes a start-side dialog opened from a sticky phone bar ("Browse docs" + search); the pager stacks below 640 px.
-- **Large screens.** From 1800 px the columns widen (sidebar 18.5rem, article 60rem, index 17rem) and reading type grows to 16 px; the line length does not.
+- **Large screens.** From 1800 px the sidebar (`19rem`) and page index (`17.5rem`) widen slightly, reading type grows to 16 px, and the centre column continues expanding across the full viewport while prose paragraphs keep their `68ch`–`72ch` measure.
 - Code samples use `CodePanel`, `CodeTabs` and `PackageInstall`; file trees use `Files`; callouts use `Alert`. Syntax colours are the muted `--fui-syntax-*` inks, never Stormlight.
 
 ## App workspace
@@ -357,5 +358,5 @@ Every collection and panel has these states. Put them where the content would be
 - 390 px: one column, 16 px gutter, no sideways scroll, 44 px targets (segmented toggles and tabs keep their look and get a 44 px hit area there), the storm below the hero text, menus in sheets.
 - 768 px: gutter 24 px, sidebar visible, settings in two columns.
 - 1440 px: the everyday desktop; the visual suite's widest size.
-- 2560 x 1315: the owner's screen. Content still starts at the left gutter; tables and rows use the width; prose keeps its measure; no giant empty centred column and no stretched 3-up card rows.
+- 2560 x 1440 / 2560 x 1315: the owner's screen. Full-canvas width with disciplined edge gutters (`clamp(1.25rem, 2.5vw, 3rem)`) and ZERO empty horizontal side wings; heroes, tables, grids, playgrounds and showcases expand proportionally across the viewport; prose paragraphs keep their `65ch`–`72ch` measure; no clamped `1200–1520px` centred island.
 - 200 % text size: nothing clips or overlaps.

@@ -74,7 +74,7 @@ Scale tokens: `--fui-text-label` 11, `xs` 12, `sm` 14, `md` 16, `lg` 18, `xl` 20
 - Numbers use tabular figures (shared components already do; add `tabular-nums` to hand-made figures).
 - Headings use `text-wrap: balance` (`text-balance`).
 - Sentence case everywhere: headings, buttons, menu items, table headers.
-- Prose measure: descriptions stop at 68ch (`.fui-description`), docs prose at 80ch, a hero lead near 46ch.
+- Prose measure: constrain line length **only** on individual prose blocks (`max-inline-size: 65ch`–`72ch`; `.fui-description` stops at `68ch`, a hero lead near `50ch`–`62ch`). Never shrink the page container to cap prose width.
 
 ## Space and density
 
@@ -156,7 +156,7 @@ Scale tokens: `--fui-text-label` 11, `xs` 12, `sm` 14, `md` 16, `lg` 18, `xl` 20
 
 The owner rejects the generic AI-generated look. Each rule has a check.
 
-1. **No centred content layouts.** Page containers, heroes and sections anchor to the left gutter. Check: no `mx-auto`, `margin-inline: auto`, `margin: 0 auto`, `justify-center`/`items-center` on a page column, no `text-center` hero or section. Centring is allowed inside a component (an empty state in a bounded region, a toast on a phone).
+1. **Full-canvas layout — no narrow clamped or centred page shells.** Page shells, headers, footers, landings, playgrounds, docs and dashboards fill 100 % of the viewport width with disciplined edge gutters (`clamp(1.25rem, 2.5vw, 3rem)` or `--fui-page-padding`). Check: no `max-width: 1200px / 1440px / 1520px`, `max-w-6xl`/`max-w-7xl`, `mx-auto`, `margin-inline: auto`, `margin: 0 auto` or `text-center` on a page shell, header, hero or section leaving dead horizontal wings on `2560×1440` displays. Constrain measure (`max-inline-size: 65ch`–`72ch`) only on individual prose blocks or intentionally small modal/auth cards; centring is allowed only inside a bounded component (an empty state, a toast on a phone).
 2. **No pill clutter.** Badges, counts and chips are soft 6 px tags tinted by their tone, with a round dot. Check: no `rounded-full` badge or chip; at most one pill per view, only for a passive label that must stand out; not every row carries a badge.
 3. **No card grid of identical cards.** Products and features are index rows (mark, name, one line, link). Check: no `grid-cols-3` of cards with an icon, title, blurb and "Learn more"; no bento layouts.
 4. **No cards in cards.** Check: a `Card` or bordered box never contains another bordered box; group with space and soft dividers inside one plate.

@@ -1,10 +1,8 @@
-/* Playground composition: 0.12 calibrated layout aligned to --site-max-width, single-plate stages, zero plate-in-plate clutter. */
+/* Playground composition: 0.12 full-canvas layout, single-plate stages, zero plate-in-plate clutter. */
 
 .playground-main {
   width: 100%;
-  max-width: var(--site-max-width, 95rem);
-  margin-inline: auto;
-  padding: clamp(2rem, 4vw, 3.25rem) var(--landing-gutter, var(--fui-page-padding)) clamp(3rem, 5vw, 4.5rem);
+  padding: clamp(2rem, 3.5vw, 3.25rem) var(--site-gutter, clamp(1.25rem, 2.5vw, 3rem)) clamp(3rem, 5vw, 4.5rem);
 }
 
 .playground-head {
@@ -13,9 +11,9 @@
 
 .playground-layout {
   display: grid;
-  grid-template-columns: 17.5rem minmax(0, 1fr);
+  grid-template-columns: clamp(16.5rem, 16vw, 20rem) minmax(0, 1fr);
   align-items: start;
-  gap: var(--fui-space-8);
+  gap: clamp(1.5rem, 2.5vw, 2.5rem);
 }
 
 .playground-mobile-select {
@@ -290,6 +288,7 @@
 
 .playground-tool-runner-head p {
   margin: 2px 0 0;
+  max-inline-size: 68ch;
   color: var(--muted-foreground);
   font-size: var(--fui-text-xs);
   line-height: 1.5;
@@ -329,7 +328,7 @@
 
 .pg-split-wide {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 20rem;
+  grid-template-columns: minmax(0, 1.45fr) clamp(20rem, 24vw, 30rem);
   gap: var(--fui-space-5);
   align-items: start;
 }

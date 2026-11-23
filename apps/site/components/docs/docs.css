@@ -1,8 +1,7 @@
 .docs {
   --docs-top: 57px;
   --docs-sidebar: 17.5rem;
-  --docs-content: 56rem;
-  --docs-toc: 16rem;
+  --docs-toc: 15.5rem;
   color: var(--foreground);
   font-family: var(--fui-font-sans);
   font-size: var(--fui-text-sm);
@@ -13,16 +12,17 @@
 }
 
 /* Grid */
-/* Three columns: the sidebar panel (its background runs to the window's left
-   edge, the navigation sits against the content), the reading column, and the
-   page index. Wide screens grow the outer columns and the type, not the lines. */
+/* Full-canvas three-column frame: sidebar pinned to the left edge, page index
+   pinned to the right edge, and the main column expanding across the full
+   viewport width while prose paragraphs keep a comfortable reading measure. */
 .docs-body {
   display: grid;
-  grid-template-columns: minmax(var(--docs-sidebar), 1fr) minmax(0, var(--docs-content)) minmax(var(--docs-toc), 1fr);
+  grid-template-columns: var(--docs-sidebar) minmax(0, 1fr) var(--docs-toc);
+  width: 100%;
 }
 .docs-sidebar-column {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   min-width: 0;
   border-right: 1px solid var(--border);
   background: var(--sidebar);
@@ -42,7 +42,7 @@
   display: grid;
   align-content: start;
   gap: var(--fui-space-4);
-  width: var(--docs-sidebar);
+  width: 100%;
   padding: var(--fui-space-5) var(--fui-space-4) var(--fui-space-6);
 }
 .docs-sidebar-repo {
@@ -50,8 +50,9 @@
   margin-top: var(--fui-space-2);
 }
 .docs-toc {
-  width: var(--docs-toc);
+  width: 100%;
   padding: var(--fui-space-10) var(--fui-space-6) var(--fui-space-6);
+  border-left: 1px solid var(--fui-separator);
 }
 
 /* Library switcher */
@@ -225,7 +226,7 @@
 /* Article */
 .docs-main {
   min-width: 0;
-  padding: var(--fui-space-10) var(--fui-space-12) var(--fui-space-16);
+  padding: var(--fui-space-10) clamp(1.5rem, 3vw, 3.5rem) var(--fui-space-16);
   outline: none;
 }
 .docs-article {
@@ -262,7 +263,7 @@
 /* Prose only: the paragraphs a component draws inside a preview or an example keep its own type and spacing. */
 .docs-section p:not(:where(.docs-preview-stage *, .docs-example-stage *)) {
   margin: 0;
-  max-width: 80ch;
+  max-inline-size: 68ch;
   color: color-mix(in oklab, var(--foreground) 82%, var(--muted-foreground));
   line-height: 1.7;
 }
@@ -313,10 +314,10 @@ h3.docs-heading {
 }
 .docs-prose > * {
   margin: 0;
-  max-width: 80ch;
+  max-inline-size: 70ch;
 }
 .docs-prose > :is(.docs-code, .fui-table-scroll, figure, div) {
-  max-width: none;
+  max-inline-size: none;
 }
 .docs-prose > h2.docs-heading {
   margin-top: var(--fui-space-6);
@@ -529,13 +530,13 @@ h3.docs-heading {
   width: 100%;
 }
 .docs .docs-props-col-name {
-  width: 23%;
+  width: 20%;
 }
 .docs .docs-props-col-type {
-  width: 27%;
+  width: 28%;
 }
 .docs .docs-props-col-desc {
-  width: 50%;
+  width: 52%;
 }
 .docs .docs-props td {
   vertical-align: top;
@@ -926,12 +927,11 @@ h3.docs-heading {
   min-height: 2.75rem;
 }
 
-/* Large screens: more room and a reading size to match. */
+/* Large screens: wider navigation rails and reading type while the main column fills the canvas. */
 @media (min-width: 1800px) {
   .docs {
-    --docs-sidebar: 18.5rem;
-    --docs-content: 60rem;
-    --docs-toc: 17rem;
+    --docs-sidebar: 19rem;
+    --docs-toc: 17.5rem;
   }
   .docs-prose,
   .docs-section p:not(:where(.docs-preview-stage *, .docs-example-stage *)) {
