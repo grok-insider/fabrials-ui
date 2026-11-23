@@ -1912,11 +1912,25 @@ export const uiCatalog: UiCatalogItem[] = [
     "A cut gem filled with dithered light: the product mark in navigation, lists and empty states.",
     ["DitherGem"],
     [
-      ["gem", "GemName", "The product's gem: stormlight, heliodor, sapphire, ruby, emerald, zircon, smokestone or amethyst."],
+      ["gem", "GemName", "The product's gem: stormlight, sapphire, smokestone, ruby, diamond, emerald, garnet, zircon, amethyst, topaz or heliodor."],
       ["size", "number", "Box size in CSS pixels: 16, 20, 28 or 40 in interfaces, larger beside a hero."],
       ["reveal", "number", "Large marks only: fills with light once on first paint."],
     ],
     "Decorative (aria-hidden). Always pair it with the product name.",
+  ),
+  ui(
+    "radiant-glyph",
+    "Radiant glyph",
+    "Brand",
+    "Canonical bilaterally symmetrical glyphs for the ten Orders of the Knights Radiant, paired with their polestones.",
+    ["RadiantGlyph", "RADIANT_ORDERS", "RADIANT_ORDER_MAP"],
+    [
+      ["order", "RadiantOrder", "windrunner, skybreaker, dustbringer, edgedancer, truthwatcher, lightweaver, elsecaller, willshaper, stoneward or bondsmith."],
+      ["size", "number", "Width and height in CSS pixels (24 by default). Crisp from 16 px icons to plate scale."],
+      ["colored", "boolean", "Paint the glyph in its order's canonical polestone token (--gem) instead of inheriting currentColor."],
+      ["title", "string", "Accessible name. Without it the glyph is decorative (aria-hidden)."],
+    ],
+    "Server-safe pure SVG (viewBox 0 0 64 64) mirrored across the central axis for exact Vorin symmetry. RADIANT_ORDERS exports the ten canonical orders in Double Eye sequence with their polestone, Surges and Herald.",
   ),
   ui(
     "corner-marks",

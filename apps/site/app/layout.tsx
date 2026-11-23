@@ -11,10 +11,10 @@ export const metadata: Metadata = {
     template: "%s · Fabrials UI",
   },
   description:
-    "The Fabrials design system as a shadcn registry: Fabrials components, shims and license-checked components from other open-source libraries.",
+    "The Fabrials design system and shadcn registry: calibrated React 19 + Base UI components, agent UI primitives, shims and canonical Stormlight marks.",
   openGraph: {
     title: "Fabrials UI",
-    description: "The Fabrials design system, ready to install with shadcn.",
+    description: "Calibrated interfaces for products and agents — @fabrials/ui, @fabrials/ai-ui and shadcn registry.",
   },
 };
 export default function RootLayout({

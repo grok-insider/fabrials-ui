@@ -113,6 +113,8 @@ import {
   placeholderList,
   placeholderText,
   ProductLockup,
+  RADIANT_ORDERS,
+  RadiantGlyph,
   RadioGroup,
   RadioGroupItem,
   RelativeTime,
@@ -140,14 +142,16 @@ import { Frame } from "@/components/demo-frame";
  */
 
 const GEMS: [GemName, string][] = [
-  ["stormlight", "Radiant"],
-  ["heliodor", "fabrials.com"],
-  ["sapphire", "Syl"],
-  ["ruby", "Spanreed"],
-  ["emerald", "X Tracker"],
-  ["zircon", "Fabrials UI"],
-  ["smokestone", "News"],
-  ["amethyst", "ai.fabrials.com"],
+  ["sapphire", "Windrunner · Syl"],
+  ["smokestone", "Skybreaker · News"],
+  ["ruby", "Dustbringer · Spanreed"],
+  ["diamond", "Edgedancer · Wyndle"],
+  ["emerald", "Truthwatcher · X Tracker"],
+  ["garnet", "Lightweaver · Lightweave"],
+  ["zircon", "Elsecaller · Fabrials UI"],
+  ["amethyst", "Willshaper · ai.fabrials.com"],
+  ["topaz", "Stoneward · Foundation"],
+  ["heliodor", "Bondsmith · fabrials.com"],
 ];
 
 // Fixed "now" so server and client render the same relative times.
@@ -489,7 +493,7 @@ export const moreDemos: Record<string, () => ReactNode> = {
     <Frame>
       <div className="flex flex-wrap items-center gap-8">
         <DitherGem gem="zircon" size={96} reveal={1200} />
-        <ul className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm sm:grid-cols-4">
+        <ul className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm sm:grid-cols-3 md:grid-cols-5">
           {GEMS.map(([gem, product]) => (
             <li key={gem} className="flex items-center gap-2.5">
               <DitherGem gem={gem} size={20} />
@@ -501,6 +505,22 @@ export const moreDemos: Record<string, () => ReactNode> = {
           ))}
         </ul>
       </div>
+    </Frame>
+  ),
+  "radiant-glyph": () => (
+    <Frame width="wide">
+      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+        {RADIANT_ORDERS.map((item) => (
+          <li
+            key={item.order}
+            className="flex flex-col items-center gap-2 rounded-(--fui-radius-md) border bg-card p-3 text-center"
+          >
+            <RadiantGlyph order={item.order} size={36} colored title={`${item.name} glyph`} />
+            <span className="text-xs font-medium text-foreground">{item.name}</span>
+            <span className="font-mono text-[11px] capitalize text-muted-foreground">{item.gem}</span>
+          </li>
+        ))}
+      </ul>
     </Frame>
   ),
   "dither-canvas": () => (
