@@ -6,7 +6,7 @@ Fabrials UI 0.12 "Instrument with life" (the look that began with 0.11) is the s
 
 1. **One interaction light.** Stormlight blue marks what you can act on and where you are: focus, links, checked controls, the active navigation item, the first data series. Nothing else is blue, apart from the working light while something works (principle 2).
 2. **Light is dithered, or it is work.** Fabrials are gems that hold stormlight. On screen, brand light is an ordered dither on canvas. The one other light is the working light: while an agent works or something loads, a band of light turns along an edge or crosses a label, and it goes out when the work ends. Nothing else glows.
-3. **Borderless surfaces, grouped by space.** Screens breathe directly on the canvas like calibrated instruments (following the restraint of x.ai and opencode.ai): slate surfaces, borderless tonal plates with soft corners, text at working sizes. Separate structure with **space first**, **subtle tonal surface shifts second** (`--card` vs `--background`), and **whisper-quiet single-axis hairlines (`--fui-separator`) third** (e.g. between table rows or section splits). Never wrap divs, cards, stat strips, tables, code panels, banners, filter bars or state panels in 4-sided `border: 1px solid` boxes or resting drop-shadow frames; reserve enclosed 1 px edges strictly for floating overlays (`Dialog`, `Popover`, `DropdownMenu`, `Command`, `Tooltip`), explicit `outline` buttons, active focus rings (`--fui-focus`) and `forced-colors: active`. One tonal plate with soft dividers beats boxes inside boxes, and a state is a tint, not a bordered box.
+3. **Borderless surfaces, architectural hairlines, zero nested boxes.** Screens breathe directly on a pure monochrome carbon canvas (`#0a0a0a` dark / `#fbfbfb` light, following the restraint of x.ai and opencode.ai): zero blue-grey tint on neutral chrome, sharp architectural geometry (2/4/6/8 px), and borderless tonal plates. Separate structure with **space first**, **whisper-quiet single-axis or flush grid hairlines (`--fui-separator`) second**, and **calm neutral carbon tonal shifts (`--card` vs `--background`) third**. Never wrap divs, cards, stat strips, tables, code panels, banners, filter bars or state panels in 4-sided `border: 1px solid` boxes or resting drop-shadow frames, and never nest a dark rounded box inside a floating rounded card; multi-item catalogues and matrices sit in flush `opencode.ai`-style hairline grids (`gap: 1px; background: var(--fui-separator)`, `border-radius: 0` cells on `--background` lifting to `--card` on hover). Reserve enclosed 1 px edges strictly for floating overlays (`Dialog`, `Popover`, `DropdownMenu`, `Command`, `Tooltip`), explicit `outline` buttons, active focus rings (`--fui-focus`) and `forced-colors: active`. A state is a tint, not a bordered box.
 4. **Say what happened.** A stale value is not a fresh one; a configured connection is not a reachable one. Errors say what went wrong and what to do; empty states invite the next action.
 5. **Accessible by default.** Every control has a name, a visible focus and a keyboard path. Colour always travels with text or a symbol.
 6. **Small pieces, owned by the host.** Shared components present; products own routing, requests, authentication and storage. Compose small components instead of adding a universal one with dozens of flags.
@@ -15,29 +15,30 @@ Fabrials UI 0.12 "Instrument with life" (the look that began with 0.11) is the s
 
 ## Colour
 
-Deep Stormwall: cold slate taken almost to black in the dark theme and almost to white in the light one, so the content and Stormlight carry the contrast. The palette is the same in every product. Values below are the references; the tokens hold them in oklch. (0.7 to 0.9 used the lighter Stormwall `#161a21` and a grey `#eceeeb` page.)
+Monochrome Carbon Obsidian (dark) and Crisp Paper (light): true neutral achromatic surfaces (`chroma 0`) with zero blue-grey tint on chrome, so content and Stormlight carry the contrast cleanly like x.ai and opencode.ai. The palette is the same in every product. Values below are the references; the tokens hold them in oklch.
 
 | Role | Token | Light | Dark |
 | --- | --- | --- | --- |
-| Page | `--background` | `#f4f5f7` | Deep Stormwall `#08090b` |
-| Surface (borderless plates, panels) | `--card` | `#ffffff` | `#101218` |
-| Overlay (menus, dialogs) | `--popover` | `#ffffff` | `#161922` |
-| Sunken (code, wells) | `--muted`, `--fui-code` | `#eceef1`, `#eff1f4` | `#161922`, `#0d0f14` |
-| Hover | `--accent` | `#e7eaee` | `#1c202a` |
-| Hairline (single-axis dividers, overlays) | `--border` | `#e3e6ea` | `#20242d` |
-| Control boundary | `--fui-control-border` | `#858d98` | `#5e6672` |
+| Page | `--background` | Crisp paper `#fbfbfb` | Carbon obsidian `#0a0a0a` |
+| Sidebar | `--sidebar` | `#f7f7f7` | `#070707` |
+| Surface (borderless plates, panels) | `--card` | `#ffffff` | `#111111` |
+| Overlay (menus, dialogs) | `--popover` | `#ffffff` | `#151515` |
+| Sunken (code, wells) | `--muted`, `--fui-code` | `#efefef`, `#f2f2f2` | `#151515`, `#0d0d0d` |
+| Hover | `--accent` | `#eaeaea` | `#1c1c1c` |
+| Hairline (overlays, inputs) | `--border` | `#dedede` | `#242424` (`oklch(0.24 0 0)`) |
+| Control boundary | `--fui-control-border` | `#878787` | `#5a5a5a` |
 | Thumb of an off switch | `--fui-switch-thumb` | the surface | ink at 66 % on the sunken track, so the state reads at about 6:1 |
-| Soft divider (rows inside one plate) | `--fui-separator` | the hairline at 62 % on the surface | the same |
+| Architectural hairline (rows, flush grids, splits) | `--fui-separator` | `oklch(0 0 0 / 9%)` | `oklch(1 0 0 / 8%)` |
 | Inset band (a table head, a well) | `--fui-surface-inset` | ink at 3.5 % on the surface | the same |
 | Hover fill | `--fui-surface-hover` | ink at 4.5 % on the surface | the same |
 | Marks and guides | `--fui-mark`, `--fui-guide` | ink at half, hairline at 75 % | the same |
-| Ink | `--foreground`, `--primary` | `#0e1116` | Cold bone `#e8eae6` |
-| Secondary ink | `--muted-foreground` | `#565d68` | `#9399a2` |
+| Ink | `--foreground`, `--primary` | `#161616` | Crisp bone `#f2f2f2` |
+| Secondary ink | `--muted-foreground` | `#5c5c5c` | `#8e8e8e` |
 | Stormlight ink (text, focus) | `--brand-ink`, `--ring` | `#2459b3` | `#9cc4ff` |
 | Stormlight fill | `--brand` | `#2a63c4` | `#8fb8f5` |
 
 - **Primary actions are ink**: ink on paper in light mode, paper on ink in dark. Stormlight fills a button only when one action must stand out (`variant="accent"`).
-- **60, 30, 10.** About 60 % of a screen is the Stormwall page; about 30 % is the storm-slate layer (plates, sidebar, hover, hairlines, secondary ink), a cool blue slate one step above the page; at most 10 % is colour that means something: Stormlight for interaction and the status inks. A screen that is mostly accent, or where status colours outnumber Stormlight, is wrong.
+- **60, 30, 10.** About 60 % of a screen is the neutral carbon/paper canvas (`#0a0a0a` / `#fbfbfb`); about 30 % is the achromatic neutral stepping (plates, sidebar, hover, hairlines, secondary ink) with zero blue tint; at most 10 % is colour that means something: Stormlight for interaction and the status inks. A screen that is mostly accent, or where status colours outnumber Stormlight, is wrong.
 - **Status inks come from the gems, not the stock palette**: verdigris for success (oxidised emerald, hue 168), heliodor brass for warning (hue 70 to 82), garnet for danger (ruby, hue 24), each at a similar lightness and a restrained chroma, and each with a word or icon beside it (`--fui-success-ink`, `--fui-warning-ink`, `--fui-danger-ink`; fills `--success`, `--warning`, `--destructive`). No Tailwind green, amber or red. Chart hues follow the same family: Stormlight, verdigris, brass, garnet, amethyst, steel.
 - **A state is a tint.** A tinted surface mixes its tone into the card: an alert, a selected row and an error panel at `--fui-tint-strength` (8 % light, 12 % dark), a tag at `--fui-tint-strong` (13 %, 18 %), the edge at `--fui-tint-edge` (22 %, 28 %). The text on it is the tone's ink, so it keeps AA.
 - **The working light** is three gems, `--fui-light-1` to `-3` (Stormlight, zircon, amethyst). It paints only `WorkingLight`, `ShimmerText tone="light"` and the agent pieces of `@fabrials/ai-ui` while they work.
@@ -83,10 +84,10 @@ Numbers use tabular figures. Headings wrap with `text-wrap: balance`. Copy is se
 
 - Spacing follows a 4 px grid (`--fui-space-*`).
 - Controls are 40 px (`--fui-control-height`); small 32, extra small 28, large 44. `data-density="compact"` tightens controls to 32 px and collection rows, as a composition choice, not a stored preference. Narrow screens and coarse pointers keep 44 px targets.
-- **Soft corners, one scale.** 4 px for keys, kbd and small marks; 6 px for tags, chips and small controls; 8 px for controls (buttons, fields, selects, segments); 10 px for menus, popovers and the command palette; 12 px for plates (cards, stats, stat groups, tables, code panels and code blocks, alerts, state panels, toasts); 16 px for dialogs and sheets (`--fui-radius-xs` to `--fui-radius-2xl`, `--fui-radius-plate`). Dots, avatars, switches and meter tracks are round. Nothing rounder than 16 px except those.
-- **Borderless plates.** A plate is a calm tonal surface (`--card` over `--background`) with 12 px corners and **no 4-sided perimeter border or resting drop shadow**. What belongs together shares one tonal plate: a `StatGroup` is one borderless plate whose figures are divided by whisper-quiet single-axis lines (`--fui-separator`) that stop short of its edges; a table's head is an inset band inside its borderless plate with quiet row dividers; a card's footer and caption sit on the plate with no box around them; interactive cards answer hover with a smooth tonal surface lift (`--accent`) rather than a glowing or thickened border. Under `forced-colors: active`, structural plates recover a 1 px `CanvasText` edge so boundaries remain legible.
-- **Tags.** Badges are soft borderless tags: 6 px corners, a tint of their tone and the tone's ink, a round dot, and no inner box outline on neutral or tinted variants. The `outline` variant is the only one with an edge; `solid` is for the rare tag that must shout. Three sizes (18, 20 and 24 px); an icon is a 12 px glyph in the tag's ink before the word; a number on its own is a count, centred in a tag at least as wide as it is tall. A tag that is a link or a button deepens its tint under the pointer, and a pressed one keeps that tint with an edge in its colour.
-- Separate with space first, subtle tonal contrast second, and a whisper-quiet single-axis hairline third. Never wrap divs, cards, stat strips, tables, code panels, banners, filter bars or state panels in 4-sided borders, and never put a plate inside a plate.
+- **Sharp architectural geometry, one scale.** 2 px for keys, kbd and small marks (`--fui-radius-xs`); 4 px for tags, chips, small controls and structural plates (`--fui-radius-sm`, `--fui-radius-plate`); 6 px for controls, menus, popovers and the command palette (`--fui-radius-md`, `--fui-radius-lg`, `--radius`); 8 px for dialogs and sheets (`--fui-radius-2xl`). Dots, avatars, switches and meter tracks are round. Nothing rounder than 8 px except those.
+- **Borderless plates and flush architectural grids.** A plate is a calm neutral carbon surface (`--card` over `--background`) with sharp 4 px corners (`--fui-radius-plate`) and **no 4-sided perimeter border or resting drop shadow**. What belongs together shares one tonal plate: a `StatGroup` is one borderless plate whose figures are divided by whisper-quiet single-axis lines (`--fui-separator`) that stop short of its edges; a table's head is an inset band inside its borderless plate with quiet row dividers; a card's footer and caption sit on the plate with no box around them; interactive cards answer hover with a smooth tonal surface lift (`--accent`) rather than a glowing or thickened border. Multi-item catalogues and matrices use flush `opencode.ai`-style architectural hairline grids (`gap: 1px; background: var(--fui-separator)`, `border-radius: 0` cells on `--background` lifting to `--card` on hover) with zero nested dark boxes inside cells. Under `forced-colors: active`, structural plates recover a 1 px `CanvasText` edge so boundaries remain legible.
+- **Tags.** Badges are sharp borderless tags: 4 px corners, a tint of their tone and the tone's ink, a round dot, and no inner box outline on neutral or tinted variants. The `outline` variant is the only one with an edge; `solid` is for the rare tag that must shout. Three sizes (18, 20 and 24 px); an icon is a 12 px glyph in the tag's ink before the word; a number on its own is a count, centred in a tag at least as wide as it is tall. A tag that is a link or a button deepens its tint under the pointer, and a pressed one keeps that tint with an edge in its colour.
+- Separate with space first, whisper-quiet architectural hairlines (`--fui-separator`) second, and pure neutral tonal contrast (`--card` vs `--background`) third. Never wrap divs, cards, stat strips, tables, code panels, banners, filter bars or state panels in 4-sided borders, and never put a box inside a box (no nested dark stages inside floating cards).
 
 ## Material
 

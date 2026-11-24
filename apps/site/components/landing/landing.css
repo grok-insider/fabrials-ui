@@ -63,10 +63,10 @@
   gap: var(--fui-space-2-5);
   max-width: 100%;
   width: fit-content;
-  padding: var(--fui-space-1) var(--fui-space-3);
-  border: 0;
-  border-radius: var(--fui-radius-full);
-  background: var(--card);
+  padding: var(--fui-space-1) var(--fui-space-2-5);
+  border: 1px solid var(--fui-separator);
+  border-radius: var(--fui-radius-sm);
+  background: transparent;
   color: var(--muted-foreground);
   font-family: var(--fui-font-label);
   font-size: var(--fui-text-label);
@@ -148,9 +148,9 @@
 .landing-specimen {
   position: relative;
   overflow: hidden;
-  border: 0;
+  border: 1px solid var(--fui-separator);
   border-radius: var(--fui-radius-plate);
-  background: var(--card);
+  background: var(--background);
 }
 
 .landing-specimen-bar {
@@ -161,7 +161,7 @@
   gap: var(--fui-space-2) var(--fui-space-3);
   padding: var(--fui-space-3) var(--fui-space-4);
   border-block-end: 1px solid var(--fui-separator);
-  background: var(--fui-surface-inset);
+  background: var(--card);
 }
 
 .landing-specimen-brand {
@@ -251,8 +251,9 @@
   gap: var(--fui-space-3);
   padding: var(--fui-space-4);
   border: 0;
-  border-radius: var(--fui-radius-lg);
-  background: var(--background);
+  border-block-start: 1px solid var(--fui-separator);
+  border-radius: 0;
+  background: transparent;
 }
 
 .landing-specimen-controls {
@@ -402,7 +403,7 @@
   white-space: nowrap;
 }
 
-/* ----------------------------------------------------- ten orders plate */
+/* ----------------------------------------------------- ten orders matrix */
 .orders-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.95fr);
@@ -413,47 +414,64 @@
 .orders-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--fui-space-2-5);
+  gap: 1px;
   margin: 0;
   padding: 0;
+  border: 1px solid var(--fui-separator);
+  background: var(--fui-separator);
   list-style: none;
 }
 
+.orders-grid > li {
+  display: flex;
+  min-width: 0;
+  background: var(--background);
+}
+
 .order-button {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--fui-space-3);
   width: 100%;
-  padding: var(--fui-space-3) var(--fui-space-3-5, 0.875rem);
+  padding: var(--fui-space-3-5, 0.875rem) var(--fui-space-4);
   border: 0;
-  border-radius: var(--fui-radius-lg);
-  background: var(--card);
+  border-radius: 0;
+  background: var(--background);
   color: var(--foreground);
   text-align: start;
   cursor: pointer;
-  transition: background-color var(--fui-duration) var(--fui-ease);
+  transition: background-color var(--fui-duration-fast) var(--fui-ease);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .order-button:hover {
-    background: var(--accent);
+    background: var(--card);
   }
 }
 
 .order-button[aria-pressed="true"] {
-  background: color-mix(in oklab, var(--brand) var(--fui-tint-strength), var(--card));
-  box-shadow: inset 0 0 0 1.5px var(--brand-ink);
+  background: var(--card);
+}
+
+.order-button[aria-pressed="true"]::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 2px;
+  background: var(--brand-ink);
 }
 
 .order-button-glyph {
   display: grid;
   place-items: center;
   flex: none;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.25rem;
+  height: 2.25rem;
   border: 0;
-  border-radius: var(--fui-radius-md);
-  background: var(--background);
+  border-radius: 0;
+  background: transparent;
 }
 
 .order-button-text {
@@ -488,9 +506,9 @@
 }
 
 .order-specimen {
-  border: 0;
-  border-radius: var(--fui-radius-plate);
-  background: var(--card);
+  border: 1px solid var(--fui-separator);
+  border-radius: 0;
+  background: var(--background);
   overflow: hidden;
 }
 
@@ -502,7 +520,7 @@
   gap: var(--fui-space-5);
   padding: var(--fui-space-6);
   border-block-end: 1px solid var(--fui-separator);
-  background: var(--fui-surface-inset);
+  background: var(--card);
 }
 
 .order-specimen-mark {
@@ -514,11 +532,11 @@
 .order-specimen-well {
   display: grid;
   place-items: center;
-  width: 6.5rem;
-  height: 6.5rem;
+  width: 5.5rem;
+  height: 5.5rem;
   border: 0;
-  border-radius: var(--fui-radius-lg);
-  background: var(--card);
+  border-radius: 0;
+  background: transparent;
 }
 
 .order-specimen-scales {
@@ -554,7 +572,7 @@
   gap: var(--fui-space-2);
   padding: var(--fui-space-2) var(--fui-space-3);
   border: 0;
-  border-radius: var(--fui-radius-md);
+  border-radius: var(--fui-radius-sm);
   background: var(--fui-code);
   font-family: var(--fui-font-mono);
   font-size: var(--fui-text-xs);
@@ -572,10 +590,10 @@
   grid-template-columns: minmax(0, 1.5fr) auto;
   align-items: center;
   gap: var(--fui-space-6);
-  padding: var(--fui-space-6);
+  padding: 0;
   border: 0;
-  border-radius: var(--fui-radius-plate);
-  background: var(--card);
+  border-radius: 0;
+  background: transparent;
 }
 
 .landing-close p {

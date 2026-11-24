@@ -3,9 +3,10 @@
 .demo {
   overflow: clip;
   border: 0;
-  border-radius: var(--fui-radius-plate);
-  background: var(--card);
-  --fui-dither-bg: var(--card);
+  border-block: 1px solid var(--fui-separator);
+  border-radius: 0;
+  background: var(--background);
+  --fui-dither-bg: var(--background);
 }
 .demo-bar {
   display: flex;
@@ -15,6 +16,7 @@
   min-height: 3rem;
   padding: var(--fui-space-2) var(--fui-space-4);
   border-bottom: 1px solid var(--fui-separator);
+  background: var(--card);
 }
 .demo-bar-note {
   margin: 0;
@@ -38,7 +40,7 @@
   align-content: start;
   min-width: 0;
   border-left: 1px solid var(--fui-separator);
-  background: var(--background);
+  background: var(--sidebar);
 }
 .demo-side-head {
   display: flex;
@@ -82,7 +84,7 @@
   gap: var(--fui-space-6);
   margin: 0;
   padding-block: var(--fui-space-2);
-  border-block: 1px solid var(--border);
+  border-block: 1px solid var(--fui-separator);
 }
 .demo-needs div {
   display: flex;
@@ -151,7 +153,7 @@
   display: grid;
   gap: var(--fui-space-3);
   padding: var(--fui-space-3) var(--fui-space-4) var(--fui-space-4);
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--fui-separator);
 }
 .demo-controls {
   display: flex;
@@ -244,7 +246,7 @@
   justify-content: space-between;
   gap: var(--fui-space-3);
   padding-top: var(--fui-space-4);
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--fui-separator);
 }
 .demo-prompt {
   display: flex;
@@ -252,7 +254,7 @@
   gap: var(--fui-space-2);
   padding: var(--fui-space-3);
   border: 0;
-  border-radius: var(--fui-radius-md);
+  border-radius: var(--fui-radius-sm);
   background: var(--card);
 }
 .demo-prompt p {
@@ -277,7 +279,7 @@
 }
 .demo-call {
   padding-block: var(--fui-space-3);
-  border-block: 1px solid var(--border);
+  border-block: 1px solid var(--fui-separator);
 }
 .demo-call summary {
   font-size: var(--fui-text-sm);
@@ -290,7 +292,7 @@
     grid-template-columns: minmax(0, 1fr);
   }
   .demo-side {
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--fui-separator);
     border-left: 0;
   }
 }

@@ -55,7 +55,7 @@ test("the card caption is a slot in the label voice", () => {
   assert.match(styles, /\.fui-card-caption \{[^}]*font-family: var\(--fui-font-label\)/);
 });
 
-test("plates have 12 px corners and stay borderless and unshadowed at rest", () => {
+test("plates have sharp 4 px architectural corners and stay borderless and unshadowed at rest", () => {
   for (const selector of [".fui-card", ".fui-stat", ".fui-stat-group", ".fui-table-scroll", ".fui-code-panel"]) {
     const block = styles.match(new RegExp(`\\n  ${selector.replace(".", "\\.")} \\{([^}]*)\\}`))?.[1] ?? "";
     assert.match(block, /border-radius: var\(--fui-radius-plate\)/, selector);
@@ -64,7 +64,7 @@ test("plates have 12 px corners and stay borderless and unshadowed at rest", () 
   }
   const material = styles.slice(styles.indexOf("/*! 0.10 material."), styles.indexOf('/* 0.11 "Instrument with life"'));
   assert.doesNotMatch(material, /\.fui-card,\s*\.fui-stat,\s*\.fui-stat-group,\s*\.fui-table-scroll,\s*\.fui-code-panel/);
-  assert.match(tokens, /--fui-radius-plate: 0\.75rem;/);
+  assert.match(tokens, /--fui-radius-plate: 0\.25rem;/);
   assert.match(tokens, /--fui-font-label: var\(--fui-font-mono\);/);
 });
 

@@ -18,7 +18,6 @@ import {
   TextAlignStart,
 } from "lucide-react";
 import {
-  Badge,
   Button,
   Collapsible,
   CollapsibleContent,
@@ -362,13 +361,15 @@ export function DocsFrame({ children }: { children: ReactNode }) {
           aria-hidden="true"
           data-testid="docs-hover-preview"
         >
-          <div className="docs-hover-preview-head">
-            <span className="docs-hover-preview-title">{hovered.title}</span>
-            <Badge size="sm">{hovered.group}</Badge>
-          </div>
-          {hovered.description && <p className="docs-hover-preview-desc">{hovered.description}</p>}
           <div className="docs-hover-preview-stage" inert>
             <ComponentSpecimen slug={hovered.slug} category={hovered.group} title={hovered.title} />
+          </div>
+          <div className="docs-hover-preview-body">
+            <div className="docs-hover-preview-head">
+              <span className="docs-hover-preview-title">{hovered.title}</span>
+              <span className="docs-hover-preview-group">{hovered.group}</span>
+            </div>
+            {hovered.description && <p className="docs-hover-preview-desc">{hovered.description}</p>}
           </div>
         </div>
       )}

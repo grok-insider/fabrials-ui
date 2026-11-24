@@ -12,10 +12,10 @@ export const DITHER_BACKGROUND = "background";
 
 export type ThemeRamp = { light: string[]; dark: string[] };
 
-/** Slate and crem clouds with Stormlight at the core. */
+/** Neutral carbon obsidian and paper clouds with Stormlight at the core. */
 export const STORM_RAMP: ThemeRamp = {
-  dark: [DITHER_BACKGROUND, "#11141a", "#1b2029", "#2b323d", "#43474e", "#6f7d92", "#a9c3e8", "#dbe8ff"],
-  light: [DITHER_BACKGROUND, "#e2e5e8", "#c9ced4", "#a3abb5", "#7b8593", "#56606e", "#3a4351", "#2a63c4"],
+  dark: [DITHER_BACKGROUND, "#121212", "#1c1c1c", "#2c2c2c", "#424242", "#6e7a8c", "#a9c3e8", "#dbe8ff"],
+  light: [DITHER_BACKGROUND, "#e6e6e6", "#cecece", "#a8a8a8", "#7d7d7d", "#545454", "#383838", "#2a63c4"],
 };
 
 /** Gem colours as hex, for ramps (the CSS tokens are oklch). */
@@ -49,8 +49,8 @@ function mix(a: string, b: string, t: number): string {
 export function gemRamp(gem: GemHexName): ThemeRamp {
   const g = GEM_HEX[gem];
   return {
-    dark: [DITHER_BACKGROUND, mix("#08090b", g, 0.3), mix("#08090b", g, 0.62), g, mix(g, "#ffffff", 0.35), mix(g, "#ffffff", 0.75)],
-    light: [DITHER_BACKGROUND, mix("#f6f7f8", g, 0.35), mix("#f6f7f8", g, 0.7), g, mix(g, "#10131a", 0.35), mix(g, "#ffffff", 0.6)],
+    dark: [DITHER_BACKGROUND, mix("#0a0a0a", g, 0.3), mix("#0a0a0a", g, 0.62), g, mix(g, "#ffffff", 0.35), mix(g, "#ffffff", 0.75)],
+    light: [DITHER_BACKGROUND, mix("#fbfbfb", g, 0.35), mix("#fbfbfb", g, 0.7), g, mix(g, "#161616", 0.35), mix(g, "#ffffff", 0.6)],
   };
 }
 

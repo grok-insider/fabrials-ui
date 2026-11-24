@@ -114,7 +114,7 @@ import { DitherGem } from "@fabrials/ui";
 
 - The link names its destination ("Install Spanreed", "Read the Syl docs"), without an arrow.
 - Numbers in a leading column only when they are real counts (the site home shows component counts); numbered markers only for real sequences.
-- A catalogue of dozens of peer entries with search and filters (ui.fabrials.com `/components`) uses borderless tonal gallery tiles (`--card` over `--background`, generous gap, smooth tonal brighten on hover, zero perimeter borders) with live miniature component specimens.
+- A catalogue of dozens of peer entries with search and filters (ui.fabrials.com `/components`) uses a flush `opencode.ai`-style architectural hairline grid (`gap: 1px; background: var(--fui-separator)`, `border-radius: 0` cells sitting directly on `--background` and gently lifting to `--card` on hover) where each live miniature specimen floats directly on the open canvas with zero nested inner boxes.
 - `SuggestionGrid` is for empty-state prompts in a chat or workspace, not for listing products.
 
 ## Brand panel on a public page

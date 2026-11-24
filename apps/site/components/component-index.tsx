@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Badge, Button, SearchInput, StatePanel } from "@fabrials/ui";
+import { Button, SearchInput, StatePanel } from "@fabrials/ui";
 import { ComponentSpecimen } from "@/components/component-specimen";
 import { componentSections, type ComponentSection } from "@/lib/docs-nav";
 
@@ -93,7 +93,7 @@ export function ComponentIndex() {
       </div>
 
       {visible.map((section) => (
-        <section key={section.id} className="docs-section" aria-labelledby={section.id}>
+        <section key={section.id} className="docs-section docs-gallery-section" aria-labelledby={section.id}>
           <div className="docs-gallery-section-head">
             <h2 id={section.id} className="docs-heading">
               <a href={`#${section.id}`} className="docs-heading-anchor">
@@ -115,9 +115,7 @@ export function ComponentIndex() {
                       <Link href={`/docs/${item.slug}`} className="docs-gallery-link">
                         {item.title}
                       </Link>
-                      <Badge size="sm" className="docs-gallery-badge">
-                        {section.name}
-                      </Badge>
+                      <span className="docs-gallery-tag">{section.name}</span>
                     </div>
                     <p className="docs-gallery-description">{item.description}</p>
                   </div>

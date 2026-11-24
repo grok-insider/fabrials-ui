@@ -6,27 +6,27 @@ Values live in `packages/ui/src/tokens.css`; the reasons in `DESIGN.md`. This fi
 
 | Role | Token [Tailwind] | Light | Dark |
 | --- | --- | --- | --- |
-| Page | `--background` [`bg-background`] | `#f4f5f7` | Deep Stormwall `#08090b` |
-| Surface: borderless plates (cards, stats, tables), panels | `--card` [`bg-card`] | `#ffffff` | `#101218` |
-| Overlay: menus, dialogs | `--popover` [`bg-popover`] | `#ffffff` | `#161922` |
-| Sunken: code, wells | `--muted`, `--fui-code` [`bg-muted`] | `#eceef1`, `#eff1f4` | `#161922`, `#0d0f14` |
-| Hover | `--accent` [`bg-accent`] | `#e7eaee` | `#1c202a` |
-| Hairline: single-axis dividers, floating overlays | `--border` [`border-border`] | `#e3e6ea` | `#20242d` |
-| Soft divider: rows inside one plate | `--fui-separator` | the hairline at 62 % on the surface | the same |
+| Page | `--background` [`bg-background`] | Crisp paper `#fbfbfb` | Carbon obsidian `#0a0a0a` |
+| Surface: borderless plates (cards, stats, tables), panels | `--card` [`bg-card`] | `#ffffff` | `#111111` |
+| Overlay: menus, dialogs | `--popover` [`bg-popover`] | `#ffffff` | `#151515` |
+| Sunken: code, wells | `--muted`, `--fui-code` [`bg-muted`] | `#efefef`, `#f2f2f2` | `#151515`, `#0d0d0d` |
+| Hover | `--accent` [`bg-accent`] | `#eaeaea` | `#1c1c1c` |
+| Hairline: overlays, inputs | `--border` [`border-border`] | `#dedede` | `#242424` (`oklch(0.24 0 0)`) |
+| Architectural hairline: rows, flush grids, section splits | `--fui-separator` | `oklch(0 0 0 / 9%)` | `oklch(1 0 0 / 8%)` |
 | Inset band, hover fill | `--fui-surface-inset`, `--fui-surface-hover` | ink at 3.5 % and 4.5 % on the surface | the same |
 | Working light (only while something works) | `--fui-light-1`, `-2`, `-3` | Stormlight, zircon, amethyst | the same gems, lighter |
-| Control boundary | `--fui-control-border` [`border-control-border`] | `#858d98` | `#5e6672` |
+| Control boundary | `--fui-control-border` [`border-control-border`] | `#878787` | `#5a5a5a` |
 | Off switch thumb | `--fui-switch-thumb` | the surface | ink at 66 % on the track (about 6:1) |
 | Corner marks, grid guides (brand moments) | `--fui-mark`, `--fui-guide` | ink at half; hairline at 75 % | the same |
-| Ink, primary button | `--foreground`, `--primary` [`text-foreground`, `bg-primary`] | `#0e1116` | Cold bone `#e8eae6` |
-| Secondary ink | `--muted-foreground` [`text-muted-foreground`] | `#565d68` | `#9399a2` |
+| Ink, primary button | `--foreground`, `--primary` [`text-foreground`, `bg-primary`] | `#161616` | Crisp bone `#f2f2f2` |
+| Secondary ink | `--muted-foreground` [`text-muted-foreground`] | `#5c5c5c` | `#8e8e8e` |
 | Stormlight ink: links, focus, current item | `--brand-ink`, `--ring` [`text-brand-ink`] | `#2459b3` | `#9cc4ff` |
 | Stormlight fill: checked controls, accent button | `--brand` [`bg-brand`] | `#2a63c4` | `#8fb8f5` |
 | Selection and quiet Stormlight tints | `--brand-soft` [`bg-brand-soft`] | 10 % brand on card | 16 % brand on card |
 | Status inks (text, icons) | `--fui-success-ink`, `--fui-warning-ink`, `--fui-danger-ink` [`text-success-ink`, `text-warning-ink`, `text-danger-ink`] | | |
 | Status fills | `--success`, `--warning`, `--destructive` | | |
 | Series | `--chart-1` … `--chart-6` | | |
-| Sidebar surface | `--sidebar` and `--sidebar-*` [`bg-sidebar`] | | |
+| Sidebar surface | `--sidebar` and `--sidebar-*` [`bg-sidebar`] | `#f7f7f7` | `#070707` |
 | Product mark | `--gem` (from `data-gem`) [`text-gem`] | | |
 | Code syntax | `--fui-syntax-*` (muted gem inks) | | |
 
@@ -88,19 +88,18 @@ Scale tokens: `--fui-text-label` 11, `xs` 12, `sm` 14, `md` 16, `lg` 18, `xl` 20
 
 | Radius | Token [Tailwind] | For |
 | --- | --- | --- |
-| 4 px | `--fui-radius-xs` [`rounded-xs`] | Keys, kbd, inline code, small marks |
-| 6 px | `--fui-radius-sm` [`rounded-sm`] | Tags (`Badge`), counts, filter chips, menu items, tooltips, small buttons |
-| 8 px | `--fui-radius-md` [`rounded-md`] | Controls: buttons, inputs, selects, segments, sidebar rows |
-| 10 px | `--fui-radius-lg` [`rounded-lg`], `--radius` | Dropdown menus, popovers, the command palette |
-| 12 px | `--fui-radius-xl` [`rounded-xl`], `--fui-radius-plate` [`rounded-plate`] | Plates: `Card`, `Stat`, `StatGroup`, `Table`, code panels, alerts, state panels, toasts and host panels that hold figures |
-| 16 px | `--fui-radius-2xl` [`rounded-2xl`] | Dialogs and sheets, the sign-in card |
+| 2 px | `--fui-radius-xs` [`rounded-xs`] | Keys, kbd, inline code, small marks |
+| 4 px | `--fui-radius-sm` [`rounded-sm`], `--fui-radius-plate` [`rounded-plate`] | Tags (`Badge`), counts, filter chips, menu items, tooltips, small buttons, and borderless plates (`Card`, `Stat`, `StatGroup`, `Table`, code panels, alerts, state panels, toasts) |
+| 6 px | `--fui-radius-md` [`rounded-md`], `--fui-radius-lg` [`rounded-lg`], `--radius` | Controls (buttons, inputs, selects, segments), dropdown menus, popovers, the command palette |
+| 8 px | `--fui-radius-2xl` [`rounded-2xl`] | Dialogs and sheets, the sign-in card |
 
 - Round (`--fui-radius-full`) only what is round by nature: radio, switch, avatar, status and badge dots, progress and meter tracks, timeline dots, scrollbar thumbs, the play key.
-- Check: no `rounded-3xl`, `rounded-4xl`, no `rounded-full` on buttons, inputs, badges, chips or containers, no `border-radius` literal above 16 px.
+- Flush architectural hairline grid cells use `border-radius: 0`.
+- Check: no `rounded-3xl`, `rounded-4xl`, no `rounded-full` on buttons, inputs, badges, chips or containers, no `border-radius` literal above 8 px.
 
 ## Surfaces and elevation
 
-- **Borderless by default.** Never wrap divs, cards, stat strips, tables, code panels, banners, filter bars or state panels in 4-sided borders (`border: 1px solid`) or resting drop-shadow boxes. Group with **space first**, **subtle tonal surface shifts second** (`--card` over `--background`), and **whisper-quiet single-axis hairlines third** (`--fui-separator` between table rows, sidebar seam or section splits). Reserve enclosed 1 px edges strictly for floating overlays (`Dialog`, `Popover`, `DropdownMenu`, `Command`, `Tooltip`), explicit `outline` buttons, active focus rings (`--fui-focus`) and `forced-colors: active`. What belongs together shares one borderless plate; never a plate inside a plate.
+- **Borderless by default & zero nested boxes.** Never wrap divs, cards, stat strips, tables, code panels, banners, filter bars or state panels in 4-sided borders (`border: 1px solid`) or resting drop-shadow boxes, and never nest dark rounded boxes inside floating cards. Group with **space first**, **whisper-quiet `--fui-separator` architectural hairlines second** (single-axis splits or flush `gap: 1px; background: var(--fui-separator)` grids with `border-radius: 0` cells), and **pure neutral carbon tonal contrast (`--card` over `--background`) third**. Reserve enclosed 1 px edges strictly for floating overlays (`Dialog`, `Popover`, `DropdownMenu`, `Command`, `Tooltip`), explicit `outline` buttons, active focus rings (`--fui-focus`) and `forced-colors: active`. What belongs together shares one borderless plate; never a box inside a box.
 - A state is a soft tint of its tone mixed into the card (`--fui-tint-strength`, tags `--fui-tint-strong`), with the tone's ink for its text and icon. No outer box border or coloured side bars.
 - A band inside a plate (a table head, a toolbar well) is `--fui-surface-inset`; a hover fill is `--fui-surface-hover` or `--accent`. Interactive cards shift tonally on hover instead of highlighting a border.
 - Depth comes from the material tokens only (`DESIGN.md` › Material): elevation `--fui-shadow-xs/sm/md/lg` (on tactile controls, active segments and floating overlays — never resting structural plates), keys `--fui-bevel` + `--fui-sheen`, raised controls `--fui-highlight` + `--fui-sheen-soft`, wells `--fui-shadow-well`, `--fui-pressed`, `--fui-focus-halo`. Check: no hand-made `box-shadow` or gradient in product code.
@@ -163,7 +162,7 @@ The owner rejects the generic AI-generated look. Each rule has a check.
 5. **No eyebrow ALL-CAPS labels.** Check: no `uppercase`, no `tracking-wide`/`wider`/`widest`, no small coloured label above a heading. `PageHeader` `eyebrow` is sentence-case context (a period, a source, a breadcrumb) in the label voice and secondary ink.
 6. **No `→` appended to buttons or links.** Check: no `→`, `↗`, `»` or trailing `ArrowRight`/`ArrowUpRight`/`ChevronRight` icons in button or link labels; the label names the destination. Arrows that carry meaning are fine: previous/next pager, back to top, a trend in `Stat`, a disclosure chevron.
 7. **No gradient or glow decoration.** Check: no `bg-gradient-*`, `linear-gradient`/`radial-gradient` backgrounds, gradient text (`bg-clip-text text-transparent`), blurred colour blobs, coloured `drop-shadow` or neon borders. Brand light appears only as dither. The exceptions are the package's material tokens (`--fui-sheen`, `--fui-sheen-soft`) inside controls, the skeleton shimmer, and the working light (`WorkingLight`, `ShimmerText tone="light"`, the agent indicators), which shows only while something works.
-8. **Borderless tonal plates.** Check: structural plates (`Card`, `Stat`, `StatGroup`, `Table`, `CodePanel`, `Alert`, `StatePanel`) have 12 px corners (`--fui-radius-plate`) and clean tonal separation (`--card` on `--background`) with zero 4-sided perimeter borders or resting drop shadows; rows inside them are divided by whisper-quiet single-axis `--fui-separator` hairlines; enclosed 1 px edges appear only on floating overlays, `outline` buttons, focus rings and `forced-colors: active`.
+8. **Borderless tonal plates & flush hairline grids.** Check: structural plates (`Card`, `Stat`, `StatGroup`, `Table`, `CodePanel`, `Alert`, `StatePanel`) have sharp 4 px corners (`--fui-radius-plate`) and clean neutral carbon separation (`--card` on `--background`) with zero 4-sided perimeter borders or resting drop shadows; catalogues/matrices sit in flush `1px` `--fui-separator` hairline grids (`border-radius: 0` cells on `--background`, lifting to `--card` on hover) with zero nested inner boxes; enclosed 1 px edges appear only on floating overlays, `outline` buttons, focus rings and `forced-colors: active`.
 9. **One orchestrated motion per page.** Check: at most one `reveal`; no stagger-in on first paint, no floating elements, parallax, looping marquees or text that animates itself outside a working state; the only hover lift is a `Card` that is a link. Effects copied from animation libraries (React Bits and similar) are refused: their licences rarely allow a library to redistribute them, and their defaults break these rules; take the idea, write it with the motion tokens.
 10. **Reduced motion respected.** Check: with `prefers-reduced-motion: reduce` nothing moves except state changes; every custom animation has a reduced-motion path.
 11. **Both themes designed.** Check: screenshots of light and dark both read well; no literal `#hex`, `rgb()`, `hsl()` or Tailwind palette colours (`bg-slate-900`, `text-blue-600`) in product code.
