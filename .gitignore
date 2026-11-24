@@ -13,3 +13,5 @@ packages/*/LOBE-ICONS-LICENSE
 packages/ui/DESIGN.md
 packages/ui/verify.mjs
 packages/ui/integrity.mjs
+
+crates/*/target/
