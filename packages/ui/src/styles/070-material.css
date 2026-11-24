@@ -82,17 +82,17 @@
     box-shadow: var(--fui-shadow-xs), var(--fui-highlight);
   }
 
-  /* Segmented choices sit in a well; the chosen segment is a raised plate. */
+  /* Segmented choices sit flat on a subtle translucent track; the active choice steps up cleanly. */
   .fui-toggle-group,
   .fui-tabs-list[data-variant="segmented"] {
-    box-shadow: var(--fui-shadow-well);
+    box-shadow: none;
   }
   .fui-toggle-group[data-indicator]::before,
   .fui-tabs-plate,
   .fui-toggle[data-pressed],
   .fui-tabs-list[data-variant="segmented"] .fui-tab[data-active] {
-    background-image: var(--fui-sheen-soft);
-    box-shadow: var(--fui-shadow-xs), var(--fui-highlight);
+    background-image: none;
+    box-shadow: none;
   }
 
   /* Structural plates stay borderless and unshadowed at rest: tonal surface contrast separates them from the canvas. */
@@ -100,10 +100,10 @@
     box-shadow: none;
   }
 
-  /* Keys are keycaps. */
+  /* Keycaps stay crisp and flat on the monochrome carbon canvas. */
   .fui-kbd {
-    background-image: var(--fui-sheen-soft);
-    box-shadow: var(--fui-highlight);
+    background-image: none;
+    box-shadow: none;
   }
 
   /* Overlays come from their trigger's side and settle on a quick-out curve; they leave faster than they came.

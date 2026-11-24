@@ -72,9 +72,9 @@
   }
   .fui-code {
     padding: 0.0625rem 0.3125rem;
-    border: 1px solid var(--border);
+    border: 0;
     border-radius: var(--fui-radius-xs);
-    background: var(--fui-code);
+    background: color-mix(in oklab, var(--foreground) 6%, transparent);
     font-family: var(--fui-font-mono);
     font-size: 0.8125rem;
   }
@@ -1901,54 +1901,61 @@
   }
 
   /* -------------------------------------------------------- badge, status */
-  /* A badge is a soft tag: 6 px corners, a tint of its tone and the tone's ink, with no outline of its own (the outline variant
-     is the one with an edge). The dot is round. */
+  /* Architectural micro-tags (x.ai × opencode.ai): crisp mono voice, 2 px corners, zero box border on soft tags.
+     Status badges with a dot render open on the canvas with a 6 px square pixel mark beside colored mono text. */
   .fui-badge {
-    --fui-badge-ink: color-mix(in oklab, var(--foreground) 80%, var(--muted-foreground));
+    --fui-badge-ink: var(--muted-foreground);
     --fui-badge-solid: var(--muted-foreground);
-    --fui-badge-text: var(--fui-text-xs);
+    --fui-badge-text: 0.6875rem;
     display: inline-flex;
     align-items: center;
-    gap: 0.3125rem;
+    gap: 0.375rem;
     min-height: 1.25rem;
     padding: 0 0.4375rem;
-    border-radius: var(--fui-radius-sm);
-    background: color-mix(in oklab, var(--fui-badge-solid) var(--fui-tint-strong), var(--card));
+    border-radius: var(--fui-radius-xs);
+    background: color-mix(in oklab, var(--foreground) 6%, transparent);
     color: var(--fui-badge-ink);
+    font-family: var(--fui-font-mono);
     font-size: var(--fui-badge-text);
     font-weight: var(--fui-weight-medium);
     font-variant-numeric: tabular-nums;
-    letter-spacing: 0.005em;
+    letter-spacing: 0.02em;
     line-height: 1;
     white-space: nowrap;
   }
   .fui-badge[data-tone="info"] {
     --fui-badge-ink: var(--brand-ink);
     --fui-badge-solid: var(--brand);
+    background: color-mix(in oklab, var(--brand) 10%, transparent);
   }
   .fui-badge[data-tone="success"] {
     --fui-badge-ink: var(--fui-success-ink);
     --fui-badge-solid: var(--success);
+    background: color-mix(in oklab, var(--success) 10%, transparent);
   }
   .fui-badge[data-tone="warning"] {
     --fui-badge-ink: var(--fui-warning-ink);
     --fui-badge-solid: var(--warning);
+    background: color-mix(in oklab, var(--warning) 10%, transparent);
   }
   .fui-badge[data-tone="danger"] {
     --fui-badge-ink: var(--fui-danger-ink);
     --fui-badge-solid: var(--destructive);
+    background: color-mix(in oklab, var(--destructive) 11%, transparent);
   }
-  .fui-badge[data-tone]:not([data-tone="neutral"]):not([data-variant="solid"]):not([data-variant="outline"]) {
-    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--fui-badge-solid) 14%, transparent);
+  .fui-badge:has(> .fui-badge-dot):not([data-variant="solid"]):not([data-variant="outline"]):not(a):not(button) {
+    gap: 0.4375rem;
+    padding-inline: 0;
+    background: transparent;
   }
   .fui-badge[data-variant="outline"] {
     background: transparent;
-    box-shadow: inset 0 0 0 1px var(--border);
+    box-shadow: inset 0 0 0 1px var(--fui-separator);
   }
   .fui-badge[data-variant="solid"] {
     background: var(--fui-badge-ink);
     box-shadow: none;
-    color: var(--card);
+    color: var(--background);
   }
   /* 0.8: --fui-badge-solid (tint, hairline, dot) and --fui-badge-ink (text) are public: a tag whose colour is data sets
      them on the badge itself (a class or style; the badge declares them, so an ancestor's value does not reach it, which also keeps
@@ -1960,7 +1967,7 @@
     flex: none;
     width: 0.375rem;
     height: 0.375rem;
-    border-radius: var(--fui-radius-full);
+    border-radius: 1px;
     background: var(--fui-badge-dot, var(--fui-badge-solid));
   }
   .fui-badge-dot[data-hollow] {
@@ -2080,11 +2087,10 @@
   .fui-status-dot {
     position: relative;
     flex-shrink: 0;
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: var(--fui-radius-full);
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 1px;
     background: var(--fui-status-color);
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--fui-status-color) 20%, transparent);
   }
 
   /* ------------------------------------------------------------------ card */
@@ -3579,10 +3585,9 @@
     min-width: 1.25rem;
     height: 1.25rem;
     padding: 0 0.3125rem;
-    border: 1px solid var(--border);
-    border-bottom-width: 2px;
+    border: 0;
     border-radius: var(--fui-radius-xs);
-    background: var(--card);
+    background: color-mix(in oklab, var(--foreground) 7%, transparent);
     color: var(--muted-foreground);
     font-family: var(--fui-font-label);
     font-size: var(--fui-text-label);
