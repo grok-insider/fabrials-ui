@@ -1,0 +1,10 @@
+[package]
+name = "fabrials-theme"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+description = "Shared Fabrials UI 0.12 monochrome carbon & paper OKLCH tokens, radii, and type scale for native Rune apps"
+repository = "https://github.com/grok-insider/fabrials-ui"
+publish = false
+
+[dependencies]
